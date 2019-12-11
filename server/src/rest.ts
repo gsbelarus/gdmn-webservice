@@ -1,7 +1,10 @@
 import Koa from 'koa';
+import router from './roters';
 
 export async function init() {
   const app = new Koa();
+  
+  app.use(router.routes());
 
   const port = 3649;
 
