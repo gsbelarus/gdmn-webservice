@@ -8,15 +8,16 @@ router.get('/signup', ctx => getSignup(ctx));
 router.get('/authOrganization', ctx => getGetKeyAuthOrganization(ctx));
 
 const getLogin = (ctx: Context) => {
-  ctx.body = 'This login';
+  ctx.body = { status: 200, result: 'This login'};
 }
 
 const getSignup = (ctx: Context) => {
-  ctx.body = 'This signup';
+  ctx.body = { status: 200, result: 'This signup'};
 }
 
 const getGetKeyAuthOrganization = (ctx: Context) => {
   ctx.status = 200;
+  ctx.body = { status: 200, result: 'getKeyAuthOrganization'};
 }
 
 export default router;
