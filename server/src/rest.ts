@@ -1,8 +1,13 @@
 import Koa from 'koa';
+import koaCors from "@koa/cors";
 import router from './roters';
 
 export async function init() {
   const app = new Koa();
+
+  app.use(koaCors({
+		credentials: true
+	}));
   
   app.use(router.routes());
 
