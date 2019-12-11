@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "0.1.0",
+  "description": "Microservice for mobile application",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node ./src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "~3.7"
+  },
+  "dependencies": {
+    "@types/koa": "^2.11",
+    "@types/koa-router": "^7.0",
+    "koa": "^2.11",
+    "koa-router": "^7.4"
+  }
+}
