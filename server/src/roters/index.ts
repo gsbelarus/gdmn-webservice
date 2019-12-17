@@ -1,9 +1,9 @@
 import Router from 'koa-router';
 import { promisify } from 'util';
 import koaPassport from 'koa-passport';
-import { User } from '../models';
-import { writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB } from '../rest';
+import { User, ActivationCode } from '../models';
+import { writeFile, readFile } from '../workWithFile';
+import { PATH_LOCAL_DB, PATH_LOCAL_DB_ACTIVATION_CODE } from '../rest';
 
 const router = new Router();
 router.get('/', async ctx => await getLogin(ctx));
@@ -11,6 +11,7 @@ router.post('/login', async ctx => getLogin(ctx));
 router.get('/signout', async ctx => getSignOut(ctx));
 router.post('/signup', ctx => signup(ctx));
 router.get('/me', ctx => getMe(ctx));
+router.get('/verifyCode', ctx => verifyCode(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
@@ -24,11 +25,11 @@ const getLogin = async (ctx: any) => {
       return user;
     } else {
       ctx.status = 204;
-      ctx.body = JSON.stringify({ status: 204, result: 'неверный пароль или логин'});
+      ctx.body = JSON.stringify({ status: 204, result: 'wrong password or login'});
     }
   } else {
     ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'вы уже вошли'});
+    ctx.body = JSON.stringify({ status: 200, result: 'you are already logged in'});
     return ctx.state.user;
   }
 }
@@ -51,7 +52,7 @@ const getSignOut = (ctx: any) => {
     return undefined;
   } else {
     ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'вышел раньше или не заходил'});
+    ctx.body = JSON.stringify({ status: 200, result: 'left before or didn’t enter'});
     return undefined;
   }
 }
@@ -60,6 +61,17 @@ const signup = (ctx: any) => {
   const newUser = ctx.request.body as User;
   writeFile(PATH_LOCAL_DB, JSON.stringify(newUser));
   ctx.body = JSON.stringify({ status: 200, result: 'This signup'});
+}
+
+const verifyCode = async(ctx: any) => {
+  const data: ActivationCode[] = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
+  if (data.find(code => code.code === ctx.request.body.code)) {
+    ctx.status = 200;
+    ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
+  } else {
+    ctx.status = 200;
+    ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
+  }
 }
 
 export default router;

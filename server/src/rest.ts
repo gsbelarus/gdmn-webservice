@@ -9,6 +9,7 @@ import { readFile } from './workWithFile';
 import bodyParser from 'koa-bodyparser';
 
 export const PATH_LOCAL_DB = 'C:\\Users\\elena.buraya\\Desktop\\DB_USERS.json'
+export const PATH_LOCAL_DB_ACTIVATION_CODE = 'C:\\Users\\elena.buraya\\Desktop\\DB_ACTIVATION_CODES.json'
 
 export async function init() {
   const app = new Koa();
