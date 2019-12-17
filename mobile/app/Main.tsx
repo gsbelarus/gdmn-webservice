@@ -6,10 +6,18 @@ const Main = (): JSX.Element => {
 
 const [inputValue, setInputValue] = useState('');
 
-const sendCode = async() => {
-  //TODO: fetch to service
-  const receivedCode = '123qwe';
-  if (receivedCode === inputValue) {
+const verifyCode = async () => {
+  const data = await fetch(
+    'http://localhost:3649/verifyCode',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({'code': inputValue})
+    }
+  ).then(res => res.json())
+  .then(res => res.body.status)
+  if (data.body.status === 200) {
     return Alert.alert(
       'Your code is correct!',
       '',
@@ -21,17 +29,17 @@ const sendCode = async() => {
       ],
     );
   }
-  else { 
+  if (data.body.status === 404) { 
     return Alert.alert(
-    'Your code is incorrect!',
-    'Try again',
-    [
-      {
-        text: 'OK', 
-        onPress: () => setInputValue('')
-      },
-    ],
-  );
+      'Your code is incorrect!',
+      'Try again',
+      [
+        {
+          text: 'OK', 
+          onPress: () => setInputValue('')
+        },
+      ],
+    );
   }
 }
 
@@ -56,7 +64,7 @@ return (
           returnKeyType="done"
           autoCorrect={false}
           blurOnSubmit={true}
-          onSubmitEditing={sendCode}
+          onSubmitEditing={verifyCode}
         />
       </View>
     </View>
