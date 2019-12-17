@@ -6,9 +6,9 @@ const Main = (): JSX.Element => {
 
 const [inputValue, setInputValue] = useState('');
 
-const sendCode = async () => {
+const verifyCode = async () => {
   const data = await fetch(
-    'http://localhost:3649/sendCode',
+    'http://localhost:3649/verifyCode',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json'},
@@ -17,7 +17,30 @@ const sendCode = async () => {
     }
   ).then(res => res.json())
   .then(res => res.body.status)
-  console.log(data.body.status)
+  if (data.body.status === 200) {
+    return Alert.alert(
+      'Your code is correct!',
+      '',
+      [
+        {
+          text: 'OK', 
+          onPress: () => setInputValue('')
+        },
+      ],
+    );
+  }
+  if (data.body.status === 404) { 
+    return Alert.alert(
+      'Your code is incorrect!',
+      'Try again',
+      [
+        {
+          text: 'OK', 
+          onPress: () => setInputValue('')
+        },
+      ],
+    );
+  }
 }
 
 return (
@@ -41,7 +64,7 @@ return (
           returnKeyType="done"
           autoCorrect={false}
           blurOnSubmit={true}
-          onSubmitEditing={sendCode}
+          onSubmitEditing={verifyCode}
         />
       </View>
     </View>
