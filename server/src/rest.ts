@@ -5,15 +5,24 @@ import session from 'koa-session';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { User } from './models';
-import { readFileAsSync } from './workWithFile';
+import { readFile } from './workWithFile';
 import bodyParser from 'koa-bodyparser';
 
-const PATH_LOCAL_DB = 'C:\\Users\\elena.buraya\\Desktop\\DB_USERS.json'
+export const PATH_LOCAL_DB = 'C:\\Users\\elena.buraya\\Desktop\\DB_USERS.json'
 
 export async function init() {
   const app = new Koa();
   app.keys = ['super-secret-key'];
-  app.use(session({}, app));
+
+  const CONFIG = {
+    key: 'koa:sess', /** (string) cookie key (default is koa:sess) */
+    maxAge: 86400000, /** (number) maxAge in ms (default is 1 days) */
+    overwrite: true, /** (boolean) can overwrite or not (default true) */
+    httpOnly: true, /** (boolean) httpOnly or not (default true) */
+    signed: true, /** (boolean) signed or not (default true) */
+  };
+
+  app.use(session(CONFIG, app));
   app.use(bodyParser());
   passport.serializeUser((user: User, done) => done(null, user.id));
 	passport.deserializeUser(async (id: number, done) => done(null, await findById(id) || undefined));
@@ -44,11 +53,11 @@ const validateAuthCreds: VerifyFunction = async (email: string, password: string
 };
 
 export const findById = async (id: number) => {
-  const data: User[] = JSON.parse(await readFileAsSync(PATH_LOCAL_DB));
+  const data: User[] = await readFile(PATH_LOCAL_DB);
   return data.find(user => user.id === id);
 }
 
 export const findByEmail = async (email: string) => {
-  const data: User[] = JSON.parse(await readFileAsSync(PATH_LOCAL_DB));
+  const data: User[] = await readFile(PATH_LOCAL_DB);
   return data.find(user => user.userName === email);
 }
