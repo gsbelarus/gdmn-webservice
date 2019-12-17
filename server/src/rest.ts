@@ -7,6 +7,10 @@ import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { User } from './models';
 import { readFile } from './workWithFile';
 import bodyParser from 'koa-bodyparser';
+import log4js from 'log4js';
+
+const logger = log4js.getLogger('SERVER');
+logger.level = 'trace';
 
 export const PATH_LOCAL_DB = 'C:\\Users\\elena.buraya\\Desktop\\DB_USERS.json'
 export const PATH_LOCAL_DB_ACTIVATION_CODE = 'C:\\Users\\elena.buraya\\Desktop\\DB_ACTIVATION_CODES.json'
@@ -38,7 +42,9 @@ export async function init() {
 
   const port = 3649;
 
+  logger.trace('Starting listener ...');
   await new Promise((resolve) => app.listen(port, () => resolve()));
+  logger.trace('Started');
 	console.log(`Rest started on http://localhost:${port}`);
 }
 
