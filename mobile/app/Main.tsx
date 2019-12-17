@@ -6,33 +6,18 @@ const Main = (): JSX.Element => {
 
 const [inputValue, setInputValue] = useState('');
 
-const sendCode = async() => {
-  //TODO: fetch to service
-  const receivedCode = '123qwe';
-  if (receivedCode === inputValue) {
-    return Alert.alert(
-      'Your code is correct!',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setInputValue('')
-        },
-      ],
-    );
-  }
-  else { 
-    return Alert.alert(
-    'Your code is incorrect!',
-    'Try again',
-    [
-      {
-        text: 'OK', 
-        onPress: () => setInputValue('')
-      },
-    ],
-  );
-  }
+const sendCode = async () => {
+  const data = await fetch(
+    'http://localhost:3649/sendCode',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({'code': inputValue})
+    }
+  ).then(res => res.json())
+  .then(res => res.body.status)
+  console.log(data.body.status)
 }
 
 return (
