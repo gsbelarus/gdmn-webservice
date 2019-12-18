@@ -12,7 +12,7 @@ import log4js from 'log4js';
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-export const PATH_LOCAL_DB = 'C:\\DB\\DB_USERS.json'
+export const PATH_LOCAL_DB_USERS = 'C:\\DB\\DB_USERS.json'
 export const PATH_LOCAL_DB_ACTIVATION_CODE = 'C:\\DB\\DB_ACTIVATION_CODES.json'
 
 export async function init() {
@@ -60,11 +60,11 @@ const validateAuthCreds: VerifyFunction = async (email: string, password: string
 };
 
 export const findById = async (id: number) => {
-  const data: User[] = await readFile(PATH_LOCAL_DB);
+  const data: User[] = await readFile(PATH_LOCAL_DB_USERS);
   return data.find(user => user.id === id);
 }
 
 export const findByEmail = async (email: string) => {
-  const data: User[] = await readFile(PATH_LOCAL_DB);
+  const data: User[] = await readFile(PATH_LOCAL_DB_USERS);
   return data.find(user => user.userName === email);
 }
