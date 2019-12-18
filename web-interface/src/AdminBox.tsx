@@ -1,19 +1,19 @@
-import React from 'react';
-import { Label, PrimaryButton, Stack, StackItem, Pivot, PivotItem, CommandBar, getTheme, ICommandBarItemProps } from 'office-ui-fabric-react';
+import React, { Profiler } from 'react';
+import { Label, PrimaryButton, Stack, StackItem, Pivot, PivotItem, CommandBar, getTheme, ICommandBarItemProps, TextField } from 'office-ui-fabric-react';
 import { Frame } from './Frame';
+import { IUserParams, IUser } from './SignInBox';
+import { Profile } from './Profile';
+
+
 
 export interface IAdminBoxProps {
-  userName: string;
-  organizations: string[];
-  onClickEditProfile: () => void;
+  userParams: IUserParams;
+  onSaveProfile: (user: IUserParams) => void;
 }
-
 const theme = getTheme();
 
-
-
 export const AdminBox = (props: IAdminBoxProps) => {
-  const {onClickEditProfile, userName} = props;
+  const {onSaveProfile, userParams} = props;
 
   const _items: ICommandBarItemProps[] = [
     {
@@ -39,7 +39,7 @@ export const AdminBox = (props: IAdminBoxProps) => {
     },
     {
       key: 'settings',
-      text: userName,
+      text: userParams.name,
      // cacheKey: 'myCacheKey', // changing this key will invalidate this item's cache
    //   iconProps: { iconName: 'Settings' },
       subMenuProps: {
@@ -60,24 +60,35 @@ export const AdminBox = (props: IAdminBoxProps) => {
     }
   ];
 
-
-
-
   return (
-    <div style={{height: '50px', backgroundColor: theme.palette.themePrimary}}>
-      <Stack horizontalAlign='end'>
-
-        <CommandBar styles={{root: {backgroundColor: theme.palette.themePrimary}}}
-          items={_items}
-          // overflowItems={_overflowItems}
-          // overflowButtonProps={overflowProps}
-          // farItems={_farItems}
-          // ariaLabel="Use left and right arrow keys to navigate between commands"
-        />
-
-      </Stack>
+    <div>
+      <div style={{height: '44px', padding: '8px', borderBottom: '1px solid #dadce0'}}>
+        <Stack horizontalAlign='end'>
+          <CommandBar
+            items={_items}
+            // overflowItems={_overflowItems}
+            // overflowButtonProps={overflowProps}
+            // farItems={_farItems}
+            // ariaLabel="Use left and right arrow keys to navigate between commands"
+          />
+        </Stack>
+      </div>
+      {!userParams.organizations
+        ? <Stack horizontalAlign='center' >
+            <div style={{width: '30vh', padding: '10px'}} >
+              <Profile
+                userParams={userParams}
+                onSaveProfile={onSaveProfile}
+              />
+            </div>
+          </Stack>
+        : <Stack horizontalAlign='center' >
+          <div style={{width: '30vh', padding: '10px'}} >
+            <Label>Организации</Label>
+          </div>
+        </Stack>
+      }
     </div>
-
 
 
 

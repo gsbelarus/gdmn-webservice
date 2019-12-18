@@ -1,13 +1,11 @@
 import React, { useReducer, useState, useEffect } from 'react';
-import { SignInBox } from './SignInBox';
+import { SignInBox, IUser, IUserSign, IUserParams } from './SignInBox';
 import { AdminBox } from './AdminBox';
-import { Link, Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
+import { Route, BrowserRouter, Switch, Redirect } from 'react-router-dom';
 
-type AppState = 'REGISTRATION' | 'ADMINISTRATION';
+type AppState = 'SIGNIN' | 'ADMIN';
 
  type Action = { type: 'SET_STATE', appState: AppState }
-//   | { type: 'SET_SHOW_SQL', showSQL: boolean }
-//   | { type: 'SET_QUERY_STATE', queryState: QueryState };
 
 interface IAppState {
   appState: AppState;
@@ -28,16 +26,20 @@ function reducer(state: IAppState, action: Action): IAppState {
 }
 
 const App: React.FC = () => {
-  const [{ appState }, viewDispatch] = useReducer(reducer, { appState: 'REGISTRATION' });
+  const [{ appState }, viewDispatch] = useReducer(reducer, { appState: 'SIGNIN' });
   const [ signInRequesting, setSignInRequesting ] = useState(false);
   const [ signUpRequesting, setSignUpRequesting ] = useState(false);
+  const [ user, setUser ] = useState({
+    name: 'sunnycreature@gmail.com',
+    fullName: 'Дзядевич И.В.',
+    phone: '+375(29)11-11-111'
+    //organizations: ['GS', 'Ampersant'],
+    //devices: ['samsungJ5']
+  } as IUserParams);
 
   useEffect( () => {
     if (signInRequesting) {
-      console.log(signInRequesting);
-
-      viewDispatch({ type: 'SET_STATE', appState: 'ADMINISTRATION' });
-      console.log(appState);
+      viewDispatch({ type: 'SET_STATE', appState: 'ADMIN' });
     }
   }
   , [signInRequesting]
@@ -45,60 +47,42 @@ const App: React.FC = () => {
   console.log(appState);
 
   return (
-    <BrowserRouter basename={window.location.href}>
+    <BrowserRouter>
       <>
-      {/* <div>
-      {
-        appState === 'REGISTRATION'
-        ?
-          <SignInBox
-            signInInitialValues={{
-              userName: 'sunnycreature@gmail.com',
-              password: '1',
-              fullName: 'Дзядевич И.В.'
-            }}
-            signInRequesting={signInRequesting}
-            signUpRequesting={signUpRequesting}
-            onSignIn={() => {setSignInRequesting(true); console.log(appState);}}
-            onSignUp={() => {}}
-          />
-        : appState === 'ADMINISTRATION'
-          ?
-            <AdminBox
-              userName={'sunnycreature@gmail.com'}
-              organizations={['GS', 'Ampersant']}
-              onClickEditProfile={() => {}}
-            />
-          :
-            <></>
-      }
-
-    </div> */}
         <div className="">
           <Switch>
+            {appState === 'SIGNIN'
+              ? <Redirect exact={true} from={`/`} to={`/signIn`} />
+              : <Redirect exact={true} from={`/signIn`} to={`/admin`} />}
             <Route
               exact={false}
-              path={`/morphology`}
-              render={<SignInBox
-                signInInitialValues={{
-                  userName: 'sunnycreature@gmail.com',
-                  password: '1',
-                  fullName: 'Дзядевич И.В.'
-                }}
-                signInRequesting={signInRequesting}
-                signUpRequesting={signUpRequesting}
-                onSignIn={() => {setSignInRequesting(true); console.log(appState);}}
-                onSignUp={() => {}}
-              />}
+              path={`/signIn`}
+              render={props => {
+                return(
+                  <SignInBox
+                    signInInitialValues={{...user, password: '1'}}
+                    signInRequesting={signInRequesting}
+                    signUpRequesting={signUpRequesting}
+                    onSignIn={() => {setSignInRequesting(true); console.log(appState);}}
+                    onSignUp={() => {}}
+                  />
+                )
+              }}
             />}
             <Route
               exact={false}
-              path={`/morphology`}
-              render={            <AdminBox
-                userName={'sunnycreature@gmail.com'}
-                organizations={['GS', 'Ampersant']}
-                onClickEditProfile={() => {}}
-              />}
+              path={`/admin`}
+              render={props =>
+                {
+                  return(
+                    <AdminBox
+                      userParams={user}
+                      onSaveProfile={(user) => {
+                        setUser(user);
+                      }}
+                    />
+                  )
+                }}
             />}
           </Switch>
         </div>

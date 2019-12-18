@@ -4,36 +4,41 @@ import React from 'react';
 import { Stack, Pivot, PivotItem, TextField, PrimaryButton, Spinner, SpinnerSize } from "office-ui-fabric-react";
 import { PasswordInput } from './PasswordInput';
 
-export interface ISignInBoxData {
-  userName: string;
-  password: string;
-  fullName: string;
+export interface IUser {
+  name: string;
+  fullName?: string;
   phone?: string;
-  organization?: string[];
-  uid?: string;
+}
+
+export interface IUserSign extends IUser {
+  password: string;
+}
+export interface IUserParams extends IUser {
+  organizations?: string[];
+  devices?: string[];
 }
 
 export interface ISignInBoxStateProps {
-  signInInitialValues: ISignInBoxData;
+  signInInitialValues: IUserSign;
   signInRequesting: boolean;
   signUpRequesting: boolean;
  // errorMessage?: string[];
 }
 
 export interface ISignInBoxProps extends ISignInBoxStateProps {
-  onSignIn: (data: ISignInBoxData) => void;
-  onSignUp: (data: ISignInBoxData) => void;
+  onSignIn: (data: IUserSign) => void;
+  onSignUp: (data: IUserSign) => void;
  // onHideMessage: () => void;
 }
 
 export const SignInBox = (props: ISignInBoxProps) => {
   const tabs = ['Вход', 'Регистрация'];
   const { onSignIn, signInRequesting, onSignUp, signUpRequesting, signInInitialValues } = props;
-  const [ userName, setUserName ] = useState(signInInitialValues.userName);
+  const [ userName, setUserName ] = useState(signInInitialValues.name);
   const [ password, setPassword ] = useState(signInInitialValues.password);
   const [ repeatPassword, setRepeatPassword ] = useState();
   const [ fullName, setFullName ] = useState(signInInitialValues.fullName);
-  const [ phone, setPhone ] = useState();
+  const [ phone, setPhone ] = useState(signInInitialValues.phone);
 
   return (
     <Stack horizontalAlign='center'>
@@ -69,7 +74,7 @@ export const SignInBox = (props: ISignInBoxProps) => {
                           signInRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
                         }
                         onClick={() => {
-                          onSignIn({ userName, password, fullName });
+                          onSignIn({ name: userName, password, fullName });
                         }}
                       />
                     </div>
@@ -121,7 +126,7 @@ export const SignInBox = (props: ISignInBoxProps) => {
                           signUpRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
                         }
                         onClick={() => {
-                          onSignUp({ userName, password, fullName });
+                          onSignUp({ name: userName, password, fullName });
                         }}
                       />
                     </div>
