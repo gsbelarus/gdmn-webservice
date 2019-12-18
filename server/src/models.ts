@@ -1,5 +1,5 @@
 export interface User {
-  id?: number;
+  id?: string;
   userName: string;
   password: string;
   activationCode?: string;
@@ -12,4 +12,9 @@ export interface ActivationCode {
   code: string;
   date: string;
   user: string;
+}
+
+export interface Organisation {
+  id: number;
+  title: string;
 }

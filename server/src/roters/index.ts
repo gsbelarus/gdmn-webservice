@@ -1,9 +1,9 @@
 import Router from 'koa-router';
 import { promisify } from 'util';
 import koaPassport from 'koa-passport';
-import { User, ActivationCode } from '../models';
+import { User, ActivationCode, Organisation } from '../models';
 import { writeFile, readFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODE, findByEmail } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODE, findByEmail, PATH_LOCAL_DB_ORGANISATIONS } from '../rest';
 import log4js from 'log4js';
 import { generateCode } from '../generateCode';
 
@@ -18,6 +18,7 @@ router.post('/signup', ctx => signup(ctx));
 router.get('/me', ctx => getMe(ctx));
 router.get('/verifyCode', ctx => verifyCode(ctx));
 router.get('/getActivationCode', ctx => getActivationCode(ctx));
+router.post('/arganisation/new', ctx => addOrganisation(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
@@ -89,11 +90,11 @@ const verifyCode = async(ctx: any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
       logger.info('device activated successfully');
-      } else {
-        ctx.status = 200;
-        ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
-        logger.warn('invalid activation code');
-      }
+    } else {
+      ctx.status = 200;
+      ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
+      logger.warn('invalid activation code');
+    }
   } else {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
@@ -120,6 +121,17 @@ const saveActivationCode = async (idUser: string) => {
     )
   );
   return code;
+}
+
+const addOrganisation = async(ctx: any) => {
+  const allOrganisations: Organisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
+  await writeFile(
+    PATH_LOCAL_DB_ACTIVATION_CODE,
+    JSON.stringify(allOrganisations && allOrganisations.length
+      ? [...allOrganisations, {id: allOrganisations[allOrganisations.length - 1].id + 1, title: ctx.request.body.title}]
+      : [{id: 0, title: ctx.request.body.title}]
+    )
+  );
 }
 
 export default router;

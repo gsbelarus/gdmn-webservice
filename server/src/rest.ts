@@ -14,6 +14,7 @@ logger.level = 'trace';
 
 export const PATH_LOCAL_DB_USERS = 'C:\\DB\\DB_USERS.json'
 export const PATH_LOCAL_DB_ACTIVATION_CODE = 'C:\\DB\\DB_ACTIVATION_CODES.json'
+export const PATH_LOCAL_DB_ORGANISATIONS = 'C:\\DB\\DB_ORGANISATIONS.json'
 
 export async function init() {
   const app = new Koa();
@@ -30,7 +31,7 @@ export async function init() {
   app.use(session(CONFIG, app));
   app.use(bodyParser());
   passport.serializeUser((user: User, done) => done(null, user.id));
-	passport.deserializeUser(async (id: number, done) => done(null, await findById(id) || undefined));
+	passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
 	passport.use(new LocalStrategy({ usernameField: 'email' }, validateAuthCreds));
 	app.use(passport.initialize());
 	app.use(passport.session());
@@ -59,7 +60,7 @@ const validateAuthCreds: VerifyFunction = async (email: string, password: string
   }
 };
 
-export const findById = async (id: number) => {
+export const findById = async (id: string) => {
   const data: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   return data ? data.find(user => user.id === id) : undefined;
 }
