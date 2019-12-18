@@ -30,11 +30,11 @@ const App: React.FC = () => {
   const [ signInRequesting, setSignInRequesting ] = useState(false);
   const [ signUpRequesting, setSignUpRequesting ] = useState(false);
   const [ user, setUser ] = useState({
-    name: 'sunnycreature@gmail.com',
-    fullName: 'Дзядевич И.В.',
-    phone: '+375(29)11-11-111'
-    //organizations: ['GS', 'Ampersant'],
-    //devices: ['samsungJ5']
+    name: 'test@gmail.com',
+    fullName: 'Тест Т.Т.',
+    phone: '+375(29)11-11-111',
+    organizations: ['GS', 'Ampersant'],
+    devices: ['samsungJ5']
   } as IUserParams);
 
   useEffect( () => {
@@ -72,17 +72,16 @@ const App: React.FC = () => {
             <Route
               exact={false}
               path={`/admin`}
-              render={props =>
-                {
-                  return(
-                    <AdminBox
-                      userParams={user}
-                      onSaveProfile={(user) => {
-                        setUser(user);
-                      }}
-                    />
-                  )
-                }}
+              render={props => {
+                return(
+                  <AdminBox
+                    userParams={user}
+                    onSaveProfile={(user) => {
+                      setUser(user);
+                    }}
+                  />
+                )
+              }}
             />}
           </Switch>
         </div>
