@@ -80,12 +80,20 @@ const signup = async (ctx: any) => {
 }
 
 const verifyCode = async(ctx: any) => {
-  // TODO: check date
   const data: ActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
-  if (data && data.find(code => code.code === ctx.request.body.code)) {
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
-    logger.info('device activated successfully');
+  const code = data && data.find(code => code.code === ctx.request.body.code);
+  if (code) {
+    const date = new Date(code.date);
+    date.setDate(date.getDate() + 7);
+    if(date >= new Date()) {
+      ctx.status = 200;
+      ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
+      logger.info('device activated successfully');
+      } else {
+        ctx.status = 200;
+        ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
+        logger.warn('invalid activation code');
+      }
   } else {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
@@ -98,6 +106,7 @@ const getActivationCode = async(ctx: any) => {
   const code = await saveActivationCode(userName);
   ctx.status = 200;
   ctx.body = JSON.stringify({ status: 200, result: code});
+  logger.info('activation code generate successfully');
 }
 
 const saveActivationCode = async (idUser: string) => {

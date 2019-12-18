@@ -11,4 +11,5 @@ export interface User {
 export interface ActivationCode {
   code: string;
   date: string;
+  user: string;
 }
