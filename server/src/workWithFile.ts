@@ -1,5 +1,6 @@
 import { promises } from 'fs';
 import log4js from 'log4js';
+import path from "path";
 
 const logger = log4js.getLogger();
 logger.level = 'trace';
@@ -19,7 +20,7 @@ export const readFile = async (filename: string) => {
 
 export const writeFile = async (filename: string, data: string) => {
   try {
-    await promises.mkdir(filename);
+    await promises.mkdir(path.dirname(filename), { recursive: true });
     await promises.writeFile(filename, data, { encoding: 'utf8', flag: 'w' });
     logger.info('Successful writing');
   }

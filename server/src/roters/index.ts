@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import koaPassport from 'koa-passport';
 import { User, ActivationCode } from '../models';
 import { writeFile, readFile } from '../workWithFile';
-import { PATH_LOCAL_DB, PATH_LOCAL_DB_ACTIVATION_CODE } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODE } from '../rest';
 import log4js from 'log4js';
 
 const logger = log4js.getLogger('SERVER');
@@ -68,9 +68,9 @@ const getSignOut = (ctx: any) => {
   }
 }
 
-const signup = (ctx: any) => {
+const signup = async (ctx: any) => {
   const newUser = ctx.request.body as User;
-  writeFile(PATH_LOCAL_DB, JSON.stringify(newUser));
+  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUser));
   ctx.body = JSON.stringify({ status: 200, result: 'This signup'});
   logger.info('sign up successful');
 }
