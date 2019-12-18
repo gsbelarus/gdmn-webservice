@@ -17,6 +17,7 @@ router.get('/signout', async ctx => getSignOut(ctx));
 router.post('/signup', ctx => signup(ctx));
 router.get('/me', ctx => getMe(ctx));
 router.get('/verifyCode', ctx => verifyCode(ctx));
+router.get('/getActivationCode', ctx => getActivationCode(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
@@ -28,7 +29,6 @@ const getLogin = async (ctx: any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: user ? user.id : false});
       logger.info(`login user ${user}`);
-      return user;
     } else {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 404, result: 'wrong password or login'});
@@ -38,7 +38,6 @@ const getLogin = async (ctx: any) => {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'you are already logged in'});
     logger.warn('this user has already logged in');
-    return ctx.state.user;
   }
 }
 
@@ -60,12 +59,10 @@ const getSignOut = (ctx: any) => {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'sign out successful'});
     logger.info(`user ${ctx.state.user.userName} sign out successful`);
-    return undefined;
   } else {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'left before or didn’t enter'});
     logger.warn('left before or didn’t enter');
-    return undefined;
   }
 }
 
@@ -74,9 +71,7 @@ const signup = async (ctx: any) => {
   if(!(await findByEmail(newUser.userName))) {
     const allUsers: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, {id: newUser.userName, ...newUser}] : [{id: newUser.userName, ...newUser}]));
-    const code = generateCode(newUser.userName);
-    await writeFile(PATH_LOCAL_DB_ACTIVATION_CODE, code);
-    ctx.body = JSON.stringify({ status: 200, result: code});
+    ctx.body = JSON.stringify({ status: 200, result: await saveActivationCode(newUser.userName)});
     logger.info('sign up successful');
   } else {
     ctx.body = JSON.stringify({ status: 404, result: 'such user already exists'});
@@ -85,6 +80,7 @@ const signup = async (ctx: any) => {
 }
 
 const verifyCode = async(ctx: any) => {
+  // TODO: check date
   const data: ActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
   if (data && data.find(code => code.code === ctx.request.body.code)) {
     ctx.status = 200;
@@ -95,6 +91,26 @@ const verifyCode = async(ctx: any) => {
     ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code'});
     logger.warn('invalid activation code');
   }
+}
+
+const getActivationCode = async(ctx: any) => {
+  const userName = ctx.request.body.user;
+  const code = await saveActivationCode(userName);
+  ctx.status = 200;
+  ctx.body = JSON.stringify({ status: 200, result: code});
+}
+
+const saveActivationCode = async (idUser: string) => {
+  const code = generateCode(idUser);
+  const allCodes: ActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
+  await writeFile(
+    PATH_LOCAL_DB_ACTIVATION_CODE,
+    JSON.stringify(allCodes
+      ? [...allCodes, {code, date: (new Date()).toString(), user: idUser}]
+      : [{code, date: Date().toString(), user: idUser}]
+    )
+  );
+  return code;
 }
 
 export default router;
