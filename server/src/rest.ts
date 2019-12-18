@@ -60,11 +60,11 @@ const validateAuthCreds: VerifyFunction = async (email: string, password: string
 };
 
 export const findById = async (id: number) => {
-  const data: User[] = await readFile(PATH_LOCAL_DB_USERS);
-  return data.find(user => user.id === id);
+  const data: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  return data ? data.find(user => user.id === id) : undefined;
 }
 
 export const findByEmail = async (email: string) => {
-  const data: User[] = await readFile(PATH_LOCAL_DB_USERS);
-  return data.find(user => user.userName === email);
+  const data: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  return data ? data.find(user => user.userName === email) : undefined;
 }

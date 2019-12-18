@@ -9,12 +9,18 @@ logger.level = 'trace';
 export const readFile = async (filename: string) => {
   try {
     const result = await promises.readFile(filename, { encoding: 'utf8', flag: 'r' });
+    const data = JSON.parse(result);
     logger.info('Successful reading');
-    return JSON.parse(result);
+    if(Array.isArray(data) && data.length) {
+      return data;
+    } else {
+      return undefined;
+    }
   }
   catch (e) {
     logger.trace(`Error reading data to file ${filename} - ${e}`);
     console.log(`Error reading data to file ${filename} - ${e}`);
+    return undefined;
   }
 }
 

@@ -3,8 +3,9 @@ import { promisify } from 'util';
 import koaPassport from 'koa-passport';
 import { User, ActivationCode } from '../models';
 import { writeFile, readFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODE } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODE, findByEmail } from '../rest';
 import log4js from 'log4js';
+import { generateCode } from '../generateCode';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -29,8 +30,8 @@ const getLogin = async (ctx: any) => {
       logger.info(`login user ${user}`);
       return user;
     } else {
-      ctx.status = 204;
-      ctx.body = JSON.stringify({ status: 204, result: 'wrong password or login'});
+      ctx.status = 200;
+      ctx.body = JSON.stringify({ status: 404, result: 'wrong password or login'});
       logger.info('failed login attempt');
     }
   } else {
@@ -70,14 +71,22 @@ const getSignOut = (ctx: any) => {
 
 const signup = async (ctx: any) => {
   const newUser = ctx.request.body as User;
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUser));
-  ctx.body = JSON.stringify({ status: 200, result: 'This signup'});
-  logger.info('sign up successful');
+  if(!(await findByEmail(newUser.userName))) {
+    const allUsers: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, {id: newUser.userName, ...newUser}] : [{id: newUser.userName, ...newUser}]));
+    const code = generateCode(newUser.userName);
+    await writeFile(PATH_LOCAL_DB_ACTIVATION_CODE, code);
+    ctx.body = JSON.stringify({ status: 200, result: code});
+    logger.info('sign up successful');
+  } else {
+    ctx.body = JSON.stringify({ status: 404, result: 'such user already exists'});
+    logger.info('such user already exists');
+  }
 }
 
 const verifyCode = async(ctx: any) => {
-  const data: ActivationCode[] = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
-  if (data.find(code => code.code === ctx.request.body.code)) {
+  const data: ActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
+  if (data && data.find(code => code.code === ctx.request.body.code)) {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
     logger.info('device activated successfully');
