@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import { IActivationCode } from '../models';
-import { readFile } from '../workWithFile';
-import { PATH_LOCAL_DB_ACTIVATION_CODES } from '../rest';
+import { IActivationCode, IDevice } from '../models';
+import { readFile, writeFile } from '../workWithFile';
+import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../rest';
 import { saveActivationCode } from './util';
 import log4js from 'log4js';
 
@@ -12,6 +12,9 @@ const router = new Router({prefix: '/device'});
 
 router.get('/verifyCode', ctx => verifyCode(ctx));
 router.get('/getActivationCode', ctx => getActivationCode(ctx));
+router.post('/new', ctx => newDevice(ctx));
+router.post('/lock', ctx => lockDevice(ctx));
+router.post('/remove', ctx => removeDevice(ctx));
 
 const verifyCode = async(ctx: any) => {
   const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
@@ -41,6 +44,63 @@ const getActivationCode = async(ctx: any) => {
   ctx.status = 200;
   ctx.body = JSON.stringify({ status: 200, result: code});
   logger.info('activation code generate successfully');
+}
+
+const newDevice = async(ctx: any) => {
+  const {uid, idUser} = ctx.request.body;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === idUser))) {
+    await writeFile(
+      PATH_LOCAL_DB_DEVICES,
+      JSON.stringify(allDevices
+        ? [...allDevices, {uid, user: idUser, isBlock: false}]
+        : [{uid, user: idUser, isBlock: false}]
+      )
+    );
+    ctx.body = JSON.stringify({ status: 200, result: 'new device added successfully'});
+    logger.warn('new device added successfully');
+  } else {
+    ctx.body = JSON.stringify({ status: 404, result: `this device(${uid}) is assigned to this user(${idUser})`});
+    logger.warn(`this device(${uid}) is assigned to this user(${idUser})`);
+  }
+}
+
+const lockDevice = async(ctx: any) => {
+  const {uid, idUser} = ctx.request.body;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+  console.log(idx);
+  if(!allDevices || idx === undefined) {
+    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
+    logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+  } else {
+    await writeFile(
+      PATH_LOCAL_DB_DEVICES,
+      JSON.stringify([...allDevices.slice(0, idx), {uid, user: idUser, isBlock: true}, ...allDevices.slice(idx + 1)]
+      )
+    );
+    ctx.body = JSON.stringify({ status: 200, result: 'device locked successfully'});
+    logger.info('device locked successfully');
+  }
+}
+
+const removeDevice = async(ctx: any) => {
+  const {uid, idUser} = ctx.request.body;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+  console.log(idx)
+  if(!allDevices || idx === undefined) {
+    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
+    logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+  } else {
+    await writeFile(
+      PATH_LOCAL_DB_DEVICES,
+      JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]
+      )
+    );
+    ctx.body = JSON.stringify({ status: 200, result: 'device removed successfully'});
+    logger.info('device removed successfully');
+  }
 }
 
 export default router;
