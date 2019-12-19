@@ -40,6 +40,7 @@ export async function init() {
 	}));
   
   app.use(router.routes());
+  app.use(router.allowedMethods());
 
   const port = 3649;
 
