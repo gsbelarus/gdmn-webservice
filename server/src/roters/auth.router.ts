@@ -52,10 +52,11 @@ const getMe = async (ctx: any) => {
 
 const getSignOut = (ctx: any) => {
   if(ctx.isAuthenticated()) {
+    const user = ctx.state.user.userName;
     ctx.logout();
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'sign out successful'});
-    logger.info(`user ${ctx.state.user.userName} sign out successful`);
+    logger.info(`user ${user} sign out successful`);
   } else {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'left before or didn’t enter'});
