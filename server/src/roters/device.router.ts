@@ -15,6 +15,7 @@ router.get('/getActivationCode', ctx => getActivationCode(ctx));
 router.post('/new', ctx => newDevice(ctx));
 router.post('/lock', ctx => lockDevice(ctx));
 router.post('/remove', ctx => removeDevice(ctx));
+router.get('/byUser', ctx => getDevicesByUser(ctx));
 
 const verifyCode = async(ctx: any) => {
   const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
@@ -58,7 +59,7 @@ const newDevice = async(ctx: any) => {
       )
     );
     ctx.body = JSON.stringify({ status: 200, result: 'new device added successfully'});
-    logger.warn('new device added successfully');
+    logger.info('new device added successfully');
   } else {
     ctx.body = JSON.stringify({ status: 404, result: `this device(${uid}) is assigned to this user(${idUser})`});
     logger.warn(`this device(${uid}) is assigned to this user(${idUser})`);
@@ -90,7 +91,7 @@ const removeDevice = async(ctx: any) => {
   const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
   console.log(idx)
   if(!allDevices || idx === undefined) {
-    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
+    ctx.body = JSON.stringify({ status: 200, result: `the device(${uid}) is not assigned to the user(${idUser})`});
     logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
   } else {
     await writeFile(
@@ -101,6 +102,20 @@ const removeDevice = async(ctx: any) => {
     ctx.body = JSON.stringify({ status: 200, result: 'device removed successfully'});
     logger.info('device removed successfully');
   }
+}
+
+const getDevicesByUser = async(ctx: any) => {
+  const {idUser} = ctx.request.body;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result: !allDevices || !allDevices.length
+      ? []
+      : allDevices
+        .filter( device => device.user === idUser)
+        .map(device => {return {uid: device.uid, state: device.isBlock ? 'blocked' : 'active'}})
+  });
+  logger.info('get devices by user successfully');
 }
 
 export default router;
