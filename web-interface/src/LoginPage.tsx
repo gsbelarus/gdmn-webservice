@@ -5,40 +5,44 @@ import { Stack, Pivot, PivotItem, TextField, PrimaryButton, Spinner, SpinnerSize
 import { PasswordInput } from './PasswordInput';
 
 export interface IUser {
-  name: string;
+  user: string;
   fullName?: string;
   phone?: string;
 }
 
-export interface IUserSign extends IUser {
+export interface IUserLog extends IUser {
   password: string;
 }
+
 export interface IUserParams extends IUser {
   organizations?: string[];
   devices?: string[];
 }
 
-export interface ISignInBoxStateProps {
-  signInInitialValues: IUserSign;
-  signInRequesting: boolean;
-  signUpRequesting: boolean;
+export interface ILoginPageStateProps {
+  logInInitialValues: IUserLog;
+  logInRequesting: boolean;
+  logUpRequesting: boolean;
  // errorMessage?: string[];
 }
 
-export interface ISignInBoxProps extends ISignInBoxStateProps {
-  onSignIn: (data: IUserSign) => void;
-  onSignUp: (data: IUserSign) => void;
+export interface ISignInBoxProps extends ILoginPageStateProps {
+  onLogIn: (data: IUserLog) => void;
+  onLogUp: (data: IUserLog) => void;
  // onHideMessage: () => void;
 }
 
-export const SignInBox = (props: ISignInBoxProps) => {
+export const LoginPage = (props: ISignInBoxProps) => {
   const tabs = ['Вход', 'Регистрация'];
-  const { onSignIn, signInRequesting, onSignUp, signUpRequesting, signInInitialValues } = props;
-  const [ userName, setUserName ] = useState(signInInitialValues.name);
-  const [ password, setPassword ] = useState(signInInitialValues.password);
+  const { onLogIn, logInRequesting, onLogUp, logUpRequesting, logInInitialValues } = props;
   const [ repeatPassword, setRepeatPassword ] = useState();
-  const [ fullName, setFullName ] = useState(signInInitialValues.fullName);
-  const [ phone, setPhone ] = useState(signInInitialValues.phone);
+  const [state, setState] = useState<IUserLog>({
+    user: logInInitialValues.user,
+    password: logInInitialValues.password,
+    fullName: logInInitialValues.fullName,
+    phone: logInInitialValues.phone
+   });
+
 
   return (
     <Stack horizontalAlign='center'>
@@ -52,16 +56,16 @@ export const SignInBox = (props: ISignInBoxProps) => {
                   <>
                     <TextField
                       label="Пользователь:"
-                      disabled={signInRequesting}
-                      value={userName}
-                      onChange={ (_, userName) => userName && setUserName(userName) }
+                      disabled={logInRequesting}
+                      value={state.user}
+                      onChange={ (_, user) => user && setState({...state, user}) }
                     />
                     <PasswordInput
                       label="Пароль:"
-                      disabled={signInRequesting}
-                      value={password}
+                      disabled={logInRequesting}
+                      value={state.password}
                       onChange={(_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-                        setPassword(newValue ? newValue : '');
+                        setState({...state, password: newValue ? newValue : ''});
                       }}
                     />
                     <div className="SignInText" style={{paddingTop: '4px', textAlign: 'right', width: '100%', textDecoration: 'underline', fontSize: '12px'}}>Забыли пароль?</div>
@@ -69,12 +73,12 @@ export const SignInBox = (props: ISignInBoxProps) => {
                       <PrimaryButton
                         text="Войти"
                         style={{marginTop: '8px', float: 'right'}}
-                        disabled={signInRequesting}
+                        disabled={logInRequesting}
                         onRenderIcon={
-                          signInRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
+                          logInRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
                         }
                         onClick={() => {
-                          onSignIn({ name: userName, password, fullName });
+                          onLogIn({ user: state.user, password: state.password });
                         }}
                       />
                     </div>
@@ -83,50 +87,50 @@ export const SignInBox = (props: ISignInBoxProps) => {
                   <>
                     <TextField
                       label="Пользователь:"
-                      disabled={signUpRequesting}
-                      value={userName}
-                      onChange={ (_, userName) => userName && setUserName(userName) }
+                      disabled={logUpRequesting}
+                      value={state.user}
+                      onChange={ (_, user) => user && setState({...state, user}) }
                     />
                     <PasswordInput
                       label="Пароль:"
-                      disabled={signUpRequesting}
-                      value={password}
+                      disabled={logUpRequesting}
+                      value={state.password}
                       onChange={(_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-                        setPassword(newValue ? newValue : '');
-                        if (repeatPassword !== '') setPassword('');
+                        setState({...state, password: newValue ? newValue : ''});
+                        if (repeatPassword !== '') setState({...state, password: ''});
                       }}
                     />
                     <PasswordInput
                       label="Повторите пароль:"
-                      disabled={signUpRequesting}
+                      disabled={logUpRequesting}
                       value={repeatPassword}
                       onChange={(_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
                         setRepeatPassword(newValue ? newValue : '');
                       }}
-                      onGetErrorMessage={(value) => value === '' ? "Повторите пароль" : value === password ? "" : "Неправильный пароль"}
+                      onGetErrorMessage={(value) => value === '' ? "Повторите пароль" : value === state.password ? "" : "Неправильный пароль"}
                     />
                     <TextField
                       label="ФИО:"
-                      disabled={signUpRequesting}
-                      value={fullName}
-                      onChange={ (_, fullName) => fullName && setFullName(fullName) }
+                      disabled={logUpRequesting}
+                      value={state.fullName}
+                      onChange={ (_, fullName) => fullName && setState({...state, fullName}) }
                     />
                     <TextField
                       label="Номер телефона:"
-                      disabled={signUpRequesting}
-                      value={phone}
-                      onChange={ (_, phone) => phone && setPhone(phone) }
+                      disabled={logUpRequesting}
+                      value={state.phone}
+                      onChange={ (_, phone) => phone && setState({...state, phone}) }
                     />
                     <div className="SignUpButtons">
                       <PrimaryButton
                         text="Регистрация"
                         style={{marginTop: '8px', float: 'right'}}
-                        disabled={signUpRequesting || userName === '' || password === '' || repeatPassword === '' || password !== repeatPassword}
+                        disabled={logUpRequesting || state.user === '' || state.password === '' || repeatPassword === '' || state.password !== repeatPassword}
                         onRenderIcon={
-                          signUpRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
+                          logUpRequesting ? (_props, _defaultRenderer) => <Spinner size={SpinnerSize.xSmall} /> : undefined
                         }
                         onClick={() => {
-                          onSignUp({ name: userName, password, fullName });
+                          onLogUp({ user: state.user, password: state.password, fullName: state.fullName });
                         }}
                       />
                     </div>
