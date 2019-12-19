@@ -9,19 +9,32 @@ export interface ILogin {
   errorMessage?: string;
 };
 
-export type LoginProc = (user: string, password: string) => void;
+export type LoginProc = (user: string, password: string) => Promise<ILogin>;
 export type LogoutProc = () => void;
 
 export const useLogin = (): [ILogin, LoginProc, LogoutProc] => {
   const [login, setLogin] = useState<ILogin>({ loginState: 'LOGGED_OUT' });
 
-  const doLogin = (user: string, password: string) => {
+  const doLogin: LoginProc = (user: string, password: string) => {
     setLogin({ loginState: 'LOGGING_IN' });
-    setTimeout( () => setLogin({
-      loginState: 'LOGGED_IN',
-      user,
-      password
-    }), 2000 );
+
+    return new Promise(
+      resolve => {
+        setTimeout( () => {
+
+          const newState: ILogin = {
+            loginState: 'LOGGED_IN',
+            user,
+            password
+          };
+
+          setLogin(newState);
+
+          resolve(newState);
+
+        }, 2000 );
+      }
+    );
   };
 
   const doLogout = () => {

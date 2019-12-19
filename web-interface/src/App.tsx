@@ -15,7 +15,12 @@ const App: React.FC = () => {
         login.loginState === 'LOGGED_OUT'
         ?
           <LoginPage
-            onLogin={doLogin}
+            onLogin={
+              (user, password) => {
+                doLogin(user, password)
+                  .then( loginData => window.alert(loginData.loginState) )
+              }
+            }
           />
         : login.loginState === 'LOGGED_IN'
         ?
