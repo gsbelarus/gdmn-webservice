@@ -16,9 +16,9 @@ const App: React.FC = () => {
         ?
           <LoginPage
             onLogin={
-              (user, password) => {
-                doLogin(user, password)
-                  .then( loginData => window.alert(loginData.loginState) )
+              async (user, password) => {
+                const loginData = await doLogin(user, password);
+                window.alert(loginData.loginState);
               }
             }
           />
