@@ -71,7 +71,7 @@ const lockDevice = async(ctx: any) => {
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
   console.log(idx);
-  if(!allDevices || idx === undefined) {
+  if(!allDevices || idx === undefined || idx < 0) {
     ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
     logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
   } else {
@@ -90,7 +90,7 @@ const removeDevice = async(ctx: any) => {
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
   console.log(idx)
-  if(!allDevices || idx === undefined) {
+  if(!allDevices || idx === undefined || idx < 0) {
     ctx.body = JSON.stringify({ status: 200, result: `the device(${uid}) is not assigned to the user(${idUser})`});
     logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
   } else {
