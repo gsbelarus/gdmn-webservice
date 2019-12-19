@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import { ActivationCode } from '../models';
+import { IActivationCode } from '../models';
 import { readFile } from '../workWithFile';
-import { PATH_LOCAL_DB_ACTIVATION_CODE } from '../rest';
+import { PATH_LOCAL_DB_ACTIVATION_CODES } from '../rest';
 import { saveActivationCode } from './util';
 import log4js from 'log4js';
 
@@ -14,7 +14,7 @@ router.get('/verifyCode', ctx => verifyCode(ctx));
 router.get('/getActivationCode', ctx => getActivationCode(ctx));
 
 const verifyCode = async(ctx: any) => {
-  const data: ActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODE);
+  const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
   const code = data && data.find(code => code.code === ctx.request.body.code);
   if (code) {
     const date = new Date(code.date);

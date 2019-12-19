@@ -4,16 +4,16 @@ import router from './roters';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
-import { User } from './models';
-import { readFile } from './workWithFile';
+import { IUser } from './models';
 import bodyParser from 'koa-bodyparser';
 import log4js from 'log4js';
+import { findByEmail, findById } from './roters/util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
 export const PATH_LOCAL_DB_USERS = 'C:\\DB\\DB_USERS.json'
-export const PATH_LOCAL_DB_ACTIVATION_CODE = 'C:\\DB\\DB_ACTIVATION_CODES.json'
+export const PATH_LOCAL_DB_ACTIVATION_CODES = 'C:\\DB\\DB_ACTIVATION_CODES.json'
 export const PATH_LOCAL_DB_ORGANISATIONS = 'C:\\DB\\DB_ORGANISATIONS.json'
 
 export async function init() {
@@ -30,7 +30,7 @@ export async function init() {
 
   app.use(session(CONFIG, app));
   app.use(bodyParser());
-  passport.serializeUser((user: User, done) => done(null, user.id));
+  passport.serializeUser((user: IUser, done) => done(null, user.id));
 	passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
 	passport.use(new LocalStrategy({ usernameField: 'email' }, validateAuthCreds));
 	app.use(passport.initialize());
@@ -60,13 +60,3 @@ const validateAuthCreds: VerifyFunction = async (email: string, password: string
     done(null, user);
   }
 };
-
-export const findById = async (id: string) => {
-  const data: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.id === id) : undefined;
-}
-
-export const findByEmail = async (email: string) => {
-  const data: User[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.userName === email) : undefined;
-}
