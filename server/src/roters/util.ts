@@ -13,7 +13,7 @@ export const findByEmail = async (email: string) => {
 }
 
 export const saveActivationCode = async (idUser: string) => {
-  const code = Math.random().toString(62).substr(3, 6);
+  const code = Math.random().toString(36).substr(3, 6);
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
   await writeFile(
     PATH_LOCAL_DB_ACTIVATION_CODES,
