@@ -24,9 +24,8 @@ interface IState {
   errorMessage?: string;
 };
 
-
-
-type Action = { type: 'SET_STATE', appState: AppState };
+type Action = { type: 'SET_STATE', appState: AppState } |
+  { type: 'SET_USER', user: IUser };
 
 const reducer = (state: IState, action: Action): IState => {
   switch (action.type) {
@@ -55,10 +54,10 @@ const App: React.FC = () => {
         user={user}
         querying={appState === 'QUERY_LOGIN'}
         errorMessage={errorMessage}
-        onLogin={ async (user, password) => {
-          const loginData = await doLogin(user, password);
+        onLogin={ async (login, password) => {
+          const loginData = await doLogin(login, password);
           if (loginData.loginState === 'LOGGED_IN') {
-            dispatch({ type: 'SET_STATE', appState: 'PROFILE' })
+            dispatch({ type: 'SET_USER', user: {login, password} })
           }
         }}
       //onLogUp={ () => {} }
