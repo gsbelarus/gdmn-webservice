@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, StatusBar, TextInput, Alert, TouchableOpacity } from 'react-native';
 import SubTitle from './components/SubTitle';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Main = (): JSX.Element => {
 
 const [inputValue, setInputValue] = useState('');
 
-const verifyCode = async () => {
-  const data = await fetch(
-    'http://localhost:3649/verifyCode',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
-      credentials: 'include',
-      body: JSON.stringify({'code': inputValue})
-    }
-  ).then(res => res.json())
-  .then(res => res.body.status)
-  if (data.body.status === 200) {
+const sendCode = async() => {
+  //TODO: fetch to service
+  const receivedCode = '123qwe';
+  if (receivedCode === inputValue) {
     return Alert.alert(
       'Your code is correct!',
       '',
@@ -29,7 +22,7 @@ const verifyCode = async () => {
       ],
     );
   }
-  if (data.body.status === 404) { 
+  else { 
     return Alert.alert(
       'Your code is incorrect!',
       'Try again',
@@ -64,7 +57,7 @@ return (
           returnKeyType="done"
           autoCorrect={false}
           blurOnSubmit={true}
-          onSubmitEditing={verifyCode}
+          onSubmitEditing={sendCode}
         />
       </View>
     </View>
@@ -75,6 +68,10 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#E3EFF4',
     flex: 1
+  },
+  deleteAllButton: {
+    marginRight: 10,
+    marginTop: 10
   },
   input: {
     borderWidth: 1,
@@ -93,7 +90,7 @@ const styles = StyleSheet.create({
   title: {
     marginRight: 10,
     alignItems: 'center'
-  }
+  },
 });
 
 export default Main;
