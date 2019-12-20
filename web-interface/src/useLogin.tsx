@@ -6,9 +6,15 @@ export interface ILogin {
   loginState: LoginState;
   user?: string;
   password?: string;
+<<<<<<< HEAD
   // fullName?: string;
   // phone?: string;
   // isAdmin?: boolean;
+=======
+  fullName?: string;
+  phone?: string;
+  isAdmin?: boolean;
+>>>>>>> master
   errorMessage?: string;
 };
 

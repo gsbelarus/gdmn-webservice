@@ -1,0 +1,35 @@
+{
+  "appenders": {
+    "out": {
+      "type": "stdout"
+    },
+    "all": {
+      "type": "file",
+      "filename": "./logs/all.log",
+      "maxLogSize": 10E6
+    },
+    "errors": {
+      "type": "file",
+      "filename": "./logs/errors.log"
+    },
+    "errorsFilter": {
+      "type": "logLevelFilter",
+      "level": "error",
+      "appender": "errors"
+    },
+    "warns": {
+      "type": "file",
+      "filename": "./logs/warns.log"
+    },
+    "warnsFilter": {
+      "type": "logLevelFilter",
+      "appender": "warns",
+      "level": "warn"
+    }
+
+  },
+  "categories": {
+    "default": { "appenders": [ "out", "errorsFilter", "warnsFilter", "all"], "level": "trace" },
+    "SERVER": { "appenders": [ "out", "errorsFilter", "warnsFilter", "all"], "level": "trace" }
+  }
+}
