@@ -1,13 +1,16 @@
 import React, { useReducer } from 'react';
 import { IUser } from './types';
 import { Login } from './components/Login';
+import { useLogin } from './useLogin';
+
+type AppState = 'LOGIN' | 'QUERY_LOGIN' | 'PROFILE';
 
 interface IState {
   /**
    * Состояние нашего приложения. В зависимости
    * от него мы будем отрисовывать экран.
    */
-  appState: 'LOGIN' | 'QUERY_LOGIN';
+  appState: AppState;
   /**
    * Наличие данных о пользователе будет для
    * нас сигналом, что успешно прошла авторизация
@@ -21,13 +24,26 @@ interface IState {
   errorMessage?: string;
 };
 
-type Action = { type: 'TEST' };
+
+
+type Action = { type: 'SET_STATE', appState: AppState };
 
 const reducer = (state: IState, action: Action): IState => {
+  switch (action.type) {
+    case 'SET_STATE': {
+      const { appState } = action;
+      return {
+        ...state,
+        appState
+      }
+    }
+  }
+
   return state;
 };
 
 const App: React.FC = () => {
+  const [login, doLogin, doLogout] = useLogin('test@gmail.com', '1');
   const [{ appState, user, errorMessage }, dispatch] = useReducer(reducer, {
     appState: 'LOGIN'
   });
@@ -39,7 +55,13 @@ const App: React.FC = () => {
         user={user}
         querying={appState === 'QUERY_LOGIN'}
         errorMessage={errorMessage}
-        onLogin={...}
+        onLogin={ async (user, password) => {
+          const loginData = await doLogin(user, password);
+          if (loginData.loginState === 'LOGGED_IN') {
+            dispatch({ type: 'SET_STATE', appState: 'PROFILE' })
+          }
+        }}
+      //onLogUp={ () => {} }
       />
     :
       <div>
