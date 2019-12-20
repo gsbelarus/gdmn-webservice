@@ -20,6 +20,7 @@ export interface IOrganisation {
   title: string;
   admin: string;
 }
+
  export interface IDevice {
   uid: string;
   user: string;
