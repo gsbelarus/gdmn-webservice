@@ -3,6 +3,7 @@ export interface IUser {
   userName: string;
   password: string;
   activationCode?: string;
+  organisation: string;
   firstName?: string;
   lastName?: string;
   numberPhone?: string;
@@ -17,7 +18,9 @@ export interface IActivationCode {
 export interface IOrganisation {
   id: number;
   title: string;
+  admin: string;
 }
+
  export interface IDevice {
   uid: string;
   user: string;
