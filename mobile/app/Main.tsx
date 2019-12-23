@@ -7,12 +7,11 @@ const Main = (): JSX.Element => {
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    'http://192.168.0.66:3649/api/device/verifyCode',
+    `http://192.168.0.66:3649/api/device/verifyCode?code=${inputValue}`,
     {
-      method: 'POST',
+      method: 'GET',
       headers: { 'Content-Type': 'application/json'},
       credentials: 'include',
-      body: JSON.stringify({'code': inputValue})
     }
   ).then(res => res.json())
   .then(res => res.status)
