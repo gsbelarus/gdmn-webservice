@@ -33,7 +33,7 @@ const addOrganisation = async(ctx: any) => {
 }
 
 const getProfile = async (ctx: any) => {
-  const {title} = ctx.request.body;
+  const {title} = ctx.query;
   const allOrganisations: IOrganisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
   const result = allOrganisations && allOrganisations.find(organisation => organisation.title === title);
   if(!allOrganisations || !result) {
