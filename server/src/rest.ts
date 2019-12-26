@@ -7,7 +7,7 @@ import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { IUser } from './models';
 import bodyParser from 'koa-bodyparser';
 import log4js from 'log4js';
-import { findByEmail, findById } from './roters/util';
+import { findByUserName, findById } from './roters/util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -33,7 +33,7 @@ export async function init() {
   app.use(bodyParser());
   passport.serializeUser((user: IUser, done) => done(null, user.id));
 	passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
-	passport.use(new LocalStrategy({ usernameField: 'email' }, validateAuthCreds));
+	passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
 	app.use(passport.initialize());
 	app.use(passport.session());
   app.use(koaCors({
@@ -51,8 +51,8 @@ export async function init() {
 	console.log(`Rest started on http://localhost:${port}`);
 }
 
-const validateAuthCreds: VerifyFunction = async (email: string, password: string, done) => {
-	const user = await findByEmail(email);
+const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
+	const user = await findByUserName(userName);
 	// TODO: use password hash
   if (!user || user.password !== password) {
     done(null, false);

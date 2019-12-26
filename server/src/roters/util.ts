@@ -7,9 +7,9 @@ export const findById = async (id: string) => {
   return data ? data.find(user => user.id === id) : undefined;
 }
 
-export const findByEmail = async (email: string) => {
+export const findByUserName = async (userName: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.userName === email) : undefined;
+  return data ? data.find(user => user.userName === userName) : undefined;
 }
 
 export const saveActivationCode = async (idUser: string) => {

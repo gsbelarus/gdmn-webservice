@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, StatusBar, TextInput, Alert, TouchableOpacity } from 'react-native';
 import SubTitle from './components/SubTitle';
-import { MaterialIcons } from '@expo/vector-icons';
 
 const Main = (): JSX.Element => {
 
 const [inputValue, setInputValue] = useState('');
-
-const sendCode = async() => {
-  //TODO: fetch to service
-  const receivedCode = '123qwe';
-  if (receivedCode === inputValue) {
+const verifyCode = async () => {
+  const data = await fetch(
+    `http://192.168.0.66:3649/api/device/verifyCode?code=${inputValue}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+    }
+  ).then(res => res.json())
+  .then(res => res.status)
+  if (data === 200) {
     return Alert.alert(
       'Your code is correct!',
       '',
@@ -22,7 +27,7 @@ const sendCode = async() => {
       ],
     );
   }
-  else { 
+  if (data === 404) { 
     return Alert.alert(
       'Your code is incorrect!',
       'Try again',
@@ -57,7 +62,7 @@ return (
           returnKeyType="done"
           autoCorrect={false}
           blurOnSubmit={true}
-          onSubmitEditing={sendCode}
+          onSubmitEditing={verifyCode}
         />
       </View>
     </View>

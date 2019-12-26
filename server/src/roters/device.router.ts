@@ -19,7 +19,7 @@ router.get('/byUser', ctx => getDevicesByUser(ctx));
 
 const verifyCode = async(ctx: any) => {
   const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const code = data && data.find(code => code.code === ctx.request.body.code);
+  const code = data && data.find(code => code.code === ctx.query.code);
   if (code) {
     const date = new Date(code.date);
     date.setDate(date.getDate() + 7);
@@ -40,7 +40,7 @@ const verifyCode = async(ctx: any) => {
 }
 
 const getActivationCode = async(ctx: any) => {
-  const userName = ctx.request.body.user;
+  const userName = ctx.query.user;
   const code = await saveActivationCode(userName);
   ctx.status = 200;
   ctx.body = JSON.stringify({ status: 200, result: code});
@@ -103,7 +103,7 @@ const removeDevice = async(ctx: any) => {
 }
 
 const getDevicesByUser = async(ctx: any) => {
-  const {idUser} = ctx.request.body;
+  const {idUser} = ctx.query;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   ctx.body = JSON.stringify({
     status: 200,

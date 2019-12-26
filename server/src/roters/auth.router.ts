@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { IUser } from '../models';
 import { PATH_LOCAL_DB_USERS } from '../rest';
 import { readFile, writeFile } from '../workWithFile';
-import { saveActivationCode, findByEmail } from './util';
+import { saveActivationCode, findByUserName } from './util';
 
 const router = new Router();
 const logger = log4js.getLogger('SERVER');
@@ -27,13 +27,13 @@ const getLogin = async (ctx: any) => {
       ctx.body = JSON.stringify({ status: 200, result: user ? user.id : false});
       logger.info(`login user ${user}`);
     } else {
-      ctx.status = 200;
+      ctx.status = 404;
       ctx.body = JSON.stringify({ status: 404, result: 'wrong password or login'});
       logger.info('failed login attempt');
     }
   } else {
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'you are already logged in'});
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: 'you are already logged in'});
     logger.warn('this user has already logged in');
   }
 }
@@ -58,20 +58,22 @@ const getSignOut = (ctx: any) => {
     ctx.body = JSON.stringify({ status: 200, result: 'sign out successful'});
     logger.info(`user ${user} sign out successful`);
   } else {
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'left before or didn’t enter'});
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: 'left before or didn’t enter'});
     logger.warn('left before or didn’t enter');
   }
 }
 
 const signup = async (ctx: any) => {
   const newUser = ctx.request.body as IUser;
-  if(!(await findByEmail(newUser.userName))) {
+  if(!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, {id: newUser.userName, ...newUser}] : [{id: newUser.userName, ...newUser}]));
+    ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: await saveActivationCode(newUser.userName)});
     logger.info('sign up successful');
   } else {
+    ctx.status = 404;
     ctx.body = JSON.stringify({ status: 404, result: 'such user already exists'});
     logger.info('such user already exists');
   }

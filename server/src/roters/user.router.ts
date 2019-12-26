@@ -13,7 +13,7 @@ router.get('/byDevice', ctx => getUsersByDevice(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
-  const {idDevice} = ctx.request.body;
+  const {idDevice} = ctx.query;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   ctx.body = JSON.stringify({
