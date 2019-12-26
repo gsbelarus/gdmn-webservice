@@ -1,56 +1,142 @@
 import { useState } from "react";
 
-export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT';
+export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT' | 'SIGNED_UP' | 'SIGNING_UP';
 
 export interface ILogin {
   loginState: LoginState;
   user?: string;
   password?: string;
-<<<<<<< HEAD
-  // fullName?: string;
-  // phone?: string;
-  // isAdmin?: boolean;
-=======
-  fullName?: string;
-  phone?: string;
-  isAdmin?: boolean;
->>>>>>> master
   errorMessage?: string;
 };
 
-export type LoginProc = (user: string, password: string) => Promise<ILogin>;
-export type LogoutProc = () => void;
+export type LogInProc = (user: string, password: string) => Promise<ILogin>;
+export type LogoutProc = () => Promise<ILogin>;
+export type SignUpProc = (user: string, password: string) => Promise<ILogin>;
 
-export const useLogin = (user?: string, password?: string): [ILogin, LoginProc, LogoutProc] => {
+export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, LogoutProc, SignUpProc] => {
   const [login, setLogin] = useState<ILogin>({ loginState: 'LOGGED_OUT', user, password });
 
-  const doLogin: LoginProc = (user: string, password: string) => {
+  const doLogin: LogInProc = (user: string, password: string) => {
     setLogin({ loginState: 'LOGGING_IN' });
-    return new Promise(
-      resolve => {
-        setTimeout( () => {
+    console.log('doLogin');
 
-          const newState: ILogin = {
-            loginState: 'LOGGED_IN',
-            user,
-            password
-          };
+    const body = JSON.stringify({
+      userName: user,
+      password,
+    });
 
-          setLogin(newState);
+    return fetch("http://localhost:3649/api/login", {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body})
+    .then ( res => res.json() )
+    .then ( res => {
+      let newState: ILogin;
 
-          resolve(newState);
-
-        }, 2000 );
+      if (res.status === 200) {
+        newState = {
+          loginState: 'LOGGED_IN',
+          user,
+          password
+        };
+       } else {
+        newState = {
+          loginState: 'LOGGING_OUT',
+          errorMessage: `${res.status} - ${res.result}`
+        };
       }
-    );
+
+      setLogin(newState);
+      return newState;
+    })
+    .catch( err => {
+      const newState: ILogin = {
+        loginState: 'LOGGING_OUT',
+        errorMessage: err
+      };
+
+      setLogin(newState);
+      return newState;
+    });
+
   };
 
-  const doLogout = () => {
-    setLogin({ loginState: 'LOGGING_OUT' });
-    setTimeout( () => setLogin({
-      loginState: 'LOGGED_OUT'
-    }), 2000 );
+  const doSignUp: SignUpProc = (user: string, password: string) => {
+    setLogin({loginState: 'SIGNING_UP', user, password});
+    console.log('doSignUp');
+
+    const body = JSON.stringify({
+      userName: user,
+      password
+    });
+
+    return fetch("http://localhost:3649/api/signup", {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body})
+      .then ( res => res.json() )
+      .then ( res => {
+        let newState: ILogin;
+
+        if (res.status === 200) {
+          newState = {
+            user,
+            password,
+            loginState: 'SIGNED_UP',
+          };
+         } else {
+          newState = {
+            loginState: 'LOGGED_OUT',
+            errorMessage: `${res.status} - ${res.result}`
+          };
+        }
+
+        setLogin(newState);
+        return newState;
+      })
+      .catch( err => {
+        const newState: ILogin = {
+          loginState: 'LOGGED_OUT',
+          errorMessage: err
+        };
+
+        setLogin(newState);
+        return newState;
+      });
   };
 
-  return [login, doLogin, doLogout];
+  const doLogOut = () => {
+
+    setLogin({loginState: 'LOGGING_OUT', user: login.user, password: login.password});
+    console.log('doLogout');
+
+    return fetch("http://localhost:3649/api/signout", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
+      .then ( res => res.json() )
+      .then ( res => {
+        let newState: ILogin;
+
+        if (res.status === 200) {
+          newState = {
+            loginState: 'LOGGED_OUT',
+          };
+         } else {
+          newState = {
+            loginState: 'SIGNED_UP',
+            user: login.user,
+            password: login.password,
+            errorMessage: `${res.status} - ${res.result}`
+          };
+        }
+
+        setLogin(newState);
+        return newState;
+      })
+      .catch( err => {
+        const newState: ILogin = {
+          loginState: 'SIGNED_UP',
+          user: login.user,
+          password: login.password,
+          errorMessage: err
+        };
+
+        setLogin(newState);
+        return newState;
+      });
+  };
+
+  return [login, doLogin, doLogOut, doSignUp];
 };

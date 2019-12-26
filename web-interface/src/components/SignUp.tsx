@@ -2,19 +2,19 @@ import { IUser } from "../types";
 import React, { useState, useEffect } from "react";
 import { Stack, TextField, Label, PrimaryButton, Link } from "office-ui-fabric-react";
 
-interface ILoginProps {
+interface ISignUpProps {
   user?: IUser;
   querying: boolean;
   errorMessage?: string;
-  onLogin: (login: string, password: string) => void;
-  onSetSignUp: () => void;
+  onSignUp: (login: string, password: string, ) => void;
   onClearError: () => void;
 };
 
-export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onClearError }: ILoginProps) => {
+export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }: ISignUpProps) => {
 
   const [login, setLogin] = useState(user?.login ? user.login : '');
   const [password, setPassword] = useState(user?.password ? user.password : '');
+  const [repeatPassword, setRepeatPassword] = useState();
 
   return (
     <div>
@@ -32,7 +32,7 @@ export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onCl
           {
             errorMessage &&
             <Label>
-              {`Ошибка при проверке пользователя на сервере: ${errorMessage}`}
+              {`Ошибка при регистрации пользователя на сервере: ${errorMessage}`}
             </Label>
           }
           <TextField
@@ -45,23 +45,20 @@ export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onCl
             value={password}
             onChange={ (_, password) => password !== undefined ? setPassword(password) : undefined }
           />
+          <TextField
+            label="Repeat password:"
+            value={repeatPassword}
+            onChange={ (_, repeatPassword) => repeatPassword !== undefined ? setRepeatPassword(repeatPassword) : undefined }
+          />
           <PrimaryButton
-            text="Login"
-            style={{float: 'right', margin: '8px 0'}}
-            disabled={ !login || !password || querying }
+            text="Signup"
+            style={{float: 'right', marginTop: '8px'}}
+            disabled={ !login || !password || querying || repeatPassword !== password}
             onClick={ () => {
               onClearError();
-              onLogin(login, password);
+              onSignUp(login, password)
             }}
           />
-          <div onClick={ () => {
-            onClearError();
-            onSetSignUp();
-            }}
-            style={{width: '100%', float: 'right', textAlign: 'right', color: '#0366d6', textDecoration: 'underline', fontSize: '12px'}}
-          >
-            Зарегистрироваться
-          </div>
         </div>
       </Stack>
     </div>
