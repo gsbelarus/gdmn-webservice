@@ -6,14 +6,14 @@ interface ILoginProps {
   user?: IUser;
   querying: boolean;
   errorMessage?: string;
-  onLogin: (login: string, password: string) => void;
+  onLogin: (userName: string, password: string) => void;
   onSetSignUp: () => void;
   onClearError: () => void;
 };
 
 export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onClearError }: ILoginProps) => {
 
-  const [login, setLogin] = useState(user?.login ? user.login : '');
+  const [userName, setLogin] = useState(user?.userName ? user.userName : '');
   const [password, setPassword] = useState(user?.password ? user.password : '');
 
   return (
@@ -36,27 +36,28 @@ export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onCl
             </Label>
           }
           <TextField
-            label="User name:"
-            value={login}
-            onChange={ (_, login) => login !== undefined ? setLogin(login) : undefined }
+            label="Имя пользователя:"
+            value={userName}
+            onChange={ (_, userName) => userName !== undefined ? setLogin(userName) : undefined }
           />
           <TextField
-            label="Password:"
+            label="Пароль:"
             value={password}
             onChange={ (_, password) => password !== undefined ? setPassword(password) : undefined }
           />
           <PrimaryButton
-            text="Login"
+            text="Войти"
             style={{float: 'right', margin: '8px 0'}}
-            disabled={ !login || !password || querying }
+            disabled={ !userName || !password || querying }
             onClick={ () => {
               onClearError();
-              onLogin(login, password);
+              onLogin(userName, password);
             }}
           />
-          <div onClick={ () => {
-            onClearError();
-            onSetSignUp();
+          <div
+            onClick={ () => {
+              onClearError();
+              onSetSignUp();
             }}
             style={{width: '100%', float: 'right', textAlign: 'right', color: '#0366d6', textDecoration: 'underline', fontSize: '12px'}}
           >

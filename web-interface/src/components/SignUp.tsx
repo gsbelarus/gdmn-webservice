@@ -12,7 +12,7 @@ interface ISignUpProps {
 
 export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }: ISignUpProps) => {
 
-  const [login, setLogin] = useState(user?.login ? user.login : '');
+  const [login, setLogin] = useState(user?.userName ? user.userName : '');
   const [password, setPassword] = useState(user?.password ? user.password : '');
   const [repeatPassword, setRepeatPassword] = useState();
 

@@ -1,9 +1,11 @@
 export interface IUser {
-  login: string;
+  userName: string;
   password: string;
   firstName?: string;
   lastName?: string;
   numberPhone?: string;
-  organizations?: string[];
-  devices?: string[];
+};
+export interface IUserCompany {
+  name: string;
+  userRole?: 'Admin';
 };

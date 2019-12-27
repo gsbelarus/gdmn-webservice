@@ -2,15 +2,16 @@ import { ICommandBarItemProps, CommandBar, Stack, Label } from "office-ui-fabric
 import React from "react";
 
 export interface IMenuProps {
-  login: string;
+  userName: string;
   querying: boolean;
   errorMessage?: string;
   onEditProfile: () => void;
   onLogOut: () => void;
   onClearError: () => void;
+  onEditCompany: () => void;
 }
 
-export const Menu = ({ login, onEditProfile, onLogOut, querying, errorMessage, onClearError }: IMenuProps) => {
+export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onEditCompany }: IMenuProps) => {
 
   const _items: ICommandBarItemProps[] = [
     {
@@ -19,9 +20,13 @@ export const Menu = ({ login, onEditProfile, onLogOut, querying, errorMessage, o
       subMenuProps: {
         items: [
           {
-            key: 'addOrganization',
+            key: 'addCompany',
             text: 'Создать организацию..',
             iconProps: { iconName: 'Org' },
+            onClick: () => {
+              onClearError();
+              onEditCompany();
+            }
           },
           {
             key: 'something',
@@ -33,7 +38,7 @@ export const Menu = ({ login, onEditProfile, onLogOut, querying, errorMessage, o
     },
     {
       key: 'settings',
-      text: login,
+      text: userName,
       subMenuProps: {
         items: [
           {
