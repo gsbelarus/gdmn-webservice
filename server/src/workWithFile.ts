@@ -37,9 +37,7 @@ export const writeFile = async (filename: string, data: string) => {
 
 export const removeFile = async (filename: string) => {
   try {
-    console.log('2');
     await promises.unlink(filename);
-    console.log('3');
     logger.info('Successful remove file');
     return 'OK';
   }

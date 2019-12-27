@@ -78,11 +78,8 @@ const getMessage = async(ctx:  any) => {
 const removeMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
     const {organisation, uid} = ctx.query;
-    console.log('1');
     const result = await remove(organisation, uid);
-    console.log('4');
-    console.log(result);
-    if(result && result === 'OK') {
+    if(result === 'OK') {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: 'OK'});
       logger.info('get message');
