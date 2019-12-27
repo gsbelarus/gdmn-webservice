@@ -10,6 +10,7 @@ logger.level = 'trace';
 const router = new Router({prefix: '/user'});
 
 router.get('/byDevice', ctx => getUsersByDevice(ctx));
+router.get('/all', ctx => getUsers(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
@@ -27,6 +28,24 @@ const getUsersByDevice = async (ctx: any) => {
           const user = allUsers && allUsers.find(user => user.id === device.user);
           return user ? {user: user.userName, state: device.isBlock ? 'blocked' : 'active'} : 'not found user'
         })
+    });
+    logger.info('get users by device successfully');
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
+const getUsers = async (ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    ctx.body = JSON.stringify({
+      status: 200,
+      result: !allUsers || !allUsers.length
+      ? []
+      : allUsers
+      .map(user => {return {id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phone: user.numberPhone}})
     });
     logger.info('get users by device successfully');
   } else {
