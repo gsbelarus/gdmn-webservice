@@ -28,6 +28,7 @@
     "koa-router": "^7.4",
     "koa-session": "^5.12",
     "log4js": "^6.1",
-    "passport-local": "^1.0"
+    "passport-local": "^1.0",
+    "uuid": "^3.3"
   }
 }
