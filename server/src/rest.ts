@@ -16,6 +16,7 @@ export const PATH_LOCAL_DB_USERS = 'C:\\DB\\DB_USERS.json'
 export const PATH_LOCAL_DB_ACTIVATION_CODES = 'C:\\DB\\DB_ACTIVATION_CODES.json'
 export const PATH_LOCAL_DB_ORGANISATIONS = 'C:\\DB\\DB_ORGANISATIONS.json'
 export const PATH_LOCAL_DB_DEVICES = 'C:\\DB\\DB_DEVICES.json'
+export const PATH_LOCAL_DB_MESSAGES = 'C:\\DB\\DB_MESSAGES\\'
 
 export async function init() {
   const app = new Koa();
