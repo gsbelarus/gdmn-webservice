@@ -1,7 +1,7 @@
 import Router from 'koa-router';
 import { IUser, IDevice } from '../models';
 import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ORGANISATIONS } from '../rest';
 import log4js from 'log4js';
 
 const logger = log4js.getLogger('SERVER');
@@ -11,6 +11,7 @@ const router = new Router({prefix: '/user'});
 
 router.get('/byDevice', ctx => getUsersByDevice(ctx));
 router.get('/all', ctx => getUsers(ctx));
+router.get('/byOrganisation', ctx => getUsersByOrganisation(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
@@ -48,6 +49,23 @@ const getUsers = async (ctx: any) => {
       .map(user => {return {id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phone: user.numberPhone}})
     });
     logger.info('get users by device successfully');
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
+const getUsersByOrganisation = async (ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {idOrganisation} = ctx.query;
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    ctx.body = JSON.stringify({
+      status: 200,
+      result: allUsers && allUsers
+        .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
+    });
+    logger.info('get users by organisation successfully');
   } else {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});
