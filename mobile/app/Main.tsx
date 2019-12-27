@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, FC } from 'react';
 import { StyleSheet, View, StatusBar, TextInput, Alert, TouchableOpacity } from 'react-native';
 import SubTitle from './components/SubTitle';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from 'react-navigation-hooks'
 
-const Main = (): JSX.Element => {
-
+const Main: FC = (): JSX.Element => {
+const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
@@ -22,7 +24,7 @@ const verifyCode = async () => {
       [
         {
           text: 'OK', 
-          onPress: () => setInputValue('')
+          onPress: () => navigate('LoginPage')
         },
       ],
     );
@@ -43,6 +45,15 @@ const verifyCode = async () => {
 
 return (
     <View style={styles.container}>
+      <View style={styles.navigation}>
+        <TouchableOpacity onPress={() => navigate('LoginPage')}>
+          <MaterialIcons
+            name="menu"
+            size={28}
+            color={'#9CAEBA'}
+          />
+        </TouchableOpacity>
+      </View>
       <StatusBar barStyle="light-content" />
       <View style={styles.title}>
         <SubTitle subtitle='Please enter your code' />
@@ -72,11 +83,12 @@ return (
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#E3EFF4',
-    flex: 1
+    flex: 1,
+    height: '100%'
   },
-  deleteAllButton: {
-    marginRight: 10,
-    marginTop: 10
+  navigation: {
+    marginLeft: 10,
+    marginTop: 20
   },
   input: {
     borderWidth: 1,
@@ -99,3 +111,4 @@ const styles = StyleSheet.create({
 });
 
 export default Main;
+

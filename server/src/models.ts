@@ -3,7 +3,7 @@ export interface IUser {
   userName: string;
   password: string;
   activationCode?: string;
-  organisation?: string;
+  organisations?: string[];
   firstName?: string;
   lastName?: string;
   numberPhone?: string;
