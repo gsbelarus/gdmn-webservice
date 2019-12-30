@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
+import { IUser } from '../types';
 
 export interface ICompanyProps {
   isCreate?: boolean;
   companyName?: string;
-  users?: string[];
+  users?: IUser[];
   onCreateCompany: (name: string) => void;
   onEditCompany: (name: string) => void;
+  onGetAllUsers: () => void;
 }
 
 export const Company = ({ onCreateCompany, onEditCompany, companyName, isCreate, users }: ICompanyProps) => {

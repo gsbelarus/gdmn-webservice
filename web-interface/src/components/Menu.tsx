@@ -8,10 +8,10 @@ export interface IMenuProps {
   onEditProfile: () => void;
   onLogOut: () => void;
   onClearError: () => void;
-  onEditCompany: () => void;
+  onCreateCompany: () => void;
 }
 
-export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onEditCompany }: IMenuProps) => {
+export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany }: IMenuProps) => {
 
   const _items: ICommandBarItemProps[] = [
     {
@@ -25,7 +25,7 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
             iconProps: { iconName: 'Org' },
             onClick: () => {
               onClearError();
-              onEditCompany();
+              onCreateCompany();
             }
           },
           {

@@ -9,8 +9,9 @@ import { SignUp } from './components/SignUp';
 import { Company } from './components/Company';
 import { useCompany } from './useCompany';
 import { useUserParams } from './useUserParams';
+import { useAdmin } from './useAdmin';
 
-type AppState = 'LOGIN' | 'QUERY_LOGIN' | 'QUERY_LOGOUT' | 'SIGNUP' | 'QUERY_SIGNUP' | 'PROFILE' | 'SAVED_PROFILE' | 'ADMIN' | 'CREATE_COMPANY';
+type AppState = 'LOGIN' | 'QUERY_LOGIN' | 'QUERY_LOGOUT' | 'SIGNUP' | 'QUERY_SIGNUP' | 'PROFILE' | 'SAVED_PROFILE' | 'ADMIN' | 'CREATE_COMPANY' | 'UPDATE_COMPANY';
 
 interface IState {
   /**
@@ -31,16 +32,19 @@ interface IState {
 
   companies?: IUserCompany[];
   companyName?: string;
-  users?: string[];
+  companyUsers?: IUser[];
+  allUsers?: IUser[];
   errorMessage?: string;
 };
 
 type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_USER', user?: IUser }
+  | { type: 'SET_COMPANY_USERS', companyUsers?: IUser[] }
+  | { type: 'SET_ALL_USERS', allUsers?: IUser[] }
   | { type: 'ADD_COMPANY', company: IUserCompany }
   | { type: 'SET_COMPANY', companyName: string }
   | { type: 'SET_COMPANIES', companies?: IUserCompany[] }
-  | { type: 'EDIT_COMPANY', oldName: string, newName: string }
+  | { type: 'UPDATE_COMPANY', oldName: string, newName: string }
   | { type: 'SET_ERROR', errorMessage?: string };
 
 
@@ -67,6 +71,20 @@ const reducer = (state: IState, action: Action): IState => {
         user
       }
     }
+    case 'SET_COMPANY_USERS': {
+      const { companyUsers } = action;
+      return {
+        ...state,
+        companyUsers
+      }
+    }
+    case 'SET_ALL_USERS': {
+      const { allUsers } = action;
+      return {
+        ...state,
+        allUsers
+      }
+    }
     case 'ADD_COMPANY': {
       const { company } = action;
       return {
@@ -74,7 +92,7 @@ const reducer = (state: IState, action: Action): IState => {
         companies: state.companies ? [...state.companies, company] : [company]
       }
     }
-    case 'EDIT_COMPANY': {
+    case 'UPDATE_COMPANY': {
       const { oldName, newName } = action;
       return {
         ...state,
@@ -104,7 +122,8 @@ const App: React.FC = () => {
   const [login, doLogIn, doLogOut, doSignUp] = useLogin();
   const [company, doCreateCompany] = useCompany();
   const [userParams, doGetCompanies, doEditUser] = useUserParams();
-  const [{ appState, user, companies, companyName, users, errorMessage }, dispatch] = useReducer(reducer, {
+  const [admin, doGetUsers, doGetUsersByCompany] = useAdmin();
+  const [{ appState, user, companies, companyName, companyUsers, allUsers, errorMessage }, dispatch] = useReducer(reducer, {
     appState: 'LOGIN'
   });
   console.log(appState);
@@ -178,7 +197,7 @@ const App: React.FC = () => {
               }
             }}
             onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
-            onEditCompany={ () => dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'}) }
+            onCreateCompany={ () => dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'}) }
           />
           { appState === 'ADMIN'
             ?
@@ -186,34 +205,50 @@ const App: React.FC = () => {
                 onCreateCompany={ () => dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'}) }
                 companies={companies?.filter(comp => comp.userRole === 'Admin').map(comp => comp.name)}
                 onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
-                onSelectCompany={ (companyName) => {
-                  dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'});
-                  dispatch({ type: 'SET_COMPANY', companyName})
+                onSelectCompany={ async (companyName) => {
+                  dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY'});
+                  dispatch({ type: 'SET_COMPANY', companyName});
+                  const adminData = await doGetUsersByCompany(companyName);
+                  if (adminData.adminState === 'RECEIVED_USERS_BY_COMPANY') {
+                    dispatch({ type: 'SET_COMPANY_USERS', companyUsers: adminData.users});
+                    //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+                  } else {
+                    dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
+                  }
                 }}
               />
-            : appState === 'CREATE_COMPANY'
+            : (appState === 'CREATE_COMPANY' || appState === 'UPDATE_COMPANY')
               ?
                 <Company
                   isCreate={appState === 'CREATE_COMPANY'}
                   companyName={companyName}
-                  users={users}
+                  users={companyUsers}
                   onCreateCompany={ async (name) => {
                     const companyData = await doCreateCompany(name);
-                    if (companyData.CompanyState === 'CREATED') {
+                    if (companyData.companyState === 'CREATED') {
                       dispatch({ type: 'ADD_COMPANY', company: {name, userRole: 'Admin'} });
                       dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
                     } else {
                       dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
                     }
                   }}
-                   onEditCompany={ () =>{ //async (oldName, newName) => {
+                  onEditCompany={ () =>{ //async (oldName, newName) => {
                   //   const orgData = await doCreateCompany(oldName, newName);
                   //   if (orgData.CompanyState === 'EDITED') {
-                  //     dispatch({ type: 'EDIT_Company', oldName, newName });
+                  //     dispatch({ type: 'UPDATE_COMPANY', oldName: '', newName: '' });
                   //     dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
                   //   } else {
                   //     dispatch({ type: 'SET_ERROR', errorMessage: orgData.errorMessage })
                   //   }
+                  }}
+                  onGetAllUsers={ async () => {
+                    const adminData = await doGetUsers();
+                    if (adminData.adminState === 'RECEIVED_USERS') {
+                      dispatch({ type: 'SET_ALL_USERS', allUsers: adminData.users});
+                      //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+                    } else {
+                      dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
+                    }
                   }}
                 />
               :
