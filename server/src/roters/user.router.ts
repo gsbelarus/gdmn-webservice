@@ -64,7 +64,8 @@ const getUsersByOrganisation = async (ctx: any) => {
       status: 200,
       result: allUsers && allUsers
         .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
-    });
+        .map(user => {return {id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phone: user.numberPhone}})
+      });
     logger.info('get users by organisation successfully');
   } else {
     ctx.status = 403;
