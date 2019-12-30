@@ -22,7 +22,7 @@ const addOrganisation = async(ctx: any) => {
       await writeFile(
         PATH_LOCAL_DB_ORGANISATIONS,
         JSON.stringify(allOrganisations
-          ? [...allOrganisations, {id: allOrganisations[allOrganisations.length - 1].id + 1, title, admin: ctx.state.user}]
+          ? [...allOrganisations, {id: title, title, admin: ctx.state.user}]
           : [{title}]
         )
       );
