@@ -24,3 +24,20 @@ export const saveActivationCode = async (idUser: string) => {
   );
   return code;
 }
+
+export const editeOrganisations = async(idUser: string, organisations: string[]) => {
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    const user = allUsers?.find(item => item.id === idUser);
+    const idx = allUsers?.findIndex( user => user.userName === user.userName );
+    console.log(`user: ${user}`);
+    if(!allUsers || idx === undefined || idx < 0) {
+      return 1;
+    } else {
+      await writeFile(
+        PATH_LOCAL_DB_USERS,
+        JSON.stringify([...allUsers.slice(0, idx), {...user, organisations: [...user?.organisations, ...organisations]}, ...allUsers.slice(idx + 1)]
+        )
+      );
+      return 0;
+    }
+}
