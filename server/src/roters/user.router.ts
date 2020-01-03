@@ -3,6 +3,7 @@ import { IUser, IDevice } from '../models';
 import { readFile, writeFile } from '../workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES } from '../rest';
 import log4js from 'log4js';
+import { editeOrganisations } from './util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -85,11 +86,29 @@ const editeProfile = async(ctx: any) => {
     } else {
       await writeFile(
         PATH_LOCAL_DB_USERS,
-        JSON.stringify([...allUsers.slice(0, idx), {id: allUsers[idx].id, ...newUser}, ...allUsers.slice(idx + 1)]
+        JSON.stringify([...allUsers.slice(0, idx), {id: allUsers[idx].id, password: allUsers[idx].password, ...newUser}, ...allUsers.slice(idx + 1)]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully'});
       logger.info('user edited successfully');
+    }
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
+const addOrganisation = async(ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {organisation, user} = ctx.request;
+    const res = await editeOrganisations(user, [organisation]);
+    if(res === 0) {
+      ctx.body = JSON.stringify({ status: 200, result: `organization(${organisation}) added to user(${user})`});
+      logger.info(`organization(${organisation}) added to user(${user})`);
+    } else {
+      ctx.body = JSON.stringify({ status: 404, result: `no such user(${user})`});
+      logger.warn(`no such user(${user})`);
     }
   } else {
     ctx.status = 403;
