@@ -40,9 +40,11 @@ const getLogin = async (ctx: any) => {
 
 const getMe = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
+    let user = ctx.state.user;
+    delete user.password;
     ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: ctx.state.user});
-    logger.info(`user authenticated: ${ctx.state.user}`);
+    ctx.body = JSON.stringify({ status: 200, result: user});
+    logger.info(`user authenticated: ${ctx.state.user.userName}`);
   } else {
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: 'not authenticated'});

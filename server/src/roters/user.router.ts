@@ -1,7 +1,7 @@
 import Router from 'koa-router';
 import { IUser, IDevice } from '../models';
 import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ORGANISATIONS } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES } from '../rest';
 import log4js from 'log4js';
 
 const logger = log4js.getLogger('SERVER');
@@ -79,7 +79,6 @@ const editeProfile = async(ctx: any) => {
     const newUser = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const idx = allUsers && allUsers.findIndex( user => user.userName === newUser.userName );
-    console.log(idx);
     if(!allUsers || idx === undefined || idx < 0) {
       ctx.body = JSON.stringify({ status: 404, result: `no such user(${newUser.userName})`});
       logger.warn(`no such user(${newUser.userName})`);

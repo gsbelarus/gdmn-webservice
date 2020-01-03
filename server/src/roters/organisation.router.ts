@@ -22,7 +22,7 @@ const addOrganisation = async(ctx: any) => {
       await writeFile(
         PATH_LOCAL_DB_ORGANISATIONS,
         JSON.stringify(allOrganisations
-          ? [...allOrganisations, {id: title, title, admin: ctx.state.user}]
+          ? [...allOrganisations, {id: title, title, admin: ctx.state.user.userName}]
           : [{title}]
         )
       );
@@ -87,7 +87,6 @@ const editeProfile = async (ctx: any) => {
     const newOrganisation = ctx.request.body;
     const allOrganisations: IOrganisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
     const idx = allOrganisations && allOrganisations.findIndex( organisation => organisation.title === newOrganisation.title );
-    console.log(idx);
     if(!allOrganisations || idx === undefined || idx < 0) {
       ctx.body = JSON.stringify({ status: 404, result: `no such organization(${newOrganisation.title})`});
       logger.warn(`no such organization(${newOrganisation.title})`);
