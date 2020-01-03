@@ -6,6 +6,6 @@ export interface IUser {
   numberPhone?: string;
 };
 export interface IUserCompany {
-  name: string;
+  companyName: string;
   userRole?: 'Admin';
 };

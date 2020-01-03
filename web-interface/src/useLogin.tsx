@@ -4,24 +4,24 @@ export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OU
 
 export interface ILogin {
   loginState: LoginState;
-  user?: string;
+  userName?: string;
   password?: string;
   errorMessage?: string;
 };
 
-export type LogInProc = (user: string, password: string) => Promise<ILogin>;
+export type LogInProc = (userName: string, password: string) => Promise<ILogin>;
 export type LogoutProc = () => Promise<ILogin>;
-export type SignUpProc = (user: string, password: string) => Promise<ILogin>;
+export type SignUpProc = (userName: string, password: string) => Promise<ILogin>;
 
-export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, LogoutProc, SignUpProc] => {
-  const [login, setLogin] = useState<ILogin>({ loginState: 'LOGGED_OUT', user, password });
+export const useLogin = (userName?: string, password?: string): [ILogin, LogInProc, LogoutProc, SignUpProc] => {
+  const [login, setLogin] = useState<ILogin>({ loginState: 'LOGGED_OUT', userName: userName, password });
 
-  const doLogin: LogInProc = (user: string, password: string) => {
+  const doLogin: LogInProc = (userName: string, password: string) => {
     setLogin({ loginState: 'LOGGING_IN' });
     console.log('doLogin');
 
     const body = JSON.stringify({
-      userName: user,
+      userName,
       password,
     });
 
@@ -33,7 +33,7 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
       if (res.status === 200) {
         newState = {
           loginState: 'LOGGED_IN',
-          user,
+          userName,
           password
         };
        } else {
@@ -58,12 +58,12 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
 
   };
 
-  const doSignUp: SignUpProc = (user: string, password: string) => {
-    setLogin({loginState: 'SIGNING_UP', user, password});
+  const doSignUp: SignUpProc = (userName: string, password: string) => {
+    setLogin({loginState: 'SIGNING_UP', userName, password});
     console.log('doSignUp');
 
     const body = JSON.stringify({
-      userName: user,
+      userName,
       password
     });
 
@@ -74,7 +74,7 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
 
         if (res.status === 200) {
           newState = {
-            user,
+            userName,
             password,
             loginState: 'SIGNED_UP',
           };
@@ -101,7 +101,7 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
 
   const doLogOut = () => {
 
-    setLogin({loginState: 'LOGGING_OUT', user: login.user, password: login.password});
+    setLogin({loginState: 'LOGGING_OUT', userName: login.userName, password: login.password});
     console.log('doLogout');
 
     return fetch("http://localhost:3649/api/signout", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
@@ -116,7 +116,7 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
          } else {
           newState = {
             loginState: 'SIGNED_UP',
-            user: login.user,
+            userName: login.userName,
             password: login.password,
             errorMessage: `${res.status} - ${res.result}`
           };
@@ -128,7 +128,7 @@ export const useLogin = (user?: string, password?: string): [ILogin, LogInProc, 
       .catch( err => {
         const newState: ILogin = {
           loginState: 'SIGNED_UP',
-          user: login.user,
+          userName: login.userName,
           password: login.password,
           errorMessage: err
         };

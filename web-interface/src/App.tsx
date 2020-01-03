@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useCallback } from 'react';
 import { IUser, IUserCompany } from './types';
 import { Login } from './components/Login';
 import { useLogin } from './useLogin';
@@ -96,7 +96,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { oldName, newName } = action;
       return {
         ...state,
-        companies: state.companies?.map(comp => comp.name === oldName ? {...comp, name: newName} : comp)
+        companies: state.companies?.map(comp => comp.companyName === oldName ? {...comp, companyName: newName} : comp)
       }
     }
     case 'SET_COMPANIES': {
@@ -113,9 +113,9 @@ const reducer = (state: IState, action: Action): IState => {
         companyName
       }
     }
+    default:
+      return state;
   }
-
-  return state;
 };
 
 const App: React.FC = () => {
@@ -128,6 +128,139 @@ const App: React.FC = () => {
   });
   console.log(appState);
 
+  const handleSetError = useCallback((errorMessage) => {
+    dispatch({ type: 'SET_ERROR', errorMessage})
+  }, [dispatch]);
+
+  const handleClearEditOK = useCallback(() => {
+    dispatch({ type: 'SET_STATE', appState: 'PROFILE' })
+  }, [dispatch]);
+
+  const handleEditUserProfile = useCallback((user: IUser) => {
+    const func = async (user: IUser) => {
+      const userParamsData = await doEditUser(user);
+      if (userParamsData.state === 'EDITED_USER') {
+        dispatch({ type: 'SET_USER', user});
+        dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
+      } else {
+        handleSetError(userParamsData.errorMessage);
+        dispatch({ type: 'SET_STATE', appState: 'PROFILE' });
+      }
+    };
+    func(user);
+  }, [dispatch, doEditUser, handleSetError]);
+
+  const handleClearError = useCallback(() => {
+    dispatch({ type: 'SET_ERROR', errorMessage: undefined})
+  }, [dispatch]);
+
+  const handleLogin = useCallback((userName: string, password: string) => {
+    const func = async (userName: string, password: string) => {
+      const loginData = await doLogIn(userName, password);
+      if (loginData.loginState === 'LOGGED_IN') {
+        dispatch({ type: 'SET_USER', user: {userName, password} });
+        //1. получить все организации с ролью в этой организации
+        //если есть, где я админ, выводить список организаций для редактирования
+        //иначе - profile со списком организаций, где я пользователь, и информацией по пользователю
+        const userParams = await doGetCompanies();
+        if (userParams.state === 'RECEIVED_COMPANIES') {
+          dispatch({ type: 'SET_COMPANIES', companies: userParams.companies });
+          dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
+        } else {
+          dispatch({ type: 'SET_ERROR', errorMessage: userParams.errorMessage })
+        }
+        const adminCompanies = userParams.companies?.filter(comp => comp.userRole === 'Admin')
+        console.log(adminCompanies);
+        if (adminCompanies?.length)
+          dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
+        else
+          dispatch({ type: 'SET_STATE', appState: 'PROFILE' });
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: loginData.errorMessage })
+      }
+    };
+    func(userName, password);
+  }, [dispatch, doLogIn, doGetCompanies]);
+
+  const handleSignUp = useCallback((userName: string, password: string) => {
+    const func = async (userName: string, password: string) => {
+      const signUpData = await doSignUp(userName, password);
+      if (signUpData.loginState === 'SIGNED_UP') {
+        dispatch({ type: 'SET_USER', user: {userName, password} });
+        dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: signUpData.errorMessage })
+      }
+    }
+    func(userName, password);
+  }, [dispatch, doSignUp]);
+
+  const handleSetSignUp = useCallback(() => {
+    dispatch({ type: 'SET_STATE', appState: 'SIGNUP'})
+  }, [dispatch]);
+
+  const handleLogOut = useCallback(() => {
+    const func = async () => {
+      const logOutData = await doLogOut();
+      if (logOutData.loginState === 'LOGGED_OUT') {
+        dispatch({ type: 'SET_USER', user: undefined});
+        dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: logOutData.errorMessage })
+      }
+    };
+    func();
+  }, [dispatch, doLogOut]);
+
+  const handleEditProfile = useCallback(() => {
+    dispatch({ type: 'SET_STATE', appState: 'PROFILE' })
+  }, [dispatch]);
+
+  const handleSetCreateCompany = useCallback(() => {
+    dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'})
+  }, [dispatch]);
+
+  const handleSelectCompany = useCallback((companyName: string) => {
+    const func = async (companyName: string) => {
+      dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY'});
+      dispatch({ type: 'SET_COMPANY', companyName});
+      const adminData = await doGetUsersByCompany(companyName);
+      if (adminData.adminState === 'RECEIVED_USERS_BY_COMPANY') {
+        dispatch({ type: 'SET_COMPANY_USERS', companyUsers: adminData.users});
+        //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
+      }
+    };
+    func(companyName);
+  }, [dispatch, doGetUsersByCompany]);
+
+  const handleCreateCompany = useCallback((companyName: string) => {
+    const func = async (companyName: string) => {
+      const companyData = await doCreateCompany(companyName);
+      if (companyData.companyState === 'CREATED') {
+        dispatch({ type: 'ADD_COMPANY', company: {companyName, userRole: 'Admin'} });
+        dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
+      }
+    };
+    func(companyName);
+  }, [dispatch, doCreateCompany]);
+
+  const handleGetAllUsers = useCallback(() => {
+    const func = async () => {
+      const adminData = await doGetUsers();
+      if (adminData.adminState === 'RECEIVED_USERS') {
+        dispatch({ type: 'SET_ALL_USERS', allUsers: adminData.users});
+        //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
+      }
+    };
+    func();
+  }, [dispatch, doGetUsers]);
+
   return (
     appState === 'LOGIN' || appState === 'QUERY_LOGIN'
     ?
@@ -135,32 +268,9 @@ const App: React.FC = () => {
         user={user}
         querying={appState === 'QUERY_LOGIN'}
         errorMessage={errorMessage}
-        onLogin={ async (userName, password) => {
-          const loginData = await doLogIn(userName, password);
-          if (loginData.loginState === 'LOGGED_IN') {
-            dispatch({ type: 'SET_USER', user: {userName, password} });
-            //1. получить все организации с ролью в этой организации
-            //если есть, где я админ, выводить список организаций для редактирования
-            //иначе - profile со списком организаций, где я пользователь, и информацией по пользователю
-            const userParams = await doGetCompanies();
-            if (userParams.state === 'RECEIVED_COMPANIES') {
-              dispatch({ type: 'SET_COMPANIES', companies: userParams.companies });
-              dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
-            } else {
-              dispatch({ type: 'SET_ERROR', errorMessage: userParams.errorMessage })
-            }
-            const adminCompanies = userParams.companies?.filter(comp => comp.userRole === 'Admin')
-            console.log(adminCompanies);
-            if (adminCompanies?.length)
-              dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
-            else
-              dispatch({ type: 'SET_STATE', appState: 'PROFILE' });
-          } else {
-            dispatch({ type: 'SET_ERROR', errorMessage: loginData.errorMessage })
-          }
-        }}
-        onSetSignUp={ () => dispatch({ type: 'SET_STATE', appState: 'SIGNUP'}) }
-        onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
+        onLogin={handleLogin}
+        onSetSignUp={handleSetSignUp}
+        onClearError={handleClearError}
       />
     :
       appState === 'SIGNUP' || appState === 'QUERY_SIGNUP'
@@ -168,16 +278,8 @@ const App: React.FC = () => {
         <SignUp
           querying={appState === 'QUERY_SIGNUP'}
           errorMessage={errorMessage}
-          onSignUp={ async (userName, password) => {
-            const signUpData = await doSignUp(userName, password);
-            if (signUpData.loginState === 'SIGNED_UP') {
-              dispatch({ type: 'SET_USER', user: {userName, password} });
-              dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
-            } else {
-              dispatch({ type: 'SET_ERROR', errorMessage: signUpData.errorMessage })
-            }
-          }}
-          onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
+          onSignUp={handleSignUp}
+          onClearError={handleClearError}
         />
       : user
         ?
@@ -186,36 +288,18 @@ const App: React.FC = () => {
             userName={user.userName}
             querying={appState === 'QUERY_LOGOUT'}
             errorMessage={errorMessage}
-            onEditProfile={ () => dispatch({ type: 'SET_STATE', appState: 'PROFILE' }) }
-            onLogOut={ async () => {
-              const logOutData = await doLogOut();
-              if (logOutData.loginState === 'LOGGED_OUT') {
-                dispatch({ type: 'SET_USER', user: undefined});
-                dispatch({ type: 'SET_STATE', appState: 'LOGIN' })
-              } else {
-                dispatch({ type: 'SET_ERROR', errorMessage: logOutData.errorMessage })
-              }
-            }}
-            onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
-            onCreateCompany={ () => dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'}) }
+            onEditProfile={handleEditProfile}
+            onLogOut={handleLogOut}
+            onClearError={handleClearError}
+            onCreateCompany={handleSetCreateCompany}
           />
           { appState === 'ADMIN'
             ?
               <AdminBox
-                onCreateCompany={ () => dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'}) }
-                companies={companies?.filter(comp => comp.userRole === 'Admin').map(comp => comp.name)}
-                onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
-                onSelectCompany={ async (companyName) => {
-                  dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY'});
-                  dispatch({ type: 'SET_COMPANY', companyName});
-                  const adminData = await doGetUsersByCompany(companyName);
-                  if (adminData.adminState === 'RECEIVED_USERS_BY_COMPANY') {
-                    dispatch({ type: 'SET_COMPANY_USERS', companyUsers: adminData.users});
-                    //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
-                  } else {
-                    dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
-                  }
-                }}
+                onCreateCompany={handleSetCreateCompany}
+                companies={companies?.filter(comp => comp.userRole === 'Admin').map(comp => comp.companyName)}
+                onClearError={handleClearError}
+                onSelectCompany={handleSelectCompany}
               />
             : (appState === 'CREATE_COMPANY' || appState === 'UPDATE_COMPANY')
               ?
@@ -223,15 +307,7 @@ const App: React.FC = () => {
                   isCreate={appState === 'CREATE_COMPANY'}
                   companyName={companyName}
                   users={companyUsers}
-                  onCreateCompany={ async (name) => {
-                    const companyData = await doCreateCompany(name);
-                    if (companyData.companyState === 'CREATED') {
-                      dispatch({ type: 'ADD_COMPANY', company: {name, userRole: 'Admin'} });
-                      dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
-                    } else {
-                      dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
-                    }
-                  }}
+                  onCreateCompany={handleCreateCompany}
                   onEditCompany={ () =>{ //async (oldName, newName) => {
                   //   const orgData = await doCreateCompany(oldName, newName);
                   //   if (orgData.CompanyState === 'EDITED') {
@@ -241,32 +317,15 @@ const App: React.FC = () => {
                   //     dispatch({ type: 'SET_ERROR', errorMessage: orgData.errorMessage })
                   //   }
                   }}
-                  onGetAllUsers={ async () => {
-                    const adminData = await doGetUsers();
-                    if (adminData.adminState === 'RECEIVED_USERS') {
-                      dispatch({ type: 'SET_ALL_USERS', allUsers: adminData.users});
-                      //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
-                    } else {
-                      dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
-                    }
-                  }}
+                  onGetAllUsers={handleGetAllUsers}
                 />
               :
                 <Profile
                   user={user}
                   isEditOK={appState === 'SAVED_PROFILE'}
-                  onClearEditOK={ () => dispatch({ type: 'SET_STATE', appState: 'PROFILE' }) }
-                  onEditProfile={async (user) => {
-                    const userParamsData = await doEditUser(user);
-                    if (userParamsData.state === 'EDITED_USER') {
-                      dispatch({ type: 'SET_USER', user});
-                      dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
-                    } else {
-                      dispatch({ type: 'SET_ERROR', errorMessage: userParamsData.errorMessage });
-                      dispatch({ type: 'SET_STATE', appState: 'PROFILE' });
-                    }
-                  }}
-                  onClearError={ () => dispatch({ type: 'SET_ERROR', errorMessage: undefined}) }
+                  onClearEditOK={handleClearEditOK}
+                  onEditProfile={handleEditUserProfile}
+                  onClearError={handleClearError}
                 />
           }
 

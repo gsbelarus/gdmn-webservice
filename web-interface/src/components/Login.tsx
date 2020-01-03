@@ -1,6 +1,6 @@
 import { IUser } from "../types";
-import React, { useState, useEffect } from "react";
-import { Stack, TextField, Label, PrimaryButton, Link } from "office-ui-fabric-react";
+import React, { useState } from "react";
+import { Stack, TextField, Label, PrimaryButton } from "office-ui-fabric-react";
 
 interface ILoginProps {
   user?: IUser;

@@ -16,7 +16,7 @@ export const Profile = ({ onEditProfile, user, onClearError, isEditOK, onClearEd
   useEffect(() => {
     if (isEditOK)
       onClearEditOK()
-  }, [state, isEditOK])
+  }, [state, isEditOK, onClearEditOK])
 
   return (
     <Stack horizontalAlign='center'>

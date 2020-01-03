@@ -1,6 +1,5 @@
- import React, { useState, useRef } from 'react';
-import { Stack, PrimaryButton, DetailsList, SelectionMode, Selection } from 'office-ui-fabric-react';
-import { IUser } from '../types';
+ import React from 'react';
+import { Stack } from 'office-ui-fabric-react';
 
 export interface IAdminProps {
   companies?: string[];

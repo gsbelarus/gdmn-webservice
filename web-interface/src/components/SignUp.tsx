@@ -1,18 +1,18 @@
 import { IUser } from "../types";
-import React, { useState, useEffect } from "react";
-import { Stack, TextField, Label, PrimaryButton, Link } from "office-ui-fabric-react";
+import React, { useState } from "react";
+import { Stack, TextField, Label, PrimaryButton } from "office-ui-fabric-react";
 
 interface ISignUpProps {
   user?: IUser;
   querying: boolean;
   errorMessage?: string;
-  onSignUp: (login: string, password: string, ) => void;
+  onSignUp: (userName: string, password: string, ) => void;
   onClearError: () => void;
 };
 
 export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }: ISignUpProps) => {
 
-  const [login, setLogin] = useState(user?.userName ? user.userName : '');
+  const [userName, setUserName] = useState(user?.userName ? user.userName : '');
   const [password, setPassword] = useState(user?.password ? user.password : '');
   const [repeatPassword, setRepeatPassword] = useState();
 
@@ -37,8 +37,8 @@ export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }:
           }
           <TextField
             label="User name:"
-            value={login}
-            onChange={ (_, login) => login !== undefined ? setLogin(login) : undefined }
+            value={userName}
+            onChange={ (_, login) => login !== undefined ? setUserName(login) : undefined }
           />
           <TextField
             label="Password:"
@@ -53,10 +53,10 @@ export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }:
           <PrimaryButton
             text="Signup"
             style={{float: 'right', marginTop: '8px'}}
-            disabled={ !login || !password || querying || repeatPassword !== password}
+            disabled={ !userName || !password || querying || repeatPassword !== password}
             onClick={ () => {
               onClearError();
-              onSignUp(login, password)
+              onSignUp(userName, password)
             }}
           />
         </div>

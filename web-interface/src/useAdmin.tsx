@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IUserCompany, IUser } from "./types";
+import { IUser } from "./types";
 
 export type AdminState = 'RECEIVED_USERS' | 'RECIEVING_USERS' | 'ADMIN' | 'RECEIVED_USERS_BY_COMPANY' | 'RECEIVING_USERS_BY_COMPANY';
 
