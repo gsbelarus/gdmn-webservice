@@ -3,6 +3,7 @@ import { IOrganisation, IUser } from '../models';
 import { readFile, writeFile } from '../workWithFile';
 import { PATH_LOCAL_DB_ORGANISATIONS, PATH_LOCAL_DB_USERS } from '../rest';
 import log4js from 'log4js';
+import { editeOrganisations } from './util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -16,7 +17,7 @@ router.post('/editeProfile', ctx => editeProfile(ctx));
 
 const addOrganisation = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {title} = ctx.request.body;
+    const {title} = ctx.query;
     const allOrganisations: IOrganisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
     if(!(allOrganisations && allOrganisations.find( organisation => organisation.title === title))) {
       await writeFile(
@@ -26,8 +27,14 @@ const addOrganisation = async(ctx: any) => {
           : [{id: title, admin: ctx.state.user.id}]
         )
       );
-      ctx.body = JSON.stringify({ status: 200, result: 'new organisation added successfully'});
-      logger.info('new organisation added successfully');
+      const res = await editeOrganisations(ctx.state.user.id, [title]);
+      if(res === 0) {
+        ctx.body = JSON.stringify({ status: 200, result: 'new organisation added successfully'});
+        logger.info('new organisation added successfully');
+      } else {
+        ctx.body = JSON.stringify({ status: 404, result: `such an user(${ctx.state.user.id}) already exists`});
+        logger.warn(`such an user(${ctx.state.user.id}) already exists`);
+      }
     } else {
       ctx.body = JSON.stringify({ status: 404, result: `such an organization(${title}) already exists`});
       logger.warn(`such an organization(${title}) already exists`);
