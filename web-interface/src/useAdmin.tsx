@@ -20,7 +20,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
     setAdmin({ adminState: 'RECIEVING_USERS' });
    console.log('doGetCompanies');
 
-    return fetch("http://localhost:3649/api/user/getUsers", {method: 'GET', headers: {'Content-Type': 'application/json'}})
+    return fetch("http://localhost:3649/api/user/getUsers", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
     .then ( res => res.json() )
     .then ( res => {
       let newState: IAdmin;
@@ -56,7 +56,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
     setAdmin({adminState: 'RECEIVING_USERS_BY_COMPANY'});
     console.log('doGetUsersByCompany');
 
-    return fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyName}` , {method: 'GET', headers: {'Content-Type': 'application/json'}})
+    return fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyName}` , {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
       .then ( res => res.json() )
       .then ( res => {
         let newState: IAdmin;

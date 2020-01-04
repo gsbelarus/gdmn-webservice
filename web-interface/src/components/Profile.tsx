@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
-import { IUser } from '../types';
+import { IUser, IUserCompany } from '../types';
 
 export interface IProfileProps {
   user: IUser;
+  companies?: IUserCompany[];
   isEditOK?: boolean;
   onClearEditOK: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
 }
 
-export const Profile = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK }: IProfileProps) => {
+export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, onClearEditOK }: IProfileProps) => {
   const [state, setState] = useState<IUser>(user);
-
+  console.log(companies);
   useEffect(() => {
     if (isEditOK)
       onClearEditOK()
@@ -59,6 +60,32 @@ export const Profile = ({ onEditProfile, user, onClearError, isEditOK, onClearEd
             }}
           />
         </div>
+        <Stack horizontalAlign='center'>
+        <div style={{width: '80vh', padding: '10px'}}>
+          {/* <div>
+            <PrimaryButton
+              text="Создать организацию"
+              style={{marginTop: '10px', float: 'left'}}
+              onClick={ () => {
+                onClearError();
+                onCreateCompany();
+              }}
+            />
+          </div> */}
+          <span style={{width: '100%', float: 'left'}}>
+            Мои организации:
+          </span>
+          {companies &&
+            companies.map((comp, xid) => {
+              return (
+                <span key={xid} style={{width: '100%', float: 'left'}}>
+                  {comp.companyName}
+                </span>
+              )
+            })
+          }
+        </div>
+      </Stack>
       </div>
     </Stack>
   )

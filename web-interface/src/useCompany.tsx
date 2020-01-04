@@ -27,7 +27,7 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
     .then ( res => res.json() )
     .then ( res => {
       let newState: ICompany;
-
+      console.log(res);
       if (res.status === 200) {
         newState = {
           companyState: 'CREATED'

@@ -1,19 +1,22 @@
 import { useState } from "react";
+import { IUserCompany } from "./types";
 
-export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT' | 'SIGNED_UP' | 'SIGNING_UP';
+export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT' | 'SIGNED_UP' | 'SIGNING_UP' | 'GETTING_ME' | 'GOT_ME';
 
 export interface ILogin {
   loginState: LoginState;
   userName?: string;
   password?: string;
+  companies?: IUserCompany[];
   errorMessage?: string;
 };
 
 export type LogInProc = (userName: string, password: string) => Promise<ILogin>;
-export type LogoutProc = () => Promise<ILogin>;
+export type LogGetMe = () => Promise<ILogin>;
+export type LogOutProc = () => Promise<ILogin>;
 export type SignUpProc = (userName: string, password: string) => Promise<ILogin>;
 
-export const useLogin = (userName?: string, password?: string): [ILogin, LogInProc, LogoutProc, SignUpProc] => {
+export const useLogin = (userName?: string, password?: string): [ILogin, LogInProc, LogGetMe, LogOutProc, SignUpProc] => {
   const [login, setLogin] = useState<ILogin>({ loginState: 'LOGGED_OUT', userName: userName, password });
 
   const doLogin: LogInProc = (userName: string, password: string) => {
@@ -22,7 +25,7 @@ export const useLogin = (userName?: string, password?: string): [ILogin, LogInPr
 
     const body = JSON.stringify({
       userName,
-      password,
+      password
     });
 
     return fetch("http://localhost:3649/api/login", {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body})
@@ -35,6 +38,43 @@ export const useLogin = (userName?: string, password?: string): [ILogin, LogInPr
           loginState: 'LOGGED_IN',
           userName,
           password
+        };
+       } else {
+        newState = {
+          loginState: 'LOGGING_OUT',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+
+      setLogin(newState);
+      return newState;
+    })
+    .catch( err => {
+      const newState: ILogin = {
+        loginState: 'LOGGING_OUT',
+        errorMessage: err
+      };
+
+      setLogin(newState);
+      return newState;
+    });
+
+  };
+
+  const doGetMe: LogGetMe = () => {
+    setLogin({ loginState: 'GETTING_ME' });
+    console.log('doGetMe');
+
+    return fetch("http://localhost:3649/api/me", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
+    .then ( res => res.json() )
+    .then ( res => {
+      let newState: ILogin;
+      console.log(res);
+      if (res.status === 200) {
+        newState = {
+          loginState: 'GOT_ME',
+          userName: res.result.userName,
+          companies: res.result.organisations?.map((org: IUserCompany) => {return {companyName: org}})
         };
        } else {
         newState = {
@@ -137,6 +177,6 @@ export const useLogin = (userName?: string, password?: string): [ILogin, LogInPr
         return newState;
       });
   };
-
-  return [login, doLogin, doLogOut, doSignUp];
+  console.log(login);
+  return [login, doLogin, doGetMe, doLogOut, doSignUp];
 };

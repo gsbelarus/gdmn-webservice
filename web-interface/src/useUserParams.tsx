@@ -9,66 +9,66 @@ export interface IUserParams {
   errorMessage?: string;
 };
 
-export type GetCompaniesProc = () => Promise<IUserParams>;
+export type GetCompaniesProc = (userName: string) => Promise<IUserParams>;
 export type EditUserProc = (user: IUser) => Promise<IUserParams>;
 export type DeleteUserProc = (userName: string) => Promise<IUserParams>;
 
 export const useUserParams = (): [IUserParams, GetCompaniesProc, EditUserProc, DeleteUserProc] => {
   const [userParams, setUserParams] = useState<IUserParams>({ state: 'ADMIN' });
 
-  const doGetCompanies: GetCompaniesProc = () => {
+  const doGetCompanies: GetCompaniesProc = (userName: string) => {
     setUserParams({ state: 'RECIEVING_COMPANIES' });
 
-    return new Promise(
-      resolve => {
-        setTimeout( () => {
+    // return new Promise(
+    //   resolve => {
+    //     setTimeout( () => {
 
-          const newState: IUserParams = {
-            state: 'RECEIVED_COMPANIES',
-            companies: []//[{name: 'Company1', userRole: 'Admin'}, {name: 'Company2'}, {name: 'Company3'}]
-          };
+    //       const newState: IUserParams = {
+    //         state: 'RECEIVED_COMPANIES',
+    //         companies: []//[{name: 'Company1', userRole: 'Admin'}, {name: 'Company2'}, {name: 'Company3'}]
+    //       };
 
-          setUserParams(newState);
+    //       setUserParams(newState);
 
-          resolve(newState);
+    //       resolve(newState);
 
-        }, 2000 );
-      }
-    );
-
-
-   // console.log('doGetCompanies');
-
-
-    // return fetch("http://localhost:3649/api/user/byDevice", {method: 'GET', headers: {'Content-Type': 'application/json'}})
-    // .then ( res => res.json() )
-    // .then ( res => {
-    //   let newState: IUserParams;
-
-    //   if (res.status === 200) {
-    //     newState = {
-    //       userParamsState: 'RECEIVED_COMPANIES',
-    //       companies: res.body
-    //     };
-    //    } else {
-    //     newState = {
-    //       userParamsState: 'ADMIN',
-    //       errorMessage: `${res.status} - ${res.result}`
-    //     };
+    //     }, 2000 );
     //   }
+    // );
 
-    //   setUserParams(newState);
-    //   return newState;
-    // })
-    // .catch( err => {
-    //   const newState: IUserParams = {
-    //     userParamsState: 'ADMIN',
-    //     errorMessage: err
-    //   };
 
-    //   setUserParams(newState);
-    //   return newState;
-    // });
+   console.log('doGetCompanies');
+
+
+    return fetch(`http://localhost:3649/api/organisation/byUser?idUser=${userName}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
+    .then ( res => res.json() )
+    .then ( res => {
+      let newState: IUserParams;
+      console.log(res);
+      if (res.status === 200) {
+        newState = {
+          state: 'RECEIVED_COMPANIES',
+          companies: res.result?.map((org: any) => ({companyName: org.title, userRole: org.userRole}) )
+        };
+       } else {
+        newState = {
+          state: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+
+      setUserParams(newState);
+      return newState;
+    })
+    .catch( err => {
+      const newState: IUserParams = {
+        state: 'ADMIN',
+        errorMessage: err
+      };
+
+      setUserParams(newState);
+      return newState;
+    });
 
   };
 
