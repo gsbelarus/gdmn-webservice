@@ -16,74 +16,70 @@ export type GetUsersByCompanyProc = (companyName: string) => Promise<IAdmin>;
 export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
   const [admin, setAdmin] = useState<IAdmin>({ adminState: 'ADMIN' });
 
-  const doGetUsers: GetUsersProc = () => {
+  const doGetUsers: GetUsersProc = async () => {
     setAdmin({ adminState: 'RECIEVING_USERS' });
    console.log('doGetCompanies');
 
-    return fetch("http://localhost:3649/api/user/getUsers", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
-    .then ( res => res.json() )
-    .then ( res => {
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/user/getUsers", { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const res = await resFetch.json();
       let newState: IAdmin;
-
       if (res.status === 200) {
         newState = {
           adminState: 'RECEIVED_USERS',
-          users: res.body.map((u: IUser) => {return {userName: u.userName, password: '123' }})
+          users: res.body.map((u: IUser) => { return { userName: u.userName, password: '123' }; })
         };
-       } else {
+      }
+      else {
         newState = {
           adminState: 'ADMIN',
           errorMessage: `${res.status} - ${res.result}`
         };
       }
-
       setAdmin(newState);
       return newState;
-    })
-    .catch( err => {
-      const newState: IAdmin = {
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
         adminState: 'ADMIN',
         errorMessage: err
       };
-
-      setAdmin(newState);
-      return newState;
-    });
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
 
   };
 
-  const doGetUsersByCompany: GetUsersByCompanyProc = (companyName: string) => {
+  const doGetUsersByCompany: GetUsersByCompanyProc = async (companyName: string) => {
     setAdmin({adminState: 'RECEIVING_USERS_BY_COMPANY'});
     console.log('doGetUsersByCompany');
 
-    return fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyName}` , {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'})
-      .then ( res => res.json() )
-      .then ( res => {
-        let newState: IAdmin;
-
-        if (res.status === 200) {
-          newState = {
-            adminState: 'RECEIVED_USERS_BY_COMPANY'
-          };
-         } else {
-          newState = {
-            adminState: 'ADMIN',
-            errorMessage: `${res.status} - ${res.result}`
-          };
-        }
-
-        setAdmin(newState);
-        return newState;
-      })
-      .catch( err => {
-        const newState: IAdmin = {
-          adminState: 'ADMIN',
-          errorMessage: err
+    try {
+      const resFetch = await fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyName}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const res = await resFetch.json();
+      let newState: IAdmin;
+      if (res.status === 200) {
+        newState = {
+          adminState: 'RECEIVED_USERS_BY_COMPANY'
         };
-
-        setAdmin(newState);
-        return newState;
-      });
+      }
+      else {
+        newState = {
+          adminState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setAdmin(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
+        adminState: 'ADMIN',
+        errorMessage: err
+      };
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
   };
 
   // const doDeleteUser = (UserName: string) => {
@@ -96,11 +92,11 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
   //   console.log('doDelete');
 
   //   return fetch("http://localhost:3649/api/user/", {method: 'POST', headers: {'Content-Type': 'application/json'}, body})
-  //     .then ( res => res.json() )
-  //     .then ( res => {
+  //     .then ( resFetch => resFetch.json() )
+  //     .then ( resFetch => {
   //       let newState: IAdmin;
 
-  //       if (res.status === 200) {
+  //       if (resFetch.status === 200) {
   //         newState = {
   //           adminState: 'DELETED',
   //         };

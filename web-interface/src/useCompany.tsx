@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export type CompanyState = 'CREATED' | 'CREATING' | 'EDITED' | 'EDITING' | 'DELETED' | 'DELETING' | 'ADMIN';
+export type CompanyState = 'CREATED' | 'CREATING' | 'UPDATED' | 'UPDATING' | 'DELETED' | 'DELETING' | 'ADMIN';
 
 export interface ICompany {
   companyState: CompanyState;
@@ -8,91 +8,83 @@ export interface ICompany {
   errorMessage?: string;
 };
 
-export type CreateCompanyProc = (CompanyName: string) => Promise<ICompany>;
-export type EditCompanyProc = (CompanyName: string) => Promise<ICompany>;
-export type DeleteCompanyProc = (CompanyName: string) => Promise<ICompany>;
+export type CreateCompanyProc = (companyName: string) => Promise<ICompany>;
+export type UpdateCompanyProc = (companyName: string) => Promise<ICompany>;
+export type DeleteCompanyProc = (companyName: string) => Promise<ICompany>;
 
-export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, EditCompanyProc, DeleteCompanyProc] => {
+export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, UpdateCompanyProc, DeleteCompanyProc] => {
   const [company, setCompany] = useState<ICompany>({ companyState: 'DELETED', companyName });
 
-  const doCreateCompany: CreateCompanyProc = (CompanyName: string) => {
+  const doCreateCompany: CreateCompanyProc = async (companyName: string) => {
     setCompany({ companyState: 'CREATING', companyName });
     console.log('doCreate');
-
-    const body = JSON.stringify({
-      title: CompanyName
-    });
-
-    return fetch("http://localhost:3649/api/organisation/new", {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body})
-    .then ( res => res.json() )
-    .then ( res => {
+    try {
+      const resFetch = await fetch(`http://localhost:3649/api/organisation/new?title=${companyName}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const res = await resFetch.json();
       let newState: ICompany;
       console.log(res);
       if (res.status === 200) {
         newState = {
           companyState: 'CREATED'
         };
-       } else {
+      }
+      else {
         newState = {
           companyState: 'ADMIN',
           errorMessage: `${res.status} - ${res.result}`
         };
       }
-
       setCompany(newState);
       return newState;
-    })
-    .catch( err => {
-      const newState: ICompany = {
+    }
+    catch (err) {
+      const newStateErr: ICompany = {
         companyState: 'ADMIN',
         errorMessage: err
       };
-
-      setCompany(newState);
-      return newState;
-    });
+      setCompany(newStateErr);
+      return newStateErr;
+    }
 
   };
 
-  const doEditCompany: EditCompanyProc = (CompanyName: string) => {
-    setCompany({companyState: 'EDITING'});
-    console.log('doEdit');
+  const doUpdateCompany: UpdateCompanyProc = async (companyName: string) => {
+    setCompany({companyState: 'UPDATING'});
+    console.log('doUpdate');
 
     const body = JSON.stringify({
-      title: CompanyName
+      title: companyName
     });
 
-    return fetch("http://localhost:3649/api/organisation/editeProfile", {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body})
-      .then ( res => res.json() )
-      .then ( res => {
-        let newState: ICompany;
-
-        if (res.status === 200) {
-          newState = {
-            companyState: 'EDITED'
-          };
-         } else {
-          newState = {
-            companyState: 'ADMIN',
-            errorMessage: `${res.status} - ${res.result}`
-          };
-        }
-
-        setCompany(newState);
-        return newState;
-      })
-      .catch( err => {
-        const newState: ICompany = {
-          companyState: 'ADMIN',
-          errorMessage: err
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/organisation/editeProfile", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
+      const res = await resFetch.json();
+      let newState: ICompany;
+      if (res.status === 200) {
+        newState = {
+          companyState: 'UPDATED'
         };
-
-        setCompany(newState);
-        return newState;
-      });
+      }
+      else {
+        newState = {
+          companyState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setCompany(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: ICompany = {
+        companyState: 'ADMIN',
+        errorMessage: err
+      };
+      setCompany(newStateErr);
+      return newStateErr;
+    }
   };
 
-  const doDeleteCompany = (CompanyName: string) => {
+  const doDeleteCompany = async (companyName: string) => {
 
     const body = JSON.stringify({
       title: companyName
@@ -101,33 +93,31 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
     setCompany({companyState: 'DELETING', companyName});
     console.log('doDelete');
 
-    return fetch("http://localhost:3649/api/", {method: 'POST', headers: {'Content-Type': 'application/json'}, body})
-      .then ( res => res.json() )
-      .then ( res => {
-        let newState: ICompany;
-
-        if (res.status === 200) {
-          newState = {
-            companyState: 'DELETED',
-          };
-         } else {
-          newState = {
-            companyState: 'ADMIN',
-          };
-        }
-
-        setCompany(newState);
-        return newState;
-      })
-      .catch( err => {
-        const newState: ICompany = {
-          companyState: 'ADMIN'
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      const res = await resFetch.json();
+      let newState: ICompany;
+      if (res.status === 200) {
+        newState = {
+          companyState: 'DELETED',
         };
-
-        setCompany(newState);
-        return newState;
-      });
+      }
+      else {
+        newState = {
+          companyState: 'ADMIN',
+        };
+      }
+      setCompany(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: ICompany = {
+        companyState: 'ADMIN'
+      };
+      setCompany(newStateErr);
+      return newStateErr;
+    }
   };
 
-  return [company, doCreateCompany, doEditCompany, doDeleteCompany];
+  return [company, doCreateCompany, doUpdateCompany, doDeleteCompany];
 };
