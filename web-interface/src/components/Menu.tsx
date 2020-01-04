@@ -1,18 +1,20 @@
-import { ICommandBarItemProps, CommandBar, Stack, Label } from "office-ui-fabric-react";
+import { ICommandBarItemProps, Stack, CommandBar, Label } from "office-ui-fabric-react";
 import React from "react";
 
 export interface IMenuProps {
+  isAdmin?: boolean;
   userName: string;
   querying: boolean;
   errorMessage?: string;
   onEditProfile: () => void;
+  onGetCompanies?: () => void;
   onLogOut: () => void;
   onClearError: () => void;
   onCreateCompany: () => void;
 }
 
-export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany }: IMenuProps) => {
-
+export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies }: IMenuProps) => {
+  console.log(isAdmin);
   const _items: ICommandBarItemProps[] = [
     {
       key: 'newItem',
@@ -48,6 +50,16 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
             onClick: () => {
               onClearError();
               onEditProfile()
+            }
+          },
+          {
+            key: 'editProfile',
+            text: 'Мои организации',
+            iconProps: { iconName: 'Org' },
+            disabled: !isAdmin,
+            onClick: () => {
+              onClearError();
+              onGetCompanies && onGetCompanies()
             }
           },
           {

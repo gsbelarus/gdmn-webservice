@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
-import { IUser, IUserCompany } from '../types';
+import { PrimaryButton, Stack, TextField, IColumn, Link, DetailsList, SelectionMode, Text } from 'office-ui-fabric-react';
+import { IUser, IUserCompany, IItem } from '../types';
 
 export interface IProfileProps {
   user: IUser;
@@ -14,19 +14,28 @@ export interface IProfileProps {
 export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, onClearEditOK }: IProfileProps) => {
   const [state, setState] = useState<IUser>(user);
 
+  const items: IItem[] = companies?.map(c => ({key: c.companyName, name: c.companyName})) || [];
+  const columns: IColumn[] = [{
+    key: 'companyName',
+    name: 'Мои организации:',
+    minWidth: 300,
+    fieldName: 'name',
+  }];
+
   useEffect(() => {
-    if (isEditOK)
-      onClearEditOK()
-  }, [state, isEditOK, onClearEditOK])
+    if (isEditOK) {
+      onClearEditOK();
+    }
+  }, [state])
 
   return (
     <Stack horizontalAlign='center'>
       { isEditOK &&
-        <div>
+        <Text>
           Данные успешно сохранены!
-        </div>
+        </Text>
       }
-      <div style={{width: '30vh', padding: '10px'}}>
+      <Stack.Item>
         <TextField
           disabled={true}
           label="Пользователь:"
@@ -60,23 +69,15 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
             }}
           />
         </div>
-      </div>
-        { !!companies?.length &&
-          <div style={{width: '80vh', padding: '10px'}}>
-            <span style={{width: '100%', float: 'left'}}>
-              Мои организации:
-            </span>
-            {
-              companies.map((comp, xid) => {
-                return (
-                  <span key={xid} style={{width: '100%', float: 'left'}}>
-                    {comp.companyName}
-                  </span>
-                )
-              })
-            }
-          </div>
-       }
+      </Stack.Item>
+      <Stack horizontalAlign='center'>
+        <DetailsList
+          items={items}
+          columns={columns}
+          selectionMode={SelectionMode.none}
+          isHeaderVisible={true}
+        />
+      </Stack>
     </Stack>
   )
 }

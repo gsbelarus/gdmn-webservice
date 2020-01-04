@@ -1,19 +1,22 @@
 import { useState } from "react";
-import { IUser } from "./types";
+import { IUser, IUserCompany } from "./types";
 
-export type AdminState = 'RECEIVED_USERS' | 'RECIEVING_USERS' | 'ADMIN' | 'RECEIVED_USERS_BY_COMPANY' | 'RECEIVING_USERS_BY_COMPANY';
+export type AdminState = 'RECEIVED_USERS' | 'RECIEVING_USERS' | 'ADMIN' | 'RECEIVED_USERS_BY_COMPANY' | 'RECEIVING_USERS_BY_COMPANY' | 'RECEIVED_COMPANY' | 'RECEIVING_COMPANY';
 
 export interface IAdmin {
   adminState: AdminState;
   users?: IUser[];
+  company?: IUserCompany;
   errorMessage?: string;
 };
 
 export type GetUsersProc = () => Promise<IAdmin>;
 export type GetUsersByCompanyProc = (companyName: string) => Promise<IAdmin>;
+export type GetCompanyProc = (companyName: string) => Promise<IAdmin>;
+
 //export type DeleteUserProc = (userName: string) => Promise<IAdmin>;
 
-export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
+export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCompanyProc] => {
   const [admin, setAdmin] = useState<IAdmin>({ adminState: 'ADMIN' });
 
   const doGetUsers: GetUsersProc = async () => {
@@ -57,10 +60,45 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
     try {
       const resFetch = await fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyName}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
+      console.log(res);
+      let newState: IAdmin;
+      if (res.status === 200) {
+         newState = {
+          adminState: 'RECEIVED_USERS_BY_COMPANY',
+          users: res.result.map((u: any) => {return {userName: u.userName, firstName: u.firstName, lastName: u.lastName, numberPhone: u.phone}})
+        };
+      }
+      else {
+        newState = {
+          adminState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setAdmin(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
+        adminState: 'ADMIN',
+        errorMessage: err
+      };
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
+  };
+
+  const doGetCompany: GetUsersByCompanyProc = async (companyName: string) => {
+    setAdmin({adminState: 'RECEIVING_COMPANY'});
+    console.log('doGetCompany');
+    console.log(companyName);
+    try {
+      const resFetch = await fetch(`http://localhost:3649/api/organisation/profile?title=${companyName}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const res = await resFetch.json();
       let newState: IAdmin;
       if (res.status === 200) {
         newState = {
-          adminState: 'RECEIVED_USERS_BY_COMPANY'
+          adminState: 'RECEIVED_COMPANY',
+          company: {companyId: res.result.id, companyName: res.result.title}
         };
       }
       else {
@@ -119,5 +157,5 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc] => {
   //     });
   // };
 
-  return [admin, doGetUsers, doGetUsersByCompany];
+  return [admin, doGetUsers, doGetUsersByCompany, doGetCompany];
 };

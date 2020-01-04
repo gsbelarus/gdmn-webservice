@@ -31,10 +31,11 @@ interface IState {
    */
 
   companies?: IUserCompany[];
-  companyName?: string;
+  currentCompany?: IUserCompany;
   companyUsers?: IUser[];
   allUsers?: IUser[];
   errorMessage?: string;
+  isAdmin?: boolean;
 };
 
 type Action = { type: 'SET_STATE', appState: AppState }
@@ -42,9 +43,10 @@ type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_COMPANY_USERS', companyUsers?: IUser[] }
   | { type: 'SET_ALL_USERS', allUsers?: IUser[] }
   | { type: 'ADD_COMPANY', company: IUserCompany }
-  | { type: 'SET_COMPANY', companyName: string }
+  | { type: 'SET_COMPANY', company?: IUserCompany }
   | { type: 'SET_COMPANIES', companies?: IUserCompany[] }
-  | { type: 'UPDATE_COMPANY', oldName: string, newName: string }
+  | { type: 'SET_IS_ADMIN', isAdmin?: boolean }
+  | { type: 'UPDATE_COMPANY', companyId: number, newName: string }
   | { type: 'SET_ERROR', errorMessage?: string };
 
 
@@ -93,10 +95,10 @@ const reducer = (state: IState, action: Action): IState => {
       }
     }
     case 'UPDATE_COMPANY': {
-      const { oldName, newName } = action;
+      const { companyId, newName } = action;
       return {
         ...state,
-        companies: state.companies?.map(comp => comp.companyName === oldName ? {...comp, companyName: newName} : comp)
+        companies: state.companies?.map(comp => comp.companyId === companyId ? {...comp, companyName: newName} : comp)
       }
     }
     case 'SET_COMPANIES': {
@@ -107,10 +109,17 @@ const reducer = (state: IState, action: Action): IState => {
       }
     }
     case 'SET_COMPANY': {
-      const { companyName } = action;
+      const { company } = action;
       return {
         ...state,
-        companyName
+        currentCompany: company
+      }
+    }
+    case 'SET_IS_ADMIN': {
+      const { isAdmin } = action;
+      return {
+        ...state,
+        isAdmin: isAdmin
       }
     }
     default:
@@ -122,15 +131,18 @@ const App: React.FC = () => {
   const [login, loginApi] = useLogin();
   const [company, doCreateCompany, doUpdateCompany] = useCompany();
   const [userParams, doGetCompanies, doEditUser] = useUserParams();
-  const [admin, doGetUsers, doGetUsersByCompany] = useAdmin();
-  const [{ appState, user, companies, companyName, companyUsers, allUsers, errorMessage }, dispatch] = useReducer(reducer, {
+  const [admin, doGetUsers, doGetUsersByCompany, doGetCompany] = useAdmin();
+  const [{ appState, user, companies, currentCompany, companyUsers, allUsers, errorMessage, isAdmin }, dispatch] = useReducer(reducer, {
     appState: 'LOGIN'
   });
   console.log(appState);
-  console.log(companies);
 
   const handleSetError = useCallback((errorMessage) => {
     dispatch({ type: 'SET_ERROR', errorMessage})
+  }, [dispatch]);
+
+  const handleSetAdmin = useCallback(() => {
+    dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
   }, [dispatch]);
 
   const handleGetComanies = useCallback((userName: string) => {
@@ -146,9 +158,10 @@ const App: React.FC = () => {
         }
         const adminCompanies = userParams.companies?.filter(comp => comp.userRole)
         console.log(adminCompanies);
-        if (adminCompanies?.length)
+        if (adminCompanies?.length) {
           dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
-        else
+          dispatch({ type: 'SET_IS_ADMIN', isAdmin: true });
+        } else
           dispatch({ type: 'SET_STATE', appState: 'PROFILE' });
       };
       func(userName);
@@ -189,6 +202,7 @@ const App: React.FC = () => {
     const func = async (user: IUser) => {
       const userParamsData = await doEditUser(user);
       if (userParamsData.state === 'EDITED_USER') {
+        console.log(user);
         dispatch({ type: 'SET_USER', user});
         dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
       } else {
@@ -257,27 +271,43 @@ const App: React.FC = () => {
     dispatch({ type: 'SET_STATE', appState: 'CREATE_COMPANY'})
   }, []);
 
-  const handleSelectCompany = useCallback((companyName: string) => {
+  const handleGetUsersByCompany = useCallback((companyName: string) => {
     const func = async (companyName: string) => {
       dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY'});
-      dispatch({ type: 'SET_COMPANY', companyName});
-      const adminData = await doGetUsersByCompany(companyName);
-      if (adminData.adminState === 'RECEIVED_USERS_BY_COMPANY') {
-        dispatch({ type: 'SET_COMPANY_USERS', companyUsers: adminData.users});
-        //dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+      const usersData = await doGetUsersByCompany(companyName);
+      console.log(usersData);
+      if (usersData.adminState === 'RECEIVED_USERS_BY_COMPANY') {
+        dispatch({ type: 'SET_COMPANY_USERS', companyUsers: usersData.users});
       } else {
-        dispatch({ type: 'SET_ERROR', errorMessage: adminData.errorMessage })
+        dispatch({ type: 'SET_ERROR', errorMessage: usersData.errorMessage })
       }
     };
     func(companyName);
   }, [dispatch, doGetUsersByCompany]);
+
+  const handleSelectCompany = useCallback((companyName: string) => {
+    const func = async (companyName: string) => {
+      dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY'});
+      const companyData = await doGetCompany(companyName);
+      console.log(companyData);
+      if (companyData.adminState === 'RECEIVED_COMPANY') {
+        dispatch({ type: 'SET_COMPANY', company: companyData.company});
+      } else {
+        dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
+      };
+      handleGetUsersByCompany(companyName);
+    };
+    func(companyName);
+  }, [dispatch, doGetCompany]);
+
 
   const handleCreateCompany = useCallback((companyName: string) => {
     const func = async (companyName: string) => {
       const companyData = await doCreateCompany(companyName);
       if (companyData.companyState === 'CREATED') {
         dispatch({ type: 'ADD_COMPANY', company: {companyName, userRole: 'Admin'} });
-        dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
+        dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
+        dispatch({ type: 'SET_IS_ADMIN', isAdmin: true });
       } else {
         dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
       }
@@ -285,18 +315,18 @@ const App: React.FC = () => {
     func(companyName);
   }, [dispatch, doCreateCompany]);
 
-  const handleUpdateCompany = useCallback((companyName: string) => {
-    const func = async (companyName: string) => {
+  const handleUpdateCompany = useCallback((companyId: number, companyName: string) => {
+    const func = async (companyId: number, companyName: string) => {
       const companyData = await doUpdateCompany(companyName);
       if (companyData.companyState === 'CREATED') {
-        dispatch({ type: 'ADD_COMPANY', company: {companyName, userRole: 'Admin'} });
+        dispatch({ type: 'ADD_COMPANY', company: {companyId, companyName, userRole: 'Admin'} });
         dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
       } else {
         dispatch({ type: 'SET_ERROR', errorMessage: companyData.errorMessage })
       }
     };
-    func(companyName);
-  }, [dispatch, doCreateCompany]);
+    func(companyId, companyName);
+  }, [dispatch, doUpdateCompany]);
 
   const handleGetAllUsers = useCallback(() => {
     const func = async () => {
@@ -342,31 +372,26 @@ const App: React.FC = () => {
             onLogOut={handleLogOut}
             onClearError={handleClearError}
             onCreateCompany={handleSetCreateCompany}
+            onGetCompanies={handleSetAdmin}
+            isAdmin={isAdmin}
           />
           { appState === 'ADMIN' && companies
             ?
-              <AdminBox
+             <AdminBox
                 onCreateCompany={handleSetCreateCompany}
-                companies={companies?.filter(comp => comp.userRole).map(comp => comp.companyName)}
+                companies={companies?.filter(comp => comp.userRole)}
                 onClearError={handleClearError}
                 onSelectCompany={handleSelectCompany}
               />
+
             : (appState === 'CREATE_COMPANY' || appState === 'UPDATE_COMPANY')
               ?
                 <Company
                   isCreate={appState === 'CREATE_COMPANY'}
-                  companyName={companyName}
+                  company={currentCompany}
                   users={companyUsers}
                   onCreateCompany={handleCreateCompany}
-                  onEditCompany={ () =>{ //async (oldName, newName) => {
-                  //   const orgData = await doCreateCompany(oldName, newName);
-                  //   if (orgData.CompanyState === 'EDITED') {
-                  //     dispatch({ type: 'UPDATE_COMPANY', oldName: '', newName: '' });
-                  //     dispatch({ type: 'SET_STATE', appState: 'ADMIN' })
-                  //   } else {
-                  //     dispatch({ type: 'SET_ERROR', errorMessage: orgData.errorMessage })
-                  //   }
-                  }}
+                  onUpdateCompany={handleUpdateCompany}
                   onGetAllUsers={handleGetAllUsers}
                 />
               :

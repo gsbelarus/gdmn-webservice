@@ -21,6 +21,7 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
     try {
       const resFetch = await fetch(`http://localhost:3649/api/organisation/new?title=${companyName}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
+
       let newState: ICompany;
       console.log(res);
       if (res.status === 200) {
