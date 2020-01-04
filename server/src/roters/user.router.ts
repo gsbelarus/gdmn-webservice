@@ -14,6 +14,7 @@ router.get('/byDevice', ctx => getUsersByDevice(ctx));
 router.get('/all', ctx => getUsers(ctx));
 router.get('/byOrganisation', ctx => getUsersByOrganisation(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
+router.post('/addOrganisation', ctx => addOrganisation(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
