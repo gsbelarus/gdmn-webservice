@@ -20,9 +20,7 @@ const newMessage = async(ctx:  any) => {
     const uuid = uuidv1();
     await writeFile(
       `${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uuid}.json`,
-      JSON.stringify({
-        body
-      })
+      body
     );
     ctx.body = JSON.stringify({ status: 200, result: {uid: uuid, date: new Date()}});
     logger.info(`new message in queue: ${uuid}`);

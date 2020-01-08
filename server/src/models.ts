@@ -16,7 +16,7 @@ export interface IActivationCode {
 }
 
 export interface IOrganisation {
-  id: number;
+  id: string;
   title: string;
   admin: string;
 }
@@ -25,4 +25,4 @@ export interface IOrganisation {
   uid: string;
   user: string;
   isBlock: boolean;
- }
+}
