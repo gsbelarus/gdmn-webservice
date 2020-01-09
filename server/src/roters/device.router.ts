@@ -25,7 +25,7 @@ const verifyCode = async(ctx: any) => {
     date.setDate(date.getDate() + 7);
     if(date >= new Date()) {
       ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
+      ctx.body = JSON.stringify({ status: 200, result: code.user});
       logger.info('device activated successfully');
     } else {
       ctx.status = 200;
@@ -48,7 +48,7 @@ const getActivationCode = async(ctx: any) => {
 }
 
 const newDevice = async(ctx: any) => {
-  if(ctx.isAuthenticated()) {
+  if(ctx.isUnauthenticated()) {
     const {uid, idUser} = ctx.request.body;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === idUser))) {
