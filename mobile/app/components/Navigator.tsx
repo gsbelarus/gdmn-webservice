@@ -1,15 +1,32 @@
-import Main from '../Main';
+import ActivationPage from './ActivationPage';
+import ProfilePage from './ProfilePage';
 import LoginPage from './LoginPage';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-const Navigator = createStackNavigator(
+const AuthNavigator = createStackNavigator(
     {
-        Main: Main,
+        ActivationPage: ActivationPage,
         LoginPage: LoginPage
     }
 );
 
-const AppContainer = createAppContainer(Navigator);
+const AppNavigator = createStackNavigator(
+    {
+        ProfilePage: ProfilePage
+    }
+);
 
-export default AppContainer;
+const createRootNavigator = (signedIn: boolean) => {
+    return createAppContainer(createSwitchNavigator(
+        {
+            App: AppNavigator,
+            Auth: AuthNavigator
+        },
+        {
+            initialRouteName: signedIn ? 'App' : 'Auth'
+        }
+    ))
+};
+
+export default createRootNavigator;

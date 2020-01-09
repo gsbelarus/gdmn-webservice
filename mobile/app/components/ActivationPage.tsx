@@ -1,23 +1,36 @@
 import React, { useState, FC } from 'react';
 import { StyleSheet, View, StatusBar, TextInput, Alert, TouchableOpacity } from 'react-native';
-import SubTitle from './components/SubTitle';
+import SubTitle from './SubTitle';
+import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks'
 
-const Main: FC = (): JSX.Element => {
+const ActivationPage: FC = (): JSX.Element => {
 const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    `http://192.168.0.66:3649/api/device/verifyCode?code=${inputValue}`,
+    `http://192.168.0.63:3649/api/device/verifyCode?code=${inputValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
       credentials: 'include',
     }
   ).then(res => res.json())
-  .then(res => res.status)
-  if (data === 200) {
+  if (data.status === 200) {
+    console.log(data.result)
+    fetch(
+      `http://192.168.0.63:3649/api/device/new`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          uid: Constants.deviceId,
+          idUser: data.result
+        })
+      }
+    )
     return Alert.alert(
       'Your code is correct!',
       '',
@@ -94,7 +107,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: '#3F4243',
-    marginTop: 200,
+    marginTop: 100,
     marginRight: 15,
     fontSize: 24,
     color: 'black',
@@ -110,5 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Main;
-
+export default ActivationPage;

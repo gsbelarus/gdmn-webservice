@@ -1,94 +1,37 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from 'react-navigation-hooks';
 
 const LoginPage = (): JSX.Element => {
 
 const [loginValue, setLoginValue] = useState('');
 const [passwordValue, setPasswordValue] = useState('');
+const {navigate} = useNavigation();
 
-const account = (login, password) => {
-  const receivedLogin = 'user';
-  const receivedPassword = '12345';
-  if (login === '' && password === '') {
+const account = async() => {
+
+  const data = await fetch(
+    'http://192.168.0.63:3649/api/login',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({
+        userName: loginValue,
+        password: passwordValue
+      })
+    }
+  ).then(res => res.json());
+  if (data.status === 200) {
+    navigate('App')
+  } else {
     return Alert.alert(
-      'Enter login and password',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => console.log('Enter login and password'),
-        },
-      ],
-    );
-  } 
-  if (login === receivedLogin && password === receivedPassword) {
-    return Alert.alert(
-      'Success',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login === receivedLogin && password !== receivedPassword) {
-    return Alert.alert(
-      'Your password is incorrect',
+      data.result,
       'Try again',
       [
         {
           text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login !== receivedLogin && password !== receivedPassword) {
-    return Alert.alert(
-      'Your login and password are incorrect',
-      'Try again',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login !== receivedLogin && password !== receivedPassword) {
-    return Alert.alert(
-      'Your login is incorrect',
-      'Try again',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login === '' && password !== '') {
-    return Alert.alert(
-      'Enter login',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login !== '' && password === '') {
-    return Alert.alert(
-      'Enter password',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
+          onPress: () => setPasswordValue('')
         },
       ],
     );
@@ -127,7 +70,7 @@ return (
     />
     <TouchableOpacity
       style = {styles.submitButton}
-      onPress = {() => account(loginValue, passwordValue)}
+      onPress = {account}
       >
       <Text style = {styles.submitButtonText}>OK</Text>
     </TouchableOpacity>
