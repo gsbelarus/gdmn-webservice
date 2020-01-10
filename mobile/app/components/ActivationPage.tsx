@@ -37,7 +37,7 @@ const verifyCode = async () => {
       [
         {
           text: 'OK', 
-          onPress: () => navigate('LoginPage')
+          onPress: () => navigate('Auth')
         },
       ],
     );
@@ -58,15 +58,6 @@ const verifyCode = async () => {
 
 return (
     <View style={styles.container}>
-      <View style={styles.navigation}>
-        <TouchableOpacity onPress={() => navigate('LoginPage')}>
-          <MaterialIcons
-            name="menu"
-            size={28}
-            color={'#9CAEBA'}
-          />
-        </TouchableOpacity>
-      </View>
       <StatusBar barStyle="light-content" />
       <View style={styles.title}>
         <SubTitle subtitle='Please enter your code' />
@@ -98,10 +89,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3EFF4',
     flex: 1,
     height: '100%'
-  },
-  navigation: {
-    marginLeft: 10,
-    marginTop: 20
   },
   input: {
     borderWidth: 1,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import Constants from 'expo-constants';
 
 const LoginPage = (): JSX.Element => {
 
@@ -8,25 +9,62 @@ const [loginValue, setLoginValue] = useState('');
 const [passwordValue, setPasswordValue] = useState('');
 const {navigate} = useNavigation();
 
-const account = async() => {
-
+const isActivateDevice = async () => {
   const data = await fetch(
-    'http://192.168.0.63:3649/api/login',
+    `http://192.168.0.63:3649/api/device/isActive?uid=${Constants.deviceId}&idUser=${loginValue}`,
     {
-      method: 'POST',
+      method: 'GET',
       headers: { 'Content-Type': 'application/json'},
       credentials: 'include',
-      body: JSON.stringify({
-        userName: loginValue,
-        password: passwordValue
-      })
     }
   ).then(res => res.json());
-  if (data.status === 200) {
-    navigate('App')
+  return data.status === 200 ? data.result ? 'ACTIVE' : 'BLOCK'  : 'ERROR'
+}
+
+const account = async() => {
+
+  const isBlock = await isActivateDevice();
+  if(isBlock === 'ACTIVE') {
+    const data = await fetch(
+      'http://192.168.0.63:3649/api/login',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          userName: loginValue,
+          password: passwordValue
+        })
+      }
+    ).then(res => res.json());
+    if (data.status === 200) {
+      navigate('App')
+    } else {
+      return Alert.alert(
+        data.result,
+        'Try again',
+        [
+          {
+            text: 'OK', 
+            onPress: () => setPasswordValue('')
+          },
+        ],
+      );
+    }
+  } else if(isBlock === 'BLOCK') {
+    return Alert.alert(
+      'This device blocked for this user.',
+      'Try again',
+      [
+        {
+          text: 'OK', 
+          onPress: () => setPasswordValue('')
+        },
+      ],
+    );
   } else {
     return Alert.alert(
-      data.result,
+      'Unknown error',
       'Try again',
       [
         {
