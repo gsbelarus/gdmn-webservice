@@ -4,9 +4,6 @@ import { useNavigation } from 'react-navigation-hooks';
 
 const ProfilePage = (): JSX.Element => {
 
-  let navigationOptions = {
-    title: 'Lots of features here',
-  };
   const {navigate} = useNavigation();
 
   const _signOutAsync = async () => {
