@@ -36,13 +36,8 @@ const verifyCode = async () => {
       '',
       [
         {
-<<<<<<< HEAD:mobile/app/Main.tsx
-          text: 'OK',
-          onPress: () => navigate('LoginPage')
-=======
           text: 'OK',
           onPress: () => navigate('Auth')
->>>>>>> master:mobile/app/components/ActivationPage.tsx
         },
       ],
     );
