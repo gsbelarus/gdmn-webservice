@@ -11,10 +11,12 @@ export interface IMenuProps {
   onLogOut: () => void;
   onClearError: () => void;
   onCreateCompany: () => void;
+  onCreateUser?: () => void;
+  onCreateCode?: () => void;
 }
 
-export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies }: IMenuProps) => {
-  console.log(isAdmin);
+export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies, onCreateUser, onCreateCode }: IMenuProps) => {
+
   const _items: ICommandBarItemProps[] = [
     {
       key: 'newItem',
@@ -22,7 +24,7 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
       subMenuProps: {
         items: [
           {
-            key: 'addCompany',
+            key: 'createCompany',
             text: 'Создать организацию..',
             iconProps: { iconName: 'Org' },
             onClick: () => {
@@ -31,9 +33,24 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
             }
           },
           {
-            key: 'something',
-            text: 'Что-то еще..',
-            iconProps: { iconName: 'AddReaction' }
+            key: 'createUser',
+            text: 'Добавить пользователя..',
+            disabled: !isAdmin || !onCreateUser,
+            iconProps: { iconName: 'AddFriend' },
+            onClick: () => {
+              onClearError();
+              onCreateUser && onCreateUser();
+            }
+          },
+          {
+            key: 'createUser',
+            text: 'Создать код',
+            disabled: !isAdmin || !onCreateCode,
+            iconProps: { iconName: 'Devices3' },
+            onClick: () => {
+              onClearError();
+              onCreateCode && onCreateCode();
+            }
           }
         ]
       }

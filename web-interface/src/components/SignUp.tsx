@@ -12,8 +12,8 @@ interface ISignUpProps {
 
 export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }: ISignUpProps) => {
 
-  const [userName, setUserName] = useState(user?.userName ? user.userName : '');
-  const [password, setPassword] = useState(user?.password ? user.password : '');
+  const [userName, setUserName] = useState(user?.userName || '');
+  const [password, setPassword] = useState(user?.password || '');
   const [repeatPassword, setRepeatPassword] = useState();
 
   return (

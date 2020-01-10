@@ -13,7 +13,7 @@ interface ILoginProps {
 
 export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onClearError }: ILoginProps) => {
 
-  const [userName, setLogin] = useState(user?.userName ? user.userName : '');
+  const [userName, setUserName] = useState(user?.userName ? user.userName : '');
   const [password, setPassword] = useState(user?.password ? user.password : '');
 
   return (
@@ -38,7 +38,7 @@ export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onCl
           <TextField
             label="Имя пользователя:"
             value={userName}
-            onChange={ (_, userName) => userName !== undefined ? setLogin(userName) : undefined }
+            onChange={ (_, userName) => userName !== undefined ? setUserName(userName) : undefined }
           />
           <TextField
             label="Пароль:"

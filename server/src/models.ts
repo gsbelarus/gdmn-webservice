@@ -6,7 +6,7 @@ export interface IUser {
   organisations?: string[];
   firstName?: string;
   lastName?: string;
-  numberPhone?: string;
+  phoneNumber?: string;
 }
 
 export interface IActivationCode {
@@ -16,7 +16,7 @@ export interface IActivationCode {
 }
 
 export interface IOrganisation {
-  id: number;
+  id: string;
   title: string;
   admin: string;
 }

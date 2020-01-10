@@ -9,7 +9,7 @@ const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    `http://192.168.0.66:3649/api/device/verifyCode?code=${inputValue}`,
+    `http://192.168.0.36:3649/api/device/verifyCode?code=${inputValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
@@ -23,19 +23,19 @@ const verifyCode = async () => {
       '',
       [
         {
-          text: 'OK', 
+          text: 'OK',
           onPress: () => navigate('LoginPage')
         },
       ],
     );
   }
-  if (data === 404) { 
+  if (data === 404) {
     return Alert.alert(
       'Your code is incorrect!',
       'Try again',
       [
         {
-          text: 'OK', 
+          text: 'OK',
           onPress: () => setInputValue('')
         },
       ],

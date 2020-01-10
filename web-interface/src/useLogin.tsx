@@ -6,6 +6,8 @@ export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OU
 export interface ILogin {
   loginState: LoginState;
   userName?: string;
+  userId?: string;
+  code?: string;
   password?: string;
   companies?: IUserCompany[];
   errorMessage?: string;
@@ -46,6 +48,7 @@ export const useLogin = (userName?: string, password?: string): [ILogin, ILoginA
         newState = {
           loginState: 'LOGGED_IN',
           userName,
+          userId: res.result,
           password
         };
       }
@@ -82,6 +85,7 @@ export const useLogin = (userName?: string, password?: string): [ILogin, ILoginA
         newState = {
           loginState: 'GOT_ME',
           userName: res.result.userName,
+          userId: res.result.id,
           companies: res.result.organisations?.map((org: IUserCompany) => {return {companyName: org}})
         };
       } else {
@@ -118,9 +122,11 @@ export const useLogin = (userName?: string, password?: string): [ILogin, ILoginA
       const resFetch = await fetch("http://localhost:3649/api/signup", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
       const res = await resFetch.json();
       let newState: ILogin;
+      console.log(res);
       if (res.status === 200) {
         newState = {
           userName,
+          code: res.result,
           password,
           loginState: 'SIGNED_UP',
         };

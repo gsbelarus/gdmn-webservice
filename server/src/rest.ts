@@ -40,7 +40,7 @@ export async function init() {
   app.use(koaCors({
 		credentials: true
 	}));
-  
+
   app.use(router.routes());
   app.use(router.allowedMethods());
 

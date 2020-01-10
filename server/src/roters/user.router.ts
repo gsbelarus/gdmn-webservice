@@ -48,7 +48,7 @@ const getUsers = async (ctx: any) => {
       result: !allUsers || !allUsers.length
       ? []
       : allUsers
-      .map(user => {return {id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phone: user.numberPhone}})
+      .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber}))
     });
     logger.info('get users by device successfully');
   } else {
@@ -66,7 +66,7 @@ const getUsersByOrganisation = async (ctx: any) => {
       status: 200,
       result: allUsers && allUsers
         .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
-        .map(user => {return {id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phone: user.numberPhone}})
+        .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber}))
       });
     logger.info('get users by organisation successfully');
   } else {
@@ -87,7 +87,7 @@ const editeProfile = async(ctx: any) => {
     } else {
       await writeFile(
         PATH_LOCAL_DB_USERS,
-        JSON.stringify([...allUsers.slice(0, idx), {id: allUsers[idx].id, password: allUsers[idx].password, ...newUser}, ...allUsers.slice(idx + 1)]
+        JSON.stringify([...allUsers.slice(0, idx), {...allUsers[idx], lastName: newUser.lastName, firstName: newUser.firstName, phoneNumber: newUser.phoneNumber}, ...allUsers.slice(idx + 1)]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully'});

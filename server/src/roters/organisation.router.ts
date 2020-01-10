@@ -24,12 +24,12 @@ const addOrganisation = async(ctx: any) => {
         PATH_LOCAL_DB_ORGANISATIONS,
         JSON.stringify(allOrganisations
           ? [...allOrganisations, {id: title, title, admin: ctx.state.user.id}]
-          : [{id: title, admin: ctx.state.user.id}]
+          : [{id: title, title, admin: ctx.state.user.id}]
         )
       );
       const res = await editeOrganisations(ctx.state.user.id, [title]);
       if(res === 0) {
-        ctx.body = JSON.stringify({ status: 200, result: 'new organisation added successfully'});
+        ctx.body = JSON.stringify({ status: 200, result: title});
         logger.info('new organisation added successfully');
       } else {
         ctx.body = JSON.stringify({ status: 404, result: `such an user(${ctx.state.user.id}) already exists`});
@@ -57,9 +57,9 @@ const getOrganisationsByUser = async (ctx: any) => {
       result: !allOrganisations || !allOrganisations.length
       ? []
       : allOrganisations
-        .filter( organisation => findUser?.organisations?.find(item => item === organisation.title))!
+        .filter( organisation => findUser?.organisations?.find(item => item === organisation.id))!
         .map(organisation => {
-          return {title: organisation.title, userRole: organisation.admin === findUser?.id}
+          return {companyName: organisation.title, companyId: organisation.id, userRole: organisation.admin === findUser?.id}
         })
     });
     logger.info('get users by device successfully');
@@ -72,12 +72,12 @@ const getOrganisationsByUser = async (ctx: any) => {
 
 const getProfile = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {title} = ctx.query;
+    const {idOrganisation} = ctx.query;
     const allOrganisations: IOrganisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
-    const result = allOrganisations && allOrganisations.find(organisation => organisation.title === title);
+    const result = allOrganisations && allOrganisations.find(organisation => organisation.id === idOrganisation);
     if(!allOrganisations || !result) {
-      ctx.body = JSON.stringify({ status: 404, result: `no such organization(${title})`});
-      logger.warn(`no such organization(${title})`);
+      ctx.body = JSON.stringify({ status: 404, result: `no such organization(${idOrganisation})`});
+      logger.warn(`no such organization(${idOrganisation})`);
     } else {
       ctx.body = JSON.stringify({ status: 200, result});
       logger.info('get profile organisation successfully');
@@ -100,7 +100,7 @@ const editeProfile = async (ctx: any) => {
     } else {
       await writeFile(
         PATH_LOCAL_DB_ORGANISATIONS,
-        JSON.stringify([...allOrganisations.slice(0, idx), {id: allOrganisations[idx].id, ...newOrganisation}, ...allOrganisations.slice(idx + 1)]
+        JSON.stringify([...allOrganisations.slice(0, idx), {id: allOrganisations[idx].id, admin: allOrganisations[idx].admin, ...newOrganisation}, ...allOrganisations.slice(idx + 1)]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'organisation edited successfully'});

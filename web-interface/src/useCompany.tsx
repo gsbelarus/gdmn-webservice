@@ -4,29 +4,30 @@ export type CompanyState = 'CREATED' | 'CREATING' | 'UPDATED' | 'UPDATING' | 'DE
 
 export interface ICompany {
   companyState: CompanyState;
-  companyName?: string;
+  companyId?: string;
   errorMessage?: string;
 };
 
 export type CreateCompanyProc = (companyName: string) => Promise<ICompany>;
-export type UpdateCompanyProc = (companyName: string) => Promise<ICompany>;
+export type UpdateCompanyProc = (companyId: string, companyName: string) => Promise<ICompany>;
 export type DeleteCompanyProc = (companyName: string) => Promise<ICompany>;
 
 export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, UpdateCompanyProc, DeleteCompanyProc] => {
-  const [company, setCompany] = useState<ICompany>({ companyState: 'DELETED', companyName });
+  const [company, setCompany] = useState<ICompany>({ companyState: 'ADMIN' });
 
   const doCreateCompany: CreateCompanyProc = async (companyName: string) => {
-    setCompany({ companyState: 'CREATING', companyName });
+    setCompany({ companyState: 'CREATING' });
     console.log('doCreate');
     try {
       const resFetch = await fetch(`http://localhost:3649/api/organisation/new?title=${companyName}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
 
       let newState: ICompany;
-      console.log(res);
+
       if (res.status === 200) {
         newState = {
-          companyState: 'CREATED'
+          companyState: 'CREATED',
+          companyId: res.result
         };
       }
       else {
@@ -49,11 +50,12 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
 
   };
 
-  const doUpdateCompany: UpdateCompanyProc = async (companyName: string) => {
+  const doUpdateCompany: UpdateCompanyProc = async (companyId: string, companyName: string) => {
     setCompany({companyState: 'UPDATING'});
     console.log('doUpdate');
 
     const body = JSON.stringify({
+      id: companyId,
       title: companyName
     });
 
@@ -91,7 +93,7 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
       title: companyName
     });
 
-    setCompany({companyState: 'DELETING', companyName});
+    setCompany({companyState: 'DELETING'});
     console.log('doDelete');
 
     try {

@@ -9,27 +9,27 @@ export interface IUserParams {
   errorMessage?: string;
 };
 
-export type GetCompaniesProc = (userName: string) => Promise<IUserParams>;
-export type EditUserProc = (user: IUser) => Promise<IUserParams>;
-export type DeleteUserProc = (userName: string) => Promise<IUserParams>;
+export type GetCompaniesProc = (userId: string) => Promise<IUserParams>;
+export type UpdateUserProc = (user: IUser) => Promise<IUserParams>;
+export type DeleteUserProc = (userId: string) => Promise<IUserParams>;
 
-export const useUserParams = (): [IUserParams, GetCompaniesProc, EditUserProc, DeleteUserProc] => {
+export const useUserParams = (): [IUserParams, GetCompaniesProc, UpdateUserProc, DeleteUserProc] => {
   const [userParams, setUserParams] = useState<IUserParams>({ state: 'ADMIN' });
 
-  const doGetCompanies: GetCompaniesProc = useCallback(async (userName: string) => {
+  const doGetCompanies: GetCompaniesProc = useCallback(async (userId: string) => {
     setUserParams({ state: 'RECIEVING_COMPANIES' });
 
    console.log('doGetCompanies');
 
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/organisation/byUser?idUser=${userName}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      const resFetch = await fetch(`http://localhost:3649/api/organisation/byUser?idUser=${userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       const res = await resFetch.json();
-
+      console.log(res);
       let newState: IUserParams;
       if (res.status === 200) {
         newState = {
           state: 'RECEIVED_COMPANIES',
-          companies: res.result?.map((org: any) => ({companyName: org.title, userRole: org.userRole}) )
+          companies: res.result
         };
        } else {
         newState = {
@@ -53,7 +53,7 @@ export const useUserParams = (): [IUserParams, GetCompaniesProc, EditUserProc, D
 
   }, []);
 
-  const doEditUser: EditUserProc = useCallback(async (user: IUser) => {
+  const doUpdateUser: UpdateUserProc = useCallback(async (user: IUser) => {
     setUserParams({state: 'EDITING_USER'});
     console.log('doEdit');
 
@@ -87,10 +87,10 @@ export const useUserParams = (): [IUserParams, GetCompaniesProc, EditUserProc, D
     }
   }, []);
 
-  const doDeleteUser = async (userName: string) => {
+  const doDeleteUser = async (userId: string) => {
 
     const body = JSON.stringify({
-      userName: userName
+      userName: userId
     });
 
     setUserParams({state: 'DELETING'});
@@ -122,5 +122,5 @@ export const useUserParams = (): [IUserParams, GetCompaniesProc, EditUserProc, D
     }
   };
 
-  return [userParams, doGetCompanies, doEditUser, doDeleteUser];
+  return [userParams, doGetCompanies, doUpdateUser, doDeleteUser];
 };
