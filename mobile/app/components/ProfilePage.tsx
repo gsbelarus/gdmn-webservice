@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, StatusBar, Button, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { path } from '../../App';
 
 const ProfilePage = (): JSX.Element => {
 
@@ -8,7 +9,7 @@ const ProfilePage = (): JSX.Element => {
 
   const _signOutAsync = async () => {
     const data = await fetch(
-      `http://192.168.0.63:3649/api/signout`,
+      `${path}signout`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json'},

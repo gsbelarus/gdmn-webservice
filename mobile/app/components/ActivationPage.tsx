@@ -4,13 +4,14 @@ import SubTitle from './SubTitle';
 import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks'
+import { path } from '../../App';
 
 const ActivationPage: FC = (): JSX.Element => {
 const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    `http://192.168.0.63:3649/api/device/verifyCode?code=${inputValue}`,
+    `${path}device/verifyCode?code=${inputValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
@@ -20,7 +21,7 @@ const verifyCode = async () => {
   if (data.status === 200) {
     console.log(data.result)
     fetch(
-      `http://192.168.0.63:3649/api/device/new`,
+      `${path}device/new`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
