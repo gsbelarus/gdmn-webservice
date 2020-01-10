@@ -25,4 +25,4 @@ export interface IOrganisation {
   uid: string;
   user: string;
   isBlock: boolean;
- }
+}

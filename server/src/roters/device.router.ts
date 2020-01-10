@@ -15,6 +15,8 @@ router.get('/getActivationCode', ctx => getActivationCode(ctx));
 router.post('/new', ctx => newDevice(ctx));
 router.post('/lock', ctx => lockDevice(ctx));
 router.post('/remove', ctx => removeDevice(ctx));
+router.get('/isExist', ctx => isExistDevice(ctx));
+router.get('/isActive', ctx => isActiveDevice(ctx));
 router.get('/byUser', ctx => getDevicesByUser(ctx));
 
 const verifyCode = async(ctx: any) => {
@@ -25,7 +27,7 @@ const verifyCode = async(ctx: any) => {
     date.setDate(date.getDate() + 7);
     if(date >= new Date()) {
       ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result: 'device activated successfully'});
+      ctx.body = JSON.stringify({ status: 200, result: code.user});
       logger.info('device activated successfully');
     } else {
       ctx.status = 200;
@@ -48,7 +50,7 @@ const getActivationCode = async(ctx: any) => {
 }
 
 const newDevice = async(ctx: any) => {
-  if(ctx.isAuthenticated()) {
+  if(ctx.isUnauthenticated()) {
     const {uid, idUser} = ctx.request.body;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === idUser))) {
@@ -117,6 +119,32 @@ const removeDevice = async(ctx: any) => {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});
     logger.warn(`access denied`);
+  }
+}
+
+const isActiveDevice = async(ctx: any) => {
+  const {uid, idUser} = ctx.query;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+  if(!allDevices || idx === undefined || idx < 0) {
+    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
+    logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+  } else {
+    ctx.body = JSON.stringify({ status: 200, result: !allDevices[idx].isBlock});
+    logger.info( `device active: ${!allDevices[idx].isBlock}`);
+  }
+}
+
+const isExistDevice = async(ctx: any) => {
+  const {uid} = ctx.query;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const idx = allDevices && allDevices.findIndex( device => device.uid === uid);
+  if(!allDevices || idx === undefined || idx < 0) {
+    ctx.body = JSON.stringify({ status: 200, result: false});
+    logger.warn(`the device(${uid}) is not exist`);
+  } else {
+    ctx.body = JSON.stringify({ status: 200, result: true});
+    logger.info( `the device(${uid}) is exist`);
   }
 }
 

@@ -1,94 +1,75 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from 'react-navigation-hooks';
+import Constants from 'expo-constants';
 
 const LoginPage = (): JSX.Element => {
 
 const [loginValue, setLoginValue] = useState('');
 const [passwordValue, setPasswordValue] = useState('');
+const {navigate} = useNavigation();
 
-const account = (login, password) => {
-  const receivedLogin = 'user';
-  const receivedPassword = '12345';
-  if (login === '' && password === '') {
+const isActivateDevice = async () => {
+  const data = await fetch(
+    `http://192.168.0.36:3649/api/device/isActive?uid=${Constants.deviceId}&idUser=${loginValue}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+    }
+  ).then(res => res.json());
+  return data.status === 200 ? data.result ? 'ACTIVE' : 'BLOCK'  : 'ERROR'
+}
+
+const account = async() => {
+
+  const isBlock = await isActivateDevice();
+  if(isBlock === 'ACTIVE') {
+    const data = await fetch(
+      'http://192.168.0.36:3649/api/login',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          userName: loginValue,
+          password: passwordValue
+        })
+      }
+    ).then(res => res.json());
+    if (data.status === 200) {
+      navigate('App')
+    } else {
+      return Alert.alert(
+        data.result,
+        'Try again',
+        [
+          {
+            text: 'OK',
+            onPress: () => setPasswordValue('')
+          },
+        ],
+      );
+    }
+  } else if(isBlock === 'BLOCK') {
     return Alert.alert(
-      'Enter login and password',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => console.log('Enter login and password'),
-        },
-      ],
-    );
-  } 
-  if (login === receivedLogin && password === receivedPassword) {
-    return Alert.alert(
-      'Success',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login === receivedLogin && password !== receivedPassword) {
-    return Alert.alert(
-      'Your password is incorrect',
+      'This device blocked for this user.',
       'Try again',
       [
         {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
+          text: 'OK',
+          onPress: () => setPasswordValue('')
         },
       ],
     );
-  }
-  if (login !== receivedLogin && password !== receivedPassword) {
+  } else {
     return Alert.alert(
-      'Your login and password are incorrect',
+      'Unknown error',
       'Try again',
       [
         {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login !== receivedLogin && password !== receivedPassword) {
-    return Alert.alert(
-      'Your login is incorrect',
-      'Try again',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login === '' && password !== '') {
-    return Alert.alert(
-      'Enter login',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
-        },
-      ],
-    );
-  }
-  if (login !== '' && password === '') {
-    return Alert.alert(
-      'Enter password',
-      '',
-      [
-        {
-          text: 'OK', 
-          onPress: () => setPasswordValue(''),
+          text: 'OK',
+          onPress: () => setPasswordValue('')
         },
       ],
     );
@@ -97,7 +78,7 @@ const account = (login, password) => {
 
 return (
   <View style={styles.container}>
-    <TextInput 
+    <TextInput
       style = {styles.input}
       value={loginValue}
       onChangeText = {setLoginValue}
@@ -108,13 +89,13 @@ return (
       underlineColorAndroid = "transparent"
       selectionColor={'black'}
       maxLength={20}
-      returnKeyType="done" 
+      returnKeyType="done"
       autoCorrect={false}
     />
-    <TextInput 
+    <TextInput
       style = {styles.input}
       value={passwordValue}
-      onChangeText = {setPasswordValue} 
+      onChangeText = {setPasswordValue}
       placeholder = "Password"
       placeholderTextColor = "#9A9FA1"
       multiline={true}
@@ -122,12 +103,12 @@ return (
       underlineColorAndroid = "transparent"
       selectionColor={'black'}
       maxLength={25}
-      returnKeyType="done" 
+      returnKeyType="done"
       autoCorrect={false}
     />
     <TouchableOpacity
       style = {styles.submitButton}
-      onPress = {() => account(loginValue, passwordValue)}
+      onPress = {account}
       >
       <Text style = {styles.submitButtonText}>OK</Text>
     </TouchableOpacity>
