@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 
 type TStartState = 'SIGN_OUT' | 'NO_ACTIVATION' | 'LOG_IN';
+export const path = 'http://192.168.0.36:3649/api/';
 
 const App = () => {
   const [signedIn, setSignedIn] = useState<TStartState>('NO_ACTIVATION');
@@ -12,7 +13,7 @@ const App = () => {
   useEffect( () => {
     const isExistDevice = async () => {
       const data = await fetch(
-        `http://192.168.0.36:3649/api/device/isExist?uid=${Constants.deviceId}`,
+        `${path}device/isExist?uid=${Constants.deviceId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},
@@ -22,7 +23,7 @@ const App = () => {
       data.status === 200 && data.result ? setSignedIn('SIGN_OUT') : undefined;
       if (data.status === 200 && data.result) {
         const getMe = await fetch(
-          'http://192.168.0.36:3649/api/me',
+          `${path}me`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json'},

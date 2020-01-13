@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import Constants from 'expo-constants';
+import { path } from '../../App';
 
 const LoginPage = (): JSX.Element => {
 
@@ -11,7 +12,7 @@ const {navigate} = useNavigation();
 
 const isActivateDevice = async () => {
   const data = await fetch(
-    `http://192.168.0.36:3649/api/device/isActive?uid=${Constants.deviceId}&idUser=${loginValue}`,
+    `${path}device/isActive?uid=${Constants.deviceId}&idUser=${loginValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
@@ -26,7 +27,7 @@ const account = async() => {
   const isBlock = await isActivateDevice();
   if(isBlock === 'ACTIVE') {
     const data = await fetch(
-      'http://192.168.0.36:3649/api/login',
+      `${path}login`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
