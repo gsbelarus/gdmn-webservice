@@ -12,10 +12,11 @@ export interface IMenuProps {
   onClearError: () => void;
   onCreateCompany: () => void;
   onCreateUser?: () => void;
+  onAddUserFromSystem?: () => void;
   onCreateCode?: () => void;
 }
 
-export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies, onCreateUser, onCreateCode }: IMenuProps) => {
+export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies, onCreateUser, onCreateCode, onAddUserFromSystem }: IMenuProps) => {
 
   const _items: ICommandBarItemProps[] = [
     {
@@ -40,6 +41,16 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
             onClick: () => {
               onClearError();
               onCreateUser && onCreateUser();
+            }
+          },
+          {
+            key: 'createUser',
+            text: 'Добавить пользователя из системы..',
+            disabled: !isAdmin || !onAddUserFromSystem,
+            iconProps: { iconName: 'AddFriend' },
+            onClick: () => {
+              onClearError();
+              onAddUserFromSystem && onAddUserFromSystem();
             }
           },
           {

@@ -3,11 +3,11 @@ import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
 
 export interface ICompanyProps {
   companyName?: string;
-  onEditCompany: (name: string) => void;
+  onUpdateCompany: (name: string) => void;
   onClearError: () => void;
 }
 
-export const Company = ({ onEditCompany, onClearError, companyName }: ICompanyProps) => {
+export const Company = ({ onUpdateCompany, onClearError, companyName }: ICompanyProps) => {
   const [nameComp, setName] = useState(companyName || '');
 
   return (
@@ -25,7 +25,7 @@ export const Company = ({ onEditCompany, onClearError, companyName }: ICompanyPr
             || nameComp === companyName}
           onClick={() => {
             onClearError();
-            onEditCompany(nameComp)
+            onUpdateCompany(nameComp)
           }}
         />
       </Stack.Item>

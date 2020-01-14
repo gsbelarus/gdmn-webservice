@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PrimaryButton, Stack, TextField, Text } from 'office-ui-fabric-react';
 import { IUser } from '../types';
 
-export interface ICompanyProps {
+export interface IUserProps {
   user?: IUser;
   isEditOK?: boolean;
   onClearEditOK?: () => void;
@@ -10,7 +10,7 @@ export interface ICompanyProps {
   onClearError: () => void;
 }
 
-export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK }: ICompanyProps) => {
+export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK }: IUserProps) => {
   const [state, setState] = useState<IUser>(user || {userName: ''});
   const [repeatPassword, setRepeatPassword] = useState();
 

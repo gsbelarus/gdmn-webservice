@@ -2,7 +2,8 @@ import { useState } from "react";
 import { IUser, IUserCompany, IDevice } from "./types";
 
 export type AdminState = 'RECEIVED_USERS' | 'RECIEVING_USERS' | 'ADMIN' | 'RECEIVED_USERS_BY_COMPANY' | 'RECEIVING_USERS_BY_COMPANY' | 'RECEIVED_COMPANY' | 'RECEIVING_COMPANY'
-  | 'CREATING_CODE' | 'CREATED_CODE' | 'CREATING_USER' | 'CREATED_USER'  | 'RECEIVED_DEVICES_BY_USER' | 'RECEIVING_DEVICES_BY_USER';
+  | 'CREATING_CODE' | 'CREATED_CODE' | 'CREATING_USER' | 'CREATED_USER'  | 'RECEIVED_DEVICES_BY_USER' | 'RECEIVING_DEVICES_BY_USER' | 'ADDING_USER' | 'ADDED_USER'
+  | 'REMOVING_USERS' | 'REMOVED_USERS' | 'REMOVING_USERS_FROM_COMPANY' | 'REMOVED_USERS_FROM_COMPANY';
 
 export interface IAdmin {
   adminState: AdminState;
@@ -18,16 +19,17 @@ export type GetUsersByCompanyProc = (companyId: string) => Promise<IAdmin>;
 export type GetCompanyProc = (companyId: string) => Promise<IAdmin>;
 export type CreateCodeProc = (userID: string) => Promise<IAdmin>;
 export type CreateUserProc = (user: IUser, companyId: string) => Promise<IAdmin>;
+export type AddUserProc = (userId: string, companyId: string) => Promise<IAdmin>;
 export type GetDevicesByUserProc = (userId: string) => Promise<IAdmin>;
+export type RemoveUsersProc = (userIds: string[]) => Promise<IAdmin>;
+export type RemoveUsersFromCompanyProc = (userIds: string[], companyId: string) => Promise<IAdmin>;
 
-//export type DeleteUserProc = (userName: string) => Promise<IAdmin>;
-
-export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCompanyProc, CreateCodeProc, CreateUserProc, GetDevicesByUserProc] => {
+export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCompanyProc, CreateCodeProc, CreateUserProc, AddUserProc, GetDevicesByUserProc, RemoveUsersProc, RemoveUsersFromCompanyProc] => {
   const [admin, setAdmin] = useState<IAdmin>({ adminState: 'ADMIN' });
 
   const doGetUsers: GetUsersProc = async () => {
     setAdmin({ adminState: 'RECIEVING_USERS' });
-   console.log('doGetCompanies');
+   console.log('doGetUsers');
 
     try {
       const resFetch = await fetch("http://localhost:3649/api/user/all", { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
@@ -36,7 +38,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
       if (res.status === 200) {
         newState = {
           adminState: 'RECEIVED_USERS',
-          users: res.result
+          users: res.result.map((r: any) => ({userId: r.id, userName: r.userName}))
         };
       }
       else {
@@ -71,7 +73,8 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
       if (res.status === 200) {
          newState = {
           adminState: 'RECEIVED_USERS_BY_COMPANY',
-          users: res.result.map((r: any) => ({userId: r.id, userName: r.userName, lastName: r.lastName, firstName: r.firstName, phoneNumber: r.phoneNumber, password: r.password}))
+          users: res.result.map((r: any) =>
+          ({userId: r.id, userName: r.userName, lastName: r.lastName, firstName: r.firstName, phoneNumber: r.phoneNumber, password: r.password}))
         };
       }
       else {
@@ -240,42 +243,122 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     }
   };
 
-  // const doDeleteUser = (UserName: string) => {
+  const doAddUser: AddUserProc = async (userId: string, companyId: string) => {
+    setAdmin({adminState: 'ADDING_USER'});
+    console.log('doAddUser');
 
-  //   const body = JSON.stringify({
-  //     userName: UserName
-  //   });
+    const body = JSON.stringify({
+      organisation: companyId,
+      user: userId
+    });
 
-  //   setAdmin({adminState: 'DELETING'});
-  //   console.log('doDelete');
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/user/addOrganisation", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
 
-  //   return fetch("http://localhost:3649/api/user/", {method: 'POST', headers: {'Content-Type': 'application/json'}, body})
-  //     .then ( resFetch => resFetch.json() )
-  //     .then ( resFetch => {
-  //       let newState: IAdmin;
+      const res = await resFetch.json();
+      console.log(res);
+      let newState: IAdmin;
+      if (res.status === 200) {
+         newState = {
+          adminState: 'ADDED_USER',
+          code: res.result
+        };
+      }
+      else {
+        newState = {
+          adminState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setAdmin(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
+        adminState: 'ADMIN',
+        errorMessage: err
+      };
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
+  };
 
-  //       if (resFetch.status === 200) {
-  //         newState = {
-  //           adminState: 'DELETED',
-  //         };
-  //        } else {
-  //         newState = {
-  //           adminState: 'ADMIN',
-  //         };
-  //       }
+  const doRemoveUsers: RemoveUsersProc = async (userIds: string[]) => {
+    setAdmin({adminState: 'REMOVING_USERS'});
+    console.log('doRemoveUsers');
 
-  //       setAdmin(newState);
-  //       return newState;
-  //     })
-  //     .catch( err => {
-  //       const newState: IAdmin = {
-  //         adminState: 'ADMIN'
-  //       };
+    const body = JSON.stringify({
+      users: userIds
+    });
 
-  //       setAdmin(newState);
-  //       return newState;
-  //     });
-  // };
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/user/removeUsers", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
 
-  return [admin, doGetUsers, doGetUsersByCompany, doGetCompany, doCreateCode, doCreateUser, doGetDevicesByUser];
+      const res = await resFetch.json();
+      console.log(res);
+      let newState: IAdmin;
+      if (res.status === 200) {
+         newState = {
+          adminState: 'REMOVED_USERS'
+        };
+      }
+      else {
+        newState = {
+          adminState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setAdmin(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
+        adminState: 'ADMIN',
+        errorMessage: err
+      };
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
+  };
+
+  const doRemoveUsersFromCompany: RemoveUsersFromCompanyProc = async (userIds: string[], companyId: string) => {
+    setAdmin({adminState: 'REMOVING_USERS_FROM_COMPANY'});
+    console.log('doRemoveUsersFromCompany');
+
+    const body = JSON.stringify({
+      users: userIds,
+      organisationId: companyId
+    });
+    console.log(body);
+    try {
+      const resFetch = await fetch("http://localhost:3649/api/user/removeUsersFromOrganisation", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
+
+      const res = await resFetch.json();
+      console.log(res);
+      let newState: IAdmin;
+      if (res.status === 200) {
+         newState = {
+          adminState: 'REMOVED_USERS_FROM_COMPANY'
+        };
+      }
+      else {
+        newState = {
+          adminState: 'ADMIN',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+      setAdmin(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IAdmin = {
+        adminState: 'ADMIN',
+        errorMessage: err
+      };
+      setAdmin(newStateErr);
+      return newStateErr;
+    }
+  };
+
+  return [admin, doGetUsers, doGetUsersByCompany, doGetCompany, doCreateCode, doCreateUser, doAddUser, doGetDevicesByUser, doRemoveUsers, doRemoveUsersFromCompany];
 };

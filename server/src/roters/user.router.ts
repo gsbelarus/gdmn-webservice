@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import { IUser, IDevice } from '../models';
+import { IUser, IDevice, IActivationCode } from '../models';
 import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES } from '../rest';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../rest';
 import log4js from 'log4js';
 import { editeOrganisations } from './util';
 
@@ -15,6 +15,8 @@ router.get('/all', ctx => getUsers(ctx));
 router.get('/byOrganisation', ctx => getUsersByOrganisation(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
 router.post('/addOrganisation', ctx => addOrganisation(ctx));
+router.post('/removeUsers', ctx => removeUsers(ctx));
+router.post('/removeUsersFromOrganisation', ctx => removeUsersFromOrganisation(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
@@ -102,7 +104,7 @@ const editeProfile = async(ctx: any) => {
 
 const addOrganisation = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation, user} = ctx.request;
+    const {organisation, user} = ctx.request.body;
     const res = await editeOrganisations(user, [organisation]);
     if(res === 0) {
       ctx.body = JSON.stringify({ status: 200, result: `organization(${organisation}) added to user(${user})`});
@@ -111,6 +113,63 @@ const addOrganisation = async(ctx: any) => {
       ctx.body = JSON.stringify({ status: 404, result: `no such user(${user})`});
       logger.warn(`no such user(${user})`);
     }
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
+const removeUsers = async(ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {users} = ctx.request.body;
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.id));
+
+    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+    const newDevices = allDevices?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
+
+    const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
+    const newCodes = allCodes?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
+
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify(newUsers));
+
+    await writeFile(
+      PATH_LOCAL_DB_DEVICES,
+      JSON.stringify(newDevices));
+
+    await writeFile(
+      PATH_LOCAL_DB_ACTIVATION_CODES,
+      JSON.stringify(newCodes));
+
+    ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully'});
+    logger.info('users removed successfully');
+
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
+const removeUsersFromOrganisation = async(ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {users, organisationId} = ctx.request.body;
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    console.log(users);
+    const newUsers = allUsers?.map(all_u =>
+      users.findIndex((u: any) => u === all_u.id) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
+      console.log(newUsers);
+    /**Пока только удалим организацию у пользователей */
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify(newUsers));
+
+    ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully'});
+    logger.info('users removed successfully');
+
   } else {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});
