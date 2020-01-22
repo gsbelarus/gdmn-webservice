@@ -23,17 +23,17 @@ const addOrganisation = async(ctx: any) => {
       await writeFile(
         PATH_LOCAL_DB_ORGANISATIONS,
         JSON.stringify(allOrganisations
-          ? [...allOrganisations, {id: title, title, admin: ctx.state.user.id}]
-          : [{id: title, title, admin: ctx.state.user.id}]
+          ? [...allOrganisations, {id: title, title, admin: ctx.state.user.userId}]
+          : [{id: title, title, admin: ctx.state.user.userId}]
         )
       );
-      const res = await editeOrganisations(ctx.state.user.id, [title]);
+      const res = await editeOrganisations(ctx.state.user.userId, [title]);
       if(res === 0) {
         ctx.body = JSON.stringify({ status: 200, result: title});
         logger.info('new organisation added successfully');
       } else {
-        ctx.body = JSON.stringify({ status: 404, result: `such an user(${ctx.state.user.id}) already exists`});
-        logger.warn(`such an user(${ctx.state.user.id}) already exists`);
+        ctx.body = JSON.stringify({ status: 404, result: `such an user(${ctx.state.user.userId}) already exists`});
+        logger.warn(`such an user(${ctx.state.user.userId}) already exists`);
       }
     } else {
       ctx.body = JSON.stringify({ status: 404, result: `such an organization(${title}) already exists`});
@@ -48,9 +48,9 @@ const addOrganisation = async(ctx: any) => {
 
 const getOrganisationsByUser = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {idUser} = ctx.query;
+    const {userId} = ctx.query;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const findUser = allUsers && allUsers.find( user => user.id === idUser);
+    const findUser = allUsers && allUsers.find( user => user.userId === userId);
     const allOrganisations: IOrganisation[] | undefined = await readFile(PATH_LOCAL_DB_ORGANISATIONS);
     ctx.body = JSON.stringify({
       status: 200,
@@ -59,10 +59,10 @@ const getOrganisationsByUser = async (ctx: any) => {
       : allOrganisations
         .filter( organisation => findUser?.organisations?.find(item => item === organisation.id))!
         .map(organisation => {
-          return {companyName: organisation.title, companyId: organisation.id, userRole: organisation.admin === findUser?.id}
+          return {companyName: organisation.title, companyId: organisation.id, userRole: organisation.admin === findUser?.userId ? 'Admin' : ''}
         })
     });
-    logger.info('get users by device successfully');
+    logger.info('get organisations by user successfully');
   } else {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});

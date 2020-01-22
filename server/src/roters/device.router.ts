@@ -13,8 +13,8 @@ const router = new Router({prefix: '/device'});
 router.get('/verifyCode', ctx => verifyCode(ctx));
 router.get('/getActivationCode', ctx => getActivationCode(ctx));
 router.post('/new', ctx => newDevice(ctx));
-router.post('/lock', ctx => lockDevice(ctx));
-router.post('/remove', ctx => removeDevice(ctx));
+router.post('/lock', ctx => lockDevices(ctx));
+router.post('/remove', ctx => removeDevices(ctx));
 router.get('/isExist', ctx => isExistDevice(ctx));
 router.get('/isActive', ctx => isActiveDevice(ctx));
 router.get('/byUser', ctx => getDevicesByUser(ctx));
@@ -42,8 +42,8 @@ const verifyCode = async(ctx: any) => {
 }
 
 const getActivationCode = async(ctx: any) => {
-  const userName = ctx.query.user;
-  const code = await saveActivationCode(userName);
+  const userId = ctx.query.user;
+  const code = await saveActivationCode(userId);
   ctx.status = 200;
   ctx.body = JSON.stringify({ status: 200, result: code});
   logger.info('activation code generate successfully');
@@ -51,21 +51,21 @@ const getActivationCode = async(ctx: any) => {
 
 const newDevice = async(ctx: any) => {
   if(ctx.isUnauthenticated()) {
-    const {uid, idUser} = ctx.request.body;
+    const {uid, userId} = ctx.request.body;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === idUser))) {
+    if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === userId))) {
       await writeFile(
         PATH_LOCAL_DB_DEVICES,
         JSON.stringify(allDevices
-          ? [...allDevices, {uid, user: idUser, isBlock: false}]
-          : [{uid, user: idUser, isBlock: false}]
+          ? [...allDevices, {uid, user: userId, isBlock: false}]
+          : [{uid, user: userId, isBlock: false}]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'new device added successfully'});
       logger.info('new device added successfully');
     } else {
-      ctx.body = JSON.stringify({ status: 404, result: `this device(${uid}) is assigned to this user(${idUser})`});
-      logger.warn(`this device(${uid}) is assigned to this user(${idUser})`);
+      ctx.body = JSON.stringify({ status: 404, result: `this device(${uid}) is assigned to this user(${userId})`});
+      logger.warn(`this device(${uid}) is assigned to this user(${userId})`);
     }
   } else {
     ctx.status = 403;
@@ -76,16 +76,16 @@ const newDevice = async(ctx: any) => {
 
 const lockDevice = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {uid, idUser} = ctx.request.body;
+    const {uid, userId} = ctx.request.body;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+    const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === userId);
     if(!allDevices || idx === undefined || idx < 0) {
-      ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
-      logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+      ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${userId})`});
+      logger.warn(`the device(${uid}) is not assigned to the user(${userId})`);
     } else {
       await writeFile(
         PATH_LOCAL_DB_DEVICES,
-        JSON.stringify([...allDevices.slice(0, idx), {uid, user: idUser, isBlock: true}, ...allDevices.slice(idx + 1)]
+        JSON.stringify([...allDevices.slice(0, idx), {uid, user: userId, isBlock: true}, ...allDevices.slice(idx + 1)]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'device locked successfully'});
@@ -98,14 +98,37 @@ const lockDevice = async(ctx: any) => {
   }
 }
 
+const lockDevices = async(ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {uIds, userId} = ctx.request.body;
+    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+    if (!uIds || !userId || !allDevices?.filter( device => uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId).length) {
+      ctx.body = JSON.stringify({ status: 200, result: `the devices(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`});
+      logger.warn(`the device(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`);
+    } else {
+      const newDevices = allDevices?.map( device => uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId ? {...device, isBlock: true} : device);
+      await writeFile(
+        PATH_LOCAL_DB_DEVICES,
+        JSON.stringify(newDevices)
+      );
+      ctx.body = JSON.stringify({ status: 200, result: 'devices locked successfully'});
+      logger.info('devices locked successfully');
+    }
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
 const removeDevice = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {uid, idUser} = ctx.request.body;
+    const {uid, userId} = ctx.request.body;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+    const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === userId);
     if(!allDevices || idx === undefined || idx < 0) {
-      ctx.body = JSON.stringify({ status: 200, result: `the device(${uid}) is not assigned to the user(${idUser})`});
-      logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+      ctx.body = JSON.stringify({ status: 200, result: `the device(${uid}) is not assigned to the user(${userId})`});
+      logger.warn(`the device(${uid}) is not assigned to the user(${userId})`);
     } else {
       await writeFile(
         PATH_LOCAL_DB_DEVICES,
@@ -122,13 +145,36 @@ const removeDevice = async(ctx: any) => {
   }
 }
 
+const removeDevices = async(ctx: any) => {
+  if(ctx.isAuthenticated()) {
+    const {uIds, userId} = ctx.request.body;
+    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+    if (!uIds || !userId || !allDevices?.filter( device => uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId).length) {
+      ctx.body = JSON.stringify({ status: 200, result: `the devices(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`});
+      logger.warn(`the device(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`);
+    } else {
+      const newDevices = allDevices?.filter( device => !(uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId));
+      await writeFile(
+        PATH_LOCAL_DB_DEVICES,
+        JSON.stringify(newDevices)
+      );
+      ctx.body = JSON.stringify({ status: 200, result: 'devices removed successfully'});
+      logger.info('devices removed successfully');
+    }
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+    logger.warn(`access denied`);
+  }
+}
+
 const isActiveDevice = async(ctx: any) => {
-  const {uid, idUser} = ctx.query;
+  const {uid, userId} = ctx.query;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === idUser);
+  const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === userId);
   if(!allDevices || idx === undefined || idx < 0) {
-    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${idUser})`});
-    logger.warn(`the device(${uid}) is not assigned to the user(${idUser})`);
+    ctx.body = JSON.stringify({ status: 404, result: `the device(${uid}) is not assigned to the user(${userId})`});
+    logger.warn(`the device(${uid}) is not assigned to the user(${userId})`);
   } else {
     ctx.body = JSON.stringify({ status: 200, result: !allDevices[idx].isBlock});
     logger.info( `device active: ${!allDevices[idx].isBlock}`);
@@ -150,14 +196,14 @@ const isExistDevice = async(ctx: any) => {
 
 const getDevicesByUser = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {idUser} = ctx.query;
+    const {userId} = ctx.query;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     ctx.body = JSON.stringify({
       status: 200,
       result: !allDevices || !allDevices.length
         ? []
         : allDevices
-          .filter( device => device.user === idUser)
+          .filter( device => device.user === userId)
           .map(device => {return {uid: device.uid, state: device.isBlock ? 'blocked' : 'active'}})
     });
     logger.info('get devices by user successfully');

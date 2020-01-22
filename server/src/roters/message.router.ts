@@ -15,8 +15,9 @@ router.post('/getAndRemove', ctx => getMessageAndRemove(ctx));
 router.post('/remove', ctx => removeMessage(ctx));
 
 const newMessage = async(ctx:  any) => {
-  if(ctx.isAuthenticated()) {
-    const {organisation, body} = ctx.query;
+  // if(ctx.isAuthenticated()) {
+    console.log(ctx.request.body);
+    const {organisation, body} = ctx.request.body;
     const uuid = uuidv1();
     await writeFile(
       `${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uuid}.json`,
@@ -24,16 +25,18 @@ const newMessage = async(ctx:  any) => {
     );
     ctx.body = JSON.stringify({ status: 200, result: {uid: uuid, date: new Date()}});
     logger.info(`new message in queue: ${uuid}`);
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
-    logger.warn(`access denied`);
-  }
+  // } else {
+  //   ctx.status = 403;
+  //   ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+  //   logger.warn(`access denied`);
+  // }
 }
 
 const getMessageAndRemove = async(ctx:  any) => {
-  if(ctx.isAuthenticated()) {
+ // if(ctx.isAuthenticated()) {
+    console.log(ctx.query);
     const {organisation, uid} = ctx.query;
+
     const message = await get(organisation, uid);
     const result = await remove(organisation, uid);
     if(result === 'OK') {
@@ -46,15 +49,15 @@ const getMessageAndRemove = async(ctx:  any) => {
       logger.warn('not deleted message');
     }
 
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
-    logger.warn(`access denied`);
-  }
+  // } else {
+  //   ctx.status = 403;
+  //   ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+  //   logger.warn(`access denied`);
+  // }
 }
 
 const getMessage = async(ctx:  any) => {
-  if(ctx.isAuthenticated()) {
+  //if(ctx.isAuthenticated()) {
     const {organisation, uid} = ctx.query;
     const message = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uid}.json`);
     if(message) {
@@ -66,11 +69,11 @@ const getMessage = async(ctx:  any) => {
       ctx.body = JSON.stringify({ status: 404, result: 'error'});
       logger.warn('not message');
     }
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
-    logger.warn(`access denied`);
-  }
+  // } else {
+  //   ctx.status = 403;
+  //   ctx.body = JSON.stringify({ status: 403, result: `access denied`});
+  //   logger.warn(`access denied`);
+  // }
 }
 
 const removeMessage = async(ctx:  any) => {

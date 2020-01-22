@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { IUserCompany } from "./types";
 
-export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT' | 'SIGNED_UP' | 'SIGNING_UP' | 'GETTING_ME' | 'GOT_ME';
+export type LoginState = 'LOGGED_OUT' | 'LOGGED_IN' | 'LOGGING_IN' | 'LOGGING_OUT' | 'SIGNED_UP' | 'SIGNING_UP';
 
 export interface ILogin {
   loginState: LoginState;
@@ -14,13 +14,11 @@ export interface ILogin {
 };
 
 export type LogInProc = (userName: string, password: string) => Promise<ILogin>;
-export type LogGetMe = () => Promise<ILogin>;
 export type LogOutProc = () => Promise<ILogin>;
 export type SignUpProc = (userName: string, password: string) => Promise<ILogin>;
 
 export type ILoginApi = {
   doLogIn: LogInProc,
-  doGetMe: LogGetMe;
   doLogOut: LogOutProc;
   doSignUp: SignUpProc;
 };
@@ -70,43 +68,6 @@ export const useLogin = (userName?: string, password?: string): [ILogin, ILoginA
       return newState;
     }
 
-  }, []);
-
-  const doGetMe: LogGetMe = useCallback(async () => {
-    setLogin({ loginState: 'GETTING_ME' });
-    console.log('doGetMe');
-
-    try {
-      const resFetch = await fetch("http://localhost:3649/api/me", {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      const res = await resFetch.json();
-
-      let newState: ILogin;
-      if (res.status === 200) {
-        newState = {
-          loginState: 'GOT_ME',
-          userName: res.result.userName,
-          userId: res.result.id,
-          companies: res.result.organisations?.map((org: IUserCompany) => {return {companyName: org}})
-        };
-      } else {
-        newState = {
-          loginState: 'LOGGING_OUT',
-          errorMessage: `${res.status} - ${res.result}`
-        };
-      }
-
-      setLogin(newState);
-      return newState;
-    }
-    catch (err) {
-      const newStateErr: ILogin = {
-        loginState: 'LOGGING_OUT',
-        errorMessage: err
-      };
-
-      setLogin(newStateErr);
-      return newStateErr;
-    };
   }, []);
 
   const doSignUp: SignUpProc = useCallback(async (userName: string, password: string) => {
@@ -189,9 +150,9 @@ export const useLogin = (userName?: string, password?: string): [ILogin, ILoginA
 
   const loginApi = useMemo(
     () => ({
-      doLogIn, doGetMe, doLogOut, doSignUp
+      doLogIn, doLogOut, doSignUp
     }),
-    [doLogIn, doGetMe, doLogOut, doSignUp]
+    [doLogIn, doLogOut, doSignUp]
   );
 
   return [login, loginApi];

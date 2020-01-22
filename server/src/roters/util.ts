@@ -4,7 +4,7 @@ import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS } from '../rest';
 
 export const findById = async (id: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.id === id) : undefined;
+  return data ? data.find(user => user.userId === id) : undefined;
 }
 
 export const findByUserName = async (userName: string) => {
@@ -12,22 +12,22 @@ export const findByUserName = async (userName: string) => {
   return data ? data.find(user => user.userName === userName) : undefined;
 }
 
-export const saveActivationCode = async (idUser: string) => {
+export const saveActivationCode = async (userId: string) => {
   const code = Math.random().toString(36).substr(3, 6);
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
   await writeFile(
     PATH_LOCAL_DB_ACTIVATION_CODES,
     JSON.stringify(allCodes
-      ? [...allCodes, {code, date: (new Date()).toString(), user: idUser}]
-      : [{code, date: Date().toString(), user: idUser}]
+      ? [...allCodes, {code, date: (new Date()).toString(), user: userId}]
+      : [{code, date: Date().toString(), user: userId}]
     )
   );
   return code;
 }
 
-export const editeOrganisations = async(idUser: string, organisations: string[]) => {
+export const editeOrganisations = async(userId: string, organisations: string[]) => {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const user = allUsers?.find(item => item.id === idUser);
+    const user = allUsers?.find(item => item.userId === userId);
     const idx = user && allUsers && allUsers.findIndex( item => item.userName === user.userName );
     if(!allUsers || idx === undefined || idx < 0) {
       return 1;

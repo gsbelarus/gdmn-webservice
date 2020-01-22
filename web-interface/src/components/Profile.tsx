@@ -1,7 +1,9 @@
 import React from 'react';
-import { Stack, IColumn, DetailsList, SelectionMode } from 'office-ui-fabric-react';
-import { IUser, IUserCompany, IItem, IDevice } from '../types';
+import { Stack } from 'office-ui-fabric-react';
+import { IUser, IUserCompany, IDevice } from '../types';
 import { User } from './User';
+import { CompanyList } from './CompanyList';
+import { DeviceList } from './DeviceList';
 
 export interface IProfileProps {
   user: IUser;
@@ -11,32 +13,12 @@ export interface IProfileProps {
   onClearEditOK?: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
+  onRemoveDevices?: (uIds: string[]) => void;
+  onBlockDevices?:  (uIds: string[]) => void;
+  isCanEditUser?: boolean;
 }
 
-export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices }: IProfileProps) => {
-
-  const companyItems: IItem[] = companies?.map(c => ({key: c.companyName, name: c.companyName})) || [];
-  const companyColumns: IColumn[] = [{
-    key: 'companyName',
-    name: 'Организации пользователя',
-    minWidth: 300,
-    fieldName: 'name',
-  }];
-
-  const deviceItems: IItem[] = devices?.map(d => ({key: d.uid, name: d.uid, state: d.state})) || [];
-  const deviceColumns: IColumn[] = [{
-    key: 'deviceName',
-    name: 'Наименование устройств',
-    minWidth: 300,
-    fieldName: 'name',
-  },
-  {
-    key: 'deviceStatus',
-    name: 'Статус',
-    minWidth: 100,
-    fieldName: 'state',
-  }];
-
+export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices, isCanEditUser, onRemoveDevices, onBlockDevices }: IProfileProps) => {
   return (
     <Stack horizontalAlign='center'>
       <User
@@ -45,20 +27,24 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
         user={user}
         onEditProfile={onEditProfile}
         onClearError={onClearError}
+        isCanEditUser={isCanEditUser}
       />
-      <Stack horizontalAlign='center'>
-        <DetailsList
-          items={companyItems}
-          columns={companyColumns}
-          selectionMode={SelectionMode.none}
-          isHeaderVisible={true}
-        />
-        <DetailsList
-          items={deviceItems}
-          columns={deviceColumns}
-          selectionMode={SelectionMode.none}
-          isHeaderVisible={true}
-        />
+      <Stack horizontalAlign='start'>
+        {
+          !!companies?.length   &&
+          <CompanyList
+            companies={companies}
+          />
+        }
+        {
+          !!devices?.length  &&
+          <DeviceList
+            devices={devices}
+            onBlockDevices={onBlockDevices}
+            onRemoveDevices={onRemoveDevices}
+            onClearError={onClearError}
+          />
+        }
       </Stack>
     </Stack>
   )

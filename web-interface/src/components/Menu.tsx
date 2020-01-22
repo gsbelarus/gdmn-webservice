@@ -47,7 +47,7 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
             key: 'createUser',
             text: 'Добавить пользователя из системы..',
             disabled: !isAdmin || !onAddUserFromSystem,
-            iconProps: { iconName: 'AddFriend' },
+            iconProps: { iconName: 'PeopleAdd' },
             onClick: () => {
               onClearError();
               onAddUserFromSystem && onAddUserFromSystem();

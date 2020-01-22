@@ -30,7 +30,7 @@ const getUsersByDevice = async (ctx: any) => {
       : allDevices
         .filter( device => device.uid === idDevice)
         .map(device => {
-          const user = allUsers && allUsers.find(user => user.id === device.user);
+          const user = allUsers && allUsers.find(user => user.userId === device.user);
           return user ? {user: user.userName, state: device.isBlock ? 'blocked' : 'active'} : 'not found user'
         })
     });
@@ -50,7 +50,7 @@ const getUsers = async (ctx: any) => {
       result: !allUsers || !allUsers.length
       ? []
       : allUsers
-      .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber}))
+      .map(user => ({userId: user.userId, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
     });
     logger.info('get users by device successfully');
   } else {
@@ -68,7 +68,7 @@ const getUsersByOrganisation = async (ctx: any) => {
       status: 200,
       result: allUsers && allUsers
         .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
-        .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber}))
+        .map(user => ({userId: user.userId, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
       });
     logger.info('get users by organisation successfully');
   } else {
@@ -89,7 +89,7 @@ const editeProfile = async(ctx: any) => {
     } else {
       await writeFile(
         PATH_LOCAL_DB_USERS,
-        JSON.stringify([...allUsers.slice(0, idx), {...allUsers[idx], lastName: newUser.lastName, firstName: newUser.firstName, phoneNumber: newUser.phoneNumber}, ...allUsers.slice(idx + 1)]
+        JSON.stringify([...allUsers.slice(0, idx), {...allUsers[idx], lastName: newUser.lastName, firstName: newUser.firstName, phoneNumber: newUser.phoneNumber, password: newUser.password}, ...allUsers.slice(idx + 1)]
         )
       );
       ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully'});
@@ -104,14 +104,14 @@ const editeProfile = async(ctx: any) => {
 
 const addOrganisation = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation, user} = ctx.request.body;
-    const res = await editeOrganisations(user, [organisation]);
+    const {organisationId, userId} = ctx.request.body;
+    const res = await editeOrganisations(userId, [organisationId]);
     if(res === 0) {
-      ctx.body = JSON.stringify({ status: 200, result: `organization(${organisation}) added to user(${user})`});
-      logger.info(`organization(${organisation}) added to user(${user})`);
+      ctx.body = JSON.stringify({ status: 200, result: `organization(${organisationId}) added to user(${userId})`});
+      logger.info(`organization(${organisationId}) added to user(${userId})`);
     } else {
-      ctx.body = JSON.stringify({ status: 404, result: `no such user(${user})`});
-      logger.warn(`no such user(${user})`);
+      ctx.body = JSON.stringify({ status: 404, result: `no such user(${userId})`});
+      logger.warn(`no such user(${userId})`);
     }
   } else {
     ctx.status = 403;
@@ -124,7 +124,7 @@ const removeUsers = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
     const {users} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.id));
+    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.userId));
 
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     const newDevices = allDevices?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
@@ -158,10 +158,8 @@ const removeUsersFromOrganisation = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
     const {users, organisationId} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    console.log(users);
     const newUsers = allUsers?.map(all_u =>
-      users.findIndex((u: any) => u === all_u.id) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
-      console.log(newUsers);
+      users.findIndex((u: any) => u === all_u.userId) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
     /**Пока только удалим организацию у пользователей */
     await writeFile(
       PATH_LOCAL_DB_USERS,

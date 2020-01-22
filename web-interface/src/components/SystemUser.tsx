@@ -20,7 +20,7 @@ export const SystemUser = ({ onClearError, onAddUser, allUsers, companyUsers }: 
         <VirtualizedComboBox
           styles={{ root: { maxWidth: '300px' } }}
           selectedKey={user}
-          label="Scaled/virtualized example with 1000 items"
+          label="Пользователи системы"
           allowFreeform={true}
           autoComplete="on"
           options={users}

@@ -1,5 +1,5 @@
 export interface IUser {
-  id?: string;
+  userId?: string;
   userName: string;
   password: string;
   activationCode?: string;
@@ -7,6 +7,7 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  creatorId: string;
 }
 
 export interface IActivationCode {

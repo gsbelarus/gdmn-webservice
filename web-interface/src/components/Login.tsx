@@ -1,9 +1,9 @@
-import { IUser } from "../types";
 import React, { useState } from "react";
 import { Stack, TextField, Label, PrimaryButton } from "office-ui-fabric-react";
 
 interface ILoginProps {
-  user?: IUser;
+  userName?: string;
+  password?: string;
   querying: boolean;
   errorMessage?: string;
   onLogin: (userName: string, password: string) => void;
@@ -11,10 +11,10 @@ interface ILoginProps {
   onClearError: () => void;
 };
 
-export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onClearError }: ILoginProps) => {
+export const Login = ({ userName, password, querying, errorMessage, onLogin, onSetSignUp, onClearError }: ILoginProps) => {
 
-  const [userName, setUserName] = useState(user?.userName ? user.userName : '');
-  const [password, setPassword] = useState(user?.password ? user.password : '');
+  const [userName_state, setUserName] = useState(userName ?? '');
+  const [password_state, setPassword] = useState(password ?? '');
 
   return (
     <div>
@@ -37,21 +37,21 @@ export const Login = ({ user, querying, errorMessage, onLogin, onSetSignUp, onCl
           }
           <TextField
             label="Имя пользователя:"
-            value={userName}
+            value={userName_state}
             onChange={ (_, userName) => userName !== undefined ? setUserName(userName) : undefined }
           />
           <TextField
             label="Пароль:"
-            value={password}
+            value={password_state}
             onChange={ (_, password) => password !== undefined ? setPassword(password) : undefined }
           />
           <PrimaryButton
             text="Войти"
             style={{float: 'right', margin: '8px 0'}}
-            disabled={ !userName || !password || querying }
+            disabled={ !userName_state || !password_state || querying }
             onClick={ () => {
               onClearError();
-              onLogin(userName, password);
+              onLogin(userName_state, password_state);
             }}
           />
           <div

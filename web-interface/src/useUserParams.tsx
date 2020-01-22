@@ -1,20 +1,70 @@
 import { useState, useCallback } from "react";
 import { IUserCompany, IUser } from "./types";
 
-export type UserState = 'RECEIVED_COMPANIES' | 'RECIEVING_COMPANIES' | 'EDITED_USER' | 'EDITING_USER' | 'DELETED' | 'DELETING' | 'ADMIN' | 'PROFILE';
+export type UserState = 'RECEIVED_COMPANIES'
+  | 'RECIEVING_COMPANIES'
+  | 'EDITED_USER'
+  | 'EDITING_USER'
+  | 'DELETED'
+  | 'DELETING'
+  | 'ADMIN'
+  | 'PROFILE'
+  | 'GETTING_ME'
+  | 'GOT_ME'
+  | 'LOGGING_OUT';
 
 export interface IUserParams {
   state: UserState;
   companies?: IUserCompany[];
+  user?: IUser;
   errorMessage?: string;
 };
 
+export type GetMeProc = () => Promise<IUserParams>;
 export type GetCompaniesProc = (userId: string) => Promise<IUserParams>;
 export type UpdateUserProc = (user: IUser) => Promise<IUserParams>;
 export type DeleteUserProc = (userId: string) => Promise<IUserParams>;
 
-export const useUserParams = (): [IUserParams, GetCompaniesProc, UpdateUserProc, DeleteUserProc] => {
+export const useUserParams = (): [IUserParams, GetMeProc, GetCompaniesProc, UpdateUserProc, DeleteUserProc] => {
   const [userParams, setUserParams] = useState<IUserParams>({ state: 'ADMIN' });
+
+  const doGetMe: GetMeProc = useCallback(async () => {
+    setUserParams({ state: 'GETTING_ME' });
+
+   console.log('doGetMe');
+
+    try {
+      const resFetch = await fetch(`http://localhost:3649/api/me`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      const res = await resFetch.json();
+
+      let newState: IUserParams;
+      const r = res.result;
+      if (res.status === 200) {
+        newState = {
+          state: 'GOT_ME',
+          user: {userId: r.id, userName: r.userName, lastName: r.lastName, firstName: r.firstName, phoneNumber: r.phoneNumber, password: r.password}
+        };
+       } else {
+        newState = {
+          state: 'LOGGING_OUT',
+          errorMessage: `${res.status} - ${res.result}`
+        };
+      }
+
+      setUserParams(newState);
+      return newState;
+    }
+    catch (err) {
+      const newStateErr: IUserParams = {
+        state: 'LOGGING_OUT',
+        errorMessage: err
+      };
+
+      setUserParams(newStateErr);
+      return newStateErr;
+    };
+
+  }, []);
 
   const doGetCompanies: GetCompaniesProc = useCallback(async (userId: string) => {
     setUserParams({ state: 'RECIEVING_COMPANIES' });
@@ -122,5 +172,5 @@ export const useUserParams = (): [IUserParams, GetCompaniesProc, UpdateUserProc,
     }
   };
 
-  return [userParams, doGetCompanies, doUpdateUser, doDeleteUser];
+  return [userParams, doGetMe, doGetCompanies, doUpdateUser, doDeleteUser];
 };

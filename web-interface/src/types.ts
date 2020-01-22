@@ -7,6 +7,7 @@ export interface IUser {
   phoneNumber?: string;
   isAdmin?: boolean;
   code?: string;
+  creatorId?: string;
 };
 export interface IUserCompany {
   companyId: string;

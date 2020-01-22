@@ -32,7 +32,7 @@ export async function init() {
 
   app.use(session(CONFIG, app));
   app.use(bodyParser());
-  passport.serializeUser((user: IUser, done) => done(null, user.id));
+  passport.serializeUser((user: IUser, done) => done(null, user.userId));
 	passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
 	passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
 	app.use(passport.initialize());

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Stack, DetailsList, IColumn, SelectionMode, Link, CheckboxVisibility, PrimaryButton, Selection } from 'office-ui-fabric-react';
 import { IUser, IItem } from '../types';
 import { Company } from './Company';
@@ -11,21 +11,17 @@ export interface ICompanyProps {
   onUpdateCompany: (companyId: string, companyName: string) => void;
   onClearError: () => void;
   onSelectUser: (userId: string) => void;
-  onRemoveUsersFromCompany?: (usersId: string[]) => void;
+  onRemoveUsersFromCompany?: (userIds: string[]) => void;
 }
 
 export const CompanyBox = ({ onUpdateCompany, companyName, companyId, users, onClearError, onSelectUser, onRemoveUsersFromCompany }: ICompanyProps) => {
-
   const [selectedItems, setSelectedItems] = useState([] as string[]);
   const selection = useRef(new Selection({
     onSelectionChanged: () => {
-      console.log(selection.current);
       const newSelection = selection.current.getSelection().map( s => s.key ).filter( s => typeof s === 'string' ) as typeof selectedItems;
       setSelectedItems(newSelection);
     }
   }));
-
-  console.log(selectedItems);
 
   const items: IItem[] = users?.map(u => ({key: u.userName, name: u.userName, status: u.isAdmin ? 'Администратор' : ''})) || [];
   const columns: IColumn[] = [{
@@ -66,9 +62,8 @@ export const CompanyBox = ({ onUpdateCompany, companyName, companyId, users, onC
         />
         {selectedItems.length > 0 && onRemoveUsersFromCompany &&
           <PrimaryButton
-            text="Удалить"
+            text="Удалить из организации"
             style={{marginTop: '10px', float: 'right'}}
-            disabled={false}
             onClick={() => {
               onClearError();
               onRemoveUsersFromCompany(selectedItems);

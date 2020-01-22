@@ -3,15 +3,16 @@ import { PrimaryButton, Stack, TextField, Text } from 'office-ui-fabric-react';
 import { IUser } from '../types';
 
 export interface IUserProps {
-  user?: IUser;
+  user: IUser;
   isEditOK?: boolean;
   onClearEditOK?: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
+  isCanEditUser?: boolean;
 }
 
-export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK }: IUserProps) => {
-  const [state, setState] = useState<IUser>(user || {userName: ''});
+export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK, isCanEditUser }: IUserProps) => {
+  const [state, setState] = useState<IUser>(user);
   const [repeatPassword, setRepeatPassword] = useState();
 
   useEffect(() => {
@@ -29,49 +30,63 @@ export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditO
       }
       <Stack.Item>
         <TextField
-          disabled={!!user}
+          disabled={!!user.userId}
           label="Пользователь:"
           value={state?.userName}
           onChange={ (_, login) => setState({...state, userName: login || ''}) }
         />
         <TextField
+          disabled={!isCanEditUser}
           label="Имя:"
           value={state?.firstName}
           onChange={ (_, firstName) => setState( {...state, firstName}) }
         />
         <TextField
+          disabled={!isCanEditUser}
           label="Фамилия:"
           value={state.lastName}
           onChange={ (_, lastName) => setState({...state, lastName}) }
         />
         <TextField
+          disabled={!isCanEditUser}
           label="Номер телефона:"
           value={state.phoneNumber}
           onChange={ (_, phoneNumber) => setState({...state, phoneNumber}) }
         />
-          <TextField
-            label="Пароль:"
-            value={state.password}
-            onChange={ (_, password) => setState({...state, password}) }
-          />
-          <TextField
-            label="Повторите пароль:"
-            value={repeatPassword}
-            onChange={ (_, repeatPassword) => setRepeatPassword(repeatPassword) }
-          />
-        <div className="">
-          <PrimaryButton
-            text="Сохранить"
-            style={{marginTop: '10px', float: 'right'}}
-            disabled={!state.userName || (((user?.firstName || '') === (state.firstName || ''))
-              && ((user?.lastName || '') === (state.lastName || '')) && ((user?.phoneNumber || '') === (state.phoneNumber || ''))
-              && ((repeatPassword || '') !== (state.password || '')))}
-            onClick={() => {
-              onClearError();
-              onEditProfile(state);
-            }}
-          />
-        </div>
+        { isCanEditUser &&
+          <div>
+            <TextField
+              label="Пароль:"
+              value={state.password}
+              onChange={ (_, password) => setState({...state, password}) }
+            />
+
+            <TextField
+              label="Повторите пароль:"
+              value={repeatPassword}
+              onChange={ (_, repeatPassword) => setRepeatPassword(repeatPassword) }
+            />
+
+            <PrimaryButton
+              text="Сохранить"
+              style={{marginTop: '10px', float: 'right'}}
+              disabled={
+                (((state.userName ?? '') !== '' || ((user?.userName || '') === ''))
+                  && ((user?.userName || '') === (state.userName || ''))
+                  && ((user?.firstName || '') === (state.firstName || ''))
+                  && ((user?.lastName || '') === (state.lastName || ''))
+                  && ((user?.phoneNumber || '') === (state.phoneNumber || ''))
+                  && ((user?.password || '') === (state.password || '')))
+                || (repeatPassword || '') !== (state.password || '')
+                || ((state.password || '') === '')
+              }
+              onClick={() => {
+                onClearError();
+                onEditProfile(state);
+              }}
+            />
+          </div>
+        }
       </Stack.Item>
     </Stack>
   )}
