@@ -72,7 +72,7 @@ const getMessage = async(ctx:  any) => {
         const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${newFile}`);
         result.push(data as IMessage);
       }
-      result.filter(res => res.toAll || (res.consumer && res.consumer === ctx.state.user.userName))
+      result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName))
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result});
       logger.info('get message');

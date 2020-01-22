@@ -29,7 +29,6 @@ export interface IOrganisation {
 
 export interface IMessage {
   producer: string;
-  toAll: boolean;
   consumer?: string;
   organisation: string;
   sedingTime: string;
