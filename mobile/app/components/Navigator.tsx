@@ -1,6 +1,7 @@
 import ActivationPage from './ActivationPage';
 import ProfilePage from './ProfilePage';
 import MessagePage from './MessagePage';
+import SendMessagePage from './SendMessagePage';
 import LoginPage from './LoginPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -23,7 +24,8 @@ const ActivationNavigator = createStackNavigator(
 const AppNavigator = createStackNavigator(
     {
         ProfilePage: ProfilePage,
-        MessagePage: MessagePage
+        MessagePage: MessagePage,
+        SendMessagePage: SendMessagePage
     },
     {
         initialRouteName: 'ProfilePage'

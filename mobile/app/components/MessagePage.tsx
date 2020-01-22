@@ -65,6 +65,13 @@ const MessagePage = (): JSX.Element => {
             color={'#9CAEBA'}
           />
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigate('SendMessagePage')}>
+          <MaterialIcons
+            name="edit"
+            size={28}
+            color={'#9CAEBA'}
+          />
+        </TouchableOpacity>
       </View>
       <Button title="Get messages" onPress={getMessages} />
       {
@@ -91,7 +98,8 @@ const styles = StyleSheet.create({
   },
   navigation: {
     marginLeft: 10,
-    marginTop: 20
+    marginTop: 20,
+    flexDirection: "row"
   },
   input: {
     margin: 15,
