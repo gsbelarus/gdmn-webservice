@@ -27,3 +27,11 @@ export interface IOrganisation {
   user: string;
   isBlock: boolean;
 }
+
+export interface IMessage {
+  producer: string;
+  consumer?: string;
+  organisation: string;
+  sedingTime: string;
+  body: string;
+}

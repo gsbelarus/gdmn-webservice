@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Navigator from './app/components/Navigator'
 import Constants from 'expo-constants';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, YellowBox } from 'react-native';
+
+YellowBox.ignoreWarnings([
+  'Require cycle:',
+]);
 
 type TStartState = 'SIGN_OUT' | 'NO_ACTIVATION' | 'LOG_IN';
 export const path = 'http://192.168.0.36:3649/api/';
