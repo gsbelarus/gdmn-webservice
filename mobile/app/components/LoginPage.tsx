@@ -12,7 +12,7 @@ const {navigate} = useNavigation();
 
 const isActivateDevice = async () => {
   const data = await fetch(
-    `${path}device/isActive?uid=${Constants.deviceId}&idUser=${loginValue}`,
+    `${path}device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},

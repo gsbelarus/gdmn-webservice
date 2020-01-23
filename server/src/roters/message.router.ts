@@ -74,9 +74,11 @@ const getMessage = async(ctx:  any) => {
         const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${newFile}`);
         result.push(data as IMessage);
       }
-      result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName))
+      console.log(result);
+      const newResult = result.filter(res => res.producer !== ctx.state.user.userName && (res.consumer === 'all' || !res.consumer || (res.consumer === ctx.state.user.userName)))
+      console.log(newResult);
       ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result});
+      ctx.body = JSON.stringify({ status: 200, result: newResult});
       logger.info('get message');
     }
     catch (e) {

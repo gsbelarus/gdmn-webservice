@@ -18,6 +18,7 @@ router.get('/me', ctx => getMe(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
+
     const user = await promisify((cb) => {
       koaPassport.authenticate('local', cb)(ctx, async () => {});
     })() as IUser | false;

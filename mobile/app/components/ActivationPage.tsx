@@ -28,7 +28,7 @@ const verifyCode = async () => {
         credentials: 'include',
         body: JSON.stringify({
           uid: Constants.deviceId,
-          idUser: data.result
+          userId: data.result
         })
       }
     )

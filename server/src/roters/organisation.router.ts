@@ -27,8 +27,8 @@ const addOrganisation = async(ctx: any) => {
           : [{id: title, title, admin: ctx.state.user.userId}]
         )
       );
-      const res = await editeOrganisations(ctx.state.user.id, [title]);
-      const res1 = await editeOrganisations('GDMN', [title]);
+      const res = await editeOrganisations(ctx.state.user.userId, [title]);
+      const res1 = await editeOrganisations('gdmn', [title]);
       if(res === 0) {
         ctx.body = JSON.stringify({ status: 200, result: title});
         logger.info('new organisation added successfully');

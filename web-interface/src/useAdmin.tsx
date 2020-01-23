@@ -101,7 +101,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     console.log('doGetDevicesByUser');
 
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/device/byUser?idUser=${userId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const resFetch = await fetch(`http://localhost:3649/api/device/byUser?userId=${userId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
       console.log(res);
       let newState: IAdmin;
