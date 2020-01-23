@@ -150,7 +150,7 @@ export interface ICompaniesResponse extends IQueryResponse {
 
 export interface ISignUpResponse extends IQueryResponse {
   type: 'SIGNUP';
-  code: string;
+  user: IUser;
 };
 
 export interface IAllUsersResponse extends IQueryResponse {
@@ -184,7 +184,7 @@ export interface IUpdateCompanyResponse extends IQueryResponse {
 
 export interface ICreateUserResponse extends IQueryResponse {
   type: 'NEW_USER';
-  code: string;
+  user: IUser;
 };
 
 export interface IAddUserResponse extends IQueryResponse {

@@ -67,12 +67,14 @@ const getSignOut = (ctx: any) => {
 }
 
 const signup = async (ctx: any) => {
-  const newUser = ctx.request.body as IUser;
-  if(!(await findByUserName(newUser.userName))) {
+  const user = ctx.request.body as IUser;
+  if(!(await findByUserName(user.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, {userId: newUser.userName, ...newUser}] : [{userId: newUser.userName, ...newUser}]));
+    const code = await saveActivationCode(user.userName);
+    const newUser = {...user, userId: user.userName, code};
+    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));
     ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: await saveActivationCode(newUser.userName)});
+    ctx.body = JSON.stringify({ status: 200, result: newUser});
     logger.info('sign up successful');
   } else {
     ctx.status = 404;

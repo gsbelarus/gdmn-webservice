@@ -64,7 +64,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       if (res.status === 200) {
         return {
           type: 'SIGNUP',
-          code: res.result
+          user: res.result
         } as ISignUpResponse;
       }
       return {
@@ -232,7 +232,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       if (res.status === 200) {
         return {
           type: 'NEW_USER',
-          code: res.result
+          user: res.result
         } as ICreateUserResponse;
       }
       return {
