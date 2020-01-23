@@ -74,7 +74,10 @@ const getMessage = async(ctx:  any) => {
       }
       result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName))
       ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result});
+      ctx.body = JSON.stringify({
+        status: 200, 
+        result: result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName))
+      });
       logger.info('get message');
     }
     catch (e) {
