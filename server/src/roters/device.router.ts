@@ -26,6 +26,7 @@ const verifyCode = async(ctx: any) => {
     const date = new Date(code.date);
     date.setDate(date.getDate() + 7);
     if(date >= new Date()) {
+      await writeFile( PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(code => code.code !== ctx.query.code)) );
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: code.user});
       logger.info('device activated successfully');
