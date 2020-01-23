@@ -1,8 +1,7 @@
 import React, { useState, FC } from 'react';
-import { StyleSheet, View, StatusBar, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, StatusBar, TextInput, Alert } from 'react-native';
 import SubTitle from './SubTitle';
 import Constants from 'expo-constants';
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks'
 import { path } from '../../App';
 
@@ -19,7 +18,6 @@ const verifyCode = async () => {
     }
   ).then(res => res.json())
   if (data.status === 200) {
-    console.log(data.result)
     fetch(
       `${path}device/new`,
       {

@@ -5,16 +5,6 @@ import { useNavigation } from 'react-navigation-hooks';
 import { path } from '../../App';
 
 const SendMessagePage = (): JSX.Element => {
-  interface IMessage {
-    id?: string;
-    userName: string;
-    password: string;
-    activationCode?: string;
-    organisations?: string[];
-    firstName?: string;
-    lastName?: string;
-    numberPhone?: string;
-  }
 
   interface IUser {
     id?: string;
@@ -80,7 +70,7 @@ const SendMessagePage = (): JSX.Element => {
         body: JSON.stringify({
           producer,
           organisation: selectedOrganisation,
-          consumer: selectedConsumer,
+          consumer: selectedConsumer !== 'all' ? selectedConsumer : undefined,
           sedingTime: (new Date()).toString(),
           body: textMessage
         })
@@ -166,18 +156,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 24,
     height: 40
- },
+  },
   submitButton: {
     backgroundColor: '#70667D',
     padding: 10,
     margin: 15,
     height: 40,
     alignItems: 'center'
- },
- submitButtonText:{
+  },
+  submitButtonText:{
     color: 'white',
     fontSize: 18
- }
+  }
 });
 
 export default SendMessagePage;
