@@ -76,7 +76,7 @@ const getMessage = async(ctx:  any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({
         status: 200, 
-        result: result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName))
+        result: result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName && res.consumer !== res.producer))
       });
       logger.info('get message');
     }
