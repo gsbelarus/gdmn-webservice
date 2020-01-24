@@ -5,7 +5,7 @@ import { IItem, IDevice } from '../types';
 export interface IDeviceListProps {
   devices: IDevice[];
   onRemoveDevices?: (uIds: string[]) => void;
-  onBlockDevices?:  (uIds: string[]) => void;
+  onBlockDevices?:  (uIds: string[], isUnBlock?: boolean) => void;
   onClearError?: () => void;
 }
 
@@ -41,31 +41,46 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
           selectionMode={SelectionMode.multiple}
           selection={selection.current}
           setKey="set"
+
         />
+      </Stack.Item>
+      <Stack.Item styles={{root: {paddingTop: '10px'}}}>
         { onRemoveDevices && onClearError && !!selectedItems.length &&
           <PrimaryButton
             text="Удалить"
-            style={{marginTop: '10px', marginLeft: '10px', float: 'right'}}
+            style={{marginLeft: '10px', float: 'right'}}
             disabled={!onRemoveDevices}
             onClick={() => {
               onClearError();
-              onRemoveDevices && onRemoveDevices(selectedItems);
-              setSelectedItems([]);
+              onRemoveDevices(selectedItems);
+              selection.current.setAllSelected(false);
             }}
           />
         }
         { onBlockDevices && onClearError && !!selectedItems.length &&
           <PrimaryButton
             text="Заблокировать"
-            style={{marginTop: '10px', float: 'right'}}
+            style={{marginLeft: '10px', float: 'right'}}
             onClick={() => {
               onClearError();
               onBlockDevices(selectedItems);
-              setSelectedItems([]);
+              selection.current.setAllSelected(false);
             }}
           />
         }
-      </Stack.Item>
+        { onBlockDevices && onClearError && !!selectedItems.length &&
+          <PrimaryButton
+            text="Разблокировать"
+            style={{float: 'right'}}
+            onClick={() => {
+              onClearError();
+              onBlockDevices(selectedItems, true);
+              selection.current.setAllSelected(false);
+            }}
+          />
+        }
+        </Stack.Item>
+
     </Stack>
   )
 }

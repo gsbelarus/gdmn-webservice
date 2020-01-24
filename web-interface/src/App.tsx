@@ -395,17 +395,11 @@ const App: React.FC = () => {
   const handleGetUserDevices = (userId: string, type: 'SET_DEVICES' | 'SET_CURRENT_DEVICES') => {
     queryServer({ command: 'GET_USER_DEVICES', userId })
     .then( data => {
-      console.log(data);
       if (data.type === 'ERROR') {
         dispatch({ type: 'SET_ERROR', errorMessage: data.message });
       }
       else if (data.type === 'USER_DEVICES') {
-        // let codes: IDevice[] | undefined = companyUsers?.filter(u => u.code && u.userId === userId).map(u => ({uid: 'Неактивированное устройство', state: 'Awaiting activation'}));
-        // codes = codes && data.devices.concat(codes);
-        // console.log(codes);
-        //if (data.devices) {
-          dispatch({ type, devices: data.devices })
-       // }
+        dispatch({ type, devices: data.devices })
       }
     })
     .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
@@ -477,7 +471,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleBlockDevices = (uIds: string[]) => {
+  const handleBlockDevices = (uIds: string[], isUnBlock?: boolean) => {
     if (currentUser?.userId) {
       queryServer({ command: 'BLOCK_DEVICES', uIds, userId: currentUser?.userId })
       .then( data => {
@@ -485,7 +479,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'BLOCK_DEVICES') {
-          dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(c => uIds.findIndex(u => u === c.uid) > -1 ? {...c, state: 'blocked'} : c)});
+          dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(c => uIds.findIndex(u => u === c.uid) > -1 ? {...c, state: !isUnBlock ? 'blocked' : 'active'} : c)});
           dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
         }
       })

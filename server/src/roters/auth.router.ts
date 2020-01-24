@@ -18,7 +18,6 @@ router.get('/me', ctx => getMe(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
-
     const user = await promisify((cb) => {
       koaPassport.authenticate('local', cb)(ctx, async () => {});
     })() as IUser | false;
@@ -70,7 +69,13 @@ const getSignOut = (ctx: any) => {
 const signup = async (ctx: any) => {
   const user = ctx.request.body as IUser;
   if(!(await findByUserName(user.userName))) {
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    let allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    console.log(allUsers);
+    if (!allUsers || !!allUsers.findIndex(u => u.userId === 'gdmn')) {
+      const gdmnUser: IUser = { userId: 'gdmn', userName: 'gdmn', password: 'gdmn', creatorId: user.userId || user.userName };
+      allUsers = allUsers ? [...allUsers, gdmnUser] : [gdmnUser];
+      await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers));
+    }
     const code = await saveActivationCode(user.userName);
     const newUser = {...user, userId: user.userName, code};
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));

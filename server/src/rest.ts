@@ -23,7 +23,7 @@ export async function init() {
   app.keys = ['super-secret-key'];
 
   const CONFIG = {
-    key: 'koa:sess', /** (string) cookie key (default is koa:sess) */
+    key: 'koa:sess1', /** (string) cookie key (default is koa:sess) */
     maxAge: 86400000, /** (number) maxAge in ms (default is 1 days) */
     overwrite: true, /** (boolean) can overwrite or not (default true) */
     httpOnly: true, /** (boolean) httpOnly or not (default true) */
