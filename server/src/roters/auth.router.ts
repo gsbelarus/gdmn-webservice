@@ -67,17 +67,16 @@ const getSignOut = (ctx: any) => {
 }
 
 const signup = async (ctx: any) => {
-  const user = ctx.request.body as IUser;
-  if(!(await findByUserName(user.userName))) {
-    let allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    if (!allUsers || !!allUsers.findIndex(u => u.userId === 'gdmn')) {
-      const gdmnUser: IUser = { userId: 'gdmn', userName: 'gdmn', password: 'gdmn', creatorId: user.userId || user.userName };
-      allUsers = allUsers ? [...allUsers, gdmnUser] : [gdmnUser];
-      await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers));
-    }
-    const code = await saveActivationCode(user.userName);
-    const newUser = {...user, userId: user.userName};
-    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));
+  const newUser = ctx.request.body as IUser;
+  if(!(await findByUserName(newUser.userName))) {
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify(allUsers
+        ? [...allUsers, {id: newUser.userName, ...newUser}]
+        : [{id: newUser.userName, ...newUser}, {userName:"gdmn", creatorId:newUser.userName, password:"gdmn", organisations:[], id:"gdmn", code:"jqgxmm"}]
+      )
+    );
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser});
     logger.info('sign up successful');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import Constants from 'expo-constants';
 import { path } from '../../App';
@@ -77,51 +77,55 @@ const account = async() => {
   }
 }
 
-return (
-  <View style={styles.container}>
-    <TextInput
-      style = {styles.input}
-      value={loginValue}
-      onChangeText = {setLoginValue}
-      placeholder = "Login"
-      placeholderTextColor = "#9A9FA1"
-      multiline={true}
-      autoCapitalize="sentences"
-      underlineColorAndroid = "transparent"
-      selectionColor={'black'}
-      maxLength={20}
-      returnKeyType="done"
-      autoCorrect={false}
-    />
-    <TextInput
-      style = {styles.input}
-      value={passwordValue}
-      onChangeText = {setPasswordValue}
-      placeholder = "Password"
-      placeholderTextColor = "#9A9FA1"
-      multiline={true}
-      autoCapitalize="sentences"
-      underlineColorAndroid = "transparent"
-      selectionColor={'black'}
-      maxLength={25}
-      returnKeyType="done"
-      autoCorrect={false}
-    />
-    <TouchableOpacity
-      style = {styles.submitButton}
-      onPress = {account}
-      >
-      <Text style = {styles.submitButtonText}>OK</Text>
-    </TouchableOpacity>
-  </View>
+  return (
+    <KeyboardAvoidingView style={{flex: 1}} behavior="height">
+      <SafeAreaView style={styles.container}>
+        <TextInput
+          style = {styles.input}
+          value={loginValue}
+          onChangeText = {setLoginValue}
+          placeholder = "Login"
+          placeholderTextColor = "#9A9FA1"
+          multiline={true}
+          autoCapitalize="sentences"
+          underlineColorAndroid = "transparent"
+          selectionColor={'black'}
+          maxLength={20}
+          returnKeyType="done"
+          autoCorrect={false}
+        />
+        <TextInput
+          style = {styles.input}
+          value={passwordValue}
+          onChangeText = {setPasswordValue}
+          placeholder = "Password"
+          placeholderTextColor = "#9A9FA1"
+          multiline={true}
+          autoCapitalize="sentences"
+          underlineColorAndroid = "transparent"
+          selectionColor={'black'}
+          maxLength={25}
+          returnKeyType="done"
+          autoCorrect={false}
+        />
+        <TouchableOpacity
+          style = {styles.submitButton}
+          onPress = {account}
+          >
+          <Text style = {styles.submitButtonText}>OK</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 200,
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: '#E3EFF4',
-    flex: 1
+    flex: 1,
+    justifyContent: 'center',
   },
   input: {
     margin: 15,
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
  },
   submitButton: {
     backgroundColor: '#70667D',
-    padding: 10,
+    padding: 8,
     margin: 15,
     height: 40,
     alignItems: 'center'

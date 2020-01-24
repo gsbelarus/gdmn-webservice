@@ -47,14 +47,14 @@ const ProfilePage = (): JSX.Element => {
       <View style={styles.navigation}>
         <TouchableOpacity onPress={() => navigate('MessagePage')}>
           <MaterialIcons
-            name="menu"
+            name="message"
             size={28}
             color={'#9CAEBA'}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigate('SendMessagePage')}>
           <MaterialIcons
-            name="edit"
+            name="create"
             size={28}
             color={'#9CAEBA'}
           />
@@ -68,7 +68,6 @@ const ProfilePage = (): JSX.Element => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 200,
     backgroundColor: '#E3EFF4',
     flex: 1
   },
