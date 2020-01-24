@@ -70,7 +70,13 @@ const signup = async (ctx: any) => {
   const newUser = ctx.request.body as IUser;
   if(!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, {id: newUser.userName, ...newUser}] : [{id: newUser.userName, ...newUser}]));
+    await writeFile(
+      PATH_LOCAL_DB_USERS, 
+      JSON.stringify(allUsers
+        ? [...allUsers, {id: newUser.userName, ...newUser}]
+        : [{id: newUser.userName, ...newUser}, {userName:"gdmn", creatorId:newUser.userName, password:"gdmn", organisations:[], id:"gdmn", code:"jqgxmm"}]
+      )
+    );
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: await saveActivationCode(newUser.userName)});
     logger.info('sign up successful');
