@@ -90,7 +90,7 @@ const SendMessagePage = (): JSX.Element => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigate('MessagePage')}>
           <MaterialIcons
-            name="edit"
+            name="message"
             size={28}
             color={'#9CAEBA'}
           />
