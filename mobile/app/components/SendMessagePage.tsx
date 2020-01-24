@@ -54,7 +54,7 @@ const SendMessagePage = (): JSX.Element => {
         }
       ).then(res => res.json())
       .then(res => res.status === 200 && (res.result as IUser[]) ? res.result as IUser[] : []);
-      setConsumers(result.reduce( (users, user) => [...users, user.userName], ['all']));
+      setConsumers(result.reduce( (users, user) => [...users, user.userName], ['all']).filter( user => user !== producer));
     }
 
     getConsumers();
