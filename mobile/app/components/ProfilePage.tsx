@@ -68,7 +68,6 @@ const ProfilePage = (): JSX.Element => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 200,
     backgroundColor: '#E3EFF4',
     flex: 1
   },
