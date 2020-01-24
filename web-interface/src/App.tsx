@@ -338,7 +338,7 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, data.user] : [data.user]});
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: [] });
             dispatch({ type: 'SET_COMPANIES', companies: companies?.filter(c => c.companyId === company.companyId) });
-            dispatch({ type: 'SET_STATE', appState: 'CREATE_CODE' });
+            dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );

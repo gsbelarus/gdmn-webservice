@@ -39,7 +39,7 @@ const SendMessagePage = (): JSX.Element => {
         .then(res => res.status === 200 && (res.result as IUser) ? (res.result as IUser).organisations : []));
       }
     }
-      
+
     getOrganisation();
   }, [])
 
@@ -75,7 +75,8 @@ const SendMessagePage = (): JSX.Element => {
           body: textMessage
         })
       }
-    ).then(res => res.json())
+    ).then(res => res.json());
+    onChangeText('');
   }
 
   return (
