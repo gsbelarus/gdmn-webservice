@@ -68,8 +68,7 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
     },
     {
       key: 'settings',
-      text: userName,
-      // style: {{minWidth: '130px'}},
+      iconProps: { iconName: 'AccountManagement'},
       subMenuProps: {
         items: [
           {
