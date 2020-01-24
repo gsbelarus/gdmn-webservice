@@ -28,6 +28,7 @@ export async function init() {
     overwrite: true, /** (boolean) can overwrite or not (default true) */
     httpOnly: true, /** (boolean) httpOnly or not (default true) */
     signed: true, /** (boolean) signed or not (default true) */
+    renew: false, /** (boolean) new session or not (defaul true) */ //если вы удалил все файлы базы данных запустите со значением true
   };
 
   app.use(session(CONFIG, app));
