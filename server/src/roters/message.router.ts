@@ -43,7 +43,6 @@ const newMessage = async(ctx:  any) => {
 const getMessageAndRemove = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
     const {organisation, uid} = ctx.query;
-
     const message = await get(organisation, uid);
     const result = await remove(organisation, uid);
     if(result === 'OK') {
@@ -76,7 +75,7 @@ const getMessage = async(ctx:  any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({
         status: 200,
-        result: result.filter(res => !res.consumer || (res.consumer && res.consumer === ctx.state.user.userName && res.consumer !== res.producer))
+        result: result.filter(res => (!res.consumer || res.consumer && res.consumer === ctx.state.user.userName) && ctx.state.user.userName !== res.producer)
       });
       logger.info('get message');
     }

@@ -53,7 +53,6 @@ const getActivationCode = async(ctx: any) => {
 const newDevice = async(ctx: any) => {
   if(ctx.isUnauthenticated()) {
     const {uid, userId} = ctx.request.body;
-
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === userId))) {
       await writeFile(

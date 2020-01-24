@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { IUser } from '../models';
 import { PATH_LOCAL_DB_USERS } from '../rest';
 import { readFile, writeFile } from '../workWithFile';
-import { saveActivationCode, findByUserName } from './util';
+import { findByUserName, saveActivationCode } from './util';
 
 const router = new Router();
 const logger = log4js.getLogger('SERVER');
@@ -18,7 +18,6 @@ router.get('/me', ctx => getMe(ctx));
 
 const getLogin = async (ctx: any) => {
   if(ctx.isUnauthenticated()) {
-
     const user = await promisify((cb) => {
       koaPassport.authenticate('local', cb)(ctx, async () => {});
     })() as IUser | false;
@@ -68,12 +67,18 @@ const getSignOut = (ctx: any) => {
 }
 
 const signup = async (ctx: any) => {
-  const user = ctx.request.body as IUser;
-  if(!(await findByUserName(user.userName))) {
+  const newUser = ctx.request.body as IUser;
+  if(!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const code = await saveActivationCode(user.userName);
-    const newUser = {...user, id: user.userName, code};
-    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));
+  //  const code = await saveActivationCode(newUser.userName);
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify(allUsers
+        ? [...allUsers, {userId: newUser.userName, ...newUser}]
+        : [{userId: newUser.userName, ...newUser}, {userName:"gdmn", creatorId:newUser.userName, password:"gdmn", organisations:[], userId:"gdmn", code:"jqgxmm"}]
+      )
+    );
+
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser});
     logger.info('sign up successful');

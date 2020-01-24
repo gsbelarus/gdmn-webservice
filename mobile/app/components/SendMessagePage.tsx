@@ -39,7 +39,7 @@ const SendMessagePage = (): JSX.Element => {
         .then(res => res.status === 200 && (res.result as IUser) ? (res.result as IUser).organisations : []));
       }
     }
-      
+
     getOrganisation();
   }, [])
 
@@ -54,7 +54,7 @@ const SendMessagePage = (): JSX.Element => {
         }
       ).then(res => res.json())
       .then(res => res.status === 200 && (res.result as IUser[]) ? res.result as IUser[] : []);
-      setConsumers(result.reduce( (users, user) => [...users, user.userName], ['all']));
+      setConsumers(result.reduce( (users, user) => [...users, user.userName], ['all']).filter( user => user !== producer));
     }
 
     getConsumers();
@@ -75,7 +75,8 @@ const SendMessagePage = (): JSX.Element => {
           body: textMessage
         })
       }
-    ).then(res => res.json())
+    ).then(res => res.json());
+    onChangeText('');
   }
 
   return (
@@ -90,7 +91,7 @@ const SendMessagePage = (): JSX.Element => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigate('MessagePage')}>
           <MaterialIcons
-            name="edit"
+            name="message"
             size={28}
             color={'#9CAEBA'}
           />
@@ -119,7 +120,7 @@ const SendMessagePage = (): JSX.Element => {
         }
       </Picker>
       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        style={styles.input}
         onChangeText={text => onChangeText(text)}
         value={textMessage}
         placeholder="Type here to enter your message"

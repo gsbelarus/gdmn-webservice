@@ -107,10 +107,8 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         userName: param.userName,
         password: param.password
       });
-      console.log(body);
       resFetch = await fetch(`http://localhost:3649/api/user/byName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
-      console.log(res);
       if (res.status === 200) {
         return {
           type: 'USER_BY_NAME',

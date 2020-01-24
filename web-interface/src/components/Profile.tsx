@@ -14,7 +14,7 @@ export interface IProfileProps {
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
   onRemoveDevices?: (uIds: string[]) => void;
-  onBlockDevices?:  (uIds: string[]) => void;
+  onBlockDevices?:  (uIds: string[], isUnBlock?: boolean) => void;
   isCanEditUser?: boolean;
 }
 
