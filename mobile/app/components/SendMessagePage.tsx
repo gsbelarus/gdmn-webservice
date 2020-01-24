@@ -119,7 +119,7 @@ const SendMessagePage = (): JSX.Element => {
         }
       </Picker>
       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        style={styles.input}
         onChangeText={text => onChangeText(text)}
         value={textMessage}
         placeholder="Type here to enter your message"
