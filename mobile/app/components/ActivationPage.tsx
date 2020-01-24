@@ -18,9 +18,7 @@ const verifyCode = async () => {
     }
   ).then(res => res.json())
   if (data.status === 200) {
-
-    console.log(data);
-    fetch(
+    await fetch(
       `${path}device/new`,
       {
         method: 'POST',

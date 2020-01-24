@@ -42,7 +42,6 @@ const newMessage = async(ctx:  any) => {
 
 const getMessageAndRemove = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    console.log(ctx.query);
     const {organisation, uid} = ctx.query;
 
     const message = await get(organisation, uid);

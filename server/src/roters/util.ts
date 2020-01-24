@@ -4,7 +4,7 @@ import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS } from '../rest';
 
 export const findById = async (id: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.userId === id) : undefined;
+  return data ? data.find(user => user.id === id) : undefined;
 }
 
 export const findByUserName = async (userName: string) => {
@@ -27,7 +27,7 @@ export const saveActivationCode = async (userId: string) => {
 
 export const editeOrganisations = async(userId: string, organisations: string[]) => {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const user = allUsers?.find(item => item.userId === userId);
+    const user = allUsers?.find(item => item.id === userId);
     const idx = user && allUsers && allUsers.findIndex( item => item.userName === user.userName );
     if(!allUsers || idx === undefined || idx < 0) {
       return 1;

@@ -25,7 +25,7 @@ const getLogin = async (ctx: any) => {
     ctx.login(user);
     if(ctx.isAuthenticated()) {
       ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result: user ? user.userId : false});
+      ctx.body = JSON.stringify({ status: 200, result: user ? user.id : false});
       logger.info(`login user ${user}`);
     } else {
       ctx.status = 404;
@@ -72,7 +72,7 @@ const signup = async (ctx: any) => {
   if(!(await findByUserName(user.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const code = await saveActivationCode(user.userName);
-    const newUser = {...user, userId: user.userName, code};
+    const newUser = {...user, id: user.userName, code};
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser});

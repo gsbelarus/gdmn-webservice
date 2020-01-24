@@ -30,7 +30,7 @@ export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditO
       }
       <Stack.Item>
         <TextField
-          disabled={!!user.userId}
+          disabled={!!user.id}
           label="Пользователь:"
           value={state?.userName}
           onChange={ (_, login) => setState({...state, userName: login || ''}) }

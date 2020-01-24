@@ -42,7 +42,7 @@ export const useUserParams = (): [IUserParams, GetMeProc, GetCompaniesProc, Upda
       if (res.status === 200) {
         newState = {
           state: 'GOT_ME',
-          user: {userId: r.id, userName: r.userName, lastName: r.lastName, firstName: r.firstName, phoneNumber: r.phoneNumber, password: r.password}
+          user: {id: r.id, userName: r.userName, lastName: r.lastName, firstName: r.firstName, phoneNumber: r.phoneNumber, password: r.password}
         };
        } else {
         newState = {

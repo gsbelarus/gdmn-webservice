@@ -129,18 +129,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 24,
     height: 40
- },
+  },
   submitButton: {
     backgroundColor: '#70667D',
     padding: 10,
     margin: 15,
     height: 40,
     alignItems: 'center'
- },
+  },
  submitButtonText:{
     color: 'white',
     fontSize: 18
- }
+  }
 });
 
 export default LoginPage;

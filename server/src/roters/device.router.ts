@@ -55,9 +55,7 @@ const newDevice = async(ctx: any) => {
     const {uid, userId} = ctx.request.body;
 
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    console.log(allDevices);
     if(!(allDevices && allDevices.find( device => device.uid === uid && device.user === userId))) {
-      console.log(2222222);
       await writeFile(
         PATH_LOCAL_DB_DEVICES,
         JSON.stringify(allDevices
@@ -174,7 +172,6 @@ const removeDevices = async(ctx: any) => {
 
 const isActiveDevice = async(ctx: any) => {
   const {uid, userId} = ctx.query;
-  console.log(userId);
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex( device => device.uid === uid && device.user === userId);
   if(!allDevices || idx === undefined || idx < 0) {

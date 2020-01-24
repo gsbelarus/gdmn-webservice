@@ -30,7 +30,7 @@ const getUsersByDevice = async (ctx: any) => {
       : allDevices
         .filter( device => device.uid === idDevice)
         .map(device => {
-          const user = allUsers && allUsers.find(user => user.userId === device.user);
+          const user = allUsers && allUsers.find(user => user.id === device.user);
           return user ? {user: user.userName, state: device.isBlock ? 'blocked' : 'active'} : 'not found user'
         })
     });
@@ -50,7 +50,7 @@ const getUsers = async (ctx: any) => {
       result: !allUsers || !allUsers.length
       ? []
       : allUsers
-      .map(user => ({userId: user.userId, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
+      .map(user => ({userId: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
     });
     logger.info('get users by device successfully');
   } else {
@@ -68,7 +68,7 @@ const getUsersByOrganisation = async (ctx: any) => {
       status: 200,
       result: allUsers && allUsers
         .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
-        .map(user => ({userId: user.userId, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
+        .map(user => ({userId: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
       });
     logger.info('get users by organisation successfully');
   } else {
@@ -124,7 +124,7 @@ const removeUsers = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
     const {users} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.userId));
+    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.id));
 
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     const newDevices = allDevices?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
@@ -159,7 +159,7 @@ const removeUsersFromOrganisation = async(ctx: any) => {
     const {users, organisationId} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const newUsers = allUsers?.map(all_u =>
-      users.findIndex((u: any) => u === all_u.userId) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
+      users.findIndex((u: any) => u === all_u.id) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
     /**Пока только удалим организацию у пользователей */
     await writeFile(
       PATH_LOCAL_DB_USERS,

@@ -22,7 +22,7 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
   return (
     <Stack horizontalAlign='center'>
       <User
-        key={user.userId}
+        key={user.id}
         isEditOK={isEditOK}
         user={user}
         onEditProfile={onEditProfile}

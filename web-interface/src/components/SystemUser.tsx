@@ -11,7 +11,7 @@ export interface ISystemUserProps {
 
 export const SystemUser = ({ onClearError, onAddUser, allUsers, companyUsers }: ISystemUserProps) => {
   const [user, setUser] = useState();
-  const users: IComboBoxOption[] = allUsers?.map(u => ({key: u.userId, text: u.userName, disabled: companyUsers?.find(cu => cu.userId === u.userId)} as IComboBoxOption)) || []
+  const users: IComboBoxOption[] = allUsers?.map(u => ({key: u.id, text: u.userName, disabled: companyUsers?.find(cu => cu.id === u.id)} as IComboBoxOption)) || []
 
   return (
     <Stack horizontalAlign='center' >

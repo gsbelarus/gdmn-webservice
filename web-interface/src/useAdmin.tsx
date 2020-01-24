@@ -203,7 +203,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     console.log('doCreateUser');
 
     const body = JSON.stringify({
-      id: user.userId,
+      id: user.id,
       userName: user.userName,
       password: user.password,
       lastName: user.lastName,
