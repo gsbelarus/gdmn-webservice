@@ -70,14 +70,13 @@ const signup = async (ctx: any) => {
   const user = ctx.request.body as IUser;
   if(!(await findByUserName(user.userName))) {
     let allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    console.log(allUsers);
     if (!allUsers || !!allUsers.findIndex(u => u.userId === 'gdmn')) {
       const gdmnUser: IUser = { userId: 'gdmn', userName: 'gdmn', password: 'gdmn', creatorId: user.userId || user.userName };
       allUsers = allUsers ? [...allUsers, gdmnUser] : [gdmnUser];
       await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers));
     }
     const code = await saveActivationCode(user.userName);
-    const newUser = {...user, userId: user.userName, code};
+    const newUser = {...user, userId: user.userName};
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(allUsers ? [...allUsers, newUser] : [newUser]));
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser});
