@@ -23,7 +23,7 @@ export const CompanyBox = ({ onUpdateCompany, companyName, companyId, users, onC
     }
   }));
 
-  const items: IItem[] = users?.filter(u => u.userId !== 'gdmn').map(u => ({key: u.userName, name: u.userName, status: u.isAdmin ? 'Администратор' : ''})) || [];
+  const items: IItem[] = users?.filter(u => u.id !== 'gdmn').map(u => ({key: u.userName, name: u.userName, status: u.isAdmin ? 'Администратор' : ''})) || [];
   const columns: IColumn[] = [{
     key: 'userName',
     name: 'Пользователь',

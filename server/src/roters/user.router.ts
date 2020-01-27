@@ -50,7 +50,7 @@ const getUsers = async (ctx: any) => {
       result: !allUsers || !allUsers.length
       ? []
       : allUsers
-      .map(user => ({userId: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
+      .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
     });
     logger.info('get users by device successfully');
   } else {
@@ -68,7 +68,7 @@ const getUsersByOrganisation = async (ctx: any) => {
       status: 200,
       result: allUsers && allUsers
         .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
-        .map(user => ({userId: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
+        .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
       });
     logger.info('get users by organisation successfully');
   } else {
@@ -124,13 +124,13 @@ const removeUsers = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
     const {users} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.userId === all_u.id));
+    const newUsers = allUsers?.filter(all_u => !users.findIndex((u: any) => u.id === all_u.id));
 
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    const newDevices = allDevices?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
+    const newDevices = allDevices?.filter(all_d => !users.findIndex((u: any) => u.id === all_d.user));
 
     const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-    const newCodes = allCodes?.filter(all_d => !users.findIndex((u: any) => u.userId === all_d.user));
+    const newCodes = allCodes?.filter(all_d => !users.findIndex((u: any) => u.id === all_d.user));
 
     await writeFile(
       PATH_LOCAL_DB_USERS,

@@ -74,8 +74,8 @@ const signup = async (ctx: any) => {
     await writeFile(
       PATH_LOCAL_DB_USERS,
       JSON.stringify(allUsers
-        ? [...allUsers, {userId: newUser.userName, ...newUser}]
-        : [{userId: newUser.userName, ...newUser}, {userName:"gdmn", creatorId:newUser.userName, password:"gdmn", organisations:[], userId:"gdmn", code:"jqgxmm"}]
+        ? [...allUsers, {id: newUser.userName, ...newUser}]
+        : [{id: newUser.userName, ...newUser}, {id:"gdmn", userName:"gdmn", creatorId:newUser.userName, password:"gdmn", organisations:[], code:"jqgxmm"}]
       )
     );
 
