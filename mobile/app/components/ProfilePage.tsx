@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   navigation: {
     marginLeft: 10,
-    marginTop: 20,
+    marginTop: 50,
     flexDirection: "row"
   },
   input: {
