@@ -1,5 +1,5 @@
 import ActivationPage from './ActivationPage';
-import ProfilePage from './ProfilePage';
+import MainPage from './MainPage';
 import MessagePage from './MessagePage';
 import SendMessagePage from './SendMessagePage';
 import LoginPage from './LoginPage';
@@ -14,7 +14,10 @@ const AuthNavigator = createStackNavigator(
 
 const ActivationNavigator = createStackNavigator(
     {
-        ActivationPage: ActivationPage,
+        ActivationPage: {
+            screen: ActivationPage,
+            navigationOptions: { title: 'GDMN'}
+        },
     },
     {
         initialRouteName: 'ActivationPage'
@@ -23,12 +26,30 @@ const ActivationNavigator = createStackNavigator(
 
 const AppNavigator = createStackNavigator(
     {
-        ProfilePage: ProfilePage,
-        MessagePage: MessagePage,
-        SendMessagePage: SendMessagePage
+        ProfilePage: {
+            screen: MainPage,
+            navigationOptions: { title: 'GDMN', headerShown: false}
+        },
+        MessagePage: {
+            screen: MessagePage,
+            navigationOptions: { title: 'GDMN'}
+        },
+        SendMessagePage: {
+            screen: SendMessagePage,
+            navigationOptions: {  }
+        }
     },
     {
-        initialRouteName: 'ProfilePage'
+        initialRouteName: 'MainPage',
+        defaultNavigationOptions: {
+          headerStyle: {
+            backgroundColor: '#000088',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }
     }
 );
 

@@ -58,7 +58,7 @@ const MessagePage = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <View style={styles.navigation}>
-        <TouchableOpacity onPress={() => navigate('ProfilePage')}>
+        <TouchableOpacity onPress={() => navigate('MainPage')}>
           <MaterialIcons
             name="menu"
             size={28}
