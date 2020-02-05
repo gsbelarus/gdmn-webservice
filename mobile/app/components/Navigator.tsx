@@ -26,9 +26,9 @@ const ActivationNavigator = createStackNavigator(
 
 const AppNavigator = createStackNavigator(
     {
-        ProfilePage: {
+        MainPage: {
             screen: MainPage,
-            navigationOptions: { title: 'GDMN', headerShown: false}
+            navigationOptions: { title: 'GDMN' }
         },
         MessagePage: {
             screen: MessagePage,
