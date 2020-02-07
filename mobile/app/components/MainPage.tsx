@@ -150,7 +150,7 @@ const MainPage = (): JSX.Element => {
         <View style={{flex: 1, justifyContent: "flex-end"}}>
           <TouchableOpacity
             style={styles.createButton}
-            onPress={() => navigate('MessagePage')}
+            onPress={() => navigate('DocumentPage')}
           >
             <Text style={styles.createButtonText}>Создать новый документ</Text>
           </TouchableOpacity>

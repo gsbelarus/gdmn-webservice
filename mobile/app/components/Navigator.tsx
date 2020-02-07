@@ -3,6 +3,7 @@ import MainPage from './MainPage';
 import MessagePage from './MessagePage';
 import SendMessagePage from './SendMessagePage';
 import LoginPage from './LoginPage';
+import DocumentPage from './DocumentPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
@@ -36,6 +37,10 @@ const AppNavigator = createStackNavigator(
         },
         SendMessagePage: {
             screen: SendMessagePage,
+            navigationOptions: {  }
+        },
+        DocumentPage: {
+            screen: DocumentPage,
             navigationOptions: {  }
         }
     },
