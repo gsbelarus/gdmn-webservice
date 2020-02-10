@@ -5,18 +5,22 @@ import session from 'koa-session';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { IUser } from './models';
-import bodyParser from 'koa-bodyparser';
+
+// import bodyParser from 'koa-bodyparser';
+import koaBody from "koa-body";
+
 import log4js from 'log4js';
 import { findByUserName, findById } from './roters/util';
+import  dev from '../config/dev';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-export const PATH_LOCAL_DB_USERS = 'C:\\DB\\DB_USERS.json'
-export const PATH_LOCAL_DB_ACTIVATION_CODES = 'C:\\DB\\DB_ACTIVATION_CODES.json'
-export const PATH_LOCAL_DB_ORGANISATIONS = 'C:\\DB\\DB_ORGANISATIONS.json'
-export const PATH_LOCAL_DB_DEVICES = 'C:\\DB\\DB_DEVICES.json'
-export const PATH_LOCAL_DB_MESSAGES = 'C:\\DB\\DB_MESSAGES\\'
+export const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
+export const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
+export const PATH_LOCAL_DB_ORGANISATIONS = `${dev.FILES_PATH}\\DB_ORGANISATIONS.json`;
+export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
+export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
 
 export async function init() {
   const app = new Koa();
@@ -30,19 +34,19 @@ export async function init() {
     signed: true, /** (boolean) signed or not (default true) */
   };
 
-  app.use(session(CONFIG, app));
-  app.use(bodyParser());
-  passport.serializeUser((user: IUser, done) => done(null, user.id));
+  passport.serializeUser((user: IUser, done) => done(null, user.id));  
 	passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
-	passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
-	app.use(passport.initialize());
-	app.use(passport.session());
-  app.use(koaCors({
-		credentials: true
-	}));
-
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+  passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
+    
+  // .use(bodyParser())  
+  app
+    .use(session(CONFIG, app))
+    .use(koaBody({multipart: true}))
+    .use(passport.initialize())
+	  .use(passport.session())
+    .use(koaCors({credentials: true}))
+    .use(router.routes())
+    .use(router.allowedMethods());
 
   const port = 3649;
 

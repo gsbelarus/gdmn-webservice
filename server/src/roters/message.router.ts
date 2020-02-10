@@ -17,13 +17,15 @@ router.delete('/messages/:id', ctx => removeMessage(ctx));
 
 const newMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const message = ctx.request.body;
-    const organisation  = message.organisation;
+    const {head: { organisation, consumer }, body} = ctx.request.body;
+
     if(!(ctx.state.user.organisations as Array<string>).find( item => item === organisation)) {
       ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the organisation(${organisation})`});
       logger.warn(`The user(${ctx.state.user.id}) not part of the organisation(${organisation})`);
     }
-    const newMessage = {...message, head: {consumer: ctx.state.user.id, producer: 'gdmn', dateTime: new Date().toString()}};
+
+    const newMessage = {head: { consumer: consumer || 'gdmn', producer: ctx.state.user.id, dateTime: new Date().toISOString()}, body };
+
     if(newMessage instanceof Object && newMessage as IMessage) {
       const uuid = uuidv1();
       await writeFile(
@@ -57,7 +59,7 @@ const getMessage = async(ctx:  any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({
         status: 200,
-        result: result.filter(res => (!res.head.consumer || res.head.consumer && res.head.consumer === ctx.state.user.userName) && ctx.state.user.userName !== res.head.producer)
+        result: result.filter(res => res.head.consumer === ctx.state.user.userName)
       });
       logger.info('get message');
     }
