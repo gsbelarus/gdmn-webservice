@@ -29,9 +29,17 @@ export interface IOrganisation {
 }
 
 export interface IMessage {
-  producer: string;
-  consumer?: string;
-  organisation: string;
-  sedingTime: string;
-  body: string;
+  head: {
+    producer: string;
+    consumer: string;
+    organisationId: string;
+    dateTime: string;
+  };
+  body: {
+    type: string;
+    payload: {
+      name: string;
+      params: string[];
+    }
+  }
 }

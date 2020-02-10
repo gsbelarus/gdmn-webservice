@@ -9,22 +9,26 @@ import { promises } from 'fs';
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-const router = new Router({prefix: '/message'});
+const router = new Router();
 
-router.post('/new', ctx => newMessage(ctx));
-router.get('/get', ctx => getMessage(ctx));
-router.post('/getAndRemove', ctx => getMessageAndRemove(ctx));
-router.post('/remove', ctx => removeMessage(ctx));
+router.post('/messages', ctx => newMessage(ctx));
+router.get('/messages', ctx => getMessage(ctx));
+router.delete('/messages/:id', ctx => removeMessage(ctx));
 
 const newMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
     const message = ctx.request.body;
     const organisation  = message.organisation;
-    if(message instanceof Object && message as IMessage) {
+    if(!(ctx.state.user.organisations as Array<string>).find( item => item === organisation)) {
+      ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the organisation(${organisation})`});
+      logger.warn(`The user(${ctx.state.user.id}) not part of the organisation(${organisation})`);
+    }
+    const newMessage = {...message, head: {consumer: ctx.state.user.id, producer: 'gdmn', dateTime: new Date().toString()}};
+    if(newMessage instanceof Object && newMessage as IMessage) {
       const uuid = uuidv1();
       await writeFile(
         `${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uuid}.json`,
-        JSON.stringify(message)
+        JSON.stringify(newMessage)
       );
       ctx.body = JSON.stringify({ status: 200, result: {uid: uuid, date: new Date()}});
       logger.info(`new message in queue: ${uuid}`);
@@ -33,28 +37,6 @@ const newMessage = async(ctx:  any) => {
       ctx.body = JSON.stringify({ status: 404, result: `incorrect format message`});
       logger.warn(`incorrect format message`);
     }
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
-    logger.warn(`access denied`);
-  }
-}
-
-const getMessageAndRemove = async(ctx:  any) => {
-  if(ctx.isAuthenticated()) {
-    const {organisation, uid} = ctx.query;
-    const message = await get(organisation, uid);
-    const result = await remove(organisation, uid);
-    if(result === 'OK') {
-      ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result: message});
-      logger.info('get message');
-    } else {
-      ctx.status = 404;
-      ctx.body = JSON.stringify({ status: 404, result: 'error'});
-      logger.warn('not deleted message');
-    }
-
   } else {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});
@@ -75,7 +57,7 @@ const getMessage = async(ctx:  any) => {
       ctx.status = 200;
       ctx.body = JSON.stringify({
         status: 200,
-        result: result.filter(res => (!res.consumer || res.consumer && res.consumer === ctx.state.user.userName) && ctx.state.user.userName !== res.producer)
+        result: result.filter(res => (!res.head.consumer || res.head.consumer && res.head.consumer === ctx.state.user.userName) && ctx.state.user.userName !== res.head.producer)
       });
       logger.info('get message');
     }
