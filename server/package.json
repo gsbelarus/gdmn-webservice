@@ -27,7 +27,6 @@
     "@types/passport-local": "^1.0",
     "@types/uuid": "^3.4",
     "koa": "^2.11",
-    "koa-body": "^4.1.1",
     "koa-bodyparser": "^4.2",
     "koa-passport": "^4.1",
     "koa-router": "^8.0",

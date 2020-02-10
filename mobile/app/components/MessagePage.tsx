@@ -43,7 +43,7 @@ const MessagePage = (): JSX.Element => {
     let result = [];
     for(const organisation of organisations ) {
       const data = await fetch(
-        `${path}message/get?organisation=${organisation}`,
+        `${path}messages/get?companyId=${organisation}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},

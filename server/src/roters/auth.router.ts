@@ -102,7 +102,7 @@ const signup = async (ctx: any) => {
                 userName: "gdmn",
                 creatorId: newUser.userName,
                 password: "gdmn",
-                organisations: [],
+                companies: [],
                 code: "jqgxmm"
               }
             ]

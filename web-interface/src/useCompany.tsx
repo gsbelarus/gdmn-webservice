@@ -19,7 +19,7 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
     setCompany({ companyState: 'CREATING' });
     console.log('doCreate');
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/organisation/new?title=${companyName}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const resFetch = await fetch(`http://localhost:3649/api/company/new?title=${companyName}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
 
       let newState: ICompany;
@@ -60,7 +60,7 @@ export const useCompany = (companyName?: string): [ICompany, CreateCompanyProc, 
     });
 
     try {
-      const resFetch = await fetch("http://localhost:3649/api/organisation/editeProfile", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
+      const resFetch = await fetch("http://localhost:3649/api/company/editeProfile", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
       const res = await resFetch.json();
       let newState: ICompany;
       if (res.status === 200) {

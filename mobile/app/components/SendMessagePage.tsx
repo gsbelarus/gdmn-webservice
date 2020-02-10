@@ -46,7 +46,7 @@ const SendMessagePage = (): JSX.Element => {
   useEffect(() => {
     const getConsumers = async() => {
       const result = await fetch(
-        `${path}user/byOrganisation?idOrganisation=${selectedOrganisation}`,
+        `${path}user/byCompany?companyId=${selectedOrganisation}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},
@@ -62,7 +62,7 @@ const SendMessagePage = (): JSX.Element => {
 
   const sendMessage = async() => {
     await fetch(
-      `${path}message/new`,
+      `${path}messages`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},

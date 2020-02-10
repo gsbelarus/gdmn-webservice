@@ -73,7 +73,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_COMPANIES':
-      resFetch = await fetch(`http://localhost:3649/api/organisation/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`http://localhost:3649/api/company/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -121,7 +121,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_COMPANY':
-      resFetch = await fetch(`http://localhost:3649/api/organisation/profile?idOrganisation=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`http://localhost:3649/api/company/profile?companyId=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -136,7 +136,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'CREATE_COMPANY':
-      resFetch = await fetch(`http://localhost:3649/api/organisation/new?title=${param.companyName}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`http://localhost:3649/api/company/new?title=${param.companyName}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -155,7 +155,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         id: param.companyId,
         title: param.companyName
       });
-      resFetch = await fetch(`http://localhost:3649/api/organisation/editeProfile`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/company/editeProfile`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -187,10 +187,10 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
 
     case 'ADD_USER':
       body = JSON.stringify({
-        organisationId: param.companyId,
+        companyId: param.companyId,
         userId: param.userId
       });
-      resFetch = await fetch(`http://localhost:3649/api/user/addOrganisation`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/user/addCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -221,7 +221,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
     case 'CREATE_USER':
       body = JSON.stringify({
         ...param.user,
-        organisations: [param.companyId],
+        companies: [param.companyId],
         creatorId: param.creatorId
       });
       resFetch = await fetch(`http://localhost:3649/api/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
@@ -268,7 +268,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_COMPANY_USERS':
-      resFetch = await fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`http://localhost:3649/api/user/byCompany?companyId=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -285,9 +285,9 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
     case 'REMOVE_COMPANY_USERS':
       body = JSON.stringify({
         users: param.userIds,
-        organisationId: param.companyId
+        companyId: param.companyId
       });
-      resFetch = await fetch(`http://localhost:3649/api/user/removeUsersFromOrganisation`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/user/removeUsersFromCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {

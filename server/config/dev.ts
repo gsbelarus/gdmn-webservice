@@ -1,3 +1,3 @@
 export default {
-  FILES_PATH: "c:\\_Work\\Temp\\DB"
+  FILES_PATH: "c:\\DB"
 };

@@ -5,9 +5,7 @@ import session from 'koa-session';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy, VerifyFunction } from "passport-local";
 import { IUser } from './models';
-
-// import bodyParser from 'koa-bodyparser';
-import koaBody from "koa-body";
+import bodyParser from 'koa-bodyparser';
 
 import log4js from 'log4js';
 import { findByUserName, findById } from './roters/util';
@@ -18,7 +16,7 @@ logger.level = 'trace';
 
 export const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
 export const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
-export const PATH_LOCAL_DB_ORGANISATIONS = `${dev.FILES_PATH}\\DB_ORGANISATIONS.json`;
+export const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
 export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
 export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
 
@@ -41,7 +39,7 @@ export async function init() {
   // .use(bodyParser())  
   app
     .use(session(CONFIG, app))
-    .use(koaBody({multipart: true}))
+    .use(bodyParser())
     .use(passport.initialize())
 	  .use(passport.session())
     .use(koaCors({credentials: true}))

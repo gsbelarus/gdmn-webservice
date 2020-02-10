@@ -17,11 +17,11 @@ router.delete('/messages/:id', ctx => removeMessage(ctx));
 
 const newMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {head: { organisation, consumer }, body} = ctx.request.body;
+    const {head: { companyId, consumer }, body} = ctx.request.body;
 
-    if(!(ctx.state.user.organisations as Array<string>).find( item => item === organisation)) {
-      ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the organisation(${organisation})`});
-      logger.warn(`The user(${ctx.state.user.id}) not part of the organisation(${organisation})`);
+    if(!(ctx.state.user.companies as Array<string>).find( item => item === companyId)) {
+      ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the company(${companyId})`});
+      logger.warn(`The user(${ctx.state.user.id}) not part of the company(${companyId})`);
     }
 
     const newMessage = {head: { consumer: consumer || 'gdmn', producer: ctx.state.user.id, dateTime: new Date().toISOString()}, body };
@@ -29,7 +29,7 @@ const newMessage = async(ctx:  any) => {
     if(newMessage instanceof Object && newMessage as IMessage) {
       const uuid = uuidv1();
       await writeFile(
-        `${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uuid}.json`,
+        `${PATH_LOCAL_DB_MESSAGES}${companyId}\\${uuid}.json`,
         JSON.stringify(newMessage)
       );
       ctx.body = JSON.stringify({ status: 200, result: {uid: uuid, date: new Date()}});
@@ -48,12 +48,12 @@ const newMessage = async(ctx:  any) => {
 
 const getMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation} = ctx.query;
+    const {companyId} = ctx.query;
     const result: IMessage[] = [];
     try {
-      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${organisation}`)
+      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`)
       for(const newFile of nameFiles ) {
-        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${newFile}`);
+        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
         result.push(data as IMessage);
       }
       ctx.status = 200;
@@ -64,8 +64,8 @@ const getMessage = async(ctx:  any) => {
       logger.info('get message');
     }
     catch (e) {
-      logger.trace(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${organisation} - ${e}`);
-      console.log(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${organisation} - ${e}`);
+      logger.trace(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
+      console.log(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
       ctx.status = 404;
       ctx.body = JSON.stringify({ status: 404, result: 'not found file or directory'});
     }
@@ -78,8 +78,8 @@ const getMessage = async(ctx:  any) => {
 
 const removeMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation, uid} = ctx.query;
-    const result = await remove(organisation, uid);
+    const {companyId, uid} = ctx.query;
+    const result = await remove(companyId, uid);
     if(result === 'OK') {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: 'OK'});
@@ -96,13 +96,8 @@ const removeMessage = async(ctx:  any) => {
   }
 }
 
-const remove = async(organisation: string, uid: string) => {
-  return await removeFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uid}.json`)
-}
-
-const get = async(organisation: string, uid: string) => {
-  const body = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uid}.json`);
-  return body;
+const remove = async(company: string, uid: string) => {
+  return await removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`)
 }
 
 export default router;
