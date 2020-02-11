@@ -4,8 +4,12 @@ import MessagePage from './MessagePage';
 import SendMessagePage from './SendMessagePage';
 import LoginPage from './LoginPage';
 import DocumentPage from './DocumentPage';
+import DocumentFilterPage from './DocumentFilterPage';
+import DirectoryPage from './DirectoryPage';
+import ProductPage from './ProductPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import { AntDesign } from '@expo/vector-icons';
 
 const AuthNavigator = createStackNavigator(
     {
@@ -17,7 +21,7 @@ const ActivationNavigator = createStackNavigator(
     {
         ActivationPage: {
             screen: ActivationPage,
-            navigationOptions: { title: 'GDMN'}
+            navigationOptions: { title: 'GDMN', }
         },
     },
     {
@@ -41,6 +45,18 @@ const AppNavigator = createStackNavigator(
         },
         DocumentPage: {
             screen: DocumentPage,
+            navigationOptions: {  }
+        },
+        DocumentFilterPage: {
+            screen: DocumentFilterPage,
+            navigationOptions: {  }
+        },
+        DirectoryPage: {
+            screen: DirectoryPage,
+            navigationOptions: {  }
+        },
+        ProductPage: {
+            screen: ProductPage,
             navigationOptions: {  }
         }
     },

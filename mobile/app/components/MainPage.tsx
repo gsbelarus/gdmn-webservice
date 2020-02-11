@@ -2,157 +2,28 @@ import React, { useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, Dimensions, Platform, } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
-import DatePicker from 'react-native-datepicker';
-import Swiper from 'react-native-web-swiper';
 import { path } from '../../App';
 
 const MainPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
-  const [date, setDate] = useState(new Date());
-  const [pressStatus, setPressStatus] = useState(false);
-
-  const today = new Date();
-
-  const data = ['Приход товара', 'Инвентаризация товаров', 3, 4, 5, 6, 7 ,8, 9, 10, 11, 12];
-  const newData = data.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
-    arr.push([]);
-  }
-  arr[arr.length - 1].push(item);
-  return arr;}, [[]]);
 
   return (
     <View style={styles.container}>
-      <View  style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid'}} key={1}>
-        <Text style={styles.subdivisionText}>Тип документа</Text>
-        <Swiper
-          controlsProps={{
-            dotsTouchable: true,
-            prevPos: false,
-            nextPos: false,
-            dotsPos: 'bottom',
-          }}
-        >
-            {
-            newData.map((d, idx) => (<View style={styles.slide} key={idx}>
-              <View style={styles.slideTextView} key={`${idx}-1`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[0]}</Text>
-              </View>
-              <View style={styles.slideTextView} key={`${idx}-2`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[1]}</Text>
-              </View>
-            </View>)
-            )
-          }
-        </Swiper>
-      </View>
-      <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
-        <Text style={styles.subdivisionText}>Подразделение</Text>
-        <Swiper
-          controlsProps={{
-            dotsTouchable: true,
-            prevPos: false,
-            nextPos: false,
-            dotsPos: 'bottom',
-          }}
-        >
-          {
-            newData.map((d, idx) => (<View style={styles.slide} key={idx}>
-              <View style={styles.slideTextView} key={`${idx}-1`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text>{d[0]}</Text>
-              </View>
-              <View style={styles.slideTextView} key={`${idx}-2`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text>{d[1]}</Text>
-              </View>
-            </View>)
-            )
-          }
-        </Swiper>
-      </View>
       <View style={{flex: 1.5, marginTop: 80}}>
-        <DatePicker
-          style={{width: '100%'}}
-          date={date}
-          mode="date"
-          placeholder="select date"
-          format="DD MMM YYYY"
-          minDate={new Date(1990, 0, 1)}
-          maxDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          iconComponent={
-            <MaterialIcons 
-            style={{
-              position: 'absolute',
-              right: 20,
-            }}
-            size={30}
-            color='#8C8D8F' 
-            name='date-range' 
-            /> 
-          }
-          customStyles={{
-            dateIcon: {
-              position: 'relative',
-              top: 4
-            },
-            dateInput: {
-              height: 50,
-              fontSize: 40,
-              borderRadius: 4,
-              marginVertical: 30,
-            },
-            dateText: {
-              fontSize: 20,
-              color: "#676869"
-            }
-          }}
-          onDateChange={(newDate) => {setDate(newDate)}}
-        />
         <TouchableHighlight
-          style={
-            pressStatus
-              ? styles.viewButtonPress
-              : styles.viewButton
-          } 
-          onHideUnderlay={() => setPressStatus(false)}
-          onShowUnderlay={() => setPressStatus(true)}
-          onPress={() => navigate('MessagePage')}
+          style={styles.viewButton} 
+          onPress={() => navigate('DirectoryPage')}
         >
           <Text 
-          style={
-            pressStatus
-            ? styles.viewButtonPressText
-            : styles.viewButtonText
-            }
-          >Просмотреть документы</Text>
+          style={styles.viewButtonText}>Справочник</Text>
         </TouchableHighlight>
-        <View style={{flex: 1, justifyContent: "flex-end"}}>
+        <View style={{flex: 1}}>
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => navigate('DocumentPage')}
           >
-            <Text style={styles.createButtonText}>Создать новый документ</Text>
+            <Text style={styles.createButtonText}>Документы</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -164,33 +35,13 @@ const MainPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
-    margin: 15,
+    marginHorizontal: 15,
+    marginTop: 100,
     flex: 1,
     justifyContent: 'space-between'
   },
-  subdivisionText: {
-    fontSize: 18,
-    marginTop: 10,
-    marginLeft: 10
-  },
-  slide: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    //justifyContent: 'flex-start',
-    //marginTop: -15
-  },
-  slideTextView: {
-    flex: 1,
-    flexGrow: 1,
-    flexDirection: 'row',
-    marginHorizontal: 5,
-    marginRight: 5,
-    alignItems: 'center',
-    //justifyContent: 'space-evenly'
-  },
   viewButton: {
-    backgroundColor: '#EEF2FC',
+    backgroundColor: '#2D3083',
     marginVertical: 15,
     height: 50,
     alignItems: 'center',
@@ -198,21 +49,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: '#212323'
   },
-  viewButtonPress: {
-    backgroundColor: '#2D3083',
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: '#212323',
-    borderWidth: 1,
-    marginVertical: 15
-  },
   viewButtonText: {
-    color: '#676869',
-    fontSize: 20
-  },
-  viewButtonPressText: {
     color: '#FFFFFF',
     fontSize: 20
   },
@@ -228,7 +65,7 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     color: '#FFFFFF',
-    fontSize: 17
+    fontSize: 20
   },
 });
 

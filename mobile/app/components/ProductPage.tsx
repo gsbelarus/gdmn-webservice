@@ -1,33 +1,41 @@
 import React from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 
-const DocumentPage = (): JSX.Element => {
+const ProductPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
 
   const data = [{
     id: 1,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
+    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг',
+    barcode: 1234567890111,
+    price: '10,55 руб.',
+    quantity: '1,03 кг.'
   },
   {
     id: 2,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
+    title: 'Томат "Черри", Испания 0.75 кг',
+    barcode: 1234567890111,
+    price: '7,55 руб.',
+    quantity: '0,55 кг.'
   },
   {
     id: 3,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
+    title: 'Томат, Беларусь 0.75 кг',
+    barcode: 1234567890111,
+    price: '7,55 руб.',
+    quantity: '0,55 кг.'
   }];
 
   return (
     <View style={styles.container}>
+      <View style={styles.documentHeader}>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>Инвентаризация №00001</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>Розничный склад</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>05.02.2020</Text>
+      </View>
       <View style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
@@ -42,26 +50,30 @@ const DocumentPage = (): JSX.Element => {
             </View>
             <View style={styles.productNumView}>
               <View style={{flex: 1, flexDirection: 'row'}}>
+                <Ionicons 
+                  size={20}
+                  color='#8C8D8F' 
+                  name='md-pricetag' 
+                /> 
                 <Text numberOfLines={5} style={styles.productPriceView}>{item.price}</Text>
               </View>
+              <Text numberOfLines={5} style={styles.productQuantityView}>{item.quantity}</Text>
             </View>
           </View>)
         }
       </View>
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: "flex-end", }}>
+      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
-          style={styles.createButton} 
-          onPress={() => navigate('DocumentFilterPage')}
+          style={styles.addButton} 
+          onPress={() => navigate('MessagePage')}
         >
-          <Text style={styles.createButtonText}>Создать новый документ</Text>
+          <MaterialIcons
+            size={20}
+            color='#FFF' 
+            name='add' 
+          />
         </TouchableOpacity>
-      </View>
-        <TouchableOpacity
-          style={styles.sendButton} 
-          onPress={() => navigate('DocumentFilterPage')}
-        >
-          <Text style={styles.sendButtonText}>Отправить</Text>
-        </TouchableOpacity>
+      </View>   
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -71,6 +83,19 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
     flex: 1,
+  },
+  documentHeader: {
+    height: 50,
+    flexDirection: 'row',
+    backgroundColor: '#5053A8'
+  },
+  documentHeaderText: {
+    flex: 1,
+    marginVertical: 5,
+    marginHorizontal: 2,
+    textAlignVertical: 'center',
+    color: '#FFFFFF',
+    fontWeight: 'bold'
   },
   productView: {
     flexDirection: 'column',
@@ -97,6 +122,11 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     color: '#000000',
   },
+  productNameView: {
+    flex: 1,
+    flexGrow: 1,
+    backgroundColor: '#E6E7FF'
+  },
   productNameTextView: {
     maxHeight: 75,
     minHeight: 45,
@@ -108,6 +138,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   productPriceView: {
+    marginLeft: 5
   },
   productTitleView: {
     fontWeight: 'bold',
@@ -118,36 +149,47 @@ const styles = StyleSheet.create({
   productBarcodeView: {
     marginTop: 5,
   },
-  sendButton: {
-    marginHorizontal: 15,
-    marginBottom: 10,
-    backgroundColor: '#2D3083',
-    color: '#FFFFFF',
-    height: 45,
+  productQuantityView: {
+  },
+  viewButton: {
+    backgroundColor: '#EEF2FC',
+    marginVertical: 15,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
     borderColor: '#212323'
   },
-  sendButtonText: {
-    color: '#FFFFFF',
-    fontSize: 17
-  },
-  createButton: {
-    marginHorizontal: 15,
-    marginBottom: 10,
+  viewButtonPress: {
     backgroundColor: '#2D3083',
-    color: '#FFFFFF',
-    height: 45,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    borderColor: '#212323'
+    borderColor: '#212323',
+    borderWidth: 1,
+    marginVertical: 15
   },
-  createButtonText: {
+  viewButtonText: {
+    color: '#676869',
+    fontSize: 20
+  },
+  viewButtonPressText: {
     color: '#FFFFFF',
-    fontSize: 17
+    fontSize: 20
+  },
+  addButton: {
+    margin: 5,
+    marginLeft: 0,
+    borderRadius: 50,
+    borderColor: '#2D3083',
+    borderWidth: 1,
+    height: 50,
+    width: 50,
+    backgroundColor: '#2D3083',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 
-export default DocumentPage;
+export default ProductPage;
