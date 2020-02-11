@@ -7,9 +7,9 @@ import DocumentPage from './DocumentPage';
 import DocumentFilterPage from './DocumentFilterPage';
 import DirectoryPage from './DirectoryPage';
 import ProductPage from './ProductPage';
+import ProductsListPage from './ProductsListPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import { AntDesign } from '@expo/vector-icons';
 
 const AuthNavigator = createStackNavigator(
     {
@@ -58,6 +58,10 @@ const AppNavigator = createStackNavigator(
         ProductPage: {
             screen: ProductPage,
             navigationOptions: {  }
+        },
+        ProductsListPage: {
+            screen: ProductsListPage,
+            navigationOptions: { title: 'Products' }
         }
     },
     {
