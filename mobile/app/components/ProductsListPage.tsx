@@ -38,21 +38,22 @@ const ProductsListPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => onChangeText(text)}
-          value={text}
-          placeholder="Type here to enter title or barCode"
-          placeholderTextColor={'#9A9FA1'}
-          multiline={false}
-          autoCapitalize="sentences"
-          underlineColorAndroid="transparent"
-          selectionColor={'black'}
-          returnKeyType="done"
-          autoCorrect={false}
-          blurOnSubmit={true}
-        />
+      <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>
+        <View style={{flex: 1, marginRight: 15}}>
+          <TextInput
+            style={styles.input}
+            onChangeText={text => onChangeText(text)}
+            value={text}
+            placeholder="Type here to enter title or barCode"
+            placeholderTextColor={'#9A9FA1'}
+            multiline={true}
+            autoCapitalize="sentences"
+            underlineColorAndroid="transparent"
+            selectionColor={'black'}
+            returnKeyType="done"
+            autoCorrect={false}
+          />
+        </View>
         <MaterialCommunityIcons
           name="barcode-scan"
           size={35}
