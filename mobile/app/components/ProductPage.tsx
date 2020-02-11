@@ -65,7 +65,7 @@ const ProductPage = (): JSX.Element => {
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
-          onPress={() => navigate('MessagePage')}
+          onPress={() => navigate('ProductsListPage')}
         >
           <MaterialIcons
             size={20}

@@ -1,0 +1,129 @@
+import React, { useState } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
+import { useNavigation } from 'react-navigation-hooks';
+import { TextInput } from 'react-native-gesture-handler';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const ProductsListPage = (): JSX.Element => {
+
+  const navigate = useNavigation();
+
+  const [text, onChangeText] = useState('');
+
+  const data = [{
+    id: 1,
+    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
+  },
+  {
+    id: 2,
+    title: 'Томат "Черри", Испания 0.75 кг'
+  },
+  {
+    id: 3,
+    title: 'Томат, Беларусь 0.75 кг'
+  },
+  {
+    id: 4,
+    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
+  },
+  {
+    id: 5,
+    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
+  },
+  {
+    id: 6,
+    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название"'
+  },
+];
+
+  return (
+    <View style={styles.container}>
+      <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => onChangeText(text)}
+          value={text}
+          placeholder="Type here to enter title or barCode"
+          placeholderTextColor={'#9A9FA1'}
+          multiline={false}
+          autoCapitalize="sentences"
+          underlineColorAndroid="transparent"
+          selectionColor={'black'}
+          returnKeyType="done"
+          autoCorrect={false}
+          blurOnSubmit={true}
+        />
+        <MaterialCommunityIcons
+          name="barcode-scan"
+          size={35}
+          color={'#9A9FA1'}
+        />
+      </View>
+      <View style={{flex: 2}}>
+        {
+          data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
+            <View style={styles.productView}>
+              <View style={styles.productTextView}>
+                <View style={styles.productIdView}>
+                  <Text style={styles.productId}>{item.id}</Text>
+                </View>
+                <View style={styles.productNameTextView}>
+                  <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>)
+        }
+      </View> 
+      <StatusBar barStyle = "light-content" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#DFE0FF',
+    flex: 1,
+  },
+  productView: {
+    flexDirection: 'column',
+  },
+  productTextView: {
+    flexDirection: 'row',
+    margin: 5,
+  },
+  productIdView: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  }, 
+  productId: {
+    margin: 15,
+    textAlignVertical: 'center',
+    color: '#000000',
+  },
+  productNameTextView: {
+    maxHeight: 75,
+    minHeight: 45,
+    marginTop: 5,
+    marginHorizontal: 5,
+    width: '90%',
+    justifyContent: 'center',
+    color: '#000000',
+    fontWeight: 'bold'
+  },
+  productTitleView: {
+    fontWeight: 'bold',
+    textAlignVertical: 'center',
+    minHeight: 25,
+    maxHeight: 70,
+    flexGrow: 1
+  },
+  input: {
+    borderColor: '#70667D',
+    borderWidth: 1,
+    fontSize: 20,
+    height: 40
+  }
+});
+
+export default ProductsListPage;

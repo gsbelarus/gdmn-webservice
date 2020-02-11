@@ -9,6 +9,8 @@ import DocumentFilterPage from './DocumentFilterPage';
 import DirectoryPage from './DirectoryPage';
 import ProductPage from './ProductPage';
 import { TouchableOpacity } from 'react-native';
+import ProductsListPage from './ProductsListPage';
+import AddProductToDocPage from './AddProductToDocPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { AntDesign } from '@expo/vector-icons';
@@ -92,6 +94,37 @@ const AppNavigator = createStackNavigator(
         },
         ProductPage: {
             screen: ProductPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        ProductsListPage: {
+            screen: ProductsListPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        AddProductToDocPage: {
+            screen: AddProductToDocPage,
+            params: {id: 0},
             navigationOptions: ({navigation}) => ({
                 headerRight: (
                     <TouchableOpacity
