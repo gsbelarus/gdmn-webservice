@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ProductsListPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const navigate = useNavigation();
 
   const [text, onChangeText] = useState('');
 
@@ -61,16 +61,18 @@ const ProductsListPage = (): JSX.Element => {
       </View>
       <View style={{flex: 2}}>
         {
-          data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <View style={styles.productView} key={idx}>
-            <View style={styles.productTextView}>
-              <View style={styles.productIdView}>
-                <Text style={styles.productId}>{item.id}</Text>
-              </View>
-              <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+          data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
+            <View style={styles.productView}>
+              <View style={styles.productTextView}>
+                <View style={styles.productIdView}>
+                  <Text style={styles.productId}>{item.id}</Text>
+                </View>
+                <View style={styles.productNameTextView}>
+                  <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+                </View>
               </View>
             </View>
-          </View>)
+          </TouchableOpacity>)
         }
       </View> 
       <StatusBar barStyle = "light-content" />

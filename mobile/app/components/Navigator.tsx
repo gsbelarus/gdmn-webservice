@@ -8,6 +8,7 @@ import DocumentFilterPage from './DocumentFilterPage';
 import DirectoryPage from './DirectoryPage';
 import ProductPage from './ProductPage';
 import ProductsListPage from './ProductsListPage';
+import AddProductToDocPage from './AddProductToDocPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
@@ -62,6 +63,11 @@ const AppNavigator = createStackNavigator(
         ProductsListPage: {
             screen: ProductsListPage,
             navigationOptions: { title: 'Products' }
+        },
+        AddProductToDocPage: {
+            screen: AddProductToDocPage,
+            params: {id: 0},
+            navigationOptions: { title: 'add product' }
         }
     },
     {
