@@ -1,14 +1,50 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, Button, Alert} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { TextInput } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const ProductsListPage = (): JSX.Element => {
 
   const navigate = useNavigation();
-
   const [text, onChangeText] = useState('');
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [doScanned, setDoScanned] = useState(false);
+
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    Alert.alert(
+      'Bar code has been scanned',
+      data,
+      [
+        {
+          text: 'OK',
+          onPress: () => {setDoScanned(false); onChangeText(data)}
+        },
+        {
+          text: 'CANCEL',
+          onPress: () => {}
+        }
+      ],
+    );
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   const data = [{
     id: 1,
@@ -38,45 +74,61 @@ const ProductsListPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>
-        <View style={{flex: 1, marginRight: 15}}>
-          <TextInput
-            style={styles.input}
-            onChangeText={text => onChangeText(text)}
-            value={text}
-            placeholder="Type here to enter title or barCode"
-            placeholderTextColor={'#9A9FA1'}
-            multiline={true}
-            autoCapitalize="sentences"
-            underlineColorAndroid="transparent"
-            selectionColor={'black'}
-            returnKeyType="done"
-            autoCorrect={false}
-          />
+      {
+        doScanned
+          ? <>
+            <BarCodeScanner
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              style={StyleSheet.absoluteFillObject}
+            />
+            {scanned && <Button title={'Tap to scan again'} onPress={() => setScanned(false)} />}
+          </>
+          : <>
+        <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>
+          <View style={{flex: 1, marginRight: 15}}>
+            <TextInput
+              style={styles.input}
+              onChangeText={text => onChangeText(text)}
+              value={text}
+              placeholder="Type here to enter title or barCode"
+              placeholderTextColor={'#9A9FA1'}
+              multiline={true}
+              autoCapitalize="sentences"
+              underlineColorAndroid="transparent"
+              selectionColor={'black'}
+              returnKeyType="done"
+              autoCorrect={false}
+            />
+          </View>
+          <TouchableOpacity
+            onPress={() => setDoScanned(true)}
+          >
+            <MaterialCommunityIcons
+              name="barcode-scan"
+              size={35}
+              color={'#9A9FA1'}
+            />
+          </TouchableOpacity>
         </View>
-        <MaterialCommunityIcons
-          name="barcode-scan"
-          size={35}
-          color={'#9A9FA1'}
-        />
-      </View>
-      <View style={{flex: 2}}>
-        {
-          data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
-            <View style={styles.productView}>
-              <View style={styles.productTextView}>
-                <View style={styles.productIdView}>
-                  <Text style={styles.productId}>{item.id}</Text>
-                </View>
-                <View style={styles.productNameTextView}>
-                  <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+        <View style={{flex: 2}}>
+          {
+            data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
+              <View style={styles.productView}>
+                <View style={styles.productTextView}>
+                  <View style={styles.productIdView}>
+                    <Text style={styles.productId}>{item.id}</Text>
+                  </View>
+                  <View style={styles.productNameTextView}>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>)
-        }
-      </View> 
-      <StatusBar barStyle = "light-content" />
+            </TouchableOpacity>)
+          }
+        </View> 
+        <StatusBar barStyle = "light-content" />
+        </>
+      }
     </View>
   );
 }
