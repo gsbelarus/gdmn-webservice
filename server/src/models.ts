@@ -3,7 +3,7 @@ export interface IUser {
   userName: string;
   password: string;
   activationCode?: string;
-  organisations?: string[];
+  companies?: string[];
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
@@ -16,7 +16,7 @@ export interface IActivationCode {
   user: string;
 }
 
-export interface IOrganisation {
+export interface ICompany {
   id: string;
   title: string;
   admin: string;
@@ -29,9 +29,17 @@ export interface IOrganisation {
 }
 
 export interface IMessage {
-  producer: string;
-  consumer?: string;
-  organisation: string;
-  sedingTime: string;
-  body: string;
+  head: {
+    producer: string;
+    consumer: string;
+    companyId: string;
+    dateTime: string;
+  };
+  body: {
+    type: string;
+    payload: {
+      name: string;
+      params: string[];
+    }
+  }
 }
