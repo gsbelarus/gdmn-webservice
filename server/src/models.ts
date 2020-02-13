@@ -43,3 +43,38 @@ export interface IMessage {
     }
   }
 }
+
+export interface IGood {
+  ID: string;
+  ALIAS: string;
+  BARCODE: string;
+  NAME: string;
+  QUANTITY: number;
+  PRICE: number;
+}
+
+export interface IContact {
+  ID: string;
+  NAME: string;
+  CONTACTTYPE: number;
+}
+
+export interface IDocumentType {
+  ID: string;
+  NAME: string;
+}
+
+export interface IDocument {
+  IDDOC: string;
+  DOCUMENTTYPE: string;
+  DOCUMENTNAME: string;
+  DOCUMENTDATE: string;
+  CONTACTKEY: string;
+}
+
+export interface IDocumentLine {
+  ID: string;
+  IDDOC: string;
+  GOODKEY: string;
+  QUANTITY: number;
+}
