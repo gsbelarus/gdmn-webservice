@@ -55,7 +55,7 @@ const newMessage = async(ctx:  any) => {
 
 const getMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {companyId} = ctx.query;
+    const { companyId } = ctx.query;
     const result: IMessage[] = [];
     try {
       const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`)
