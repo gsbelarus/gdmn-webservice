@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 
 const DocumentPage = (): JSX.Element => {
@@ -18,7 +18,7 @@ const DocumentPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
@@ -37,8 +37,8 @@ const DocumentPage = (): JSX.Element => {
             </View>
           </View>)
         }
-      </View>
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: "flex-end", }}>
+      </ScrollView>
+      <View style={{ flexDirection: 'column', justifyContent: "flex-end", }}>
         <TouchableOpacity
           style={styles.createButton} 
           onPress={() => navigate('DocumentFilterPage')}

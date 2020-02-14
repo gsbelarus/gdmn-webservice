@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, Text, AsyncStorage, ScrollView} from 'react-native';
 
 const DirectoryPage = (): JSX.Element => {
 
@@ -14,7 +14,7 @@ const DirectoryPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
@@ -27,7 +27,7 @@ const DirectoryPage = (): JSX.Element => {
             </View>
           </View>)
         }
-      </View> 
+      </ScrollView> 
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginHorizontal: 5,
     width: '90%',
-    //textAlignVertical: 'center',
     justifyContent: 'center',
     color: '#000000',
     fontWeight: 'bold'

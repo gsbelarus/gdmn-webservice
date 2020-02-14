@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 
@@ -23,7 +23,7 @@ const ProductPage = (): JSX.Element => {
         <Text numberOfLines={5} style={styles.documentHeaderText}>Розничный склад</Text>
         <Text numberOfLines={5} style={styles.documentHeaderText}>05.02.2020</Text>
       </View>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
@@ -48,8 +48,8 @@ const ProductPage = (): JSX.Element => {
             </View>
           </View>)
         }
-      </View>
-      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
+      </ScrollView>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
           onPress={() => navigate('ProductsListPage')}

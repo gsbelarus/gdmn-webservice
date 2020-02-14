@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, StatusBar, Text} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 
-const AddProductToDocPage = (): JSX.Element => {
+const ProductDetailPage = (): JSX.Element => {
 
   const navigate = useNavigation();
 
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default AddProductToDocPage;
+export default ProductDetailPage;
