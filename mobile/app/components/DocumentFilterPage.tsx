@@ -32,27 +32,27 @@ const DocumentFilterPage = (): JSX.Element => {
             dotsPos: 'bottom',
           }}
         >
-            {
-            newData.map((d, idx) => (<View style={styles.slide} key={idx}>
-              <View style={styles.slideTextView} key={`${idx}-1`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[0]}</Text>
-              </View>
-              <View style={styles.slideTextView} key={`${idx}-2`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[1]}</Text>
-              </View>
-            </View>)
-            )
-          }
+          {
+          newData.map((d, idx) => (<View style={styles.slide} key={idx}>
+            <View style={styles.slideTextView} key={`${idx}-1`}>
+              <MaterialCommunityIcons
+                name="checkbox-blank-circle"
+                size={20}
+                color={'#F1FA3F'}
+              />
+              <Text numberOfLines={5}>{d[0]}</Text>
+            </View>
+            <View style={styles.slideTextView} key={`${idx}-2`}>
+              <MaterialCommunityIcons
+                name="checkbox-blank-circle"
+                size={20}
+                color={'#F1FA3F'}
+              />
+              <Text numberOfLines={5}>{d[1]}</Text>
+            </View>
+          </View>)
+          )
+        }
         </Swiper>
       </View>
       <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
@@ -101,13 +101,13 @@ const DocumentFilterPage = (): JSX.Element => {
           cancelBtnText="Cancel"
           iconComponent={
             <MaterialIcons 
-            style={{
-              position: 'absolute',
-              right: 20,
-            }}
-            size={30}
-            color='#8C8D8F' 
-            name='date-range' 
+              style={{
+                position: 'absolute',
+                right: 20,
+              }}
+              size={30}
+              color='#8C8D8F' 
+              name='date-range' 
             /> 
           }
           customStyles={{
@@ -129,22 +129,22 @@ const DocumentFilterPage = (): JSX.Element => {
           onDateChange={(newDate) => {setDate(newDate)}}
         />
         <View style={styles.buttonView}>
-            <View style={{flex: 1}}>
-                <TouchableOpacity
-                    style={styles.buttonOk} 
-                    onPress={() => navigate('ProductPage')}
-                >
-                    <Text style={styles.buttonOkText}>ОК</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={{flex: 1}}>
-                <TouchableOpacity
-                    style={styles.buttonCancel}
-                    onPress={() => navigate('DocumentPage')}
-                >
-                    <Text style={styles.buttonCancelText}>Отмена</Text>
-                </TouchableOpacity>
-            </View>
+          <View style={{flex: 1}}>
+            <TouchableOpacity
+              style={styles.buttonOk} 
+              onPress={() => navigate('ProductPage')}
+            >
+              <Text style={styles.buttonOkText}>ОК</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{flex: 1}}>
+            <TouchableOpacity
+              style={styles.buttonCancel}
+              onPress={() => navigate('DocumentPage')}
+            >
+              <Text style={styles.buttonCancelText}>Отмена</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <StatusBar barStyle = "light-content" />

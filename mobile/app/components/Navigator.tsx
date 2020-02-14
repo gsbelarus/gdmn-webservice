@@ -1,8 +1,6 @@
 import React from 'react';
 import ActivationPage from './ActivationPage';
 import MainPage from './MainPage';
-import MessagePage from './MessagePage';
-import SendMessagePage from './SendMessagePage';
 import LoginPage from './LoginPage';
 import DocumentPage from './DocumentPage';
 import DocumentFilterPage from './DocumentFilterPage';
@@ -38,14 +36,6 @@ const AppNavigator = createStackNavigator(
         MainPage: {
             screen: MainPage,
             navigationOptions: { title: 'GDMN' }
-        },
-        MessagePage: {
-            screen: MessagePage,
-            navigationOptions: { title: 'GDMN'}
-        },
-        SendMessagePage: {
-            screen: SendMessagePage,
-            navigationOptions: { }
         },
         DocumentPage: {
             screen: DocumentPage,
@@ -120,7 +110,8 @@ const AppNavigator = createStackNavigator(
                                 name='home' 
                             />
                     </TouchableOpacity>
-            )}  )
+                ),
+            })
         },
         AddProductToDocPage: {
             screen: AddProductToDocPage,
