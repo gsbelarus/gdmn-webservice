@@ -2,27 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "request": "attach",
-      "name": "Node: Nodemon",
-      "processId": "${command:PickProcess}",
-      "restart": true,
-      "protocol": "inspector"
-    },
-
-    {
+      "name": "Debug server",
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}\\dist\\server.js",
-      "preLaunchTask": "typescript",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-    },
-    {
-      "name": "Current TS File",
-      "type": "node",
-      "request": "launch",
-      "args": ["${relativeFile}"],
+      "args": ["src/index.ts"],
       "runtimeArgs": ["-r", "ts-node/register"],
       "cwd": "${workspaceRoot}",
       "protocol": "inspector",
