@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { TextInput } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,31 +10,14 @@ const ProductsListPage = (): JSX.Element => {
 
   const [text, onChangeText] = useState('');
 
-  const data = [{
-    id: 1,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 2,
-    title: 'Томат "Черри", Испания 0.75 кг'
-  },
-  {
-    id: 3,
-    title: 'Томат, Беларусь 0.75 кг'
-  },
-  {
-    id: 4,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 5,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 6,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название"'
-  },
-];
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const getData = async() => {
+      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+    }
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -62,18 +45,20 @@ const ProductsListPage = (): JSX.Element => {
       </View>
       <View style={{flex: 2}}>
         {
-          data.filter(item => item.title.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
-            <View style={styles.productView}>
-              <View style={styles.productTextView}>
-                <View style={styles.productIdView}>
-                  <Text style={styles.productId}>{item.id}</Text>
-                </View>
-                <View style={styles.productNameTextView}>
-                  <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+          data.filter(item => item.BARCODE.toLowerCase().includes(text.toLowerCase()) || item.NAME.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
+            <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
+              <View style={styles.productView}>
+                <View style={styles.productTextView}>
+                  <View style={styles.productIdView}>
+                    <Text style={styles.productId}>{idx}</Text>
+                  </View>
+                  <View style={styles.productNameTextView}>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>)
+            </TouchableOpacity>)
+          )
         }
       </View> 
       <StatusBar barStyle = "light-content" />

@@ -1,30 +1,20 @@
-import React from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 
 const DocumentPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
+  const [data, setData] = useState([]);
+  const [dataContact, setDataContact] = useState([]);
 
-  const data = [{
-    id: 1,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
-  },
-  {
-    id: 2,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
-  },
-  {
-    id: 3,
-    title: 'Инвентаризация №00001',
-    barcode: 'Розничный склад',
-    price: '05.02.2020'
-  }];
+  useEffect(() => {
+    const getData = async() => {
+      setData(JSON.parse(await AsyncStorage.getItem('docs')));
+      setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
+    }
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -33,16 +23,16 @@ const DocumentPage = (): JSX.Element => {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
               <View style={styles.productIdView}>
-                <Text style={styles.productId}>{item.id}</Text>
+                <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
-                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.barcode}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{item.DOCUMENTNAME}</Text>
+                <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.ID === item.CONTACTKEY) ? dataContact.find(contact => contact.ID === item.CONTACTKEY).NAME : 'unknown contact'}</Text>
               </View>
             </View>
             <View style={styles.productNumView}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <Text numberOfLines={5} style={styles.productPriceView}>{item.price}</Text>
+                <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.DOCUMENTDATE).toLocaleDateString()}</Text>
               </View>
             </View>
           </View>)

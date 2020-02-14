@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 
@@ -7,27 +7,14 @@ const ProductPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
 
-  const data = [{
-    id: 1,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг',
-    barcode: 1234567890111,
-    price: '10,55 руб.',
-    quantity: '1,03 кг.'
-  },
-  {
-    id: 2,
-    title: 'Томат "Черри", Испания 0.75 кг',
-    barcode: 1234567890111,
-    price: '7,55 руб.',
-    quantity: '0,55 кг.'
-  },
-  {
-    id: 3,
-    title: 'Томат, Беларусь 0.75 кг',
-    barcode: 1234567890111,
-    price: '7,55 руб.',
-    quantity: '0,55 кг.'
-  }];
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const getData = async() => {
+      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+    }
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -41,11 +28,11 @@ const ProductPage = (): JSX.Element => {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
               <View style={styles.productIdView}>
-                <Text style={styles.productId}>{item.id}</Text>
+                <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
-                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.barcode}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
+                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.BARCODE}</Text>
               </View>
             </View>
             <View style={styles.productNumView}>
@@ -55,9 +42,9 @@ const ProductPage = (): JSX.Element => {
                   color='#8C8D8F' 
                   name='md-pricetag' 
                 /> 
-                <Text numberOfLines={5} style={styles.productPriceView}>{item.price}</Text>
+                <Text numberOfLines={5} style={styles.productPriceView}>{item.PRICE}</Text>
               </View>
-              <Text numberOfLines={5} style={styles.productQuantityView}>{item.quantity}</Text>
+              <Text numberOfLines={5} style={styles.productQuantityView}>{item.QUANTITY}</Text>
             </View>
           </View>)
         }

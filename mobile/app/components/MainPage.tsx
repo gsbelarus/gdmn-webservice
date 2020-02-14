@@ -9,7 +9,6 @@ const MainPage = (): JSX.Element => {
 
   useEffect( () => {
     const typesData = ['goods', 'docTypes', 'contacts', 'docs', 'docLines'];
-
     const getData = async() => {
       const data = await fetch(
         `${path}test/all`,
@@ -26,12 +25,12 @@ const MainPage = (): JSX.Element => {
 
     const checkData = async() => {
       const keys = await AsyncStorage.getAllKeys();
-      keys.length !== 0 && typesData.filter( item => !keys.find(key => key === item)).length !== 0
+      keys.length !== 0 || typesData.filter( item => !keys.find(key => key === item)).length !== 0
       ? await getData()
       : undefined;
     }
     checkData();
-  });
+  }, []);
 
   return (
     <View style={styles.container}>
