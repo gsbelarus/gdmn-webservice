@@ -19,9 +19,16 @@ const newMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
     const {head: { companyId, consumer }, body} = ctx.request.body;
 
-    if(!(ctx.state.user.companies as Array<string>).find( item => item === companyId)) {
-      ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the company(${companyId})`});
-      logger.warn(`The user(${ctx.state.user.id}) not part of the company(${companyId})`);
+    if (!ctx.state.user.companies) {
+      ctx.body = JSON.stringify({ status: 404, result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})` });
+      logger.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${companyId})`);
+      return;      
+    }
+
+    if(!(ctx.state.user.companies as Array<string>).find(item => item === companyId)) {
+      ctx.body = JSON.stringify({ status: 404, result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`});
+      logger.warn(`The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`);
+      return;
     }
 
     const newMessage = {head: { consumer: consumer || 'gdmn', producer: ctx.state.user.id, dateTime: new Date().toISOString()}, body };
