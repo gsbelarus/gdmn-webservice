@@ -1,12 +1,36 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, Dimensions, Platform, } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { path } from '../../App';
 
 const MainPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
+
+  useEffect( () => {
+    const typesData = ['goods', 'docTypes', 'contacts', 'docs', 'docLines'];
+    const getData = async() => {
+      const data = await fetch(
+        `${path}test/all`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json'},
+          credentials: 'include',
+        }
+      ).then(res => res.json());
+      data.status === 200
+      ? data.result.map((item, idx) => AsyncStorage.setItem(typesData[idx], JSON.stringify(item)))
+      : undefined;
+    }
+
+    const checkData = async() => {
+      const keys = await AsyncStorage.getAllKeys();
+      keys.length !== 0 || typesData.filter( item => !keys.find(key => key === item)).length !== 0
+      ? await getData()
+      : undefined;
+    }
+    checkData();
+  }, []);
 
   return (
     <View style={styles.container}>

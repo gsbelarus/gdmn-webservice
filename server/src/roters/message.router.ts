@@ -9,22 +9,28 @@ import { promises } from 'fs';
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-const router = new Router({prefix: '/message'});
+const router = new Router();
 
-router.post('/new', ctx => newMessage(ctx));
-router.get('/get', ctx => getMessage(ctx));
-router.post('/getAndRemove', ctx => getMessageAndRemove(ctx));
-router.post('/remove', ctx => removeMessage(ctx));
+router.post('/messages', ctx => newMessage(ctx));
+router.get('/messages', ctx => getMessage(ctx));
+router.delete('/messages/:id', ctx => removeMessage(ctx));
 
 const newMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const message = ctx.request.body;
-    const organisation  = message.organisation;
-    if(message instanceof Object && message as IMessage) {
+    const {head: { companyId, consumer }, body} = ctx.request.body;
+
+    if(!(ctx.state.user.companies as Array<string>).find( item => item === companyId)) {
+      ctx.body = JSON.stringify({ status: 404, result: `The user(${ctx.state.user.id}) not part of the company(${companyId})`});
+      logger.warn(`The user(${ctx.state.user.id}) not part of the company(${companyId})`);
+    }
+
+    const newMessage = {head: { consumer: consumer || 'gdmn', producer: ctx.state.user.id, dateTime: new Date().toISOString()}, body };
+
+    if(newMessage instanceof Object && newMessage as IMessage) {
       const uuid = uuidv1();
       await writeFile(
-        `${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uuid}.json`,
-        JSON.stringify(message)
+        `${PATH_LOCAL_DB_MESSAGES}${companyId}\\${uuid}.json`,
+        JSON.stringify(newMessage)
       );
       ctx.body = JSON.stringify({ status: 200, result: {uid: uuid, date: new Date()}});
       logger.info(`new message in queue: ${uuid}`);
@@ -40,48 +46,26 @@ const newMessage = async(ctx:  any) => {
   }
 }
 
-const getMessageAndRemove = async(ctx:  any) => {
-  if(ctx.isAuthenticated()) {
-    const {organisation, uid} = ctx.query;
-    const message = await get(organisation, uid);
-    const result = await remove(organisation, uid);
-    if(result === 'OK') {
-      ctx.status = 200;
-      ctx.body = JSON.stringify({ status: 200, result: message});
-      logger.info('get message');
-    } else {
-      ctx.status = 404;
-      ctx.body = JSON.stringify({ status: 404, result: 'error'});
-      logger.warn('not deleted message');
-    }
-
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied`});
-    logger.warn(`access denied`);
-  }
-}
-
 const getMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation} = ctx.query;
+    const {companyId} = ctx.query;
     const result: IMessage[] = [];
     try {
-      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${organisation}`)
+      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`)
       for(const newFile of nameFiles ) {
-        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${newFile}`);
+        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
         result.push(data as IMessage);
       }
       ctx.status = 200;
       ctx.body = JSON.stringify({
         status: 200,
-        result: result.filter(res => (!res.consumer || res.consumer && res.consumer === ctx.state.user.userName) && ctx.state.user.userName !== res.producer)
+        result: result.filter(res => res.head.consumer === ctx.state.user.userName)
       });
       logger.info('get message');
     }
     catch (e) {
-      logger.trace(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${organisation} - ${e}`);
-      console.log(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${organisation} - ${e}`);
+      logger.trace(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
+      console.log(`Error reading data to directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
       ctx.status = 404;
       ctx.body = JSON.stringify({ status: 404, result: 'not found file or directory'});
     }
@@ -94,8 +78,8 @@ const getMessage = async(ctx:  any) => {
 
 const removeMessage = async(ctx:  any) => {
   if(ctx.isAuthenticated()) {
-    const {organisation, uid} = ctx.query;
-    const result = await remove(organisation, uid);
+    const {companyId, uid} = ctx.query;
+    const result = await remove(companyId, uid);
     if(result === 'OK') {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: 'OK'});
@@ -112,13 +96,8 @@ const removeMessage = async(ctx:  any) => {
   }
 }
 
-const remove = async(organisation: string, uid: string) => {
-  return await removeFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uid}.json`)
-}
-
-const get = async(organisation: string, uid: string) => {
-  const body = await readFile(`${PATH_LOCAL_DB_MESSAGES}${organisation}\\${uid}.json`);
-  return body;
+const remove = async(company: string, uid: string) => {
+  return await removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`)
 }
 
 export default router;

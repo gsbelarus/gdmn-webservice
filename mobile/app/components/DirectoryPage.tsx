@@ -1,37 +1,16 @@
-import React from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text} from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from 'react-navigation-hooks';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, Text, AsyncStorage} from 'react-native';
 
 const DirectoryPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const [data, setData] = useState([]);
 
-  const data = [{
-    id: 1,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 2,
-    title: 'Томат "Черри", Испания 0.75 кг'
-  },
-  {
-    id: 3,
-    title: 'Томат, Беларусь 0.75 кг'
-  },
-  {
-    id: 4,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 5,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название", Испания 0.75 кг'
-  },
-  {
-    id: 6,
-    title: 'Томат "Черри очень очень очень очень очень очень длинное предлинное название"'
-  },
-];
+  useEffect(() => {
+    const getData = async() => {
+      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+    }
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -40,10 +19,10 @@ const DirectoryPage = (): JSX.Element => {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
               <View style={styles.productIdView}>
-                <Text style={styles.productId}>{item.id}</Text>
+                <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.title}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
               </View>
             </View>
           </View>)

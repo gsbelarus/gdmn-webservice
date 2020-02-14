@@ -1,30 +1,45 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 import DatePicker from 'react-native-datepicker';
 import Swiper from 'react-native-web-swiper';
-import { path } from '../../App';
 
 const DocumentFilterPage = (): JSX.Element => {
 
   const {navigate} = useNavigation();
   const [date, setDate] = useState(new Date());
+  const [docTypes, setDocTypes] = useState([]);
+  const [contacts, setContacts] = useState([]);
 
   const today = new Date();
 
-  const data = ['Приход товара', 'Инвентаризация товаров', 3, 4, 5, 6, 7 ,8, 9, 10, 11, 12];
-  const newData = data.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
-    arr.push([]);
-  }
-  arr[arr.length - 1].push(item);
-  return arr;}, [[]]);
+  useEffect(() => {
+    const getData = async() => {
+      const d_docTypes = JSON.parse(await AsyncStorage.getItem('docTypes'));
+      const d_contacts = JSON.parse(await AsyncStorage.getItem('contacts'));
+      const newDT = d_docTypes.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
+        arr.push([]);
+      }
+      arr[arr.length - 1].push(item);
+      return arr;}, [[]])
+      setDocTypes(newDT);
+      const newC = d_contacts.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
+        arr.push([]);
+      }
+      arr[arr.length - 1].push(item);
+      return arr;}, [[]])
+      setContacts(newC);
+    }
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View  style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid'}} key={1}>
         <Text style={styles.subdivisionText}>Тип документа</Text>
-        <Swiper
+        {docTypes && docTypes.length !== 0
+        ? <Swiper
           controlsProps={{
             dotsTouchable: true,
             prevPos: false,
@@ -33,47 +48,15 @@ const DocumentFilterPage = (): JSX.Element => {
           }}
         >
           {
-          newData.map((d, idx) => (<View style={styles.slide} key={idx}>
-            <View style={styles.slideTextView} key={`${idx}-1`}>
-              <MaterialCommunityIcons
-                name="checkbox-blank-circle"
-                size={20}
-                color={'#F1FA3F'}
-              />
-              <Text numberOfLines={5}>{d[0]}</Text>
-            </View>
-            <View style={styles.slideTextView} key={`${idx}-2`}>
-              <MaterialCommunityIcons
-                name="checkbox-blank-circle"
-                size={20}
-                color={'#F1FA3F'}
-              />
-              <Text numberOfLines={5}>{d[1]}</Text>
-            </View>
-          </View>)
-          )
-        }
-        </Swiper>
-      </View>
-      <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
-        <Text style={styles.subdivisionText}>Подразделение</Text>
-        <Swiper
-          controlsProps={{
-            dotsTouchable: true,
-            prevPos: false,
-            nextPos: false,
-            dotsPos: 'bottom',
-          }}
-        >
-          {
-            newData.map((d, idx) => (<View style={styles.slide} key={idx}>
+            docTypes.map((d, idx) => (<View style={styles.slide} key={idx}>
               <View style={styles.slideTextView} key={`${idx}-1`}>
                 <MaterialCommunityIcons
                   name="checkbox-blank-circle"
                   size={20}
                   color={'#F1FA3F'}
                 />
-                <Text>{d[0]}</Text>
+                {console.log(d[0].NAME)}
+                <Text numberOfLines={5}>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
               </View>
               <View style={styles.slideTextView} key={`${idx}-2`}>
                 <MaterialCommunityIcons
@@ -81,12 +64,50 @@ const DocumentFilterPage = (): JSX.Element => {
                   size={20}
                   color={'#F1FA3F'}
                 />
-                <Text>{d[1]}</Text>
+                <Text numberOfLines={5}>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
               </View>
             </View>)
             )
           }
         </Swiper>
+        : <Text>Not found</Text>
+      }
+      </View>
+      <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
+        <Text style={styles.subdivisionText}>Подразделение</Text>
+        {contacts && contacts.length !== 0
+          ? <Swiper
+            controlsProps={{
+              dotsTouchable: true,
+              prevPos: false,
+              nextPos: false,
+              dotsPos: 'bottom',
+            }}
+          >
+            {
+              contacts.map((d, idx) => (<View style={styles.slide} key={idx}>
+                <View style={styles.slideTextView} key={`${idx}-1`}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank-circle"
+                    size={20}
+                    color={'#F1FA3F'}
+                  />
+                  <Text>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
+                </View>
+                <View style={styles.slideTextView} key={`${idx}-2`}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank-circle"
+                    size={20}
+                    color={'#F1FA3F'}
+                  />
+                  <Text>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
+                </View>
+              </View>)
+              )
+            }
+          </Swiper>
+          : <Text>Not found</Text>
+        }
       </View>
       <View style={{flex: 1.5, marginTop: 80}}>
         <DatePicker
