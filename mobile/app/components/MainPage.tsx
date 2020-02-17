@@ -25,9 +25,9 @@ const MainPage = (): JSX.Element => {
 
     const checkData = async() => {
       const keys = await AsyncStorage.getAllKeys();
-      keys.length !== 0 || typesData.filter( item => !keys.find(key => key === item)).length !== 0
-      ? await getData()
-      : undefined;
+      keys.length !== 0 && typesData.filter( item => !keys.find(key => key === item)).length === 0
+      ? undefined
+      : await getData();
     }
     checkData();
   }, []);
