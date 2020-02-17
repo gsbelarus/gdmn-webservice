@@ -8,20 +8,34 @@ const ProductPage = (): JSX.Element => {
   const navigation = useNavigation();
 
   const [data, setData] = useState([]);
+  const [doc, setDoc] = useState();
+  const [docType, setDocType] = useState();
+  const [contact, setContact] = useState();
 
   useEffect(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('goods')));
+      setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === navigation.getParam('docId')));
     }
     getData();
   }, []);
 
+  useEffect(() => {
+    if(doc) {
+    const getData = async() => {
+      setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
+      setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
+    }
+    getData();
+    }
+  }, [doc])
+
   return (
     <View style={styles.container}>
       <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('docType')}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('contact')}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('date')}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.NAME : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.NAME : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.DOCUMENTDATE : 'unknow'}</Text>
       </View>
       <View style={{flex: 1}}>
         {

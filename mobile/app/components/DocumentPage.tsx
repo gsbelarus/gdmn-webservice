@@ -7,11 +7,13 @@ const DocumentPage = (): JSX.Element => {
   const {navigate} = useNavigation();
   const [data, setData] = useState([]);
   const [dataContact, setDataContact] = useState([]);
+  const [dataDocTypes, setDataDocTypes] = useState([]);
 
   useEffect(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
+      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('docTypes')));
     }
     getData();
   }, []);
@@ -26,7 +28,7 @@ const DocumentPage = (): JSX.Element => {
                 <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.DOCUMENTNAME}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE) ? dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE).NAME : 'unknow'}</Text>
                 <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.ID === item.CONTACTKEY) ? dataContact.find(contact => contact.ID === item.CONTACTKEY).NAME : 'unknown contact'}</Text>
               </View>
             </View>
