@@ -7,7 +7,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const ProductsListPage = (): JSX.Element => {
 
-  const navigate = useNavigation();
+  const navigation = useNavigation();
   const [text, onChangeText] = useState('');
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -101,7 +101,7 @@ const ProductsListPage = (): JSX.Element => {
         <View style={{flex: 2}}>
           {
             data.filter(item => item.BARCODE.toLowerCase().includes(text.toLowerCase()) || item.NAME.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
-              <TouchableOpacity key={idx} onPress={() => { navigate.setParams({'id': idx}); navigate.navigate('AddProductToDocPage', {id: idx})}}>
+              <TouchableOpacity key={idx} onPress={() => { navigation.navigate('AddProductToDocPage', {id: idx})}}>
                 <View style={styles.productView}>
                   <View style={styles.productTextView}>
                     <View style={styles.productIdView}>

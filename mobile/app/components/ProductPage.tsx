@@ -5,7 +5,7 @@ import { useNavigation } from 'react-navigation-hooks';
 
 const ProductPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const navigation = useNavigation();
 
   const [data, setData] = useState([]);
 
@@ -19,9 +19,9 @@ const ProductPage = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>Инвентаризация №00001</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>Розничный склад</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>05.02.2020</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('docType')}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('contact')}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('date')}</Text>
       </View>
       <View style={{flex: 1}}>
         {
@@ -52,7 +52,7 @@ const ProductPage = (): JSX.Element => {
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
-          onPress={() => navigate('ProductsListPage')}
+          onPress={() => navigation.navigate('ProductsListPage')}
         >
           <MaterialIcons
             size={20}
