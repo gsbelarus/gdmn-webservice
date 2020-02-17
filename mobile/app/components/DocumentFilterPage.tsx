@@ -210,7 +210,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     CONTACTKEY: selectedContact,
                     DOCUMENTDATE: date.toLocaleString()
                 });
-                await AsyncStorage.setItem('docs', JSON.stringify(docs), () => console.log('successfull'));
+                await AsyncStorage.setItem('docs', JSON.stringify(docs));
                 navigation.navigate('ProductPage', {
                   'docId': docId.toString()
                 });
