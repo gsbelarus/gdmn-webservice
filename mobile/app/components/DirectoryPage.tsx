@@ -36,14 +36,14 @@ const DirectoryPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
-    flex: 1,
+    flex: 1
   },
   productView: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productIdView: {
     justifyContent: 'center',
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000',
+    color: '#000000'
   },
   productNameTextView: {
     maxHeight: 75,

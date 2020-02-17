@@ -55,7 +55,6 @@ const DocumentFilterPage = (): JSX.Element => {
                   size={20}
                   color={'#F1FA3F'}
                 />
-                {console.log(d[0].NAME)}
                 <Text numberOfLines={5}>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
               </View>
               <View style={styles.slideTextView} key={`${idx}-2`}>

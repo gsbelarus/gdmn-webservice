@@ -69,7 +69,7 @@ const ProductPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
-    flex: 1,
+    flex: 1
   },
   documentHeader: {
     height: 50,
@@ -85,11 +85,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   productView: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productNumView: {
     height: 25,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000',
+    color: '#000000'
   },
   productNameView: {
     flex: 1,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   productBarcodeView: {
-    marginTop: 5,
+    marginTop: 5
   },
   productQuantityView: {
   },
