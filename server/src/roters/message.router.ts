@@ -13,7 +13,7 @@ const router = new Router();
 
 router.post("/messages", ctx => newMessage(ctx));
 router.get("/messages", ctx => getMessage(ctx));
-router.delete("/messages/:id", ctx => removeMessage(ctx));
+router.delete("/messages/:companyId/:id", ctx => removeMessage(ctx));
 
 const newMessage = async (ctx: any) => {
   if (ctx.isAuthenticated()) {
@@ -48,7 +48,7 @@ const newMessage = async (ctx: any) => {
       return;
     }
 
-    const uuid = uuidv1();    
+    const uuid = uuidv1();
     const newMessage = {
       head: {
         id: uuid,
@@ -90,7 +90,7 @@ const getMessage = async (ctx: any) => {
     ctx.body = JSON.stringify({ status: 403, result: `access denied` });
     logger.warn(`access denied`);
     return;
-  }    
+  }
 
   const { companyId } = ctx.query;
   const result: IMessage[] = [];
@@ -130,7 +130,7 @@ const getMessage = async (ctx: any) => {
 
 const removeMessage = async (ctx: any) => {
   if (ctx.isAuthenticated()) {
-    const { companyId, uid } = ctx.query;
+    const { companyId, id: uid } = ctx.params;
     const result = await remove(companyId, uid);
 
     if (result === "OK") {
