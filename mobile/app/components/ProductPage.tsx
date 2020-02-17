@@ -14,19 +14,21 @@ const ProductPage = (): JSX.Element => {
 
   useEffect(() => {
     const getData = async() => {
-      setData(JSON.parse(await AsyncStorage.getItem('goods')));
-      setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === navigation.getParam('docId')));
+      const docId = navigation.getParam('docId');
+      const docLines = (JSON.parse(await AsyncStorage.getItem('docLines'))).filter(item => item.IDDOC === docId);
+      setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docLines.find(line => line.GOODKEY === item.ID)));
+      setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === docId));
     }
     getData();
   }, []);
 
   useEffect(() => {
     if(doc) {
-    const getData = async() => {
-      setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
-      setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
-    }
-    getData();
+      const getData = async() => {
+        setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
+        setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
+      }
+      getData();
     }
   }, [doc])
 
