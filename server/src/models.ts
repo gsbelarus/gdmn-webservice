@@ -30,6 +30,7 @@ export interface ICompany {
 
 export interface IMessage {
   head: {
+    id: string;
     producer: string;
     consumer: string;
     companyId: string;
