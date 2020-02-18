@@ -88,7 +88,7 @@ const ProductsListPage = (): JSX.Element => {
         <ScrollView style={{flex: 2}}>
           {
             data.filter(item => item.BARCODE.toLowerCase().includes(text.toLowerCase()) || item.NAME.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
-              <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductDetailPage', {id: idx})}}>
+              <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: idx, idDoc: navigation.getParam('idDoc')})}>
                 <View style={styles.productView}>
                   <View style={styles.productTextView}>
                     <View style={styles.productIdView}>

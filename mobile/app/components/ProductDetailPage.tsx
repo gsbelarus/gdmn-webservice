@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, Text, AsyncStorage, TouchableOpacity} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import InputSpinner from "react-native-input-spinner";
 
 const ProductDetailPage = (): JSX.Element => {
 
-  const navigate = useNavigation();
+  const navigation = useNavigation();
 
   const [data, setData] = useState();
   const [value, setValue] = useState();
 
   useEffect(() => {
     const getData = async() => {
-      setData(JSON.parse(await AsyncStorage.getItem('goods')).find(i => i.ID === navigate.getParam('id').toString()));
+      setData(JSON.parse(await AsyncStorage.getItem('goods')).find(i => i.ID === navigation.getParam('id').toString()));
     }
     getData();
   }, []);
@@ -45,6 +45,23 @@ const ProductDetailPage = (): JSX.Element => {
           onChange={setValue}
         />
       </View>
+      <TouchableOpacity
+        style={styles.buttonOk} 
+        onPress={async () => {
+          const docLines = JSON.parse(await AsyncStorage.getItem('docLines'));
+          const docLineId = Number(docLines[docLines.length - 1].ID) + 1;
+          docLines.push({
+            ID: docLineId.toString(),
+            IDDOC: navigation.getParam('idDoc'),
+            GOODKEY: navigation.getParam('id').toString(),
+            QUANTITY: value
+          });
+          await AsyncStorage.setItem('docLines', JSON.stringify(docLines));
+          navigation.navigate('ProductPage');
+        }}
+      >
+        <Text style={styles.buttonOkText}>ОК</Text>
+      </TouchableOpacity>
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -92,6 +109,19 @@ const styles = StyleSheet.create({
   inputSpinner: {
     marginTop: 5,
     width: 180
+  },
+  buttonOk: {
+    marginRight: 15,
+    backgroundColor: '#2D3083',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    borderColor: '#212323'
+  },
+  buttonOkText: {
+    color: '#FFFFFF',
+    fontSize: 17
   }
 });
 

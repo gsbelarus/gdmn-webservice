@@ -1,27 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from 'react-navigation-hooks';
+import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 
 const ProductPage = (): JSX.Element => {
 
   const navigation = useNavigation();
 
   const [data, setData] = useState([]);
+  const [doc, setDoc] = useState();
+  const [docType, setDocType] = useState();
+  const [contact, setContact] = useState();
+
+    useFocusEffect(React.useCallback(() => {
+      const getData = async() => {
+        const docId = navigation.getParam('docId');
+        const docLines = (JSON.parse(await AsyncStorage.getItem('docLines'))).filter(item => item.IDDOC === docId);
+        setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docLines.find(line => line.GOODKEY === item.ID)));
+        setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === docId));
+      }
+      getData();
+    }, []));
 
   useEffect(() => {
-    const getData = async() => {
-      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+    if(doc) {
+      const getData = async() => {
+        setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
+        setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
+      }
+      getData();
     }
-    getData();
-  }, []);
+  }, [doc])
 
   return (
     <View style={styles.container}>
       <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('docType')}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('contact')}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{navigation.getParam('date')}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.NAME : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.NAME : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.DOCUMENTDATE : 'unknow'}</Text>
       </View>
       <ScrollView style={{flex: 1}}>
         {
@@ -52,7 +68,7 @@ const ProductPage = (): JSX.Element => {
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
-          onPress={() => navigation.navigate('ProductsListPage')}
+          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId')})}
         >
           <MaterialIcons
             size={20}

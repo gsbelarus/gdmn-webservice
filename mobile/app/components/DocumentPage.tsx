@@ -4,14 +4,16 @@ import { useNavigation } from 'react-navigation-hooks';
 
 const DocumentPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [dataContact, setDataContact] = useState([]);
+  const [dataDocTypes, setDataDocTypes] = useState([]);
 
   useEffect(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
+      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('docTypes')));
     }
     getData();
   }, []);
@@ -20,35 +22,39 @@ const DocumentPage = (): JSX.Element => {
     <View style={styles.container}>
       <ScrollView style={{flex: 1}}>
         {
-          data.map( (item, idx) => <View style={styles.productView} key={idx}>
-            <View style={styles.productTextView}>
-              <View style={styles.productIdView}>
-                <Text style={styles.productId}>{idx + 1}</Text>
+          data.map( (item, idx) =>
+            <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.IDDOC})}}>
+              <View style={styles.productView} key={idx}>
+                <View style={styles.productTextView}>
+                  <View style={styles.productIdView}>
+                    <Text style={styles.productId}>{idx + 1}</Text>
+                  </View>
+                  <View style={styles.productNameTextView}>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE) ? dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE).NAME : 'unknow'}</Text>
+                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.ID === item.CONTACTKEY) ? dataContact.find(contact => contact.ID === item.CONTACTKEY).NAME : 'unknown contact'}</Text>
+                  </View>
+                </View>
+                <View style={styles.productNumView}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.DOCUMENTDATE).toLocaleDateString()}</Text>
+                  </View>
+                </View>
               </View>
-              <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.DOCUMENTNAME}</Text>
-                <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.ID === item.CONTACTKEY) ? dataContact.find(contact => contact.ID === item.CONTACTKEY).NAME : 'unknown contact'}</Text>
-              </View>
-            </View>
-            <View style={styles.productNumView}>
-              <View style={{flex: 1, flexDirection: 'row'}}>
-                <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.DOCUMENTDATE).toLocaleDateString()}</Text>
-              </View>
-            </View>
-          </View>)
+            </TouchableOpacity>
+          )
         }
       </ScrollView>
       <View style={{ flexDirection: 'column', justifyContent: "flex-end", }}>
         <TouchableOpacity
           style={styles.createButton} 
-          onPress={() => navigate('DocumentFilterPage')}
+          onPress={() => navigation.navigate('DocumentFilterPage')}
         >
           <Text style={styles.createButtonText}>Создать новый документ</Text>
         </TouchableOpacity>
       </View>
         <TouchableOpacity
           style={styles.sendButton} 
-          onPress={() => navigate('DocumentFilterPage')}
+          onPress={() => {}/*navigation.navigate('DocumentFilterPage')*/}
         >
           <Text style={styles.sendButtonText}>Отправить</Text>
         </TouchableOpacity>

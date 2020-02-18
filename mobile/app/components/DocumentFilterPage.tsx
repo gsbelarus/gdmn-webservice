@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 import DatePicker from 'react-native-datepicker';
@@ -201,11 +201,18 @@ const DocumentFilterPage = (): JSX.Element => {
           <View style={{flex: 1}}>
             <TouchableOpacity
               style={styles.buttonOk} 
-              onPress={() => {
+              onPress={async () => {
+                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                const docId = Number(docs[docs.length - 1].IDDOC) + 1;
+                docs.push({
+                    IDDOC: docId.toString(),
+                    DOCUMENTTYPE: selectedDocType,
+                    CONTACTKEY: selectedContact,
+                    DOCUMENTDATE: date.toLocaleString()
+                });
+                await AsyncStorage.setItem('docs', JSON.stringify(docs));
                 navigation.navigate('ProductPage', {
-                  'docType': docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.ID === selectedDocType).NAME,
-                  'contact': contacts && contacts.length !== 0 && contacts.flat().find(i => i.ID === selectedDocType).NAME,
-                  'date': date.toLocaleString()
+                  'docId': docId.toString()
                 });
               }}
             >
