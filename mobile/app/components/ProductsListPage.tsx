@@ -26,12 +26,16 @@ const ProductsListPage = (): JSX.Element => {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     Alert.alert(
-      'Bar code has been scanned',
+      'Штрих-код был отсканирован',
       data,
       [
         {
           text: 'OK',
-          onPress: () => {setDoScanned(false); onChangeText(data)}
+          onPress: () => {
+            setDoScanned(false);
+            onChangeText(data);
+            setScanned(false)
+          }
         },
         {
           text: 'CANCEL',
@@ -42,10 +46,10 @@ const ProductsListPage = (): JSX.Element => {
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return <Text>Запрос на получение доступа к камере</Text>;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>Нет доступа к камере</Text>;
   }
 
   return (
@@ -57,7 +61,7 @@ const ProductsListPage = (): JSX.Element => {
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={StyleSheet.absoluteFillObject}
             />
-            {scanned && <Button title={'Tap to scan again'} onPress={() => setScanned(false)} />}
+            {scanned && <Button title={'Сканировать ещё раз'} onPress={() => setScanned(false)} />}
           </>
           : <>
           <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>

@@ -29,9 +29,9 @@ const ProductPage = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.name : 'unknow'}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.name : 'unknow'}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.head.date : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.name : ''}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.name : ''}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.head.date : ''}</Text>
       </View>
       <ScrollView style={{flex: 1}}>
         {
@@ -52,9 +52,9 @@ const ProductPage = (): JSX.Element => {
                   color='#8C8D8F' 
                   name='md-pricetag' 
                 />
-                <Text numberOfLines={5} style={styles.productPriceView}>{remains && remains.find(remain => remain.goodId === item.id) ? remains.find(remain => remain.goodId === item.id).price : 'unknow'}</Text>
+                <Text numberOfLines={5} style={styles.productPriceView}>{remains && remains.find(remain => remain.goodId === item.id) ? remains.find(remain => remain.goodId === item.id).price : ''}</Text>
               </View>
-              <Text numberOfLines={5} style={styles.productQuantityView}>{doc ? doc.lines.find(line => line.goodId === item.id).quantity : 'unknow'}</Text>
+              <Text numberOfLines={5} style={styles.productQuantityView}>{doc ? doc.lines.find(line => line.goodId === item.id).quantity : ''}</Text>
             </View>
           </View>)
         }

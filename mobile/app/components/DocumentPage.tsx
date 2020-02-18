@@ -30,8 +30,8 @@ const DocumentPage = (): JSX.Element => {
                     <Text style={styles.productId}>{idx + 1}</Text>
                   </View>
                   <View style={styles.productNameTextView}>
-                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : 'unknow'}</Text>
-                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : 'unknown contact'}</Text>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
+                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>

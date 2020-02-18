@@ -71,7 +71,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     size={20}
                     color={'#F1FA3F'}
                   />
-                  <Text numberOfLines={5}>{d[0] && d[0].name ? d[0].name : 'unknown'}</Text>
+                  <Text numberOfLines={5}>{d[0] && d[0].name ? d[0].name : ''}</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
@@ -86,7 +86,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     size={20}
                     color={'#F1FA3F'}
                   />
-                  <Text numberOfLines={5}>{d[1] && d[1].name ? d[1].name : 'unknown'}</Text>
+                  <Text numberOfLines={5}>{d[1] && d[1].name ? d[1].name : ''}</Text>
                 </View>
               </TouchableOpacity>
             </View>)
@@ -130,7 +130,7 @@ const DocumentFilterPage = (): JSX.Element => {
                       size={20}
                       color={'#F1FA3F'}
                     />
-                    <Text>{d[0] && d[0].name ? d[0].name : 'unknown'}</Text>
+                    <Text>{d[0] && d[0].name ? d[0].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -147,14 +147,14 @@ const DocumentFilterPage = (): JSX.Element => {
                       size={20}
                       color={'#F1FA3F'}
                     />
-                    <Text>{d[1] && d[1].name ? d[1].name : 'unknown'}</Text>
+                    <Text>{d[1] && d[1].name ? d[1].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
               </View>)
               )
             }
           </Swiper>
-          : <Text>Not found</Text>
+          : <Text></Text>
         }
       </View>
       <View style={{flex: 1.5, marginTop: 80}}>
