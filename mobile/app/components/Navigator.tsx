@@ -8,7 +8,7 @@ import DirectoryPage from './DirectoryPage';
 import ProductPage from './ProductPage';
 import { TouchableOpacity } from 'react-native';
 import ProductsListPage from './ProductsListPage';
-import AddProductToDocPage from './AddProductToDocPage';
+import ProductDetailPage from './ProductDetailPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { AntDesign } from '@expo/vector-icons';
@@ -113,8 +113,8 @@ const AppNavigator = createStackNavigator(
                 ),
             })
         },
-        AddProductToDocPage: {
-            screen: AddProductToDocPage,
+        ProductDetailPage: {
+            screen: ProductDetailPage,
             params: {id: 0},
             navigationOptions: ({navigation}) => ({
                 headerRight: (

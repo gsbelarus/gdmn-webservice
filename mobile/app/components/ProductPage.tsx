@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 
@@ -14,21 +14,19 @@ const ProductPage = (): JSX.Element => {
 
   useEffect(() => {
     const getData = async() => {
-      const docId = navigation.getParam('docId');
-      const docLines = (JSON.parse(await AsyncStorage.getItem('docLines'))).filter(item => item.IDDOC === docId);
-      setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docLines.find(line => line.GOODKEY === item.ID)));
-      setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === docId));
+      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+      setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === navigation.getParam('docId')));
     }
     getData();
   }, []);
 
   useEffect(() => {
     if(doc) {
-      const getData = async() => {
-        setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
-        setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
-      }
-      getData();
+    const getData = async() => {
+      setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
+      setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
+    }
+    getData();
     }
   }, [doc])
 
@@ -39,7 +37,7 @@ const ProductPage = (): JSX.Element => {
         <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.NAME : 'unknow'}</Text>
         <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.DOCUMENTDATE : 'unknow'}</Text>
       </View>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
@@ -64,11 +62,11 @@ const ProductPage = (): JSX.Element => {
             </View>
           </View>)
         }
-      </View>
-      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
+      </ScrollView>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
-          onPress={() => navigation.navigate('ProductsListPage')}
+          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId')})}
         >
           <MaterialIcons
             size={20}
@@ -85,7 +83,7 @@ const ProductPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
-    flex: 1,
+    flex: 1
   },
   documentHeader: {
     height: 50,
@@ -101,11 +99,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   productView: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productNumView: {
     height: 25,
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000',
+    color: '#000000'
   },
   productNameView: {
     flex: 1,
@@ -150,7 +148,7 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   productBarcodeView: {
-    marginTop: 5,
+    marginTop: 5
   },
   productQuantityView: {
   },

@@ -17,6 +17,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-dropdown-menu": "^2.0.0",
     "react-native-gesture-handler": "^1.5.2",
+    "react-native-input-spinner": "^1.2.8",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-textfield": "^0.16.1",
     "react-native-paper": "^3.4.0",

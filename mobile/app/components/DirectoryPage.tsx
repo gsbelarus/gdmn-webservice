@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, Text, AsyncStorage, ScrollView} from 'react-native';
 
 const DirectoryPage = (): JSX.Element => {
 
@@ -14,7 +14,7 @@ const DirectoryPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
@@ -27,7 +27,7 @@ const DirectoryPage = (): JSX.Element => {
             </View>
           </View>)
         }
-      </View> 
+      </ScrollView> 
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -36,14 +36,14 @@ const DirectoryPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
-    flex: 1,
+    flex: 1
   },
   productView: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productIdView: {
     justifyContent: 'center',
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000',
+    color: '#000000'
   },
   productNameTextView: {
     maxHeight: 75,
@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginHorizontal: 5,
     width: '90%',
-    //textAlignVertical: 'center',
     justifyContent: 'center',
     color: '#000000',
     fontWeight: 'bold'

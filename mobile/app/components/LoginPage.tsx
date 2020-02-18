@@ -125,21 +125,23 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#E3EFF4',
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   input: {
     margin: 15,
-    borderColor: '#70667D',
+    borderColor: '#2D3083',
     borderWidth: 1,
     fontSize: 24,
-    height: 40
+    height: 50,
+    
   },
   submitButton: {
-    backgroundColor: '#70667D',
+    backgroundColor: '#2D3083',
     padding: 8,
     margin: 15,
-    height: 40,
-    alignItems: 'center'
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
  submitButtonText:{
     color: 'white',

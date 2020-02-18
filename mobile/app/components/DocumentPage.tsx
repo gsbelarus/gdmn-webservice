@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 
 const DocumentPage = (): JSX.Element => {
@@ -20,7 +20,7 @@ const DocumentPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) =>
             <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.IDDOC})}}>
@@ -43,8 +43,8 @@ const DocumentPage = (): JSX.Element => {
             </TouchableOpacity>
           )
         }
-      </View>
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: "flex-end", }}>
+      </ScrollView>
+      <View style={{ flexDirection: 'column', justifyContent: "flex-end", }}>
         <TouchableOpacity
           style={styles.createButton} 
           onPress={() => navigation.navigate('DocumentFilterPage')}
@@ -66,14 +66,14 @@ const DocumentPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
-    flex: 1,
+    flex: 1
   },
   productView: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productNumView: {
     height: 25,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000',
+    color: '#000000'
   },
   productNameTextView: {
     maxHeight: 75,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   productBarcodeView: {
-    marginTop: 5,
+    marginTop: 5
   },
   sendButton: {
     marginHorizontal: 15,
