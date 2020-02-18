@@ -11,33 +11,27 @@ const ProductPage = (): JSX.Element => {
   const [doc, setDoc] = useState();
   const [docType, setDocType] = useState();
   const [contact, setContact] = useState();
+  const [remains, setRemains] = useState();
 
-    useFocusEffect(React.useCallback(() => {
-      const getData = async() => {
-        const docId = navigation.getParam('docId');
-        const docLines = (JSON.parse(await AsyncStorage.getItem('docLines'))).filter(item => item.IDDOC === docId);
-        setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docLines.find(line => line.GOODKEY === item.ID)));
-        setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.IDDOC === docId));
-      }
-      getData();
-    }, []));
-
-  useEffect(() => {
-    if(doc) {
-      const getData = async() => {
-        setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.ID === doc.DOCUMENTTYPE));
-        setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.ID === doc.CONTACTKEY));
-      }
-      getData();
+  useFocusEffect(React.useCallback(() => {
+    const getData = async() => {
+      const docId = navigation.getParam('docId');
+      const docs = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === docId)
+      setDoc(docs);
+      setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docs.lines.find(line => line.goodId === item.id)));
+      setRemains(JSON.parse(await AsyncStorage.getItem('remains')));
+      setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.id === docs.head.doctype));
+      setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.id === docs.head.fromcontactId));
     }
-  }, [doc])
+    getData();
+  }, []));
 
   return (
     <View style={styles.container}>
       <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.NAME : 'unknow'}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.NAME : 'unknow'}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.DOCUMENTDATE : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.name : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.name : 'unknow'}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.head.date : 'unknow'}</Text>
       </View>
       <ScrollView style={{flex: 1}}>
         {
@@ -47,8 +41,8 @@ const ProductPage = (): JSX.Element => {
                 <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
-                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.BARCODE}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
+                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.barcode}</Text>
               </View>
             </View>
             <View style={styles.productNumView}>
@@ -57,10 +51,10 @@ const ProductPage = (): JSX.Element => {
                   size={20}
                   color='#8C8D8F' 
                   name='md-pricetag' 
-                /> 
-                <Text numberOfLines={5} style={styles.productPriceView}>{item.PRICE}</Text>
+                />
+                <Text numberOfLines={5} style={styles.productPriceView}>{remains && remains.find(remain => remain.goodId === item.id) ? remains.find(remain => remain.goodId === item.id).price : 'unknow'}</Text>
               </View>
-              <Text numberOfLines={5} style={styles.productQuantityView}>{item.QUANTITY}</Text>
+              <Text numberOfLines={5} style={styles.productQuantityView}>{doc ? doc.lines.find(line => line.goodId === item.id).quantity : 'unknow'}</Text>
             </View>
           </View>)
         }
@@ -68,7 +62,7 @@ const ProductPage = (): JSX.Element => {
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
         <TouchableOpacity
           style={styles.addButton} 
-          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId')})}
+          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
         >
           <MaterialIcons
             size={20}

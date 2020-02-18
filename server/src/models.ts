@@ -46,36 +46,53 @@ export interface IMessage {
 }
 
 export interface IGood {
-  ID: string;
-  ALIAS: string;
-  BARCODE: string;
-  NAME: string;
-  QUANTITY: number;
-  PRICE: number;
+  id: number;
+	name: string;
+	barcode: string;
+	alias: string;
 }
 
 export interface IContact {
-  ID: string;
-  NAME: string;
-  CONTACTTYPE: number;
+  id: number;
+	name: string;
+	type: number;
+}
+
+export interface IRemain {
+  goodId: number;
+  quantity: number;
+  price: number;
+  contactId: number;
 }
 
 export interface IDocumentType {
-  ID: string;
-  NAME: string;
+  id: number;
+	name: string;
 }
 
 export interface IDocument {
-  IDDOC: string;
-  DOCUMENTTYPE: string;
-  DOCUMENTNAME: string;
-  DOCUMENTDATE: string;
-  CONTACTKEY: string;
+  id: string;
+  head: IHead;
+	lines: ILine[];
 }
 
 export interface IDocumentLine {
-  ID: string;
-  IDDOC: string;
-  GOODKEY: string;
-  QUANTITY: number;
+  id: string;
+  docId: string;
+  goodId: string;
+  quantity: number;
+}
+
+
+export interface IHead {
+	doctype: number;
+	fromcontactId: number;
+	tocontactId: number;
+	date: string;
+}
+
+export interface ILine {
+	id: string;
+	goodId: number;
+	quantity: number;
 }

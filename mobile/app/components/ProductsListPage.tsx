@@ -12,13 +12,14 @@ const ProductsListPage = (): JSX.Element => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
-  const [data, setData] = useState([]);
+  const [goods, setGoods] = useState([]);
 
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      setData(JSON.parse(await AsyncStorage.getItem('goods')));
+      const remains = JSON.parse(await AsyncStorage.getItem('remains')).filter(item => item.contactId === navigation.getParam('contactId'));
+      setGoods(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => remains.find(remain => remain.goodId === item.id)));
     })();
   }, []);
 
@@ -87,15 +88,15 @@ const ProductsListPage = (): JSX.Element => {
           </View>
         <ScrollView style={{flex: 2}}>
           {
-            data.filter(item => item.BARCODE.toLowerCase().includes(text.toLowerCase()) || item.NAME.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
-              <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: idx, idDoc: navigation.getParam('idDoc')})}>
+            goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
+              <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
                 <View style={styles.productView}>
                   <View style={styles.productTextView}>
                     <View style={styles.productIdView}>
                       <Text style={styles.productId}>{idx}</Text>
                     </View>
                     <View style={styles.productNameTextView}>
-                      <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
+                      <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
                     </View>
                   </View>
                 </View>

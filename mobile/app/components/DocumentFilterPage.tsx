@@ -42,8 +42,8 @@ const DocumentFilterPage = (): JSX.Element => {
         <View style={{flexDirection: 'row'}}>
           <Text style={styles.subdivisionText}>Тип документа: </Text>
           <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
-            {selectedDocType && docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.ID === selectedDocType)
-            ? docTypes.flat().find(i => i.ID === selectedDocType).NAME
+            {docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.id === selectedDocType)
+            ? docTypes.flat().find(i => i.id === selectedDocType).name
             : 'Не выбрано'}
           </Text>
         </View>
@@ -63,7 +63,7 @@ const DocumentFilterPage = (): JSX.Element => {
                   height: 30,
                   
                 }}
-                onPress={() => setSelectedDocType(d[0].ID)}
+                onPress={() => setSelectedDocType(d[0].id)}
               >
                 <View style={styles.slideTextView} key={`${idx}-1`}>
                   <MaterialCommunityIcons
@@ -71,14 +71,14 @@ const DocumentFilterPage = (): JSX.Element => {
                     size={20}
                     color={'#F1FA3F'}
                   />
-                  <Text numberOfLines={5}>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
+                  <Text numberOfLines={5}>{d[0] && d[0].name ? d[0].name : 'unknown'}</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
                   height: 30
                 }}
-                onPress={() => setSelectedDocType(d[1].ID)}
+                onPress={() => setSelectedDocType(d[1].id)}
               >
                 <View style={styles.slideTextView} key={`${idx}-2`}>
                   <MaterialCommunityIcons
@@ -86,7 +86,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     size={20}
                     color={'#F1FA3F'}
                   />
-                  <Text numberOfLines={5}>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
+                  <Text numberOfLines={5}>{d[1] && d[1].name ? d[1].name : 'unknown'}</Text>
                 </View>
               </TouchableOpacity>
             </View>)
@@ -100,8 +100,8 @@ const DocumentFilterPage = (): JSX.Element => {
         <View style={{flexDirection: 'row'}}>
           <Text style={styles.subdivisionText}>Подразделение: </Text>
           <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
-            {contacts && contacts.length !== 0 && contacts.flat().find(i => i.ID === selectedContact)
-            ? contacts.flat().find(i => i.ID === selectedContact).NAME
+            {contacts && contacts.length !== 0 && contacts.flat().find(i => i.id === selectedContact)
+            ? contacts.flat().find(i => i.id === selectedContact).name
             : 'Не выбрано'}
           </Text>
         </View>
@@ -122,7 +122,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                  onPress={() => setSelectedContact(d[0].ID)}
+                  onPress={() => setSelectedContact(d[0].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-1`}>
                     <MaterialCommunityIcons
@@ -130,7 +130,7 @@ const DocumentFilterPage = (): JSX.Element => {
                       size={20}
                       color={'#F1FA3F'}
                     />
-                    <Text>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
+                    <Text>{d[0] && d[0].name ? d[0].name : 'unknown'}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -139,7 +139,7 @@ const DocumentFilterPage = (): JSX.Element => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                  onPress={() => setSelectedContact(d[1].ID)}
+                  onPress={() => setSelectedContact(d[1].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-2`}>
                     <MaterialCommunityIcons
@@ -147,7 +147,7 @@ const DocumentFilterPage = (): JSX.Element => {
                       size={20}
                       color={'#F1FA3F'}
                     />
-                    <Text>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
+                    <Text>{d[1] && d[1].name ? d[1].name : 'unknown'}</Text>
                   </View>
                 </TouchableOpacity>
               </View>)
@@ -203,13 +203,17 @@ const DocumentFilterPage = (): JSX.Element => {
               style={styles.buttonOk} 
               onPress={async () => {
                 const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                const docId = Number(docs[docs.length - 1].IDDOC) + 1;
+                const docId = Number(docs[docs.length - 1].docId) + 1;
                 docs.push({
-                    IDDOC: docId.toString(),
-                    DOCUMENTTYPE: selectedDocType,
-                    CONTACTKEY: selectedContact,
-                    DOCUMENTDATE: date.toLocaleString()
-                });
+                  id: docId.toString(),
+                  head: {
+                    doctype: selectedDocType,
+                    fromcontactId: selectedContact,
+                    tocontactId: selectedContact,
+                    date: date.toLocaleString()
+                  },
+                  lines: []
+              });
                 await AsyncStorage.setItem('docs', JSON.stringify(docs));
                 navigation.navigate('ProductPage', {
                   'docId': docId.toString()
