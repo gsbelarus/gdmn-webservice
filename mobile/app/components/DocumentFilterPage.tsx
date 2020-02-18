@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, StyleProp, ViewStyle } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 import DatePicker from 'react-native-datepicker';
@@ -7,10 +7,12 @@ import Swiper from 'react-native-web-swiper';
 
 const DocumentFilterPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const navigation = useNavigation();
   const [date, setDate] = useState(new Date());
   const [docTypes, setDocTypes] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [selectedDocType, setSelectedDocType] = useState();
+  const [selectedContact, setSelectedContact] = useState();
 
   const today = new Date();
 
@@ -37,7 +39,14 @@ const DocumentFilterPage = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <View  style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid'}} key={1}>
-        <Text style={styles.subdivisionText}>Тип документа</Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.subdivisionText}>Тип документа: </Text>
+          <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
+            {selectedDocType && docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.ID === selectedDocType)
+            ? docTypes.flat().find(i => i.ID === selectedDocType).NAME
+            : 'Не выбрано'}
+          </Text>
+        </View>
         {docTypes && docTypes.length !== 0
         ? <Swiper
           controlsProps={{
@@ -49,22 +58,37 @@ const DocumentFilterPage = (): JSX.Element => {
         >
           {
             docTypes.map((d, idx) => (<View style={styles.slide} key={idx}>
-              <View style={styles.slideTextView} key={`${idx}-1`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
-              </View>
-              <View style={styles.slideTextView} key={`${idx}-2`}>
-                <MaterialCommunityIcons
-                  name="checkbox-blank-circle"
-                  size={20}
-                  color={'#F1FA3F'}
-                />
-                <Text numberOfLines={5}>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
-              </View>
+              <TouchableOpacity
+                style={{
+                  height: 30,
+                  
+                }}
+                onPress={() => setSelectedDocType(d[0].ID)}
+              >
+                <View style={styles.slideTextView} key={`${idx}-1`}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank-circle"
+                    size={20}
+                    color={'#F1FA3F'}
+                  />
+                  <Text numberOfLines={5}>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  height: 30
+                }}
+                onPress={() => setSelectedDocType(d[1].ID)}
+              >
+                <View style={styles.slideTextView} key={`${idx}-2`}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank-circle"
+                    size={20}
+                    color={'#F1FA3F'}
+                  />
+                  <Text numberOfLines={5}>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
+                </View>
+              </TouchableOpacity>
             </View>)
             )
           }
@@ -73,7 +97,14 @@ const DocumentFilterPage = (): JSX.Element => {
       }
       </View>
       <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
-        <Text style={styles.subdivisionText}>Подразделение</Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.subdivisionText}>Подразделение: </Text>
+          <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
+            {contacts && contacts.length !== 0 && contacts.flat().find(i => i.ID === selectedContact)
+            ? contacts.flat().find(i => i.ID === selectedContact).NAME
+            : 'Не выбрано'}
+          </Text>
+        </View>
         {contacts && contacts.length !== 0
           ? <Swiper
             controlsProps={{
@@ -85,22 +116,40 @@ const DocumentFilterPage = (): JSX.Element => {
           >
             {
               contacts.map((d, idx) => (<View style={styles.slide} key={idx}>
-                <View style={styles.slideTextView} key={`${idx}-1`}>
-                  <MaterialCommunityIcons
-                    name="checkbox-blank-circle"
-                    size={20}
-                    color={'#F1FA3F'}
-                  />
-                  <Text>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
-                </View>
-                <View style={styles.slideTextView} key={`${idx}-2`}>
-                  <MaterialCommunityIcons
-                    name="checkbox-blank-circle"
-                    size={20}
-                    color={'#F1FA3F'}
-                  />
-                  <Text>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
-                </View>
+                <TouchableOpacity
+                  style={{
+                    height: 25,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => setSelectedContact(d[0].ID)}
+                >
+                  <View style={styles.slideTextView} key={`${idx}-1`}>
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-circle"
+                      size={20}
+                      color={'#F1FA3F'}
+                    />
+                    <Text>{d[0] && d[0].NAME ? d[0].NAME : 'unknown'}</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    height: 25,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => setSelectedContact(d[1].ID)}
+                >
+                  <View style={styles.slideTextView} key={`${idx}-2`}>
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-circle"
+                      size={20}
+                      color={'#F1FA3F'}
+                    />
+                    <Text>{d[1] && d[1].NAME ? d[1].NAME : 'unknown'}</Text>
+                  </View>
+                </TouchableOpacity>
               </View>)
               )
             }
@@ -152,7 +201,13 @@ const DocumentFilterPage = (): JSX.Element => {
           <View style={{flex: 1}}>
             <TouchableOpacity
               style={styles.buttonOk} 
-              onPress={() => navigate('ProductPage')}
+              onPress={() => {
+                navigation.navigate('ProductPage', {
+                  'docType': docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.ID === selectedDocType).NAME,
+                  'contact': contacts && contacts.length !== 0 && contacts.flat().find(i => i.ID === selectedDocType).NAME,
+                  'date': date.toLocaleString()
+                });
+              }}
             >
               <Text style={styles.buttonOkText}>ОК</Text>
             </TouchableOpacity>
@@ -160,7 +215,7 @@ const DocumentFilterPage = (): JSX.Element => {
           <View style={{flex: 1}}>
             <TouchableOpacity
               style={styles.buttonCancel}
-              onPress={() => navigate('DocumentPage')}
+              onPress={() => navigation.navigate('DocumentPage')}
             >
               <Text style={styles.buttonCancelText}>Отмена</Text>
             </TouchableOpacity>
@@ -187,6 +242,7 @@ const styles = StyleSheet.create({
   slide: {
     flex: 1,
     flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center'
   },
   slideTextView: {
@@ -195,7 +251,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 5,
     marginRight: 5,
-    alignItems: 'center'
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: '#FFF'
+  },
+  selectedSlideTextView: {
+    flex: 1,
+    flexGrow: 1,
+    flexDirection: 'row',
+    marginHorizontal: 5,
+    marginRight: 5,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: '#080',
+    backgroundColor: '#EEE'
   },
   buttonView: {
     flex: 1,
