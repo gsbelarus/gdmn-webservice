@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { SimpleLineIcons } from '@expo/vector-icons';
 import { path } from '../../App';
 
 const MainPage = (): JSX.Element => {
@@ -32,9 +33,52 @@ const MainPage = (): JSX.Element => {
     checkData();
   }, []);
 
+  const _signOutAsync = async () => {
+    const data = await fetch(
+      `${path}logout`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include'
+      }
+    ).then(res => res.json())
+    if (data.status === 200) {
+      return Alert.alert(
+        'You login in app!',
+        '',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigate('Auth')
+          },
+        ],
+      );
+    } else {
+      return Alert.alert(
+        data.result,
+        'Try again',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ],
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={{flex: 1.5, marginTop: 80}}>
+      <View style={styles.logoutButton}>
+          <TouchableOpacity onPress={_signOutAsync}>
+            <SimpleLineIcons
+              name="logout"
+              size={28}
+              color={'#2D3083'}
+            />
+          </TouchableOpacity>
+        </View>
+      <View style={{flex: 2}}>
         <TouchableHighlight
           style={styles.viewButton} 
           onPress={() => navigate('DirectoryPage')}
@@ -60,7 +104,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 15,
-    marginTop: 100,
+    marginTop: 30,
     flex: 1,
     justifyContent: 'space-between'
   },
@@ -78,7 +122,6 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   createButton: {
-    //margin: 15,
     backgroundColor: '#2D3083',
     color: '#FFFFFF',
     height: 50,
@@ -91,6 +134,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20
   },
+  logoutButton: {
+    flex: 1,
+    paddingLeft: 300
+  }
 });
 
 export default MainPage;
