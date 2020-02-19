@@ -34,37 +34,43 @@ const MainPage = (): JSX.Element => {
   }, []);
 
   const _signOutAsync = async () => {
-    const data = await fetch(
-      `${path}logout`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json'},
-        credentials: 'include'
-      }
-    ).then(res => res.json())
-    if (data.status === 200) {
-      return Alert.alert(
-        'You login in app!',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigate('Auth')
-          },
-        ],
-      );
-    } else {
-      return Alert.alert(
-        data.result,
-        'Try again',
-        [
-          {
-            text: 'OK',
-            onPress: () => {}
-          },
-        ],
-      );
-    }
+    Alert.alert(
+      'Подтвердите выход',
+      '',
+      [
+        {
+          text: 'OK',
+          onPress: async() => {
+            const data = await fetch(
+              `${path}logout`,
+              {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json'},
+                credentials: 'include'
+              }
+            ).then(res => res.json())
+            if (data.status !== 200) {
+              return Alert.alert(
+                data.result,
+                'Попробуйте еще раз',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => {}
+                  },
+                ],
+              );
+            } else {
+              navigate('Auth');
+            }
+          }
+        },
+        {
+          text: 'Отмена',
+          onPress: () => {}
+        },
+      ],
+    );
   };
 
   return (

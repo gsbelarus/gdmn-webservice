@@ -84,7 +84,7 @@ const account = async() => {
           style = {styles.input}
           value={loginValue}
           onChangeText = {setLoginValue}
-          placeholder = "Login"
+          placeholder = "Логин"
           placeholderTextColor = "#9A9FA1"
           multiline={true}
           autoCapitalize="sentences"
@@ -98,7 +98,7 @@ const account = async() => {
           style = {styles.input}
           value={passwordValue}
           onChangeText = {setPasswordValue}
-          placeholder = "Password"
+          placeholder = "Пароль"
           placeholderTextColor = "#9A9FA1"
           multiline={true}
           autoCapitalize="sentences"
