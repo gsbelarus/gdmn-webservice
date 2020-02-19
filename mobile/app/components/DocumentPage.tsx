@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 
 const DocumentPage = (): JSX.Element => {
 
@@ -9,14 +9,14 @@ const DocumentPage = (): JSX.Element => {
   const [dataContact, setDataContact] = useState([]);
   const [dataDocTypes, setDataDocTypes] = useState([]);
 
-  useEffect(() => {
+  useFocusEffect(React.useCallback(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
       setDataDocTypes(JSON.parse(await AsyncStorage.getItem('docTypes')));
     }
     getData();
-  }, []);
+  }, []));
 
   return (
     <View style={styles.container}>
