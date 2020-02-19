@@ -2,13 +2,13 @@ import Router from 'koa-router';
 import log4js from 'log4js';
 import { readFile, writeFile } from '../workWithFile';
 import  dev from '../../config/dev';
-import { IGood, IContact, IDocumentType, IDocument, IDocumentLine } from '../models';
+import { IGood, IContact, IDocumentType, IDocument } from '../models';
 
 const PATH_GOODS = `${dev.FILES_PATH}\\Goods.json`;
 const PATH_DOCUMENT_TYPE = `${dev.FILES_PATH}\\GD_DocumentType.json`;
 const PATH_CONTACT = `${dev.FILES_PATH}\\GD_Contact.json`;
 const PATH_DOCUMENT = `${dev.FILES_PATH}\\Document.json`;
-const PATH_DOCUMENT_LINE = `${dev.FILES_PATH}\\Document_Line.json`;
+const PATH_REMAINS = `${dev.FILES_PATH}\\Remains.json`;
 
 const router = new Router({prefix: '/test'});
 const logger = log4js.getLogger('SERVER');
@@ -22,8 +22,8 @@ const getAllData = async (ctx: any) => {
     const docTypes: IDocumentType[] | undefined = await readFile(PATH_DOCUMENT_TYPE);
     const contacts: IContact[] | undefined = await readFile(PATH_CONTACT);
     const docs: IDocument[] | undefined = await readFile(PATH_DOCUMENT);
-    const docLines: IDocumentLine[] | undefined = await readFile(PATH_DOCUMENT_LINE);
-    ctx.body = JSON.stringify({ status: 200, result: [goods, docTypes, contacts, docs, docLines]});
+    const remains: IDocument[] | undefined = await readFile(PATH_REMAINS);
+    ctx.body = JSON.stringify({ status: 200, result: [goods, remains, docTypes, contacts, docs]});
     logger.info('get all data');
   } else {
     ctx.status = 403;

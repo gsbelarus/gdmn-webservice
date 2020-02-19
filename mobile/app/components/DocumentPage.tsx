@@ -23,20 +23,20 @@ const DocumentPage = (): JSX.Element => {
       <ScrollView style={{flex: 1}}>
         {
           data.map( (item, idx) =>
-            <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.IDDOC})}}>
+            <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.id})}}>
               <View style={styles.productView} key={idx}>
                 <View style={styles.productTextView}>
                   <View style={styles.productIdView}>
                     <Text style={styles.productId}>{idx + 1}</Text>
                   </View>
                   <View style={styles.productNameTextView}>
-                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE) ? dataDocTypes.find(type => type.ID === item.DOCUMENTTYPE).NAME : 'unknow'}</Text>
-                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.ID === item.CONTACTKEY) ? dataContact.find(contact => contact.ID === item.CONTACTKEY).NAME : 'unknown contact'}</Text>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
+                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
-                    <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.DOCUMENTDATE).toLocaleDateString()}</Text>
+                    <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.head.date).toLocaleDateString()}</Text>
                   </View>
                 </View>
               </View>

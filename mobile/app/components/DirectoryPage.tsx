@@ -22,7 +22,7 @@ const DirectoryPage = (): JSX.Element => {
                 <Text style={styles.productId}>{idx + 1}</Text>
               </View>
               <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.NAME}</Text>
+                <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
               </View>
             </View>
           </View>)

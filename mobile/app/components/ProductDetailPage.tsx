@@ -8,11 +8,13 @@ const ProductDetailPage = (): JSX.Element => {
   const navigation = useNavigation();
 
   const [data, setData] = useState();
+  const [nameProduct, setNameProduct] = useState();
   const [value, setValue] = useState();
 
   useEffect(() => {
     const getData = async() => {
-      setData(JSON.parse(await AsyncStorage.getItem('goods')).find(i => i.ID === navigation.getParam('id').toString()));
+      setData(JSON.parse(await AsyncStorage.getItem('remains')).find(i => i.goodId === navigation.getParam('id')));
+      setNameProduct(JSON.parse(await AsyncStorage.getItem('goods')).find(i => i.id === navigation.getParam('id')).name);
     }
     getData();
   }, []);
@@ -20,15 +22,15 @@ const ProductDetailPage = (): JSX.Element => {
   return (
     <View style={styles.container}>
       <View style={{alignItems: 'center'}}>
-        {data ? <Text numberOfLines={5} style={styles.productName}>{data.NAME}</Text> : undefined}
+        {nameProduct ? <Text numberOfLines={5} style={styles.productName}>{nameProduct}</Text> : undefined}
       </View>
       <View style={styles.productPriceView}>
         <Text style={{fontSize: 17}}>Цена:</Text>
-        {data ? <Text style={styles.productPrice}>{data.PRICE}</Text> : undefined}
+        {data ? <Text style={styles.productPrice}>{data.price}</Text> : undefined}
       </View>
       <View style={styles.productQuantityView}>
         <Text style={{fontSize: 17}}>Количество:</Text>
-        {data ? <Text style={styles.productQuantity}>{data.QUANTITY}</Text> : undefined}
+        {data ? <Text style={styles.productQuantity}>{data.quantity}</Text> : undefined}
       </View>
       <View style={styles.editQuantityView}>
         <Text style={{fontSize: 17}}>Изменить количество:</Text>
@@ -45,25 +47,28 @@ const ProductDetailPage = (): JSX.Element => {
           onChange={setValue}
         />
       </View>
-      <View style={styles.buttonOkView}>
-        <TouchableOpacity
-          style={styles.buttonOk} 
-          onPress={async () => {
-            const docLines = JSON.parse(await AsyncStorage.getItem('docLines'));
-            const docLineId = Number(docLines[docLines.length - 1].ID) + 1;
-            docLines.push({
-              ID: docLineId.toString(),
-              IDDOC: navigation.getParam('idDoc'),
-              GOODKEY: navigation.getParam('id').toString(),
-              QUANTITY: value
-            });
-            await AsyncStorage.setItem('docLines', JSON.stringify(docLines));
-            navigation.navigate('ProductPage');
-          }}
-        >
-          <Text style={styles.buttonOkText}>ОК</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.buttonOk} 
+        onPress={async () => {
+          const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+          const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
+          docs[docs.findIndex(item => item.id === docLine.id)] = {
+            ...docLine,
+            lines: [
+              ...docLine.lines,
+              {
+                id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
+                goodId: navigation.getParam('id'),
+                quantity: value
+              }
+            ]
+          };
+          await AsyncStorage.setItem('docs', JSON.stringify(docs));
+          navigation.navigate('ProductPage');
+        }}
+      >
+        <Text style={styles.buttonOkText}>ОК</Text>
+      </TouchableOpacity>
       <StatusBar barStyle = "light-content" />
     </View>
   );

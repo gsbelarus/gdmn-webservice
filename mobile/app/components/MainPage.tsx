@@ -9,7 +9,7 @@ const MainPage = (): JSX.Element => {
   const {navigate} = useNavigation();
 
   useEffect( () => {
-    const typesData = ['goods', 'docTypes', 'contacts', 'docs', 'docLines'];
+    const typesData = ['goods', 'remains', 'docTypes', 'contacts', 'docs'];
     const getData = async() => {
       const data = await fetch(
         `${path}test/all`,
