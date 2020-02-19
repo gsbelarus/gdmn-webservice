@@ -31,7 +31,7 @@ const ProductPage = (): JSX.Element => {
       <View style={styles.documentHeader}>
         <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.name : ''}</Text>
         <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.name : ''}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? doc.head.date : ''}</Text>
+        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? new Date(doc.head.date).toLocaleDateString() : ''}</Text>
       </View>
       <ScrollView style={{flex: 1}}>
         {

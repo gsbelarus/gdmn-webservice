@@ -203,9 +203,9 @@ const DocumentFilterPage = (): JSX.Element => {
               style={styles.buttonOk} 
               onPress={async () => {
                 const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                const docId = Number(docs[docs.length - 1].docId) + 1;
+                const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
                 docs.push({
-                  id: docId.toString(),
+                  id: docId,
                   head: {
                     doctype: selectedDocType,
                     fromcontactId: selectedContact,
