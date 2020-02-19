@@ -45,23 +45,25 @@ const ProductDetailPage = (): JSX.Element => {
           onChange={setValue}
         />
       </View>
-      <TouchableOpacity
-        style={styles.buttonOk} 
-        onPress={async () => {
-          const docLines = JSON.parse(await AsyncStorage.getItem('docLines'));
-          const docLineId = Number(docLines[docLines.length - 1].ID) + 1;
-          docLines.push({
-            ID: docLineId.toString(),
-            IDDOC: navigation.getParam('idDoc'),
-            GOODKEY: navigation.getParam('id').toString(),
-            QUANTITY: value
-          });
-          await AsyncStorage.setItem('docLines', JSON.stringify(docLines));
-          navigation.navigate('ProductPage');
-        }}
-      >
-        <Text style={styles.buttonOkText}>ОК</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonOkView}>
+        <TouchableOpacity
+          style={styles.buttonOk} 
+          onPress={async () => {
+            const docLines = JSON.parse(await AsyncStorage.getItem('docLines'));
+            const docLineId = Number(docLines[docLines.length - 1].ID) + 1;
+            docLines.push({
+              ID: docLineId.toString(),
+              IDDOC: navigation.getParam('idDoc'),
+              GOODKEY: navigation.getParam('id').toString(),
+              QUANTITY: value
+            });
+            await AsyncStorage.setItem('docLines', JSON.stringify(docLines));
+            navigation.navigate('ProductPage');
+          }}
+        >
+          <Text style={styles.buttonOkText}>ОК</Text>
+        </TouchableOpacity>
+      </View>
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -110,18 +112,24 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: 180
   },
+  buttonOkView: {
+    alignItems: 'center',
+  },
   buttonOk: {
     marginRight: 15,
     backgroundColor: '#2D3083',
-    height: 50,
+    width: '20%',
+    height: 35,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: '#212323'
+    borderRadius: 7,
+    borderColor: '#212323',
+    marginHorizontal: 15,
+    marginTop: 15
   },
   buttonOkText: {
     color: '#FFFFFF',
-    fontSize: 17
+    fontSize: 16
   }
 });
 
