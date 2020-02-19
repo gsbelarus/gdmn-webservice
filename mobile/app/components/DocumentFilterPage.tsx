@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Alert } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'react-navigation-hooks';
 import DatePicker from 'react-native-datepicker';
@@ -202,22 +202,34 @@ const DocumentFilterPage = (): JSX.Element => {
             <TouchableOpacity
               style={styles.buttonOk} 
               onPress={async () => {
-                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
-                docs.push({
-                  id: docId,
-                  head: {
-                    doctype: selectedDocType,
-                    fromcontactId: selectedContact,
-                    tocontactId: selectedContact,
-                    date: date.toLocaleString()
-                  },
-                  lines: []
-              });
-                await AsyncStorage.setItem('docs', JSON.stringify(docs));
-                navigation.navigate('ProductPage', {
-                  'docId': docId.toString()
-                });
+                if(selectedContact !== undefined && selectedDocType !== undefined) {
+                  const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                  const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
+                  docs.push({
+                    id: docId,
+                    head: {
+                      doctype: selectedDocType,
+                      fromcontactId: selectedContact,
+                      tocontactId: selectedContact,
+                      date: date.toLocaleString()
+                    },
+                    lines: []
+                  });
+                  await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                  navigation.navigate('ProductPage', {
+                    'docId': docId.toString()
+                  });
+                } else {
+                  Alert.alert(
+                    'Предупреждение!',
+                    'Вы не выбрали тип документа или подразделение',
+                    [
+                      {
+                        text: 'OK'
+                      },
+                    ],
+                  );
+                }
               }}
             >
               <Text style={styles.buttonOkText}>ОК</Text>
