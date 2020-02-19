@@ -18,7 +18,7 @@ const ProductPage = (): JSX.Element => {
       const docId = navigation.getParam('docId');
       const docs = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === docId)
       setDoc(docs);
-      setData(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docs.lines.find(line => line.goodId === item.id)));
+      setData(docs!.lines ? JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docs.lines.find(line => line.goodId === item.id)) : []);
       setRemains(JSON.parse(await AsyncStorage.getItem('remains')));
       setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.id === docs.head.doctype));
       setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.id === docs.head.fromcontactId));

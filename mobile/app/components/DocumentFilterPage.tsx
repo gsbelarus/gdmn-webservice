@@ -217,7 +217,7 @@ const DocumentFilterPage = (): JSX.Element => {
                   });
                   await AsyncStorage.setItem('docs', JSON.stringify(docs));
                   navigation.navigate('ProductPage', {
-                    'docId': docId.toString()
+                    'docId': docId
                   });
                 } else {
                   Alert.alert(
