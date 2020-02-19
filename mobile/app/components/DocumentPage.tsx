@@ -30,13 +30,13 @@ const DocumentPage = (): JSX.Element => {
                     <Text style={styles.productId}>{idx + 1}</Text>
                   </View>
                   <View style={styles.productNameTextView}>
-                    <Text numberOfLines={5} style={styles.productTitleView}>{dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
-                    <Text numberOfLines={5} style={styles.productBarcodeView}>{dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
+                    <Text numberOfLines={5} style={styles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
+                    <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
-                    <Text numberOfLines={5} style={styles.productPriceView}>{new Date(item.head.date).toLocaleDateString()}</Text>
+                    <Text numberOfLines={5} style={styles.productPriceView}>{item && item.head ? new Date(item.head.date).toLocaleDateString() : ''}</Text>
                   </View>
                 </View>
               </View>

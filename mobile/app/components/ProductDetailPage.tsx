@@ -47,28 +47,30 @@ const ProductDetailPage = (): JSX.Element => {
           onChange={setValue}
         />
       </View>
-      <TouchableOpacity
-        style={styles.buttonOk} 
-        onPress={async () => {
-          const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-          const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
-          docs[docs.findIndex(item => item.id === docLine.id)] = {
-            ...docLine,
-            lines: [
-              ...docLine.lines,
-              {
-                id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
-                goodId: navigation.getParam('id'),
-                quantity: value
-              }
-            ]
-          };
-          await AsyncStorage.setItem('docs', JSON.stringify(docs));
-          navigation.navigate('ProductPage');
-        }}
-      >
-        <Text style={styles.buttonOkText}>ОК</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonOkView}>
+        <TouchableOpacity
+          style={styles.buttonOk} 
+          onPress={async () => {
+            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+            const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
+            docs[docs.findIndex(item => item.id === docLine.id)] = {
+              ...docLine,
+              lines: [
+                ...docLine.lines,
+                {
+                  id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
+                  goodId: navigation.getParam('id'),
+                  quantity: value
+                }
+              ]
+            };
+            await AsyncStorage.setItem('docs', JSON.stringify(docs));
+            navigation.navigate('ProductPage');
+          }}
+        >
+          <Text style={styles.buttonOkText}>ОК</Text>
+        </TouchableOpacity>
+      </View>
       <StatusBar barStyle = "light-content" />
     </View>
   );
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     width: 180
   },
   buttonOkView: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   buttonOk: {
     marginRight: 15,
