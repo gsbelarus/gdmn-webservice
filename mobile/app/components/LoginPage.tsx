@@ -43,7 +43,7 @@ const account = async() => {
     } else {
       return Alert.alert(
         data.result,
-        'Try again',
+        'Неправильный логин или пароль',
         [
           {
             text: 'OK',
@@ -54,8 +54,8 @@ const account = async() => {
     }
   } else if(isBlock === 'BLOCK') {
     return Alert.alert(
-      'This device blocked for this user.',
-      'Try again',
+      'Устройство заблокировано!',
+      'Обратитесь к администратору',
       [
         {
           text: 'OK',
@@ -65,8 +65,8 @@ const account = async() => {
     );
   } else {
     return Alert.alert(
-      'Unknown error',
-      'Try again',
+      'Неизвестная ошибка',
+      '',
       [
         {
           text: 'OK',
