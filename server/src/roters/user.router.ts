@@ -3,7 +3,7 @@ import { IUser, IDevice, IActivationCode } from '../models';
 import { readFile, writeFile } from '../workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../rest';
 import log4js from 'log4js';
-import { editeOrganisations } from './util';
+import { editeCompanies } from './util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -12,11 +12,11 @@ const router = new Router({prefix: '/user'});
 
 router.get('/byDevice', ctx => getUsersByDevice(ctx));
 router.get('/all', ctx => getUsers(ctx));
-router.get('/byOrganisation', ctx => getUsersByOrganisation(ctx));
+router.get('/byCompany', ctx => getUsersByCompany(ctx));
 router.post('/edite', ctx => editeProfile(ctx));
-router.post('/addOrganisation', ctx => addOrganisation(ctx));
+router.post('/addCompany', ctx => addCompany(ctx));
 router.post('/removeUsers', ctx => removeUsers(ctx));
-router.post('/removeUsersFromOrganisation', ctx => removeUsersFromOrganisation(ctx));
+router.post('/removeUsersFromCompany', ctx => removeUsersFromCompany(ctx));
 
 const getUsersByDevice = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
@@ -60,17 +60,17 @@ const getUsers = async (ctx: any) => {
   }
 }
 
-const getUsersByOrganisation = async (ctx: any) => {
+const getUsersByCompany = async (ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {idOrganisation} = ctx.query;
+    const {companyId} = ctx.query;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     ctx.body = JSON.stringify({
       status: 200,
       result: allUsers && allUsers
-        .filter(user => user.organisations && user.organisations.length && user.organisations.find( org => org === idOrganisation))
+        .filter(user => user.companies && user.companies.length && user.companies.find( org => org === companyId))
         .map(user => ({id: user.id, userName: user.userName, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber, creatorId: user.creatorId}))
       });
-    logger.info('get users by organisation successfully');
+    logger.info('get users by company successfully');
   } else {
     ctx.status = 403;
     ctx.body = JSON.stringify({ status: 403, result: `access denied`});
@@ -102,13 +102,13 @@ const editeProfile = async(ctx: any) => {
   }
 }
 
-const addOrganisation = async(ctx: any) => {
+const addCompany = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {organisationId, userId} = ctx.request.body;
-    const res = await editeOrganisations(userId, [organisationId]);
+    const {companyId, userId} = ctx.request.body;
+    const res = await editeCompanies(userId, [companyId]);
     if(res === 0) {
-      ctx.body = JSON.stringify({ status: 200, result: `organization(${organisationId}) added to user(${userId})`});
-      logger.info(`organization(${organisationId}) added to user(${userId})`);
+      ctx.body = JSON.stringify({ status: 200, result: `organization(${companyId}) added to user(${userId})`});
+      logger.info(`organization(${companyId}) added to user(${userId})`);
     } else {
       ctx.body = JSON.stringify({ status: 404, result: `no such user(${userId})`});
       logger.warn(`no such user(${userId})`);
@@ -154,12 +154,12 @@ const removeUsers = async(ctx: any) => {
   }
 }
 
-const removeUsersFromOrganisation = async(ctx: any) => {
+const removeUsersFromCompany = async(ctx: any) => {
   if(ctx.isAuthenticated()) {
-    const {users, organisationId} = ctx.request.body;
+    const {users, companyId} = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const newUsers = allUsers?.map(all_u =>
-      users.findIndex((u: any) => u === all_u.id) !== -1  ? {...all_u, organisations: all_u.organisations?.filter(o => o !== organisationId)} : all_u);
+      users.findIndex((u: any) => u === all_u.id) !== -1  ? {...all_u, companies: all_u.companies?.filter(o => o !== companyId)} : all_u);
     /**Пока только удалим организацию у пользователей */
     await writeFile(
       PATH_LOCAL_DB_USERS,

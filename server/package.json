@@ -6,11 +6,14 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node ./src/index.ts",
-    "start:dev": "cross-env NODE_ENV=dev npm run start"
+    "start:dev": "cross-env NODE_ENV=dev npm run start",
+    "dev": "nodemon src/index.ts"
   },
   "devDependencies": {
-    "cross-env": "^6.0",
-    "ts-node": "^8.5",
+    "cross-env": "^7.0",
+    "nodemon": "^2.0",
+    "ts-node": "^8.6.2",
+    "tsconfig-paths": "^3.9",
     "typescript": "~3.7"
   },
   "dependencies": {
@@ -18,18 +21,18 @@
     "@types/koa": "^2.11",
     "@types/koa-bodyparser": "^4.3",
     "@types/koa-passport": "^4.0",
-    "@types/koa-router": "^7.0",
+    "@types/koa-router": "^7.4",
     "@types/koa-session": "^5.10",
-    "@types/koa__cors": "^2.2",
+    "@types/koa__cors": "^3.0",
     "@types/passport-local": "^1.0",
     "@types/uuid": "^3.4",
     "koa": "^2.11",
     "koa-bodyparser": "^4.2",
     "koa-passport": "^4.1",
-    "koa-router": "^7.4",
-    "koa-session": "^5.12",
+    "koa-router": "^8.0",
+    "koa-session": "^5.13",
     "log4js": "^6.1",
     "passport-local": "^1.0",
-    "uuid": "^3.3"
+    "uuid": "^3.4"
   }
 }

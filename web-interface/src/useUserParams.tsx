@@ -72,7 +72,7 @@ export const useUserParams = (): [IUserParams, GetMeProc, GetCompaniesProc, Upda
    console.log('doGetCompanies');
 
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/organisation/byUser?userId=${userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      const resFetch = await fetch(`http://localhost:3649/api/company/byUser?userId=${userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       const res = await resFetch.json();
       console.log(res);
       let newState: IUserParams;

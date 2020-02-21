@@ -2,18 +2,19 @@ import React, { useEffect, useState } from 'react';
 import Navigator from './app/components/Navigator'
 import Constants from 'expo-constants';
 import { StyleSheet, View, ActivityIndicator, YellowBox } from 'react-native';
+import config from './config';
 
 YellowBox.ignoreWarnings([
   'Require cycle:',
 ]);
 
 type TStartState = 'SIGN_OUT' | 'NO_ACTIVATION' | 'LOG_IN';
-export const path = 'http://192.168.0.73:3649/api/';
+export const path = `${config.server.name}:${config.server.port}/api/`;
 
 const App = () => {
   const [signedIn, setSignedIn] = useState<TStartState>('NO_ACTIVATION');
   const [loading, setLoading] = useState(true);
-
+  console.disableYellowBox = !config.debug.showWarnings;
   useEffect( () => {
     const isExistDevice = async () => {
       const data = await fetch(

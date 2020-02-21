@@ -1,10 +1,17 @@
+import React from 'react';
 import ActivationPage from './ActivationPage';
-import ProfilePage from './ProfilePage';
-import MessagePage from './MessagePage';
-import SendMessagePage from './SendMessagePage';
+import MainPage from './MainPage';
 import LoginPage from './LoginPage';
+import DocumentPage from './DocumentPage';
+import DocumentFilterPage from './DocumentFilterPage';
+import DirectoryPage from './DirectoryPage';
+import ProductPage from './ProductPage';
+import { TouchableOpacity } from 'react-native';
+import ProductsListPage from './ProductsListPage';
+import ProductDetailPage from './ProductDetailPage';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import { AntDesign } from '@expo/vector-icons';
 
 const AuthNavigator = createStackNavigator(
     {
@@ -14,7 +21,10 @@ const AuthNavigator = createStackNavigator(
 
 const ActivationNavigator = createStackNavigator(
     {
-        ActivationPage: ActivationPage,
+        ActivationPage: {
+            screen: ActivationPage,
+            navigationOptions: { title: 'GDMN', }
+        },
     },
     {
         initialRouteName: 'ActivationPage'
@@ -23,12 +33,114 @@ const ActivationNavigator = createStackNavigator(
 
 const AppNavigator = createStackNavigator(
     {
-        ProfilePage: ProfilePage,
-        MessagePage: MessagePage,
-        SendMessagePage: SendMessagePage
+        MainPage: {
+            screen: MainPage,
+            navigationOptions: { title: 'GDMN' }
+        },
+        DocumentPage: {
+            screen: DocumentPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        DocumentFilterPage: {
+            screen: DocumentFilterPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        DirectoryPage: {
+            screen: DirectoryPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        ProductPage: {
+            screen: ProductPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        },
+        ProductsListPage: {
+            screen: ProductsListPage,
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+                ),
+            })
+        },
+        ProductDetailPage: {
+            screen: ProductDetailPage,
+            params: {id: 0},
+            navigationOptions: ({navigation}) => ({
+                headerRight: (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={{height: 50, width: 50, justifyContent: 'center'}}>
+                            <AntDesign
+                                size={25}
+                                color='#FFF' 
+                                name='home' 
+                            />
+                    </TouchableOpacity>
+            )}  )
+        }
     },
     {
-        initialRouteName: 'ProfilePage'
+        initialRouteName: 'MainPage',
+        defaultNavigationOptions: {
+          headerStyle: {
+            backgroundColor: '#000088',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }
     }
 );
 

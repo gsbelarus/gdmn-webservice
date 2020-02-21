@@ -31,7 +31,7 @@ const verifyCode = async () => {
       }
     )
     return Alert.alert(
-      'Your code is correct!',
+      'Корректный код!',
       '',
       [
         {
@@ -43,8 +43,8 @@ const verifyCode = async () => {
   }
   if (data === 404) {
     return Alert.alert(
-      'Your code is incorrect!',
-      'Try again',
+      'Некорректный код!',
+      'Повторите ещё раз',
       [
         {
           text: 'OK',

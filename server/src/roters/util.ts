@@ -25,7 +25,7 @@ export const saveActivationCode = async (userId: string) => {
   return code;
 }
 
-export const editeOrganisations = async(userId: string, organisations: string[]) => {
+export const editeCompanies = async(userId: string, companies: string[]) => {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const user = allUsers?.find(item => item.id === userId);
     const idx = user && allUsers && allUsers.findIndex( item => item.userName === user.userName );
@@ -34,7 +34,7 @@ export const editeOrganisations = async(userId: string, organisations: string[])
     } else {
       await writeFile(
         PATH_LOCAL_DB_USERS,
-        JSON.stringify([...allUsers.slice(0, idx), {...user, organisations: user && user.organisations ? [...user?.organisations, ...organisations] : organisations}, ...allUsers.slice(idx + 1)])
+        JSON.stringify([...allUsers.slice(0, idx), {...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies}, ...allUsers.slice(idx + 1)])
       );
       return 0;
     }
