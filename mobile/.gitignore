@@ -16,3 +16,4 @@ web-report/
 
 # config
 config/dev.ts
+config/prod.ts
