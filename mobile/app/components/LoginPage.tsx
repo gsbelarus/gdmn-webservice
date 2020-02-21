@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, View } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import Constants from 'expo-constants';
 import { path } from '../../App';
@@ -78,8 +78,8 @@ const account = async() => {
 }
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-      <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView style={{flex: 1}} behavior="padding">
+      <View style={styles.container}>
         <TextInput
           style = {styles.input}
           value={loginValue}
@@ -114,7 +114,7 @@ const account = async() => {
           >
           <Text style = {styles.submitButtonText}>OK</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 24,
     height: 50,
-    
   },
   submitButton: {
     backgroundColor: '#2D3083',

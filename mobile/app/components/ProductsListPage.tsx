@@ -92,7 +92,8 @@ const ProductsListPage = (): JSX.Element => {
           </View>
         <ScrollView style={{flex: 2}}>
           {
-            goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
+            goods.find(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase()))
+            ? goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
               <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
                 <View style={styles.productView}>
                   <View style={styles.productTextView}>
@@ -106,6 +107,7 @@ const ProductsListPage = (): JSX.Element => {
                 </View>
               </TouchableOpacity>)
             )
+            : <Text style={{fontSize: 17, textAlign: 'center'}}>Товар не найден</Text>
           }
         </ScrollView> 
         <StatusBar barStyle = "light-content" />
