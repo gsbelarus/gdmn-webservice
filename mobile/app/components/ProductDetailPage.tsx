@@ -53,15 +53,27 @@ const ProductDetailPage = (): JSX.Element => {
           onPress={async () => {
             const docs = JSON.parse(await AsyncStorage.getItem('docs'));
             const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
+            const lineId = docLine.lines.findIndex(line => line.goodId === navigation.getParam('id'));
+            lineId < 0
+            ? undefined
+            : docLine.lines.splice(lineId, 1, {
+              id: docLine.lines[lineId].id,
+              goodId: navigation.getParam('id'),
+              quantity: docLine.lines[lineId].quantity + value
+            })
             docs[docs.findIndex(item => item.id === docLine.id)] = {
               ...docLine,
-              lines: [
+              lines: lineId < 0 ? [
                 ...docLine.lines,
                 {
                   id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
                   goodId: navigation.getParam('id'),
                   quantity: value
                 }
+              ]
+              :
+              [
+                ...docLine.lines
               ]
             };
             await AsyncStorage.setItem('docs', JSON.stringify(docs));

@@ -166,8 +166,8 @@ const DocumentFilterPage = (): JSX.Element => {
           format="DD MMM YYYY"
           minDate={new Date(1990, 0, 1)}
           maxDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
+          confirmBtnText="Ок"
+          cancelBtnText="Отмена"
           iconComponent={
             <MaterialIcons 
               style={{
@@ -211,7 +211,7 @@ const DocumentFilterPage = (): JSX.Element => {
                       doctype: selectedDocType,
                       fromcontactId: selectedContact,
                       tocontactId: selectedContact,
-                      date: date.toLocaleString()
+                      date: date.toString()
                     },
                     lines: []
                   });

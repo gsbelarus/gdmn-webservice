@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const DocumentPage = (): JSX.Element => {
 
@@ -22,7 +23,7 @@ const DocumentPage = (): JSX.Element => {
     <View style={styles.container}>
       <ScrollView style={{flex: 1}}>
         {
-          data.map( (item, idx) =>
+          data ? data.map( (item, idx) => <View style={styles.deleteView}>
             <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.id})}}>
               <View style={styles.productView} key={idx}>
                 <View style={styles.productTextView}>
@@ -41,7 +42,26 @@ const DocumentPage = (): JSX.Element => {
                 </View>
               </View>
             </TouchableOpacity>
+            <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
+            <TouchableOpacity
+              style={styles.deleteButton} 
+              onPress={async () => {
+                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                setData(JSON.parse(await AsyncStorage.getItem('docs')));
+              }}
+            >
+              <MaterialIcons
+                size={25}
+                color='#2D3083' 
+                name='delete-forever' 
+              />
+            </TouchableOpacity>
+            <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
+            </View>
+          </View>
           )
+          : undefined
         }
       </ScrollView>
       <View style={{ flexDirection: 'column', justifyContent: "flex-end", }}>
@@ -98,7 +118,7 @@ const styles = StyleSheet.create({
     minHeight: 45,
     marginTop: 5,
     marginHorizontal: 5,
-    width: '90%',
+    width: '75%',
     textAlignVertical: 'center',
     color: '#000000',
     fontWeight: 'bold'
@@ -143,6 +163,16 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#FFFFFF',
     fontSize: 17
+  },
+  deleteView: {
+    flexDirection: 'row'
+  },
+  deleteButton: {
+    marginTop: 15,
+    height: 25,
+    width: 25,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 
