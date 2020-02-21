@@ -8,12 +8,12 @@ YellowBox.ignoreWarnings([
 ]);
 
 type TStartState = 'SIGN_OUT' | 'NO_ACTIVATION' | 'LOG_IN';
-export const path = 'http://192.168.0.72:3649/api/';
+export const path = 'http://192.168.0.73:3649/api/';
 
 const App = () => {
   const [signedIn, setSignedIn] = useState<TStartState>('NO_ACTIVATION');
   const [loading, setLoading] = useState(true);
-
+  console.disableYellowBox = true;
   useEffect( () => {
     const isExistDevice = async () => {
       const data = await fetch(

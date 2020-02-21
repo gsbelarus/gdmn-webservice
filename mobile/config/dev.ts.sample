@@ -1,0 +1,9 @@
+export default {
+  server: {
+    name: 'http://192.168.0.73',
+    port: 3649
+  },
+  debug: {
+    showWarnings: true
+  }
+};
