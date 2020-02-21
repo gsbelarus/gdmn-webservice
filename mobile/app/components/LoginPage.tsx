@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, View } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import Constants from 'expo-constants';
 import { path } from '../../App';
@@ -43,7 +43,7 @@ const account = async() => {
     } else {
       return Alert.alert(
         data.result,
-        'Try again',
+        'Неправильный логин или пароль',
         [
           {
             text: 'OK',
@@ -54,8 +54,8 @@ const account = async() => {
     }
   } else if(isBlock === 'BLOCK') {
     return Alert.alert(
-      'This device blocked for this user.',
-      'Try again',
+      'Устройство заблокировано!',
+      'Обратитесь к администратору',
       [
         {
           text: 'OK',
@@ -65,8 +65,8 @@ const account = async() => {
     );
   } else {
     return Alert.alert(
-      'Unknown error',
-      'Try again',
+      'Неизвестная ошибка',
+      '',
       [
         {
           text: 'OK',
@@ -78,13 +78,13 @@ const account = async() => {
 }
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-      <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView style={{flex: 1}} behavior="padding">
+      <View style={styles.container}>
         <TextInput
           style = {styles.input}
           value={loginValue}
           onChangeText = {setLoginValue}
-          placeholder = "Login"
+          placeholder = "Логин"
           placeholderTextColor = "#9A9FA1"
           multiline={true}
           autoCapitalize="sentences"
@@ -98,7 +98,7 @@ const account = async() => {
           style = {styles.input}
           value={passwordValue}
           onChangeText = {setPasswordValue}
-          placeholder = "Password"
+          placeholder = "Пароль"
           placeholderTextColor = "#9A9FA1"
           multiline={true}
           autoCapitalize="sentences"
@@ -114,7 +114,7 @@ const account = async() => {
           >
           <Text style = {styles.submitButtonText}>OK</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -125,21 +125,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#E3EFF4',
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   input: {
     margin: 15,
-    borderColor: '#70667D',
+    borderColor: '#2D3083',
     borderWidth: 1,
     fontSize: 24,
-    height: 40
+    height: 50,
   },
   submitButton: {
-    backgroundColor: '#70667D',
+    backgroundColor: '#2D3083',
     padding: 8,
     margin: 15,
-    height: 40,
-    alignItems: 'center'
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
  submitButtonText:{
     color: 'white',

@@ -66,7 +66,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     console.log('doGetUsersByCompany');
 
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/user/byOrganisation?idOrganisation=${companyId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const resFetch = await fetch(`http://localhost:3649/api/user/byCompany?companyId=${companyId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
 
       let newState: IAdmin;
@@ -135,7 +135,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     console.log('doGetCompany');
 
     try {
-      const resFetch = await fetch(`http://localhost:3649/api/organisation/profile?idOrganisation=${companyId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+      const resFetch = await fetch(`http://localhost:3649/api/company/profile?companyId=${companyId}`, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
       const res = await resFetch.json();
       let newState: IAdmin;
       console.log(res.result);
@@ -209,7 +209,7 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
       lastName: user.lastName,
       firstName: user.firstName,
       phoneNumber: user.phoneNumber,
-      organisations: [companyId]
+      companies: [companyId]
     });
 
     try {
@@ -248,12 +248,12 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
     console.log('doAddUser');
 
     const body = JSON.stringify({
-      organisation: companyId,
-      user: userId
+      companyId: companyId,
+      userId: userId
     });
 
     try {
-      const resFetch = await fetch("http://localhost:3649/api/user/addOrganisation", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
+      const resFetch = await fetch("http://localhost:3649/api/user/addCompany", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
 
       const res = await resFetch.json();
       console.log(res);
@@ -327,11 +327,11 @@ export const useAdmin = (): [IAdmin, GetUsersProc, GetUsersByCompanyProc, GetCom
 
     const body = JSON.stringify({
       users: userIds,
-      organisationId: companyId
+      companyId: companyId
     });
     console.log(body);
     try {
-      const resFetch = await fetch("http://localhost:3649/api/user/removeUsersFromOrganisation", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
+      const resFetch = await fetch("http://localhost:3649/api/user/removeUsersFromCompany", { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body });
 
       const res = await resFetch.json();
       console.log(res);
