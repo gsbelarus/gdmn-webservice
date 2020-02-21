@@ -18,7 +18,7 @@ const DocumentFilterPage = (): JSX.Element => {
 
   useEffect(() => {
     const getData = async() => {
-      const d_docTypes = JSON.parse(await AsyncStorage.getItem('docTypes'));
+      const d_docTypes = JSON.parse(await AsyncStorage.getItem('documenttypes'));
       const d_contacts = JSON.parse(await AsyncStorage.getItem('contacts'));
       const newDT = d_docTypes.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
         arr.push([]);
@@ -203,7 +203,8 @@ const DocumentFilterPage = (): JSX.Element => {
               style={styles.buttonOk} 
               onPress={async () => {
                 if(selectedContact !== undefined && selectedDocType !== undefined) {
-                  const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                  const docsObject = await AsyncStorage.getItem('docs');
+                  const docs = docsObject ? JSON.parse(await AsyncStorage.getItem('docs')) : [];
                   const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
                   docs.push({
                     id: docId,

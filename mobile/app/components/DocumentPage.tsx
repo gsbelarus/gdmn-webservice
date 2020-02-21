@@ -16,7 +16,7 @@ const DocumentPage = (): JSX.Element => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
-      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('docTypes')));
+      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('documenttypes')));
       const getMe = await fetch(
         `${path}me`,
         {
@@ -42,7 +42,7 @@ const DocumentPage = (): JSX.Element => {
           credentials: 'include',
           body: JSON.stringify({
             head: {
-              company_id: user.companies[0]
+              companyId: user.companies[0]
             },
             body: {
               type: "cmd",
@@ -146,7 +146,7 @@ const DocumentPage = (): JSX.Element => {
       </View>
       <TouchableOpacity
         style={styles.sendButton} 
-        onPress={async() => sendUpdateRequest
+        onPress={async() => sendUpdateRequest()
           //await AsyncStorage.removeItem('docs');
         }
       >

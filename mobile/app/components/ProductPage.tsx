@@ -20,7 +20,7 @@ const ProductPage = (): JSX.Element => {
       setDoc(docs);
       setData(docs!.lines ? JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docs.lines.find(line => line.goodId === item.id)) : []);
       setRemains(JSON.parse(await AsyncStorage.getItem('remains')));
-      setDocType(JSON.parse(await AsyncStorage.getItem('docTypes')).find(item => item.id === docs.head.doctype));
+      setDocType(JSON.parse(await AsyncStorage.getItem('documenttypes')).find(item => item.id === docs.head.doctype));
       setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.id === docs.head.fromcontactId));
     }
     getData();

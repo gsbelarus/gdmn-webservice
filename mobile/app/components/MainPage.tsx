@@ -27,7 +27,7 @@ const MainPage = (): JSX.Element => {
     }*/
 
     const checkData = async() => {
-      await AsyncStorage.clear();
+      //await AsyncStorage.clear();
       /*const keys = await AsyncStorage.getAllKeys();
       !!keys && typesData.filter( item => !keys.find(key => key === item)).length === 0
       ? undefined
@@ -58,7 +58,7 @@ const MainPage = (): JSX.Element => {
           credentials: 'include',
           body: JSON.stringify({
             head: {
-              company_id: user.companies[0]
+              companyId: user.companies[0]
             },
             body: {
               type: "cmd",
@@ -133,7 +133,7 @@ const MainPage = (): JSX.Element => {
           ]
         )
       } else {
-        data.payload.map(item => AsyncStorage.setItem(item.name, JSON.stringify(item.data)));
+        data.body.payload.map(item => AsyncStorage.setItem(item.name, JSON.stringify(item.data)));
         setResUpd(undefined);
       }
     } else {
@@ -218,7 +218,7 @@ const MainPage = (): JSX.Element => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.createButton} 
-            onPress={async() => !resUpd ? sendUpdateRequest : checkUpdateRequest }
+            onPress={async() => {!resUpd ? sendUpdateRequest() : checkUpdateRequest()} }
           >
             <Text style={styles.createButtonText}>{!resUpd ? 'Обновить данные' : 'Получить обновления'}</Text>
           </TouchableOpacity>
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   createButton: {
+    marginBottom: 15,
     backgroundColor: '#2D3083',
     color: '#FFFFFF',
     height: 50,
