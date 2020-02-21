@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView, Alert} from 'react-native';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
+import { path } from '../../App';
 
 const DocumentPage = (): JSX.Element => {
 
@@ -9,15 +10,86 @@ const DocumentPage = (): JSX.Element => {
   const [data, setData] = useState([]);
   const [dataContact, setDataContact] = useState([]);
   const [dataDocTypes, setDataDocTypes] = useState([]);
+  const [user, setUser] = useState();
 
   useFocusEffect(React.useCallback(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
       setDataDocTypes(JSON.parse(await AsyncStorage.getItem('docTypes')));
+      const getMe = await fetch(
+        `${path}me`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json'},
+          credentials: 'include',
+        }
+      ).then(res => res.json());
+      getMe.status === 200 && getMe.result !== 'not authenticated'
+      ? setUser(getMe.result)
+      : undefined;
     }
     getData();
   }, []));
+
+  const sendUpdateRequest = async () => {
+    if(user) {
+      const result = await fetch(
+        `${path}messages`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json'},
+          credentials: 'include',
+          body: JSON.stringify({
+            head: {
+              company_id: user.companies[0]
+            },
+            body: {
+              type: "cmd",
+              payload: {
+                name: "post_documents",
+                params: data
+              }
+            }
+          })
+        }
+      ).then(res => res.json());
+      if(result.status === 200) {
+        Alert.alert(
+          'Успех!',
+          '',
+          [
+            {
+              text: 'OK',
+              onPress: () => {}
+            },
+          ]
+        )
+      } else {
+        Alert.alert(
+          'Запрос не был отправлен',
+          '',
+          [
+            {
+              text: 'OK',
+              onPress: () => {}
+            },
+          ]
+        )
+      }
+    } else {
+      Alert.alert(
+        'Упс!',
+        'Что-то пошло не так!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ]
+      )
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -72,12 +144,14 @@ const DocumentPage = (): JSX.Element => {
           <Text style={styles.createButtonText}>Создать новый документ</Text>
         </TouchableOpacity>
       </View>
-        <TouchableOpacity
-          style={styles.sendButton} 
-          onPress={() => {}/*navigation.navigate('DocumentFilterPage')*/}
-        >
-          <Text style={styles.sendButtonText}>Отправить</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.sendButton} 
+        onPress={async() => sendUpdateRequest
+          //await AsyncStorage.removeItem('docs');
+        }
+      >
+        <Text style={styles.sendButtonText}>Отправить</Text>
+      </TouchableOpacity>
       <StatusBar barStyle = "light-content" />
     </View>
   );
