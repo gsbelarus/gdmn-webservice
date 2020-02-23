@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, StatusBar, Text, AsyncStorage, ScrollView} from 'react-native';
 
@@ -16,7 +17,7 @@ const DirectoryPage = (): JSX.Element => {
     <View style={styles.container}>
       <ScrollView style={{flex: 1}}>
         {
-          !data ? <Text>Справочник пуст</Text> : data.map( (item, idx) => <View style={styles.productView} key={idx}>
+          !data ? <Text>Справочник пуст</Text> : data.map((item, idx) => <View style={styles.productView} key={idx}>
             <View style={styles.productTextView}>
               <View style={styles.productIdView}>
                 <Text style={styles.productId}>{idx + 1}</Text>
