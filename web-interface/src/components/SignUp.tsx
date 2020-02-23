@@ -14,7 +14,7 @@ export const SignUp = ({ user, querying, errorMessage, onSignUp, onClearError }:
 
   const [userName, setUserName] = useState(user?.userName || '');
   const [password, setPassword] = useState(user?.password || '');
-  const [repeatPassword, setRepeatPassword] = useState();
+  const [repeatPassword, setRepeatPassword] = useState<string>();
 
   return (
     <div>

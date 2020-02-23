@@ -10,7 +10,7 @@ export interface ISystemUserProps {
 }
 
 export const SystemUser = ({ onClearError, onAddUser, allUsers, companyUsers }: ISystemUserProps) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState<string | number| undefined>();
   const users: IComboBoxOption[] = allUsers?.map(u => ({key: u.id, text: u.userName, disabled: companyUsers?.find(cu => cu.id === u.id)} as IComboBoxOption)) || []
 
   return (
@@ -35,7 +35,7 @@ export const SystemUser = ({ onClearError, onAddUser, allUsers, companyUsers }: 
           disabled={false}
           onClick={() => {
             onClearError();
-            onAddUser(user);
+            onAddUser(user as string);
           }}
         />
 
