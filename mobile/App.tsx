@@ -1,63 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import Navigator from './app/components/Navigator'
-import Constants from 'expo-constants';
-import { StyleSheet, View, ActivityIndicator, YellowBox } from 'react-native';
-import config from './config';
+import React, { useEffect, useState } from "react";
+import Navigator from "./app/components/Navigator";
+import Constants from "expo-constants";
+import { StyleSheet, View, ActivityIndicator, YellowBox } from "react-native";
+import config from "./config";
 
-YellowBox.ignoreWarnings([
-  'Require cycle:',
-]);
+YellowBox.ignoreWarnings(["Require cycle:"]);
 
-type TStartState = 'SIGN_OUT' | 'NO_ACTIVATION' | 'LOG_IN';
+type TStartState = "SIGN_OUT" | "NO_ACTIVATION" | "LOG_IN";
 export const path = `${config.server.name}:${config.server.port}/api/`;
 
 const App = () => {
-  const [signedIn, setSignedIn] = useState<TStartState>('NO_ACTIVATION');
+  const [signedIn, setSignedIn] = useState<TStartState>("NO_ACTIVATION");
   const [loading, setLoading] = useState(true);
+  
   console.disableYellowBox = !config.debug.showWarnings;
-  useEffect( () => {
+  
+  useEffect(() => {
     const isExistDevice = async () => {
       const data = await fetch(
         `${path}device/isExist?uid=${Constants.deviceId}`,
         {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json'},
-          credentials: 'include',
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include"
         }
       ).then(res => res.json());
-      data.status === 200 && data.result ? setSignedIn('SIGN_OUT') : undefined;
+      
+      data.status === 200 && data.result ? setSignedIn("SIGN_OUT") : undefined;
+      
       if (data.status === 200 && data.result) {
-        const getMe = await fetch(
-          `${path}me`,
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json'},
-            credentials: 'include',
-          }
-        ).then(res => res.json());
-        setSignedIn(getMe.status === 200 && getMe.result !== 'not authenticated' ? 'LOG_IN' : 'SIGN_OUT');
+        const getMe = await fetch(`${path}me`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include"
+        }).then(res => res.json());
+        
+        setSignedIn(
+          getMe.status === 200 && getMe.result !== "not authenticated"
+            ? "LOG_IN"
+            : "SIGN_OUT"
+        );
       }
+      
       setLoading(false);
-    }
+    };
 
     isExistDevice();
-  }, [])
+  }, []);
 
   const Layout = Navigator(signedIn);
 
-  return loading
-  ? <View style={styles.container}>
-    <ActivityIndicator size='large' color='#70667D' />
-  </View>
-  : <Layout/>;
-}
+  return loading ? (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="#70667D" />
+    </View>
+  ) : (
+    <Layout />
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E3EFF4',
-    justifyContent: 'center'
+    backgroundColor: "#E3EFF4",
+    justifyContent: "center"
   }
-})
+});
 
 export default App;

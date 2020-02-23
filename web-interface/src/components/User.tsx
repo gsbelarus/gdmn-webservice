@@ -13,7 +13,7 @@ export interface IUserProps {
 
 export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK, isCanEditUser }: IUserProps) => {
   const [state, setState] = useState<IUser>(user);
-  const [repeatPassword, setRepeatPassword] = useState();
+  const [repeatPassword, setRepeatPassword] = useState<string>();
 
   useEffect(() => {
     if (isEditOK && onClearEditOK) {
