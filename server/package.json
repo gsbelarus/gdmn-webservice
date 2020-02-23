@@ -6,15 +6,35 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node ./src/index.ts",
-    "start:dev": "cross-env NODE_ENV=dev npm run start",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "checkup": "yarn run prettier:fix && yarn run eslint:run",
+    "prettier:check": "prettier --check \"src/**/*.ts\"",
+    "prettier:fix": "prettier --write \"src/**/*.ts\"",
+    "eslint:run": "eslint \"src/**/*.ts\""
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "husky": "^4.2.3",
+    "jest": "^25.1.0",
+    "tslint": "^6.0.0",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "prettier": "^1.19.1",
     "cross-env": "^7.0",
     "nodemon": "^2.0",
     "ts-node": "^8.6.2",
     "tsconfig-paths": "^3.9",
-    "typescript": "~3.7"
+    "typescript": "~3.8"
   },
   "dependencies": {
     "@koa/cors": "^3.0",
@@ -34,5 +54,11 @@
     "log4js": "^6.1",
     "passport-local": "^1.0",
     "uuid": "^3.4"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "yarn checkup"
+    }
   }
 }

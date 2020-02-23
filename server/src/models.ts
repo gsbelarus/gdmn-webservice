@@ -22,7 +22,7 @@ export interface ICompany {
   admin: string;
 }
 
- export interface IDevice {
+export interface IDevice {
   uid: string;
   user: string;
   isBlock: boolean;
@@ -41,21 +41,21 @@ export interface IMessage {
     payload: {
       name: string;
       params: string[];
-    }
-  }
+    };
+  };
 }
 
 export interface IGood {
   id: number;
-	name: string;
-	barcode: string;
-	alias: string;
+  name: string;
+  barcode: string;
+  alias: string;
 }
 
 export interface IContact {
   id: number;
-	name: string;
-	type: number;
+  name: string;
+  type: number;
 }
 
 export interface IRemain {
@@ -67,13 +67,13 @@ export interface IRemain {
 
 export interface IDocumentType {
   id: number;
-	name: string;
+  name: string;
 }
 
 export interface IDocument {
   id: string;
   head: IHead;
-	lines: ILine[];
+  lines: ILine[];
 }
 
 export interface IDocumentLine {
@@ -83,16 +83,15 @@ export interface IDocumentLine {
   quantity: number;
 }
 
-
 export interface IHead {
-	doctype: number;
-	fromcontactId: number;
-	tocontactId: number;
-	date: string;
+  doctype: number;
+  fromcontactId: number;
+  tocontactId: number;
+  date: string;
 }
 
 export interface ILine {
-	id: string;
-	goodId: number;
-	quantity: number;
+  id: string;
+  goodId: number;
+  quantity: number;
 }

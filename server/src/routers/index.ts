@@ -6,10 +6,10 @@ import User from './user.router';
 import Message from './message.router';
 import Test from './test.router';
 
-const rootRouter = new Router({prefix: '/api'});
+const rootRouter = new Router({ prefix: '/api' });
 
 for (const route of [Auth, Company, Device, User, Message, Test]) {
-	rootRouter.use(route.routes());
+  rootRouter.use(route.routes());
 }
 
 export default rootRouter;
