@@ -51,13 +51,14 @@ const DocumentPage = (): JSX.Element => {
               type: "cmd",
               payload: {
                 name: "post_documents",
-                params: data
+                params: data.filter(doc => doc.head.status === 1)
               }
             }
           })
         }
       ).then(res => res.json());
       if(result.status === 200) {
+        setData(data.map(doc => {return doc.head.status === 1 ? {...doc, head: { ...doc.head, status: doc.head.status + 1}} : doc}))
         Alert.alert(
           'Успех!',
           '',
