@@ -13,6 +13,8 @@ const DocumentPage = (): JSX.Element => {
   const [dataDocTypes, setDataDocTypes] = useState([]);
   const [user, setUser] = useState();
 
+  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D']
+
   useFocusEffect(React.useCallback(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
@@ -106,7 +108,7 @@ const DocumentPage = (): JSX.Element => {
                   <View style={styles.productNameTextView}>
                     <Text numberOfLines={5} style={styles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
                     <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
-                    <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
+                    <Text numberOfLines={5} style={{...styles.productTitleView, color: statusColors[item.head.status], fontWeight: 'bold' }}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>
@@ -117,21 +119,21 @@ const DocumentPage = (): JSX.Element => {
               </View>
             </TouchableOpacity>
             <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              style={styles.deleteButton} 
-              onPress={async () => {
-                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                setData(JSON.parse(await AsyncStorage.getItem('docs')));
-              }}
-            >
-              <MaterialIcons
-                size={25}
-                color='#2D3083' 
-                name='delete-forever' 
-              />
-            </TouchableOpacity>
-            <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
+              <TouchableOpacity
+                style={styles.deleteButton} 
+                onPress={async () => {
+                  const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                  await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                  setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                }}
+              >
+                <MaterialIcons
+                  size={25}
+                  color='#2D3083' 
+                  name='delete-forever' 
+                />
+              </TouchableOpacity>
+              <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
             </View>
           </View>
           )
