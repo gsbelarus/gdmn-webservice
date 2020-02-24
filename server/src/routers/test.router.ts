@@ -19,11 +19,11 @@ router.get('/all', async ctx => getAllData(ctx));
 const getAllData = async (ctx: any) => {
   if (ctx.isAuthenticated()) {
     const goods: IGood[] | undefined = await readFile(PATH_GOODS);
-    const docTypes: IDocumentType[] | undefined = await readFile(PATH_DOCUMENT_TYPE);
+    const documenttypes: IDocumentType[] | undefined = await readFile(PATH_DOCUMENT_TYPE);
     const contacts: IContact[] | undefined = await readFile(PATH_CONTACT);
     const docs: IDocument[] | undefined = await readFile(PATH_DOCUMENT);
     const remains: IDocument[] | undefined = await readFile(PATH_REMAINS);
-    ctx.body = JSON.stringify({ status: 200, result: [goods, remains, docTypes, contacts, docs] });
+    ctx.body = JSON.stringify({ status: 200, result: [goods, remains, documenttypes, contacts, docs]});
     logger.info('get all data');
   } else {
     ctx.status = 403;
