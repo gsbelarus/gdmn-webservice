@@ -115,20 +115,20 @@ const DocumentPage = (): JSX.Element => {
               </View>
             </TouchableOpacity>
             <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              style={styles.deleteButton} 
-              onPress={async () => {
-                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                setData(JSON.parse(await AsyncStorage.getItem('docs')));
-              }}
-            >
-              <MaterialIcons
-                size={25}
-                color='#2D3083' 
-                name='delete-forever' 
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton} 
+                onPress={async () => {
+                  const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                  await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                  setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                }}
+              >
+                <MaterialIcons
+                  size={25}
+                  color='#2D3083' 
+                  name='delete-forever' 
+                />
+              </TouchableOpacity>
             <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
             </View>
           </View>

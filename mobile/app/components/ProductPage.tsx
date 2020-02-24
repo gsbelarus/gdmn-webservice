@@ -18,13 +18,19 @@ const ProductPage = (): JSX.Element => {
       const docId = navigation.getParam('docId');
       const docs = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === docId)
       setDoc(docs);
-      setData(docs!.lines ? JSON.parse(await AsyncStorage.getItem('goods')).filter(item => docs.lines.find(line => line.goodId === item.id)) : []);
       setRemains(JSON.parse(await AsyncStorage.getItem('remains')));
       setDocType(JSON.parse(await AsyncStorage.getItem('documenttypes')).find(item => item.id === docs.head.doctype));
       setContact(JSON.parse(await AsyncStorage.getItem('contacts')).find(item => item.id === docs.head.fromcontactId));
     }
     getData();
   }, []));
+
+  useEffect(() => {
+    const getData = async() => {
+      setData(doc?.lines ? JSON.parse(await AsyncStorage.getItem('goods')).filter(item => doc?.lines.find(line => line.goodId === item.id)) : []);
+    }
+    getData();
+  }, [doc])
 
   return (
     <View style={styles.container}>
@@ -44,7 +50,29 @@ const ProductPage = (): JSX.Element => {
                 <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
                 <Text numberOfLines={5} style={styles.productBarcodeView}>{item.barcode}</Text>
               </View>
+              <View style={{ justifyContent: 'space-between'}}>
+                <TouchableOpacity
+                  style={styles.deleteButton} 
+                  onPress={async () => {
+                    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                    const docId = docs.findIndex(curr => curr.id === doc.id);
+                    docs[docId] = {
+                      ...doc,
+                      lines: doc.lines.filter( line => line.goodId !== item.id)
+                    }
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                    setDoc(docs[docId]);
+                  }}
+                >
+                  <MaterialIcons
+                    size={25}
+                    color='#2D3083' 
+                    name='delete-forever' 
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
+            
             <View style={styles.productNumView}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <Ionicons 
@@ -52,9 +80,9 @@ const ProductPage = (): JSX.Element => {
                   color='#8C8D8F' 
                   name='md-pricetag' 
                 />
-                <Text numberOfLines={5} style={styles.productPriceView}>{remains && remains.find(remain => remain.goodId === item.id) ? remains.find(remain => remain.goodId === item.id).price : ''}</Text>
+                <Text numberOfLines={5} style={styles.productPriceView}>{remains?.find(remain => remain.goodId === item.id) ? remains?.find(remain => remain.goodId === item.id).price : ''}</Text>
               </View>
-              <Text numberOfLines={5} style={styles.productQuantityView}>{doc ? doc.lines.find(line => line.goodId === item.id).quantity : ''}</Text>
+              <Text numberOfLines={5} style={styles.productQuantityView}>{doc?.lines?.find(line => line.goodId === item.id) ? doc?.lines?.find(line => line.goodId === item.id).quantity : ''}</Text>
             </View>
           </View>)
         }
@@ -129,7 +157,7 @@ const styles = StyleSheet.create({
     minHeight: 45,
     marginTop: 5,
     marginHorizontal: 5,
-    width: '90%',
+    width: '75%',
     textAlignVertical: 'center',
     color: '#000000',
     fontWeight: 'bold'
@@ -174,6 +202,13 @@ const styles = StyleSheet.create({
   viewButtonPressText: {
     color: '#FFFFFF',
     fontSize: 20
+  },
+  deleteButton: {
+    marginTop: 15,
+    height: 25,
+    width: 25,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   addButton: {
     margin: 5,
