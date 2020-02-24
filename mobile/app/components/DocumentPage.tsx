@@ -3,6 +3,7 @@ import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Scro
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { path } from '../../App';
+import statuses from '../../assets/documentStatuses.json';
 
 const DocumentPage = (): JSX.Element => {
 
@@ -105,6 +106,7 @@ const DocumentPage = (): JSX.Element => {
                   <View style={styles.productNameTextView}>
                     <Text numberOfLines={5} style={styles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
                     <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
+                    <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>

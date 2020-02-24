@@ -212,7 +212,8 @@ const DocumentFilterPage = (): JSX.Element => {
                       doctype: selectedDocType,
                       fromcontactId: selectedContact,
                       tocontactId: selectedContact,
-                      date: date.toString()
+                      date: date.toString(),
+                      status: 0
                     },
                     lines: []
                   });
