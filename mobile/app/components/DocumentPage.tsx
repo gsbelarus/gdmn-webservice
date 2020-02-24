@@ -95,9 +95,9 @@ const DocumentPage = (): JSX.Element => {
     <View style={styles.container}>
       <ScrollView style={{flex: 1}}>
         {
-          data ? data.map( (item, idx) => <View style={styles.deleteView}>
-            <TouchableOpacity key={idx} onPress={() => { navigation.navigate('ProductPage', {docId: item.id})}}>
-              <View style={styles.productView} key={idx}>
+          data ? data.map( (item, idx) => <View style={styles.deleteView}  key={idx}>
+            <TouchableOpacity onPress={() => { navigation.navigate('ProductPage', {docId: item.id})}}>
+              <View style={styles.productView}>
                 <View style={styles.productTextView}>
                   <View style={styles.productIdView}>
                     <Text style={styles.productId}>{idx + 1}</Text>
