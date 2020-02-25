@@ -123,9 +123,21 @@ const DocumentPage = (): JSX.Element => {
               <TouchableOpacity
                 style={styles.deleteButton} 
                 onPress={async () => {
-                  const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                  await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                  setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                  if(item.head.status === 2) {
+                    Alert.alert(
+                      'Предупреждение!',
+                      'Документ со статусом "Отправлено" не может быть удалён.',
+                      [
+                        {
+                          text: 'OK'
+                        },
+                      ],
+                    );
+                  } else {
+                    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                    setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                  }
                 }}
               >
                 <MaterialIcons
