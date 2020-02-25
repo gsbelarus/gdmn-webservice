@@ -134,9 +134,23 @@ const DocumentPage = (): JSX.Element => {
                       ],
                     );
                   } else {
-                    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                    await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                    setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                    Alert.alert(
+                      'Предупреждение!',
+                      'Вы действительно хотите удалить этот документ? После удаления нельзя восстановить.',
+                      [
+                        {
+                          text: 'OK',
+                          onPress: async() => {
+                            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                            await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                            setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                          }
+                        },
+                        {
+                          text: 'Отмена'
+                        },
+                      ],
+                    );
                   }
                 }}
               >
