@@ -3,6 +3,7 @@ import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Scro
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { path } from '../../App';
+import statuses from '../../assets/documentStatuses.json';
 
 const DocumentPage = (): JSX.Element => {
 
@@ -11,6 +12,8 @@ const DocumentPage = (): JSX.Element => {
   const [dataContact, setDataContact] = useState([]);
   const [dataDocTypes, setDataDocTypes] = useState([]);
   const [user, setUser] = useState();
+
+  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D']
 
   useFocusEffect(React.useCallback(() => {
     const getData = async() => {
@@ -48,13 +51,14 @@ const DocumentPage = (): JSX.Element => {
               type: "cmd",
               payload: {
                 name: "post_documents",
-                params: data
+                params: data.filter(doc => doc.head.status === 1)
               }
             }
           })
         }
       ).then(res => res.json());
       if(result.status === 200) {
+        setData(data.map(doc => {return doc.head.status === 1 ? {...doc, head: { ...doc.head, status: doc.head.status + 1}} : doc}))
         Alert.alert(
           'Успех!',
           '',
@@ -105,6 +109,7 @@ const DocumentPage = (): JSX.Element => {
                   <View style={styles.productNameTextView}>
                     <Text numberOfLines={5} style={styles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
                     <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
+                    <Text numberOfLines={5} style={{...styles.productTitleView, color: statusColors[item.head.status], fontWeight: 'bold' }}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
                   </View>
                 </View>
                 <View style={styles.productNumView}>
@@ -115,21 +120,47 @@ const DocumentPage = (): JSX.Element => {
               </View>
             </TouchableOpacity>
             <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              style={styles.deleteButton} 
-              onPress={async () => {
-                const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                setData(JSON.parse(await AsyncStorage.getItem('docs')));
-              }}
-            >
-              <MaterialIcons
-                size={25}
-                color='#2D3083' 
-                name='delete-forever' 
-              />
-            </TouchableOpacity>
-            <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
+              <TouchableOpacity
+                style={styles.deleteButton} 
+                onPress={async () => {
+                  if(item.head.status === 2) {
+                    Alert.alert(
+                      'Предупреждение!',
+                      'Документ со статусом "Отправлено" не может быть удалён.',
+                      [
+                        {
+                          text: 'OK'
+                        },
+                      ],
+                    );
+                  } else {
+                    Alert.alert(
+                      'Предупреждение!',
+                      'Вы действительно хотите удалить этот документ? После удаления нельзя восстановить.',
+                      [
+                        {
+                          text: 'OK',
+                          onPress: async() => {
+                            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                            await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                            setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                          }
+                        },
+                        {
+                          text: 'Отмена'
+                        },
+                      ],
+                    );
+                  }
+                }}
+              >
+                <MaterialIcons
+                  size={25}
+                  color='#2D3083' 
+                  name='delete-forever' 
+                />
+              </TouchableOpacity>
+              <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
             </View>
           </View>
           )
@@ -242,7 +273,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   deleteButton: {
-    marginTop: 15,
+    flex: 1,
     height: 25,
     width: 25,
     justifyContent: 'center',

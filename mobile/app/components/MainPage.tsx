@@ -27,13 +27,13 @@ const MainPage = (): JSX.Element => {
     }
 
     const checkData = async() => {
-      await AsyncStorage.clear();
+      //await AsyncStorage.clear();
       const keys = await AsyncStorage.getAllKeys();
       !!keys && typesData.filter( item => !keys.find(key => key === item)).length === 0
       ? undefined
       : await getData();
-/*
-      const getMe = await fetch(
+
+      /*const getMe = await fetch(
         `${path}me`,
         {
           method: 'GET',
