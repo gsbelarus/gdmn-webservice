@@ -11,8 +11,8 @@ const MainPage = (): JSX.Element => {
   const [resUpd, setResUpd] = useState();
 
   useEffect( () => {
-    //const typesData = ['goods', 'remains', 'docTypes', 'contacts', 'docs'];
-    /*const getData = async() => {
+    const typesData = ['goods', 'remains', 'documenttypes', 'contacts', 'docs'];
+    const getData = async() => {
       const data = await fetch(
         `${path}test/all`,
         {
@@ -24,16 +24,16 @@ const MainPage = (): JSX.Element => {
       data.status === 200
       ? data.result.map((item, idx) => AsyncStorage.setItem(typesData[idx], JSON.stringify(item)))
       : undefined;
-    }*/
+    }
 
     const checkData = async() => {
       //await AsyncStorage.clear();
-      /*const keys = await AsyncStorage.getAllKeys();
+      const keys = await AsyncStorage.getAllKeys();
       !!keys && typesData.filter( item => !keys.find(key => key === item)).length === 0
       ? undefined
       : await getData();
-*/
-      const getMe = await fetch(
+
+      /*const getMe = await fetch(
         `${path}me`,
         {
           method: 'GET',
@@ -43,7 +43,7 @@ const MainPage = (): JSX.Element => {
       ).then(res => res.json());
       getMe.status === 200 && getMe.result !== 'not authenticated'
       ? setUser(getMe.result)
-      : undefined;
+      : undefined;*/
     }
     checkData();
   }, []);

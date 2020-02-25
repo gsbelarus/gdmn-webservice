@@ -59,47 +59,53 @@ const ProductPage = (): JSX.Element => {
           </View>)
         }
       </ScrollView>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
-        <TouchableOpacity
-          style={styles.addButton} 
-          onPress={() => {
-            Alert.alert(
-              'Подтвердите действие',
-              'Статус будет изменён на "Готово". После этого редактирование документа будет невозможно.',
-              [
-                {
-                  text: 'OK',
-                  onPress: async() => {
-                    const docId = navigation.getParam('docId');
-                    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                    await AsyncStorage.setItem('docs', JSON.stringify(docs.map(currDoc => {return currDoc.id === docId ? {...currDoc, head: {...currDoc.head, status: currDoc.head.status + 1}} : currDoc})));
-                  }
-                },
-                {
-                  text: 'Отмена',
-                  onPress: () => {}
-                },
-              ]
-            )
-          }}
-        >
-          <AntDesign
-            size={20}
-            color='#FFF' 
-            name='check' 
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.addButton} 
-          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
-        >
-          <MaterialIcons
-            size={20}
-            color='#FFF' 
-            name='add' 
-          />
-        </TouchableOpacity>
-      </View>   
+      {
+        doc?.head.status === 0
+        ? <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
+          <TouchableOpacity
+            style={styles.addButton} 
+            onPress={() => {
+              Alert.alert(
+                'Подтвердите действие',
+                'Статус будет изменён на "Готово". После этого редактирование документа будет невозможно.',
+                [
+                  {
+                    text: 'OK',
+                    onPress: async() => {
+                      if(doc.head.status == 0) {
+                        const docId = navigation.getParam('docId');
+                        const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                        await AsyncStorage.setItem('docs', JSON.stringify(docs.map(currDoc => {return currDoc.id === docId ? {...currDoc, head: {...currDoc.head, status: currDoc.head.status + 1}} : currDoc})));
+                      }
+                    }
+                  },
+                  {
+                    text: 'Отмена',
+                    onPress: () => {}
+                  },
+                ]
+              )
+            }}
+          >
+            <AntDesign
+              size={20}
+              color='#FFF' 
+              name='check' 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButton} 
+            onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
+          >
+            <MaterialIcons
+              size={20}
+              color='#FFF' 
+              name='add' 
+            />
+          </TouchableOpacity>
+        </View>
+        : undefined
+      }  
       <StatusBar barStyle = "light-content" />
     </View>
   );

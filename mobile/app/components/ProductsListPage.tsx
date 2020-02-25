@@ -90,28 +90,28 @@ const ProductsListPage = (): JSX.Element => {
               />
             </TouchableOpacity>
           </View>
-        <ScrollView style={{flex: 2}}>
-          {
-            goods.find(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase()))
-            ? goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
-              <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
-                <View style={styles.productView}>
-                  <View style={styles.productTextView}>
-                    <View style={styles.productIdView}>
-                      <Text style={styles.productId}>{idx}</Text>
-                    </View>
-                    <View style={styles.productNameTextView}>
-                      <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
+          <ScrollView style={{flex: 2}}>
+            {
+              goods.find(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase()))
+              ? goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
+                <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
+                  <View style={styles.productView}>
+                    <View style={styles.productTextView}>
+                      <View style={styles.productIdView}>
+                        <Text style={styles.productId}>{idx}</Text>
+                      </View>
+                      <View style={styles.productNameTextView}>
+                        <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>)
-            )
-            : <Text style={{fontSize: 17, textAlign: 'center'}}>Товар не найден</Text>
-          }
-        </ScrollView> 
-        <StatusBar barStyle = "light-content" />
-      </>
+                </TouchableOpacity>)
+              )
+              : <Text style={{fontSize: 17, textAlign: 'center'}}>Товар не найден</Text>
+            }
+          </ScrollView> 
+          <StatusBar barStyle = "light-content" />
+        </>
       }
     </View>
   );

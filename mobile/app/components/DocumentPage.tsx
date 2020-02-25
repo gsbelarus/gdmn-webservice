@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   deleteButton: {
-    marginTop: 15,
+    flex: 1,
     height: 25,
     width: 25,
     justifyContent: 'center',
