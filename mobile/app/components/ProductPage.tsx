@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView, Alert} from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 
@@ -54,14 +54,29 @@ const ProductPage = (): JSX.Element => {
                 <TouchableOpacity
                   style={styles.deleteButton} 
                   onPress={async () => {
-                    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                    const docId = docs.findIndex(curr => curr.id === doc.id);
-                    docs[docId] = {
-                      ...doc,
-                      lines: doc.lines.filter( line => line.goodId !== item.id)
-                    }
-                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
-                    setDoc(docs[docId]);
+                    Alert.alert(
+                      'Вы уверены, что хотите удалить?',
+                      '',
+                      [
+                        {
+                          text: 'OK',
+                          onPress: async() => {
+                            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                            const docId = docs.findIndex(curr => curr.id === doc.id);
+                            docs[docId] = {
+                              ...doc,
+                              lines: doc.lines.filter( line => line.goodId !== item.id)
+                            }
+                            await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                            setDoc(docs[docId]);
+                          }
+                        },
+                        {
+                          text: 'Отмена',
+                          onPress: () => {}
+                        },
+                      ]
+                    );
                   }}
                 >
                   <MaterialIcons
@@ -87,17 +102,61 @@ const ProductPage = (): JSX.Element => {
           </View>)
         }
       </ScrollView>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', margin: 10}}>
-        <TouchableOpacity
-          style={styles.addButton} 
-          onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
-        >
-          <MaterialIcons
-            size={20}
-            color='#FFF' 
-            name='add' 
-          />
-        </TouchableOpacity>
+      <View style={{ flexDirection: 'row', marginBottom: 10, marginTop: 10}}>
+        <View style={{ flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={styles.editButton} 
+            onPress={() => navigation.navigate('DocumentFilterPage', {docId: doc.id})}
+          >
+            <MaterialIcons
+              size={25}
+              color='#FFF' 
+              name='edit' 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteDocumentButton} 
+            onPress={async () => {
+              Alert.alert(
+                'Вы уверены, что хотите удалить?',
+                '',
+                [
+                  {
+                    text: 'OK',
+                    onPress: async() => {
+                      const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                      await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(item => item.id !== doc.id)));
+                      setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                      navigation.navigate('DocumentPage');
+                    }
+                  },
+                  {
+                    text: 'Отмена',
+                    onPress: () => {}
+                  },
+                ]
+              );
+            }}
+          >
+            <MaterialIcons
+              size={25}
+              color='#FFF' 
+              name='delete-forever' 
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+          <TouchableOpacity
+            style={styles.addButton} 
+            onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
+          >
+            <MaterialIcons
+              size={25}
+              color='#FFF' 
+              name='add' 
+            />
+          </TouchableOpacity>
+        </View>
       </View>   
       <StatusBar barStyle = "light-content" />
     </View>
@@ -210,9 +269,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  deleteDocumentButton: {
+    borderRadius: 50,
+    borderColor: '#2D3083',
+    borderWidth: 1,
+    height: 50,
+    width: 50,
+    backgroundColor: '#2D3083',
+    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  editButton: {
+    marginLeft: 15,
+    borderRadius: 50,
+    borderColor: '#2D3083',
+    borderWidth: 1,
+    height: 50,
+    width: 50,
+    backgroundColor: '#2D3083',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   addButton: {
-    margin: 5,
-    marginLeft: 0,
+    marginLeft: 175,
     borderRadius: 50,
     borderColor: '#2D3083',
     borderWidth: 1,
