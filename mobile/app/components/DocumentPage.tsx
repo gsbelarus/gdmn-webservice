@@ -204,10 +204,8 @@ const styles = StyleSheet.create({
     height: 25,
     flexDirection: 'row',
     backgroundColor: '#F0F0FF',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 48,
-    paddingHorizontal: 30
+    paddingLeft: 48
   },
   productIdView: {
     justifyContent: 'center',
@@ -223,7 +221,7 @@ const styles = StyleSheet.create({
     minHeight: 45,
     marginTop: 5,
     marginHorizontal: 5,
-    width: '75%',
+    width: '100%',
     textAlignVertical: 'center',
     color: '#000000',
     fontWeight: 'bold'

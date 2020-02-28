@@ -32,6 +32,14 @@ const DocumentFilterPage = (): JSX.Element => {
       arr[arr.length - 1].push(item);
       return arr;}, [[]])
       setContacts(newC);
+
+      const documentId = navigation.getParam('docId');
+      if(!!documentId) {
+        const doc = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === documentId);
+        setSelectedDocType(d_docTypes.find(item => item.id === doc.head.doctype)!.id)
+        setSelectedContact(d_contacts.find(item => item.id === doc.head.fromcontactId)!.id)
+        setDate(new Date(doc.head.date))
+      }
     }
     getData();
   }, []);
@@ -60,8 +68,7 @@ const DocumentFilterPage = (): JSX.Element => {
             docTypes.map((d, idx) => (<View style={styles.slide} key={idx}>
               <TouchableOpacity
                 style={{
-                  height: 30,
-                  
+                  height: 30
                 }}
                 onPress={() => setSelectedDocType(d[0].id)}
               >
@@ -105,7 +112,8 @@ const DocumentFilterPage = (): JSX.Element => {
             : 'Не выбрано'}
           </Text>
         </View>
-        {contacts && contacts.length !== 0
+        {
+          contacts && contacts.length !== 0
           ? <Swiper
             controlsProps={{
               dotsTouchable: true,
@@ -205,22 +213,38 @@ const DocumentFilterPage = (): JSX.Element => {
                 if(selectedContact !== undefined && selectedDocType !== undefined) {
                   const docsObject = await AsyncStorage.getItem('docs');
                   const docs = docsObject ? JSON.parse(await AsyncStorage.getItem('docs')) : [];
-                  const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
-                  docs.push({
-                    id: docId,
-                    head: {
-                      doctype: selectedDocType,
-                      fromcontactId: selectedContact,
-                      tocontactId: selectedContact,
-                      date: date.toString(),
-                      status: 0
-                    },
-                    lines: []
-                  });
-                  await AsyncStorage.setItem('docs', JSON.stringify(docs));
-                  navigation.navigate('ProductPage', {
-                    'docId': docId
-                  });
+                  if(!!navigation.getParam('docId')) {
+                    const doc = docs.find(item => item.id === navigation.getParam('docId'));
+                    docs[docs.findIndex(item => item.id === doc.id)] = {
+                      ...doc,
+                      head: {
+                        ...doc.head,
+                        doctype: selectedDocType,
+                        fromcontactId: selectedContact,
+                        tocontactId: selectedContact,
+                        date: date.toString()
+                      }
+                    };
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                    navigation.goBack();
+
+                  } else {
+                    const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
+                    docs.push({
+                      id: docId,
+                      head: {
+                        doctype: selectedDocType,
+                        fromcontactId: selectedContact,
+                        tocontactId: selectedContact,
+                        date: date.toString()
+                      },
+                      lines: []
+                    });
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                    navigation.navigate('ProductPage', {
+                      'docId': docId
+                    });
+                  }
                 } else {
                   Alert.alert(
                     'Предупреждение!',
