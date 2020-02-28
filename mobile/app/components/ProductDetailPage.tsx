@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, StatusBar, Text, AsyncStorage, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import InputSpinner from "react-native-input-spinner";
 
@@ -9,7 +9,7 @@ const ProductDetailPage = (): JSX.Element => {
 
   const [data, setData] = useState();
   const [nameProduct, setNameProduct] = useState();
-  const [value, setValue] = useState();
+  const [value, setValue] = useState(1);
 
   useEffect(() => {
     const getData = async() => {
@@ -33,7 +33,7 @@ const ProductDetailPage = (): JSX.Element => {
         {data ? <Text style={styles.productQuantity}>{data.quantity}</Text> : undefined}
       </View>
       <View style={styles.editQuantityView}>
-        <Text style={{fontSize: 17}}>Изменить количество:</Text>
+        <Text style={{fontSize: 17}}>Добавить количество:</Text>
         <InputSpinner 
           returnKeyType="done"
           style={styles.inputSpinner}
@@ -45,6 +45,12 @@ const ProductDetailPage = (): JSX.Element => {
           colorLeft={'#2D3083'}
           colorRight={'#2D3083'}
           onChange={setValue}
+          onMin={() => {
+            Alert.alert(
+              'Предупреждение', 
+              'Минимальное значение уже выбрано!'
+            )
+          }}
         />
       </View>
       <View style={styles.buttonOkView}>
