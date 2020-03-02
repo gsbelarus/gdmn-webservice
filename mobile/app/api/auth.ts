@@ -2,7 +2,7 @@ import { get, post, put } from './http.service';
 import Constants from "expo-constants";
 
 export const authApi = {
-  login: async (userCredentials: { name: string; password: string }): Promise<{ token: string }> => {
+  login: async (userCredentials: { name: string; password: string }): Promise<any> => {
     return post('/login', {
       username: userCredentials.name,
       password: userCredentials.password
@@ -17,7 +17,7 @@ export const authApi = {
     return get(`/me`);
   },
 
-  fetchData: async <T>(name: string): Promise<T> => {
+/*   fetchData: async <T>(name: string): Promise<T> => {
     return get(`/${name}`);
   },
 
@@ -27,5 +27,5 @@ export const authApi = {
 
   updateData: async <T>(name: string, body: any): Promise<T> => {
     return put(`/${name}`, body);
-  }
+  } */
 };

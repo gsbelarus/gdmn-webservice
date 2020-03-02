@@ -1,5 +1,5 @@
 import React, { useState, FC } from 'react';
-import { StyleSheet, View, StatusBar, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, StatusBar, TextInput, Alert, Button } from 'react-native';
 import SubTitle from './SubTitle';
 import Constants from 'expo-constants';
 import { useNavigation } from 'react-navigation-hooks'
@@ -59,14 +59,14 @@ return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.title}>
-        <SubTitle subtitle='Please enter your code' />
+        <SubTitle subtitle='Регистрация устройства' />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={inputValue}
           onChangeText={setInputValue}
-          placeholder="Type here to enter your code"
+          placeholder="Введите код"
           placeholderTextColor={'#9A9FA1'}
           multiline={true}
           autoCapitalize="sentences"
@@ -79,6 +79,7 @@ return (
           onSubmitEditing={verifyCode}
         />
       </View>
+      <Button title="Отправить" onPress={verifyCode}/>
     </View>
   );
 }

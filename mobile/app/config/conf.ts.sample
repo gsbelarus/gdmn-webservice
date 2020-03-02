@@ -3,7 +3,7 @@ export default {
     name: 'http://192.168.0.73',
     port: 3649
   },
-  apiPath: 'api/',
+  apiPath: 'api',
   debug: {
     showWarnings: true
   }

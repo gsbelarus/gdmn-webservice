@@ -1,6 +1,7 @@
 export default {
   server: {
-    name: 'http://192.168.0.41',
+    protocol: 'http://',
+    name: '192.168.0.150',
     port: 3649
   },
   apiPath: 'api',
