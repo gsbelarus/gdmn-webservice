@@ -4446,10 +4446,10 @@ react-native-gesture-handler@^1.5.2:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-input-spinner@^1.2.8:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/react-native-input-spinner/-/react-native-input-spinner-1.2.9.tgz#ee47d36a293ea8311e898fe13a6466f1c3303bb7"
-  integrity sha512-IRo1KGI6gRpPLmJuqhKR2QNS/piR768jht208SF+NJATtrSpc8rUtBcM6aCJR5zNvFCD5OQscOejq7iMI0YF1w==
+react-native-input-spinner@^1.2.10:
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/react-native-input-spinner/-/react-native-input-spinner-1.2.10.tgz#6d822f1ac8e1b845c014c25e2993bec20c3f2ae7"
+  integrity sha512-dUxgvB+Yx0bYeW57YEriKXweX+pZh9ItU7xA6VfUhPdboEcgaMLME5vm1zOUeEnusZZcvVBDkYXiObKMaJVDzA==
 
 react-native-material-buttons@^0.5.0:
   version "0.5.0"
