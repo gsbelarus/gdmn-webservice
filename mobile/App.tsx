@@ -1,58 +1,84 @@
 import React, { useEffect, useState } from "react";
 import Navigator from "./app/components/Navigator";
-import Constants from "expo-constants";
-import { StyleSheet, View, ActivityIndicator, YellowBox } from "react-native";
-import config from "./config";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  YellowBox
+} from "react-native";
+import сonfig from "./app/config/index";
+import { authApi } from "./app/api/auth";
 
-YellowBox.ignoreWarnings(["Require cycle:"]);
+type TAppState = "CONNECTION" | "PENDING" | "CONNECTED";
+
+// YellowBox.ignoreWarnings(["Require cycle:"]);
 
 type TStartState = "SIGN_OUT" | "NO_ACTIVATION" | "LOG_IN";
-export const path = `${config.server.name}:${config.server.port}/api/`;
+
+interface IServerResponse {
+  status: number;
+  result: boolean;
+}
 
 const App = () => {
   const [signedIn, setSignedIn] = useState<TStartState>("NO_ACTIVATION");
-  const [loading, setLoading] = useState(true);
-  
-  console.disableYellowBox = !config.debug.showWarnings;
-  
+  const [appState, setAppState] = useState<TAppState>("CONNECTION");
+  const [serverResp, setServerResp] = useState<IServerResponse>(undefined);
+  const [errorText, setErrorText] = useState("");
+
+  console.disableYellowBox = !сonfig.debug.showWarnings;
+  /*
+    Порядок работы:
+      1) Проверка статуса устройства на сервере
+      2) Получение статуса пользователя на сервере
+  */
   useEffect(() => {
-    const isExistDevice = async () => {
-      const data = await fetch(
-        `${path}device/isExist?uid=${Constants.deviceId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include"
-        }
-      ).then(res => res.json());
-      
-      data.status === 200 && data.result ? setSignedIn("SIGN_OUT") : undefined;
-      
-      if (data.status === 200 && data.result) {
-        const getMe = await fetch(`${path}me`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include"
-        }).then(res => res.json());
-        
-        setSignedIn(
-          getMe.status === 200 && getMe.result !== "not authenticated"
-            ? "LOG_IN"
-            : "SIGN_OUT"
-        );
+    authApi
+      .getDeviceStatus<IServerResponse>()
+      .then(data => setServerResp(data))
+      .catch((err: Error) => setErrorText(err.message));
+  }, []);
+
+  useEffect(() => {
+    if (!errorText) return;
+
+    setAppState("PENDING");
+  }, [errorText]);
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (!serverResp?.result) {
+        setSignedIn("SIGN_OUT");
+        return;
       }
-      
-      setLoading(false);
+
+      authApi
+        .getUserStatus<string>()
+        .then(data =>
+          setSignedIn(data !== "not authenticated" ? "LOG_IN" : "SIGN_OUT")
+        )
+        .catch((err: Error) => setErrorText(err.message));
     };
 
-    isExistDevice();
-  }, []);
+    if (appState === "CONNECTION") checkUserStatus();
+  }, [appState]);
+
+  useEffect(() => {
+    if (!serverResp) return;
+
+    setAppState("CONNECTED");
+  }, [serverResp]);
 
   const Layout = Navigator(signedIn);
 
-  return loading ? (
+  return appState !== "CONNECTED" ? (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#70667D" />
+      {appState === "CONNECTION" ? (
+        <ActivityIndicator size="large" color="#70667D" />
+      ) : (
+        <Text>No connection: {errorText}</Text>
+      )}
     </View>
   ) : (
     <Layout />

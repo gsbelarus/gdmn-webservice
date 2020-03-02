@@ -3,14 +3,14 @@ import { StyleSheet, View, StatusBar, TextInput, Alert } from 'react-native';
 import SubTitle from './SubTitle';
 import Constants from 'expo-constants';
 import { useNavigation } from 'react-navigation-hooks'
-import { path } from '../../App';
+import { baseUrl } from '../helpers/utils';
 
 const ActivationPage: FC = (): JSX.Element => {
 const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    `${path}device/verifyCode?code=${inputValue}`,
+    `${baseUrl}device/verifyCode?code=${inputValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
@@ -19,7 +19,7 @@ const verifyCode = async () => {
   ).then(res => res.json())
   if (data.status === 200) {
     await fetch(
-      `${path}device/new`,
+      `${baseUrl}device/new`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},

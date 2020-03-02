@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { SimpleLineIcons } from '@expo/vector-icons';
-import { path } from '../../App';
+import { baseUrl } from '../helpers/utils';
 
 const MainPage = (): JSX.Element => {
 
@@ -14,7 +14,7 @@ const MainPage = (): JSX.Element => {
     const typesData = ['goods', 'remains', 'documenttypes', 'contacts', 'docs'];
     const getData = async() => {
       const data = await fetch(
-        `${path}test/all`,
+        `${baseUrl}/test/all`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},
@@ -34,7 +34,7 @@ const MainPage = (): JSX.Element => {
       : await getData();
 
       /*const getMe = await fetch(
-        `${path}me`,
+        `${baseUrl}me`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},
@@ -51,7 +51,7 @@ const MainPage = (): JSX.Element => {
   const sendUpdateRequest = async () => {
     if(user) {
       const result = await fetch(
-        `${path}messages`,
+        `${baseUrl}/messages`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json'},
@@ -112,7 +112,7 @@ const MainPage = (): JSX.Element => {
 
   const checkUpdateRequest = async () => {
     const result = await fetch(
-      `${path}messages?companyId=${user.companies[0]}`,
+      `${baseUrl}/messages?companyId=${user.companies[0]}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json'},
@@ -159,7 +159,7 @@ const MainPage = (): JSX.Element => {
           text: 'OK',
           onPress: async() => {
             const data = await fetch(
-              `${path}logout`,
+              `${baseUrl}/logout`,
               {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json'},

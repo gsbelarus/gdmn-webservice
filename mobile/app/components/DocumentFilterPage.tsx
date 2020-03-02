@@ -1,12 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Alert } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from 'react-navigation-hooks';
-import DatePicker from 'react-native-datepicker';
-import Swiper from 'react-native-web-swiper';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  TouchableOpacity,
+  Text,
+  AsyncStorage,
+  Alert
+} from "react-native";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "react-navigation-hooks";
+import DatePicker from "@react-native-community/datetimepicker";
+import Swiper from "react-native-web-swiper";
 
 const DocumentFilterPage = (): JSX.Element => {
-
   const navigation = useNavigation();
   const [date, setDate] = useState(new Date());
   const [docTypes, setDocTypes] = useState([]);
@@ -16,119 +23,171 @@ const DocumentFilterPage = (): JSX.Element => {
 
   const today = new Date();
 
+  const handleDate = (event, selectedDate)=> {
+    const currentDate = selectedDate || date;
+ 
+    setDate(currentDate);
+    // setShow(Platform.OS === 'ios' ? true : false);
+  };
+
   useEffect(() => {
-    const getData = async() => {
-      const d_docTypes = JSON.parse(await AsyncStorage.getItem('documenttypes'));
-      const d_contacts = JSON.parse(await AsyncStorage.getItem('contacts'));
-      const newDT = d_docTypes.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
-        arr.push([]);
-      }
-      arr[arr.length - 1].push(item);
-      return arr;}, [[]])
+    const getData = async () => {
+      const d_docTypes = JSON.parse(
+        await AsyncStorage.getItem("documenttypes")
+      );
+      const d_contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+      const newDT = d_docTypes.reduce(
+        (arr, item) => {
+          if (arr[arr.length - 1].length == 2) {
+            arr.push([]);
+          }
+          arr[arr.length - 1].push(item);
+          return arr;
+        },
+        [[]]
+      );
       setDocTypes(newDT);
-      const newC = d_contacts.reduce((arr, item) => {if (arr[arr.length - 1].length == 2) {
-        arr.push([]);
-      }
-      arr[arr.length - 1].push(item);
-      return arr;}, [[]])
+      const newC = d_contacts.reduce(
+        (arr, item) => {
+          if (arr[arr.length - 1].length == 2) {
+            arr.push([]);
+          }
+          arr[arr.length - 1].push(item);
+          return arr;
+        },
+        [[]]
+      );
       setContacts(newC);
 
-      const documentId = navigation.getParam('docId');
-      if(!!documentId) {
-        const doc = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === documentId);
-        setSelectedDocType(d_docTypes.find(item => item.id === doc.head.doctype)!.id)
-        setSelectedContact(d_contacts.find(item => item.id === doc.head.fromcontactId)!.id)
-        setDate(new Date(doc.head.date))
+      const documentId = navigation.getParam("docId");
+      if (!!documentId) {
+        const doc = JSON.parse(await AsyncStorage.getItem("docs")).find(
+          item => item.id === documentId
+        );
+        setSelectedDocType(
+          d_docTypes.find(item => item.id === doc.head.doctype)!.id
+        );
+        setSelectedContact(
+          d_contacts.find(item => item.id === doc.head.fromcontactId)!.id
+        );
+        setDate(new Date(doc.head.date));
       }
-    }
+    };
     getData();
   }, []);
 
   return (
     <View style={styles.container}>
-      <View  style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid'}} key={1}>
-        <View style={{flexDirection: 'row'}}>
+      <View
+        style={{
+          flex: 1,
+          borderColor: "#B1B1B1",
+          borderRadius: 4,
+          borderWidth: 1,
+          borderStyle: "solid"
+        }}
+        key={1}
+      >
+        <View style={{ flexDirection: "row" }}>
           <Text style={styles.subdivisionText}>Тип документа: </Text>
-          <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
-            {docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.id === selectedDocType)
-            ? docTypes.flat().find(i => i.id === selectedDocType).name
-            : 'Не выбрано'}
+          <Text style={{ ...styles.subdivisionText, fontWeight: "bold" }}>
+            {docTypes &&
+            docTypes.length !== 0 &&
+            docTypes.flat().find(i => i.id === selectedDocType)
+              ? docTypes.flat().find(i => i.id === selectedDocType).name
+              : "Не выбрано"}
           </Text>
         </View>
-        {docTypes && docTypes.length !== 0
-        ? <Swiper
-          controlsProps={{
-            dotsTouchable: true,
-            prevPos: false,
-            nextPos: false,
-            dotsPos: 'bottom',
-          }}
-        >
-          {
-            docTypes.map((d, idx) => (<View style={styles.slide} key={idx}>
-              <TouchableOpacity
-                style={{
-                  height: 30
-                }}
-                onPress={() => setSelectedDocType(d[0].id)}
-              >
-                <View style={styles.slideTextView} key={`${idx}-1`}>
-                  <MaterialCommunityIcons
-                    name="checkbox-blank-circle"
-                    size={20}
-                    color={'#F1FA3F'}
-                  />
-                  <Text numberOfLines={5}>{d[0] && d[0].name ? d[0].name : ''}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  height: 30
-                }}
-                onPress={() => setSelectedDocType(d[1].id)}
-              >
-                <View style={styles.slideTextView} key={`${idx}-2`}>
-                  <MaterialCommunityIcons
-                    name="checkbox-blank-circle"
-                    size={20}
-                    color={'#F1FA3F'}
-                  />
-                  <Text numberOfLines={5}>{d[1] && d[1].name ? d[1].name : ''}</Text>
-                </View>
-              </TouchableOpacity>
-            </View>)
-            )
-          }
-        </Swiper>
-        : <Text>Not found</Text>
-      }
-      </View>
-      <View style={{flex: 1, borderColor: '#B1B1B1', borderRadius: 4, borderWidth: 1, borderStyle: 'solid', marginTop: 15, marginBottom: -60}} key={2}>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={styles.subdivisionText}>Подразделение: </Text>
-          <Text style={{...styles.subdivisionText, fontWeight: 'bold'}}>
-            {contacts && contacts.length !== 0 && contacts.flat().find(i => i.id === selectedContact)
-            ? contacts.flat().find(i => i.id === selectedContact).name
-            : 'Не выбрано'}
-          </Text>
-        </View>
-        {
-          contacts && contacts.length !== 0
-          ? <Swiper
+        {docTypes && docTypes.length !== 0 ? (
+          <Swiper
             controlsProps={{
               dotsTouchable: true,
               prevPos: false,
               nextPos: false,
-              dotsPos: 'bottom',
+              dotsPos: "bottom"
             }}
           >
-            {
-              contacts.map((d, idx) => (<View style={styles.slide} key={idx}>
+            {docTypes.map((d, idx) => (
+              <View style={styles.slide} key={idx}>
+                <TouchableOpacity
+                  style={{
+                    height: 30
+                  }}
+                  onPress={() => setSelectedDocType(d[0].id)}
+                >
+                  <View style={styles.slideTextView} key={`${idx}-1`}>
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-circle"
+                      size={20}
+                      color={"#F1FA3F"}
+                    />
+                    <Text numberOfLines={5}>
+                      {d[0] && d[0].name ? d[0].name : ""}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    height: 30
+                  }}
+                  onPress={() => setSelectedDocType(d[1].id)}
+                >
+                  <View style={styles.slideTextView} key={`${idx}-2`}>
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-circle"
+                      size={20}
+                      color={"#F1FA3F"}
+                    />
+                    <Text numberOfLines={5}>
+                      {d[1] && d[1].name ? d[1].name : ""}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </Swiper>
+        ) : (
+          <Text>Not found</Text>
+        )}
+      </View>
+      <View
+        style={{
+          flex: 1,
+          borderColor: "#B1B1B1",
+          borderRadius: 4,
+          borderWidth: 1,
+          borderStyle: "solid",
+          marginTop: 15,
+          marginBottom: -60
+        }}
+        key={2}
+      >
+        <View style={{ flexDirection: "row" }}>
+          <Text style={styles.subdivisionText}>Подразделение: </Text>
+          <Text style={{ ...styles.subdivisionText, fontWeight: "bold" }}>
+            {contacts &&
+            contacts.length !== 0 &&
+            contacts.flat().find(i => i.id === selectedContact)
+              ? contacts.flat().find(i => i.id === selectedContact).name
+              : "Не выбрано"}
+          </Text>
+        </View>
+        {contacts && contacts.length !== 0 ? (
+          <Swiper
+            controlsProps={{
+              dotsTouchable: true,
+              prevPos: false,
+              nextPos: false,
+              dotsPos: "bottom"
+            }}
+          >
+            {contacts.map((d, idx) => (
+              <View style={styles.slide} key={idx}>
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                   onPress={() => setSelectedContact(d[0].id)}
                 >
@@ -136,16 +195,16 @@ const DocumentFilterPage = (): JSX.Element => {
                     <MaterialCommunityIcons
                       name="checkbox-blank-circle"
                       size={20}
-                      color={'#F1FA3F'}
+                      color={"#F1FA3F"}
                     />
-                    <Text>{d[0] && d[0].name ? d[0].name : ''}</Text>
+                    <Text>{d[0] && d[0].name ? d[0].name : ""}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                   onPress={() => setSelectedContact(d[1].id)}
                 >
@@ -153,30 +212,32 @@ const DocumentFilterPage = (): JSX.Element => {
                     <MaterialCommunityIcons
                       name="checkbox-blank-circle"
                       size={20}
-                      color={'#F1FA3F'}
+                      color={"#F1FA3F"}
                     />
-                    <Text>{d[1] && d[1].name ? d[1].name : ''}</Text>
+                    <Text>{d[1] && d[1].name ? d[1].name : ""}</Text>
                   </View>
                 </TouchableOpacity>
-              </View>)
-              )
-            }
+              </View>
+            ))}
           </Swiper>
-          : <Text></Text>
-        }
+        ) : (
+          <Text></Text>
+        )}
       </View>
-      <View style={{flex: 1.5, marginTop: 80}}>
+      <View style={{ flex: 1.5, marginTop: 80 }}>
         <DatePicker
-          style={{width: '100%'}}
+          style={{ width: "100%" }}
           date={date}
           mode="date"
-          placeholder="select date"
-          format="DD MMM YYYY"
-          minDate={new Date(1990, 0, 1)}
-          maxDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-          confirmBtnText="Ок"
-          cancelBtnText="Отмена"
-          iconComponent={
+          value={date}
+          onChange={handleDate}
+          // placeholder="select date"
+          // format="DD MMM YYYY"
+          // minDate={new Date(1990, 0, 1)}
+          // maxDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
+          // confirmBtnText="Ок"
+          // cancelBtnText="Отмена"
+          /* iconComponent={
             <MaterialIcons 
               style={{
                 position: 'absolute',
@@ -185,7 +246,7 @@ const DocumentFilterPage = (): JSX.Element => {
               size={30}
               color='#8C8D8F' 
               name='date-range' 
-            /> 
+            />  
           }
           customStyles={{
             dateIcon: {
@@ -204,17 +265,25 @@ const DocumentFilterPage = (): JSX.Element => {
             }
           }}
           onDateChange={(newDate) => {setDate(newDate)}}
+          */
         />
         <View style={styles.buttonView}>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
-              style={styles.buttonOk} 
+              style={styles.buttonOk}
               onPress={async () => {
-                if(selectedContact !== undefined && selectedDocType !== undefined) {
-                  const docsObject = await AsyncStorage.getItem('docs');
-                  const docs = docsObject ? JSON.parse(await AsyncStorage.getItem('docs')) : [];
-                  if(!!navigation.getParam('docId')) {
-                    const doc = docs.find(item => item.id === navigation.getParam('docId'));
+                if (
+                  selectedContact !== undefined &&
+                  selectedDocType !== undefined
+                ) {
+                  const docsObject = await AsyncStorage.getItem("docs");
+                  const docs = docsObject
+                    ? JSON.parse(await AsyncStorage.getItem("docs"))
+                    : [];
+                  if (!!navigation.getParam("docId")) {
+                    const doc = docs.find(
+                      item => item.id === navigation.getParam("docId")
+                    );
                     docs[docs.findIndex(item => item.id === doc.id)] = {
                       ...doc,
                       head: {
@@ -225,11 +294,11 @@ const DocumentFilterPage = (): JSX.Element => {
                         date: date.toString()
                       }
                     };
-                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                    await AsyncStorage.setItem("docs", JSON.stringify(docs));
                     navigation.goBack();
-
                   } else {
-                    const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
+                    const docId =
+                      docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
                     docs.push({
                       id: docId,
                       head: {
@@ -240,20 +309,20 @@ const DocumentFilterPage = (): JSX.Element => {
                       },
                       lines: []
                     });
-                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
-                    navigation.navigate('ProductPage', {
-                      'docId': docId
+                    await AsyncStorage.setItem("docs", JSON.stringify(docs));
+                    navigation.navigate("ProductPage", {
+                      docId: docId
                     });
                   }
                 } else {
                   Alert.alert(
-                    'Предупреждение!',
-                    'Вы не выбрали тип документа или подразделение',
+                    "Предупреждение!",
+                    "Вы не выбрали тип документа или подразделение",
                     [
                       {
-                        text: 'OK'
-                      },
-                    ],
+                        text: "OK"
+                      }
+                    ]
                   );
                 }
               }}
@@ -261,27 +330,27 @@ const DocumentFilterPage = (): JSX.Element => {
               <Text style={styles.buttonOkText}>ОК</Text>
             </TouchableOpacity>
           </View>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
               style={styles.buttonCancel}
-              onPress={() => navigation.navigate('DocumentPage')}
+              onPress={() => navigation.navigate("DocumentPage")}
             >
               <Text style={styles.buttonCancelText}>Отмена</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      <StatusBar barStyle = "light-content" />
+      <StatusBar barStyle="light-content" />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     margin: 15,
     flex: 1,
-    justifyContent: 'space-between'
+    justifyContent: "space-between"
   },
   subdivisionText: {
     fontSize: 18,
@@ -290,65 +359,65 @@ const styles = StyleSheet.create({
   },
   slide: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center"
   },
   slideTextView: {
     flex: 1,
     flexGrow: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginHorizontal: 5,
     marginRight: 5,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: '#FFF'
+    borderColor: "#FFF"
   },
   selectedSlideTextView: {
     flex: 1,
     flexGrow: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginHorizontal: 5,
     marginRight: 5,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: '#080',
-    backgroundColor: '#EEE'
+    borderColor: "#080",
+    backgroundColor: "#EEE"
   },
   buttonView: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 20
   },
   buttonOk: {
     marginRight: 15,
-    backgroundColor: '#2D3083',
+    backgroundColor: "#2D3083",
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 4,
-    borderColor: '#212323'
+    borderColor: "#212323"
   },
   buttonOkText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 17
   },
   buttonCancel: {
     marginLeft: 15,
-    backgroundColor: '#2D3083',
-    color: '#FFFFFF',
+    backgroundColor: "#2D3083",
+    color: "#FFFFFF",
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 4,
-    borderColor: '#212323'
+    borderColor: "#212323"
   },
   buttonCancelText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 17
-  },
+  }
 });
 
 export default DocumentFilterPage;

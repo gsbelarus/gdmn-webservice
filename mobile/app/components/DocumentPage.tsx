@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView, Alert} from 'react-native';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
-import { path } from '../../App';
+import { baseUrl } from '../helpers/utils';
 import statuses from '../../assets/documentStatuses.json';
 
 const DocumentPage = (): JSX.Element => {
@@ -21,7 +21,7 @@ const DocumentPage = (): JSX.Element => {
       setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
       setDataDocTypes(JSON.parse(await AsyncStorage.getItem('documenttypes')));
       const getMe = await fetch(
-        `${path}me`,
+        `${baseUrl}/me`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json'},
@@ -38,7 +38,7 @@ const DocumentPage = (): JSX.Element => {
   const sendUpdateRequest = async () => {
     if(user) {
       const result = await fetch(
-        `${path}messages`,
+        `${baseUrl}/messages`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json'},

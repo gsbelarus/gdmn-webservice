@@ -14,7 +14,6 @@
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
-    "react-native-datepicker": "^1.7.2",
     "react-native-dropdown-menu": "^2.0.0",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-input-spinner": "^1.2.10",
