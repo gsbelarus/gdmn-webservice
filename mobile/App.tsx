@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
 import Navigator from "./app/components/Navigator";
 import {
   StyleSheet,
@@ -13,11 +13,39 @@ import { authApi } from "./app/api/auth";
 import { timeout } from './app/helpers/utils';
 import config from "./app/config";
 
-type TAppState = "CONNECTION" | "PENDING" | "CONNECTED";
-
 // YellowBox.ignoreWarnings(["Require cycle:"]);
 
+type TAppState = "CONNECTION" | "PENDING" | "CONNECTED";
+
 type TStartState = "SIGN_OUT" | "NO_ACTIVATION" | "LOG_IN";
+
+interface IAppState {
+  signedIn?: TStartState;
+  appState?: TAppState;
+  serverResp?: IServerResponse;
+  errorText?: string;
+}
+
+const initialState: IAppState = {
+  appState: "CONNECTION",
+  errorText: ''
+};
+
+interface IState {
+  state: IAppState;
+  setState: React.Dispatch<React.SetStateAction<IAppState>>;
+}
+
+const defaultAppState: IState = {
+  state: initialState,
+  setState: (): void => { },
+};
+
+export const AppContext = createContext<IState>(defaultAppState);
+
+export const useAppContext = (): IState => {
+  return useContext(AppContext);
+};
 
 interface IServerResponse {
   status: number;
@@ -30,19 +58,17 @@ const App = () => {
   const [serverResp, setServerResp] = useState<IServerResponse>(undefined);
   const [errorText, setErrorText] = useState("");
 
+  const { state, setState } = useAppContext();
+
   console.disableYellowBox = !сonfig.debug.showWarnings;
 
-  /*   const connect = async () => {
-      return authApi.getDeviceStatus<IServerResponse>()
-        .then(data => setServerResp(data as IServerResponse))
-        .catch((err: Error) => setErrorText(err.message));
-    } */
   /*
     Порядок работы:
       1) Проверка статуса устройства на сервере
       2) Получение статуса пользователя на сервере
   */
   useEffect(() => {
+    setState({ appState: 'CONNECTION' })
     setAppState('CONNECTION')
   }, []);
 
