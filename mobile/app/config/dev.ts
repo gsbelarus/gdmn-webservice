@@ -5,6 +5,7 @@ export default {
   },
   apiPath: 'api',
   debug: {
-    showWarnings: true
+    showWarnings: true,
+    useMockup: true
   }
 };

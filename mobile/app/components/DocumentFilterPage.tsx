@@ -20,6 +20,7 @@ const DocumentFilterPage = (): JSX.Element => {
   const [contacts, setContacts] = useState([]);
   const [selectedDocType, setSelectedDocType] = useState();
   const [selectedContact, setSelectedContact] = useState();
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const today = new Date();
 
@@ -225,16 +226,17 @@ const DocumentFilterPage = (): JSX.Element => {
         )}
       </View>
       <View style={{ flex: 1.5, marginTop: 80 }}>
+        {
+        !showCalendar ? 
+        <Text>{date}</Text>
+        :
         <DatePicker
           style={{ width: "100%" }}
-          date={date}
           mode="date"
           value={date}
           onChange={handleDate}
-          // placeholder="select date"
-          // format="DD MMM YYYY"
-          // minDate={new Date(1990, 0, 1)}
-          // maxDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
+          minimumDate={new Date(1990, 0, 1)}
+          maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
           // confirmBtnText="Ок"
           // cancelBtnText="Отмена"
           /* iconComponent={
@@ -266,7 +268,7 @@ const DocumentFilterPage = (): JSX.Element => {
           }}
           onDateChange={(newDate) => {setDate(newDate)}}
           */
-        />
+        />}
         <View style={styles.buttonView}>
           <View style={{ flex: 1 }}>
             <TouchableOpacity
