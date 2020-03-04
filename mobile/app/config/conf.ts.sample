@@ -1,10 +1,12 @@
 export default {
   server: {
+    protocol: 'http://',
     name: 'http://192.168.0.73',
     port: 3649
   },
   apiPath: 'api',
   debug: {
-    showWarnings: true
+    showWarnings: true,
+    useMockup: true
   }
 };
