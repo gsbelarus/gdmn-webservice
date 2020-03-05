@@ -9,13 +9,14 @@ export interface IServerResponse {
   result: boolean;
 }
 
-type TAppState = "CONNECTION" | "ERROR" | "CONNECTED";
+// type TAppState = "CONNECTION" | "ERROR" | "CONNECTED";
 
-type TDeviceStatus = "NO_ACTIVATION" | "LOGGED_OUT" | "LOGGED_IN";
+// export type TDeviceStatus = "NOT_REGISTERED" | "NOT_ACTIVATED" | "ACTIVATED";
 
 export interface IAppState {
-  deviceStatus: TDeviceStatus;
   companyID?: string;
-  isLogged: boolean;
-  appState: TAppState;
+  userID?: string;
+  deviceRegistered?: boolean
+  deviceActive?: boolean
+  loggedIn?: boolean;
 }

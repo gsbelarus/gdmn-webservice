@@ -1,33 +1,10 @@
-import React, {Reducer } from "react";
+import React, { Reducer } from "react";
 import { IAppState } from "../model";
+import { TActions, ActionTypes } from './actions';
 
-interface IAction<T, R = any> {
-  type: T;
-  payload: R;
-}
+export { AppActions } from './actions';
 
-enum ActionTypes {
-  SET_ERROR = 'SET_ERROR',
-  CONNECTION = 'CONNECTION'
-}
-
-type IError = string;
-
-export type ErrorCreateAction = IAction<ActionTypes.SET_ERROR, IError>;
-
-export const errorCreate = (errorText: IError): ErrorCreateAction => {
-  return {
-    type: ActionTypes.SET_ERROR,
-    payload: errorText
-  };
-}
-
-type TActions = IAction<ActionTypes>;
-
-const initialState: IAppState = {
-  appState: "CONNECTION",
-  errorText: ""
-};
+const initialState: IAppState = {};
 
 type ContextProps = {
   state: IAppState;
@@ -41,24 +18,37 @@ const defaultAppState: ContextProps = {
 
 const reducer: Reducer<IAppState, TActions> = (state = initialState, action) => {
   switch (action.type) {
-    case ActionTypes.SET_ERROR:
-      return { ...state, errorText: action.payload };
+    case ActionTypes.SET_DEVICE_STATUS:
+      return { ...state, isDeviceRegistered: action.payload };
     default:
       return state;
   }
 };
 
-export const MyContext = React.createContext<ContextProps>(defaultAppState);
 
-export const MyContextProvider = (props: any) => {
+export const StoreContext = React.createContext<ContextProps>(defaultAppState);
+
+export const StoreProvider = (props: any) => {
   let [state, dispatch] = React.useReducer(reducer, initialState);
   let value = { state, dispatch };
-  return (
-    <MyContext.Provider value={value}>{props.children}</MyContext.Provider>
-  );
+  return <StoreContext.Provider value={value}>{props.children}</StoreContext.Provider>
+};
+
+/* const createStoreContext = () => {
+  const StoreContext = React.createContext<ContextProps>(defaultAppState);
+
+  const StoreProvider = (props: any) => {
+    let [state, dispatch] = React.useReducer(reducer, initialState);
+    let value = { state, dispatch };
+    return <StoreContext.Provider value={value}>{props.children}</StoreContext.Provider>
+  };
+
+  const useStore = () => React.useContext(StoreContext);
+
+  return { StoreProvider, useStore };
 }
 
-
+export const { StoreProvider, useStore } = createStoreContext(); */
 /* const Actions: IAction<ActionTypes>[] = [{ type: ActionTypes.ERROR, payload: '' }, { type: ActionTypes.CONNECTION, payload: '' }];
 
 /* const reducer: Reducer<IAppState, TActions> = (state = initialState, action) => {

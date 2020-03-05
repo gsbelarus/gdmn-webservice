@@ -1,12 +1,12 @@
 import React from "react";
-import MyApp from './app/index'
-import { MyContextProvider } from "./app/store";
+import { Loading } from './app/pages';
+import { StoreProvider } from "./app/store";
 
 const App = () => {
   return (
-    <MyContextProvider>
-      <MyApp />
-    </MyContextProvider>
+    <StoreProvider>
+      <Loading />
+    </StoreProvider>
   )
 }
 
