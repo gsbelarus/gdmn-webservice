@@ -55,3 +55,11 @@ interface ActionCreatorsMapObject {
 export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<
   A[keyof A]
 >;
+
+/* export const makeActionCreators = (dispatch, fns) => {
+  return Object.entries(fns).reduce((hash, [name, fn]) => {
+    hash[name] = (...args) => dispatch(fn(...args));
+    return hash;
+  }, {});
+}
+ */

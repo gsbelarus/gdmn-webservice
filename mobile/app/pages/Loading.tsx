@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { authApi } from "../api/auth";
 import { timeout } from "../helpers/utils";
-import config from "../config/index";
-// import { useStore, deviceStatus } from '../store';
-import { StoreContext, AppActions } from '../store';
+import { useStore } from '../store';
 import { IDataFetch } from "../model";
+
+import config from "../config/index";
 
 interface IServerResponse {
   status: number;
@@ -21,9 +21,7 @@ interface IServerResponse {
 }
 
 export const Loading = () => {
-  // const { state: { isDeviceRegistered, isUserLogged }, dispatch } = useStore();
-  const { state: {deviceRegistered, loggedIn}, dispatch } = React.useContext(StoreContext);
-
+  const { state: { deviceRegistered, loggedIn }, actions } = useStore();
   const [serverResp, setServerResp] = useState<IServerResponse>(undefined);
   const [serverReq, setServerReq] = useState<IDataFetch>(undefined);
 
@@ -39,7 +37,7 @@ export const Loading = () => {
   useEffect(() => {
     if (deviceRegistered ?? serverReq?.isLoading) {
       // если нет начального состояния то обращаемся к серверу
-      // TODO: Таймаут вынести в конфиг
+      // TODO Таймаут вынести в конфиг
       timeout(5000, authApi.getDeviceStatus<IServerResponse>())
         .then(data => setServerResp(data as IServerResponse))
         .catch((err: Error) => setServerReq({ isError: true, status: err.message, isLoading: false }));
@@ -49,68 +47,39 @@ export const Loading = () => {
   useEffect(() => {
     if (serverResp) {
       // получен ответ от сервера - передаём результат в глобальный стейт
-      // setServerReq({...serverReq, status: 'got it'});
-      // serverResp.result ? dispatch(deviceStatus(true)) : null;
-      dispatch(AppActions.setDeviceStatus(true));
+      // TODO Проверить если свойство result не передано
+      actions.setDeviceStatus(serverResp.result || false)
     }
-    //   timeout(5000, authApi.getDeviceStatus<IServerResponse>())
-    //     .then(data => setServerResp(data as IServerResponse))
-    //     .catch((err: Error) => setErrorText(err.message));
-    // }
   }, [serverResp]);
 
+  useEffect(() => {
+    // TODO проверить случай когда устройство не зарегистрировано
+    if (deviceRegistered) {
+      // устройство зарегистрировано, проверяем пользователя
+      timeout(5000, authApi.getUserStatus<string>())
+        .then(data => actions.setUserStatus(data !== "not authenticated"))
+        .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }));
+    }
+  }, [deviceRegistered])
 
-
-  /*   useEffect(() => {
-      if (deviceStatus === 'CONNECTION') {
-        setErrorText('');
-        timeout(5000, authApi.getDeviceStatus<IServerResponse>())
-          .then(data => setServerResp(data as IServerResponse))
-          .catch((err: Error) => setErrorText(err.message));
-      }
-    }, [deviceStatus]);
-    */
-
-  /*  useEffect(() => {
-     const checkUserStatus = async () => {
-       // setErrorText(signedIn);
-       if (!serverResp?.result) {
-         setSignedIn("LOGGED_OUT");
-         return;
-       }
-
-       authApi
-         .getUserStatus<string>()
-         .then(data =>
-           setSignedIn(data !== "not authenticated" ? "LOGGED_IN" : "LOGGED_OUT")
-         )
-         .catch((err: Error) => setErrorText(err.message));
-     };
-
-     if (appState === "CONNECTION" && serverResp) checkUserStatus();
-   }, [appState]); */
-
-  /*   useEffect(() => {
-      if (!serverResp || signedIn === "NO_ACTIVATION") return;
-
-    }, [serverResp]); */
-
-  /*   useEffect(() => {
-      if (!errorText) return;
-
-      setAppState("PENDING");
-    }, [errorText]); */
+  useEffect(() => {
+    // Устанавливаем начальнео состояние
+    // TODO переделать на useReducer
+    setServerReq({ isLoading: false, isError: false, status: undefined })
+  }, [loggedIn])
 
   const Layout = Navigator(deviceRegistered ? (loggedIn ? 'LOG_IN' : 'LOG_OUT') : 'NO_ACTIVATION');
 
   /* Если устройство получило статус то переходим в следующе окно */
-  return deviceRegistered ?
+  return deviceRegistered && loggedIn !== undefined ?
     <Layout />
     :
     (
       <View style={styles.container}>
-        <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу. {deviceRegistered} {serverReq?.status}</Text>
+        <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
         <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text>
+        <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered ? 'Registered' : 'not Registered'}</Text>
+        <Text style={{ color: "#888", fontSize: 15 }}>{loggedIn === undefined ? 'undefined' : 'not loggedIn'}</Text>
         {
           !serverReq?.isLoading
             ? <Button onPress={() => setServerReq({ isError: false, isLoading: true, status: undefined })} title="Подключиться" />
