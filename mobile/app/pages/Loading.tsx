@@ -54,12 +54,12 @@ export const Loading = () => {
 
   useEffect(() => {
     // TODO проверить случай когда устройство не зарегистрировано
-    if (deviceRegistered) {
+    deviceRegistered
       // устройство зарегистрировано, проверяем пользователя
-      timeout(5000, authApi.getUserStatus<string>())
+      ? timeout(5000, authApi.getUserStatus<string>())
         .then(data => actions.setUserStatus(data !== "not authenticated"))
-        .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }));
-    }
+        .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }))
+      : actions.setUserStatus(false);
   }, [deviceRegistered])
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export const Loading = () => {
   const Layout = Navigator(deviceRegistered ? (loggedIn ? 'LOG_IN' : 'LOG_OUT') : 'NO_ACTIVATION');
 
   /* Если устройство получило статус то переходим в следующе окно */
-  return deviceRegistered && loggedIn !== undefined ?
+  return deviceRegistered !== undefined && loggedIn !== undefined ?
     <Layout />
     :
     (
