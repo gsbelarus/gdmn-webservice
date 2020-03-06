@@ -4,9 +4,9 @@ export interface IDataFetch {
   status?: string;
 }
 
-export interface IServerResponse {
+export interface IServerResponse<T> {
   status: number;
-  result: boolean;
+  result: T;
 }
 
 // type TAppState = "CONNECTION" | "ERROR" | "CONNECTED";

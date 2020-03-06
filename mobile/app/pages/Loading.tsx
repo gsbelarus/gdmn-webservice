@@ -11,18 +11,25 @@ import {
 import { authApi } from "../api/auth";
 import { timeout } from "../helpers/utils";
 import { useStore } from '../store';
-import { IDataFetch } from "../model";
+import { IDataFetch, IServerResponse } from "../model";
 
 import config from "../config/index";
 
-interface IServerResponse {
-  status: number;
-  result: boolean;
+interface IUser {
+  id: string;
+  userName: string;
+  companies?: string[];
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
 }
+
+const isUser = (obj: any): obj is IUser =>
+  (obj as IUser).id !== undefined;
 
 export const Loading = () => {
   const { state: { deviceRegistered, loggedIn }, actions } = useStore();
-  const [serverResp, setServerResp] = useState<IServerResponse>(undefined);
+  const [serverResp, setServerResp] = useState<IServerResponse<boolean>>(undefined);
   const [serverReq, setServerReq] = useState<IDataFetch>(undefined);
 
   console.disableYellowBox = !config.debug.showWarnings;
@@ -38,8 +45,8 @@ export const Loading = () => {
     if (deviceRegistered ?? serverReq?.isLoading) {
       // если нет начального состояния то обращаемся к серверу
       // TODO Таймаут вынести в конфиг
-      timeout(5000, authApi.getDeviceStatus<IServerResponse>())
-        .then(data => setServerResp(data as IServerResponse))
+      timeout(5000, authApi.getDeviceStatus<IServerResponse<boolean>>())
+        .then(data => setServerResp(data as IServerResponse<boolean>))
         .catch((err: Error) => setServerReq({ isError: true, status: err.message, isLoading: false }));
     }
   }, [serverReq]);
@@ -48,7 +55,7 @@ export const Loading = () => {
     if (serverResp) {
       // получен ответ от сервера - передаём результат в глобальный стейт
       // TODO Проверить если свойство result не передано
-      actions.setDeviceStatus(serverResp.result || false)
+      actions.setDeviceStatus(serverResp.result ?? false)
     }
   }, [serverResp]);
 
@@ -56,8 +63,9 @@ export const Loading = () => {
     // TODO проверить случай когда устройство не зарегистрировано
     deviceRegistered
       // устройство зарегистрировано, проверяем пользователя
-      ? timeout(5000, authApi.getUserStatus<string>())
-        .then(data => actions.setUserStatus(data !== "not authenticated"))
+      ? timeout(5000, authApi.getUserStatus<IServerResponse<IUser | string>>())
+    //    .then(data => actions.setUserStatus(isUser(data)))
+        .then(data => setServerReq({ isError: true, isLoading: false, status: (data as IUser).userName }))
         .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }))
       : actions.setUserStatus(false);
   }, [deviceRegistered])
