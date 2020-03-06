@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from "react";
-import Navigator from "../components/Navigator";
-import {
-  StyleSheet,
-  View,
-  Text,
-  ActivityIndicator,
-  YellowBox,
-  Button
-} from "react-native";
-import { authApi } from "../api/auth";
-import { timeout } from "../helpers/utils";
+import React, { useEffect, useState } from 'react';
+import Navigator from '../components/Navigator';
+import { StyleSheet, View, Text, ActivityIndicator, YellowBox, Button } from 'react-native';
+import { authApi } from '../api/auth';
+import { timeout } from '../helpers/utils';
 import { useStore } from '../store';
-import { IDataFetch, IServerResponse } from "../model";
+import { IDataFetch, IServerResponse } from '../model';
 
-import config from "../config/index";
+import config from '../config/index';
 
 interface IUser {
   id: string;
@@ -24,12 +17,14 @@ interface IUser {
   phoneNumber?: string;
 }
 
-const isUser = (obj: any): obj is IUser =>
-  (obj as IUser).id !== undefined;
+const isUser = (obj: any): obj is IUser => obj instanceof Object && 'id' in obj;
 
 export const Loading = () => {
-  const { state: { deviceRegistered, loggedIn }, actions } = useStore();
-  const [serverResp, setServerResp] = useState<IServerResponse<boolean>>(undefined);
+  const {
+    state: { deviceRegistered, loggedIn },
+    actions
+  } = useStore();
+  const [serverResp, setServerResp] = useState<IServerResponse<boolean | IUser>>(undefined);
   const [serverReq, setServerReq] = useState<IDataFetch>(undefined);
 
   console.disableYellowBox = !config.debug.showWarnings;
@@ -46,7 +41,7 @@ export const Loading = () => {
       // если нет начального состояния то обращаемся к серверу
       // TODO Таймаут вынести в конфиг
       timeout(5000, authApi.getDeviceStatus<IServerResponse<boolean>>())
-        .then(data => setServerResp(data as IServerResponse<boolean>))
+        .then((data: IServerResponse<boolean>) => setServerResp(data))
         .catch((err: Error) => setServerReq({ isError: true, status: err.message, isLoading: false }));
     }
   }, [serverReq]);
@@ -55,61 +50,67 @@ export const Loading = () => {
     if (serverResp) {
       // получен ответ от сервера - передаём результат в глобальный стейт
       // TODO Проверить если свойство result не передано
-      actions.setDeviceStatus(serverResp.result ?? false)
+      // TODO перенести result уровнем выше
+      actions.setDeviceStatus(serverResp.result as boolean);
     }
   }, [serverResp]);
 
   useEffect(() => {
     // TODO проверить случай когда устройство не зарегистрировано
     deviceRegistered
-      // устройство зарегистрировано, проверяем пользователя
-      ? timeout(5000, authApi.getUserStatus<IServerResponse<IUser | string>>())
-    //    .then(data => actions.setUserStatus(isUser(data)))
-        .then(data => setServerReq({ isError: true, isLoading: false, status: (data as IUser).userName }))
-        .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }))
-      : actions.setUserStatus(false);
-  }, [deviceRegistered])
+      ? // устройство зарегистрировано, проверяем пользователя
+        timeout(5000, authApi.getUserStatus<IServerResponse<IUser | string>>())
+          .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
+          .catch((err: Error) => setServerReq({ isError: true, isLoading: false, status: err.message }))
+      : // устройство не зарегистрировано, устанавливем статус пользователя loggedIn: false
+        actions.setUserStatus(false);
+  }, [deviceRegistered]);
 
   useEffect(() => {
     // Устанавливаем начальнео состояние
     // TODO переделать на useReducer
-    setServerReq({ isLoading: false, isError: false, status: undefined })
-  }, [loggedIn])
+    setServerReq({ isLoading: false, isError: false, status: undefined });
+  }, [loggedIn]);
 
   const Layout = Navigator(deviceRegistered ? (loggedIn ? 'LOG_IN' : 'LOG_OUT') : 'NO_ACTIVATION');
 
   /* Если устройство получило статус то переходим в следующе окно */
-  return deviceRegistered !== undefined && loggedIn !== undefined ?
+  return deviceRegistered !== undefined && loggedIn !== undefined ? (
     <Layout />
-    :
-    (
-      <View style={styles.container}>
-        <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
-        <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text>
-        <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered ? 'Registered' : 'not Registered'}</Text>
-        <Text style={{ color: "#888", fontSize: 15 }}>{loggedIn === undefined ? 'undefined' : 'not loggedIn'}</Text>
-        {
-          !serverReq?.isLoading
-            ? <Button onPress={() => setServerReq({ isError: false, isLoading: true, status: undefined })} title="Подключиться" />
-            : <>
-              <ActivityIndicator size="large" color="#70667D" />
-              <Button onPress={() => setServerReq({ isError: true, isLoading: false, status: 'прервано пользователем' })} title="Прервать" />
-            </>
-        }
-        {
-          serverReq?.isError
-            ? <Text style={{ color: "#888", fontSize: 18 }}>Ошибка: {serverReq?.status}</Text>
-            : null
-        }
-      </View>
-    );
+  ) : (
+    <View style={styles.container}>
+      <Text style={{ color: '#888', fontSize: 18 }}>Подключение к серверу</Text>
+      <Text style={{ color: '#888', fontSize: 15 }}>
+        {config.server.name}:{config.server.port}
+      </Text>
+      <Text style={{ color: '#888', fontSize: 15 }}>
+        reg: {deviceRegistered === undefined ? 'undefined' : deviceRegistered ? 'Registered' : 'not Registered'}
+      </Text>
+      <Text style={{ color: '#888', fontSize: 15 }}>log: {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not logged'}</Text>
+      {!serverReq?.isLoading ? (
+        <Button
+          onPress={() => setServerReq({ isError: false, isLoading: true, status: undefined })}
+          title="Подключиться"
+        />
+      ) : (
+        <>
+          <ActivityIndicator size="large" color="#70667D" />
+          <Button
+            onPress={() => setServerReq({ isError: true, isLoading: false, status: 'прервано пользователем' })}
+            title="Прервать"
+          />
+        </>
+      )}
+      {serverReq?.isError ? <Text style={{ color: '#888', fontSize: 18 }}>Ошибка: {serverReq?.status}</Text> : null}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E3EFF4",
-    alignItems: "center",
-    justifyContent: "center"
+    backgroundColor: '#E3EFF4',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
