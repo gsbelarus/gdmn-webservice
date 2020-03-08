@@ -15,5 +15,3 @@ web-report/
 .DS_Store
 
 # config
-/app/config/dev.ts
-/app/config/prod.ts
