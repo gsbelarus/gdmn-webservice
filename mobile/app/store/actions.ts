@@ -2,6 +2,8 @@
 import { createActionPayload, ActionsUnion } from './utils';
 
 export enum ActionTypes {
+  DISCONNECT = 'DISCONNECT',
+  LOGOUT = 'LOGOUT',
   SET_DEVICE_STATUS = 'SET_DEVICE_STATUS',
   SET_USER_STATUS = 'SET_USER_STATUS',
   SET_COMPANY_ID = 'SET_COMPANY_ID',
@@ -9,8 +11,10 @@ export enum ActionTypes {
 }
 
 export const AppActions = {
-  setDeviceStatus: createActionPayload<ActionTypes.SET_DEVICE_STATUS, boolean>(ActionTypes.SET_DEVICE_STATUS),
-  setUserStatus: createActionPayload<ActionTypes.SET_USER_STATUS, boolean>(ActionTypes.SET_USER_STATUS),
+  disconnect: createActionPayload<ActionTypes.DISCONNECT, void>(ActionTypes.DISCONNECT),
+  logout: createActionPayload<ActionTypes.LOGOUT, void>(ActionTypes.LOGOUT),
+  setDeviceStatus: createActionPayload<ActionTypes.SET_DEVICE_STATUS, boolean | undefined>(ActionTypes.SET_DEVICE_STATUS),
+  setUserStatus: createActionPayload<ActionTypes.SET_USER_STATUS, boolean | undefined>(ActionTypes.SET_USER_STATUS),
   setCompanyID: createActionPayload<ActionTypes.SET_COMPANY_ID, string>(ActionTypes.SET_COMPANY_ID),
   setUserID: createActionPayload<ActionTypes.SET_USER_ID, string>(ActionTypes.SET_USER_ID)
 }

@@ -2,36 +2,49 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { baseUrl } from '../helpers/utils';
+import { authApi } from '../api/auth';
+import { useStore } from '../store';
 
 const MainPage = (): JSX.Element => {
 
-  const {navigate} = useNavigation();
+  const { navigate } = useNavigation();
   const [user, setUser] = useState();
   const [resUpd, setResUpd] = useState();
 
-  useEffect( () => {
+  const { state, actions } = useStore();
+
+  useEffect(() => {
+    // Если сброшен флаг регистрации то переходим на страничку входа в систему
+    if (state.deviceRegistered === undefined) {
+      navigate('Auth');
+      Alert.alert('Тест', '', [{ text: 'OK' }]);
+    }
+  }, [state.deviceRegistered])
+
+  useEffect(() => {
     const typesData = ['goods', 'remains', 'documenttypes', 'contacts', 'docs'];
-    const getData = async() => {
+    const getData = async () => {
       const data = await fetch(
         `${baseUrl}/test/all`,
         {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
         }
       ).then(res => res.json());
       data.status === 200
-      ? data.result.map((item, idx) => AsyncStorage.setItem(typesData[idx], JSON.stringify(item)))
-      : undefined;
+        ? data.result.map((item, idx) => AsyncStorage.setItem(typesData[idx], JSON.stringify(item)))
+        : undefined;
     }
 
-    const checkData = async() => {
+    const checkData = async () => {
       await AsyncStorage.clear();
       const keys = await AsyncStorage.getAllKeys();
-      !!keys && typesData.filter( item => !keys.find(key => key === item)).length === 0
-      ? undefined
-      : await getData();
+      !!keys && typesData.filter(item => !keys.find(key => key === item)).length === 0
+        ? undefined
+        : await getData();
 
       /*const getMe = await fetch(
         `${baseUrl}me`,
@@ -49,12 +62,12 @@ const MainPage = (): JSX.Element => {
   }, []);
 
   const sendUpdateRequest = async () => {
-    if(user) {
+    if (user) {
       const result = await fetch(
         `${baseUrl}/messages`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({
             head: {
@@ -72,15 +85,14 @@ const MainPage = (): JSX.Element => {
           })
         }
       ).then(res => res.json());
-      if(result.status === 200) {
+      if (result.status === 200) {
         setResUpd(result.result);
         Alert.alert(
           'Успех!',
           'Через несколько секунд нажжмите на "Получить обновления".',
           [
             {
-              text: 'OK',
-              onPress: () => {}
+              text: 'OK'
             },
           ]
         )
@@ -90,8 +102,7 @@ const MainPage = (): JSX.Element => {
           '',
           [
             {
-              text: 'OK',
-              onPress: () => {}
+              text: 'OK'
             },
           ]
         )
@@ -102,8 +113,7 @@ const MainPage = (): JSX.Element => {
         'Что-то пошло не так!',
         [
           {
-            text: 'OK',
-            onPress: () => {}
+            text: 'OK'
           },
         ]
       )
@@ -115,20 +125,20 @@ const MainPage = (): JSX.Element => {
       `${baseUrl}/messages?companyId=${user.companies[0]}`,
       {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
       }
     ).then(res => res.json());
-    if(result.status === 200) {
+    if (result.status === 200) {
       const data = result.result.find(item => item.body.type === 'data');
-      if(!data) {
+      if (!data) {
         Alert.alert(
           'Упс!',
           'Что-то пошло не так!',
           [
             {
               text: 'OK',
-              onPress: () => {}
+              onPress: () => { }
             },
           ]
         )
@@ -143,48 +153,66 @@ const MainPage = (): JSX.Element => {
         [
           {
             text: 'OK',
-            onPress: () => {}
+            onPress: () => { }
           },
         ]
       )
     }
   }
 
-  const _signOutAsync = async () => {
+  const _logoutAsync = async () => {
     Alert.alert(
-      'Подтвердите выход',
-      '',
+      'Выйти из пользователя?', '',
       [
         {
-          text: 'OK',
-          onPress: async() => {
-            const data = await fetch(
-              `${baseUrl}/logout`,
-              {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json'},
-                credentials: 'include'
-              }
-            ).then(res => res.json())
-            if (data.status !== 200) {
-              return Alert.alert(
-                data.result,
-                'Попробуйте еще раз',
-                [
-                  {
-                    text: 'OK',
-                    onPress: () => {}
-                  },
-                ],
-              );
-            } else {
-              navigate('Auth');
+          text: 'Подтвердить',
+          onPress: async () => {
+            const res = await authApi.logout();
+            if (res.status === 200) {
+              actions.logout();
+              return;
             }
+            return Alert.alert(
+              'Ошибка сервера', res.result,
+              [
+                {
+                  text: 'OK'
+                },
+              ],
+            );
           }
         },
         {
           text: 'Отмена',
-          onPress: () => {}
+        },
+      ],
+    );
+  };
+
+  const _disconnectAsync = async () => {
+    Alert.alert(
+      'Отключиться от сервера?', '',
+      [
+        {
+          text: 'Подтвердить',
+          onPress: async () => {
+            const res = await authApi.logout();
+            if (res.status === 200) {
+              actions.disconnect();
+              return;
+            }
+            return Alert.alert(
+              'Ошибка сервера', res.result,
+              [
+                {
+                  text: 'OK'
+                },
+              ],
+            );
+          }
+        },
+        {
+          text: 'Отмена',
         },
       ],
     );
@@ -192,24 +220,14 @@ const MainPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.logoutButton}>
-          <TouchableOpacity onPress={_signOutAsync}>
-            <SimpleLineIcons
-              name="logout"
-              size={28}
-              color={'#2D3083'}
-            />
-          </TouchableOpacity>
-        </View>
-      <View style={{flex: 2}}>
+      <View style={{ flex: 2 }}>
         <TouchableHighlight
-          style={styles.viewButton} 
+          style={styles.viewButton}
           onPress={() => navigate('DirectoryPage')}
         >
-          <Text 
-          style={styles.viewButtonText}>Справочник</Text>
+          <Text style={styles.viewButtonText}>Справочник</Text>
         </TouchableHighlight>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => navigate('DocumentPage')}
@@ -217,23 +235,39 @@ const MainPage = (): JSX.Element => {
             <Text style={styles.createButtonText}>Документы</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.createButton} 
-            onPress={async() => {!resUpd ? sendUpdateRequest() : checkUpdateRequest()} }
+            style={styles.createButton}
+            onPress={async () => { !resUpd ? sendUpdateRequest() : checkUpdateRequest() }}
           >
             <Text style={styles.createButtonText}>{!resUpd ? 'Обновить данные' : 'Получить обновления'}</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <StatusBar barStyle = "light-content" />
+      <View style={{ flexDirection: 'row-reverse' }}>
+        <TouchableOpacity onPress={_disconnectAsync} style={styles.systemButtons}>
+          <MaterialCommunityIcons
+            size={30}
+            color='#FFF'
+            name='logout-variant'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={_logoutAsync} style={styles.systemButtons}>
+          <MaterialCommunityIcons
+            size={30}
+            color='#FFF'
+            name='account-convert'
+          />
+        </TouchableOpacity>
+      </View>
+      <StatusBar barStyle="light-content" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 15,
-    marginTop: 30,
+    // backgroundColor: '#FFFFFF',
+    marginHorizontal: 10,
+    marginTop: 0,
     flex: 1,
     justifyContent: 'space-between'
   },
@@ -264,9 +298,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20
   },
-  logoutButton: {
-    flex: 1,
-    paddingLeft: 300
+  systemButtons: {
+    margin: 10,
+    borderRadius: 50,
+    borderColor: '#2D3083',
+    borderWidth: 1,
+    height: 50,
+    width: 50,
+    backgroundColor: '#2D3083',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 

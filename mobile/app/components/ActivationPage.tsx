@@ -10,7 +10,7 @@ const {navigate} = useNavigation();
 const [inputValue, setInputValue] = useState('');
 const verifyCode = async () => {
   const data = await fetch(
-    `${baseUrl}device/verifyCode?code=${inputValue}`,
+    `${baseUrl}/device/verifyCode?code=${inputValue}`,
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json'},
@@ -19,7 +19,7 @@ const verifyCode = async () => {
   ).then(res => res.json())
   if (data.status === 200) {
     await fetch(
-      `${baseUrl}device/new`,
+      `${baseUrl}/device/new`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},

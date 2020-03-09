@@ -6,7 +6,10 @@ import { ActionsUnion } from './utils';
 import { AppActions } from './actions';
 export { AppActions } from './actions';
 
-const initialState: IAppState = {};
+const initialState: IAppState = {
+  deviceRegistered: undefined,
+  loggedIn: undefined
+};
 
 type ContextProps = {
   state: IAppState;
@@ -20,6 +23,10 @@ const defaultAppState: ContextProps = {
 
 const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
+    case ActionTypes.DISCONNECT:
+      return initialState;
+    case ActionTypes.LOGOUT:
+      return { ...state, userID: undefined, loggedIn: false};
     case ActionTypes.SET_DEVICE_STATUS:
       return { ...state, deviceRegistered: action.payload };
     case ActionTypes.SET_USER_STATUS:
