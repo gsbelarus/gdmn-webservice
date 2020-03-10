@@ -2,7 +2,7 @@ import Router from 'koa-router';
 import { readFile, writeFile, removeFile } from '../workWithFile';
 import { PATH_LOCAL_DB_MESSAGES } from '../rest';
 import log4js from 'log4js';
-import uuidv1 from 'uuid';
+import { v1 as uuidv1 } from 'uuid';
 import { IMessage } from '../models';
 import { promises } from 'fs';
 

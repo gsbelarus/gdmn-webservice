@@ -9,14 +9,20 @@ export interface IServerResponse<T> {
   result: T;
 }
 
-// type TAppState = "CONNECTION" | "ERROR" | "CONNECTED";
-
-// export type TDeviceStatus = "NOT_REGISTERED" | "NOT_ACTIVATED" | "ACTIVATED";
-
 export interface IAppState {
   companyID?: string;
   userID?: string;
   deviceRegistered?: boolean
   deviceActive?: boolean
   loggedIn?: boolean;
+}
+
+// перенести в общую папку common
+export interface IUser {
+  id: string;
+  userName: string;
+  companies?: string[];
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
 }

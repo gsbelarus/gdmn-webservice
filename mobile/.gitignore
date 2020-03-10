@@ -13,7 +13,3 @@ web-report/
 
 # macOS
 .DS_Store
-
-# config
-*/config/prod.ts
-*/config/dev.ts
