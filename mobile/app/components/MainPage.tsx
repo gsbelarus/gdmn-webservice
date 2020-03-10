@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, Text, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
-import { SimpleLineIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { baseUrl } from '../helpers/utils';
 import { authApi } from '../api/auth';
@@ -14,14 +13,6 @@ const MainPage = (): JSX.Element => {
   const [resUpd, setResUpd] = useState();
 
   const { state, actions } = useStore();
-
-  useEffect(() => {
-    // Если сброшен флаг регистрации то переходим на страничку входа в систему
-    if (state.deviceRegistered === undefined) {
-      navigate('Auth');
-      Alert.alert('Тест', '', [{ text: 'OK' }]);
-    }
-  }, [state.deviceRegistered])
 
   useEffect(() => {
     const typesData = ['goods', 'remains', 'documenttypes', 'contacts', 'docs'];
@@ -189,35 +180,6 @@ const MainPage = (): JSX.Element => {
     );
   };
 
-  const _disconnectAsync = async () => {
-    Alert.alert(
-      'Отключиться от сервера?', '',
-      [
-        {
-          text: 'Подтвердить',
-          onPress: async () => {
-            const res = await authApi.logout();
-            if (res.status === 200) {
-              actions.disconnect();
-              return;
-            }
-            return Alert.alert(
-              'Ошибка сервера', res.result,
-              [
-                {
-                  text: 'OK'
-                },
-              ],
-            );
-          }
-        },
-        {
-          text: 'Отмена',
-        },
-      ],
-    );
-  };
-
   return (
     <View style={styles.container}>
       <View style={{ flex: 2 }}>
@@ -243,13 +205,13 @@ const MainPage = (): JSX.Element => {
         </View>
       </View>
       <View style={{ flexDirection: 'row-reverse' }}>
-        <TouchableOpacity onPress={_disconnectAsync} style={styles.systemButtons}>
+{/*         <TouchableOpacity onPress={_disconnectAsync} style={styles.systemButtons}>
           <MaterialCommunityIcons
             size={30}
             color='#FFF'
             name='logout-variant'
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={_logoutAsync} style={styles.systemButtons}>
           <MaterialCommunityIcons
             size={30}

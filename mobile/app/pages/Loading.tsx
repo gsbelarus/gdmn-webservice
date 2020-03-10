@@ -18,6 +18,11 @@ import { IDataFetch, IServerResponse, IUser } from "../model";
 import config from "../config/index";
 import { Settings } from "./Settings";
 
+/*
+  TODO доработать функцию формирования пути подключения
+  Считываем данные из файла, если файла нет или не заполнено, то берём из конфига
+*/
+
 interface ILoadingState {
   serverResp?: IServerResponse<any>,
   serverReq: IDataFetch,
@@ -29,7 +34,7 @@ type Action =
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
   | { type: 'SETTINGS_FORM'; showSettings: boolean }
-  | { type: 'SET_RESPONSE'; status: number, result: any}
+  | { type: 'SET_RESPONSE'; status: number, result: any }
 
 function reducer(state: ILoadingState, action: Action): ILoadingState {
   switch (action.type) {
@@ -38,11 +43,11 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
     case 'SETTINGS_FORM':
       return { ...state, showSettings: action.showSettings };
     case 'SET_RESPONSE':
-      return { ...state, serverResp: {result: action.result, status: action.status}};
+      return { ...state, serverResp: { result: action.result, status: action.status } };
     case 'SET_ERROR':
-      return { ...state, serverReq: {...state.serverReq, isError: true, status: action.text, isLoading: false }};
+      return { ...state, serverReq: { ...state.serverReq, isError: true, status: action.text, isLoading: false } };
     case 'SET_CONNECTION':
-      return { ...state, serverResp: undefined, serverReq: {...state.serverReq, isError: false, status: undefined, isLoading: true }};
+      return { ...state, serverResp: undefined, serverReq: { ...state.serverReq, isError: false, status: undefined, isLoading: true } };
     default:
       return state;
   }
@@ -59,8 +64,6 @@ const isUser = (obj: any): obj is IUser => obj instanceof Object && 'id' in obj;
 export const Loading = () => {
   const { state: { deviceRegistered, loggedIn }, actions } = useStore();
   const [state, setState] = useReducer(reducer, initialState);
-  // const [serverResp, setServerResp] = useState<IServerResponse<any>>(undefined);
-  // const [serverReq, setServerReq] = useState<IDataFetch>(undefined);
 
   console.disableYellowBox = !config.debug.showWarnings;
   /*
@@ -76,8 +79,8 @@ export const Loading = () => {
       // если нет начального состояния то обращаемся к серверу
       // TODO Таймаут вынести в конфиг
       timeout(5000, authApi.getDeviceStatus())
-        .then((data: IServerResponse<boolean>) => setState({type: 'SET_RESPONSE', result: data.result, status: data.status}))
-        .catch((err: Error) => setState({type: 'SET_ERROR', text: err.message}));
+        .then((data: IServerResponse<boolean>) => setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }))
+        .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
   }, [state.serverReq]);
 
@@ -97,16 +100,13 @@ export const Loading = () => {
       // устройство зарегистрировано, проверяем пользователя
       ? timeout(5000, authApi.getUserStatus())
         .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
-        // .then((data: IServerResponse<IUser | string>) => setServerReq({ isError: true, isLoading: false, status: JSON.stringify(data.result)}))
-        .catch((err: Error) => setState({type: 'SET_ERROR', text: err.message}))
+        .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [deviceRegistered])
 
   useEffect(() => {
-    // Устанавливаем начальнео состояние
-    // TODO переделать на useReducer
-    setState({type: 'INIT'})
-    // setServerReq({ isLoading: false, isError: false, status: undefined })
+    // Устанавливаем начальное состояние
+    setState({ type: 'INIT' })
   }, [loggedIn])
 
   const Layout = Navigator(deviceRegistered ? (loggedIn ? 'LOG_IN' : 'LOG_OUT') : 'NO_ACTIVATION');
@@ -117,42 +117,42 @@ export const Loading = () => {
     :
     (
       state.showSettings
-      ? <Settings confirm={() => setState({'type': 'SETTINGS_FORM', showSettings: false})}/>
-      :
-      <>
-        <View style={styles.container}>
-          <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
-          <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text>
-          <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered === undefined ? 'undefined' : (deviceRegistered ? 'Registered' : 'not Registered')}</Text>
-          <Text style={{ color: "#888", fontSize: 15 }}>{loggedIn === undefined ? 'undefined' : (loggedIn ? 'logged' : 'not loggedIn')}</Text>
-          {
-            !state.serverReq?.isLoading
-              ? <Button onPress={() => setState({type: 'SET_CONNECTION'})} title="Подключиться" />
-              : <>
-                <ActivityIndicator size="large" color="#70667D" />
-                <Button onPress={() => setState({type: 'SET_ERROR', text: 'прервано пользователем'})} title="Прервать" />
-              </>
-          }
-          {
-            state.serverReq?.isError
-              ? <Text style={{ color: "#888", fontSize: 18 }}>Ошибка: {state.serverReq?.status}</Text>
-              : null
-          }
-        </View>
-        <View
-          style={{ alignItems: 'flex-end', backgroundColor: "#E3EFF4" }}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setState({ type: 'SETTINGS_FORM', showSettings: true })}>
-            <MaterialIcons
-              size={30}
-              color='#FFF'
-              name='settings'
-            />
-          </TouchableOpacity>
-        </View>
-      </>
+        ? <Settings confirm={() => setState({ 'type': 'SETTINGS_FORM', showSettings: false })} />
+        :
+        <>
+          <View style={styles.container}>
+            <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
+            <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text>
+            <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered === undefined ? 'undefined' : (deviceRegistered ? 'Registered' : 'not Registered')}</Text>
+            <Text style={{ color: "#888", fontSize: 15 }}>{loggedIn === undefined ? 'undefined' : (loggedIn ? 'logged' : 'not loggedIn')}</Text>
+            {
+              !state.serverReq?.isLoading
+                ? <Button onPress={() => setState({ type: 'SET_CONNECTION' })} title="Подключиться" />
+                : <>
+                  <ActivityIndicator size="large" color="#70667D" />
+                  <Button onPress={() => setState({ type: 'SET_ERROR', text: 'прервано пользователем' })} title="Прервать" />
+                </>
+            }
+            {
+              state.serverReq?.isError
+                ? <Text style={{ color: "#888", fontSize: 18 }}>Ошибка: {state.serverReq?.status}</Text>
+                : null
+            }
+          </View>
+          <View
+            style={{ alignItems: 'flex-end', backgroundColor: "#E3EFF4" }}
+          >
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setState({ type: 'SETTINGS_FORM', showSettings: true })}>
+              <MaterialIcons
+                size={30}
+                color='#FFF'
+                name='settings'
+              />
+            </TouchableOpacity>
+          </View>
+        </>
     );
 };
 
