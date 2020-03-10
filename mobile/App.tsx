@@ -1,6 +1,6 @@
 import React from "react";
-import { Loading } from './app/pages';
-import { StoreProvider } from "./app/store";
+import { Loading } from './src/pages';
+import { StoreProvider } from "./src/store";
 
 const App = () => {
   return (

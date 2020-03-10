@@ -3,7 +3,7 @@ import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Scro
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { baseUrl } from '../helpers/utils';
-import statuses from '../../assets/documentStatuses.json';
+import statuses from '../assets/documentStatuses.json';
 
 const DocumentPage = (): JSX.Element => {
 
