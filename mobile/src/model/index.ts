@@ -9,7 +9,15 @@ export interface IServerResponse<T> {
   result: T;
 }
 
+export interface IBaseUrl {
+  protocol: string;
+  server: string;
+  port: number;
+  apiPath: string;
+}
+
 export interface IAppState {
+  baseUrl?: IBaseUrl;
   companyID?: string;
   userID?: string;
   deviceRegistered?: boolean

@@ -7,6 +7,7 @@ import { AppActions } from './actions';
 export { AppActions } from './actions';
 
 const initialState: IAppState = {
+  baseUrl: undefined,
   deviceRegistered: undefined,
   loggedIn: undefined
 };
@@ -26,7 +27,9 @@ const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IA
     case ActionTypes.DISCONNECT:
       return initialState;
     case ActionTypes.LOGOUT:
-      return { ...state, userID: undefined, loggedIn: false};
+      return { ...state, userID: undefined, loggedIn: false };
+    case ActionTypes.SET_BASEURL:
+      return { ...state, baseUrl: action.payload };
     case ActionTypes.SET_DEVICE_STATUS:
       return { ...state, deviceRegistered: action.payload };
     case ActionTypes.SET_USER_STATUS:

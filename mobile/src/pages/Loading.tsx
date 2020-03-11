@@ -62,7 +62,7 @@ const initialState: ILoadingState = {
 const isUser = (obj: any): obj is IUser => obj instanceof Object && 'id' in obj;
 
 export const Loading = () => {
-  const { state: { deviceRegistered, loggedIn }, actions } = useStore();
+  const { state: { deviceRegistered, loggedIn, baseUrl }, actions } = useStore();
   const [state, setState] = useReducer(reducer, initialState);
 
   console.disableYellowBox = !config.debug.showWarnings;
@@ -122,7 +122,9 @@ export const Loading = () => {
         <>
           <View style={styles.container}>
             <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
-            <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text>
+            {/* <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text> */}
+            <Text style={{ color: "#888", fontSize: 15 }}>{`${baseUrl.server}:${baseUrl.port}`}</Text>
+
             <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered === undefined ? 'undefined' : (deviceRegistered ? 'Registered' : 'not Registered')}</Text>
             <Text style={{ color: "#888", fontSize: 15 }}>{loggedIn === undefined ? 'undefined' : (loggedIn ? 'logged' : 'not loggedIn')}</Text>
             {

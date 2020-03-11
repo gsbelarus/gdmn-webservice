@@ -1,5 +1,6 @@
 // import { TDeviceStatus } from '../model'
 import { createActionPayload, ActionsUnion } from './utils';
+import { IBaseUrl } from '../model';
 
 export enum ActionTypes {
   DISCONNECT = 'DISCONNECT',
@@ -7,12 +8,14 @@ export enum ActionTypes {
   SET_DEVICE_STATUS = 'SET_DEVICE_STATUS',
   SET_USER_STATUS = 'SET_USER_STATUS',
   SET_COMPANY_ID = 'SET_COMPANY_ID',
-  SET_USER_ID = 'SET_USER_ID'
+  SET_USER_ID = 'SET_USER_ID',
+  SET_BASEURL = 'SET_BASEURL',
 }
 
 export const AppActions = {
   disconnect: createActionPayload<ActionTypes.DISCONNECT, void>(ActionTypes.DISCONNECT),
   logout: createActionPayload<ActionTypes.LOGOUT, void>(ActionTypes.LOGOUT),
+  setBaseUrl: createActionPayload<ActionTypes.SET_BASEURL, IBaseUrl>(ActionTypes.SET_BASEURL),
   setDeviceStatus: createActionPayload<ActionTypes.SET_DEVICE_STATUS, boolean | undefined>(ActionTypes.SET_DEVICE_STATUS),
   setUserStatus: createActionPayload<ActionTypes.SET_USER_STATUS, boolean | undefined>(ActionTypes.SET_USER_STATUS),
   setCompanyID: createActionPayload<ActionTypes.SET_COMPANY_ID, string>(ActionTypes.SET_COMPANY_ID),
