@@ -6,7 +6,7 @@ import SettingsItem from '../../components/SettingsItem';
 export const Settings = () => {
   return (
     <ScrollView /* style={{ backgroundColor: theme.colors.background }} */>
-      <SettingsItem label="Удалять документы после синхронизации" value={true} onValueChange={() => {}} />
+      <SettingsItem label="Удалять после передачи" value={true} onValueChange={() => {}} />
       <Divider />
       <SettingsItem label="Синхронизировать" value={true} onValueChange={() => {}} />
     </ScrollView>
