@@ -1,3 +1,10 @@
+import { AppActions } from "../store";
+
+export interface IContextProps {
+  state: IAppState;
+  actions: typeof AppActions;
+}
+
 export interface IDataFetch {
   isLoading: boolean;
   isError: boolean;
@@ -14,6 +21,11 @@ export interface IBaseUrl {
   server: string;
   port: number;
   apiPath: string;
+}
+
+export interface ICredentials {
+  username: string;
+  password: string;
 }
 
 export interface IAppState {

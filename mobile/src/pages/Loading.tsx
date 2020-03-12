@@ -17,6 +17,7 @@ import { IDataFetch, IServerResponse, IUser } from "../model";
 
 import config from "../config/index";
 import { Settings } from "./Settings";
+import { MainScreen } from "../screens/App/MainScreen";
 
 /*
   TODO доработать функцию формирования пути подключения
@@ -113,7 +114,7 @@ export const Loading = () => {
 
   /* Если устройство получило статус то переходим в следующе окно */
   return (deviceRegistered && loggedIn) !== undefined ?
-    <Layout />
+    <MainScreen />
     :
     (
       state.showSettings
@@ -122,7 +123,6 @@ export const Loading = () => {
         <>
           <View style={styles.container}>
             <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
-            {/* <Text style={{ color: "#888", fontSize: 15 }}>{config.server.name}:{config.server.port}</Text> */}
             <Text style={{ color: "#888", fontSize: 15 }}>{`${baseUrl.server}:${baseUrl.port}`}</Text>
 
             <Text style={{ color: "#888", fontSize: 15 }}>{deviceRegistered === undefined ? 'undefined' : (deviceRegistered ? 'Registered' : 'not Registered')}</Text>

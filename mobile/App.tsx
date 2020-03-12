@@ -1,55 +1,53 @@
-import React, { useState, useEffect } from "react";
-import { AsyncStorage, Text, ActivityIndicator } from "react-native";
-import { AppLoading } from 'expo';
-import { Loading } from './src/pages';
-import { StoreProvider, useStore } from "./src/store";
-import { baseUrl } from "./src/helpers/utils";
-import config from "./src/config";
-import { IBaseUrl } from "./src/model";
+import React from 'react';
+import { ScrollView, AsyncStorage, YellowBox, Platform, StatusBar, I18nManager } from 'react-native';
+import {
+  Provider as PaperProvider,
+  DefaultTheme as PaperLightTheme,
+  DarkTheme as PaperDarkTheme,
+  Appbar,
+  List,
+  Divider
+} from 'react-native-paper';
+import {
+  InitialState,
+  useLinking,
+  NavigationContainerRef,
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme
+} from '@react-navigation/native';
+import { StoreProvider } from './src/store';
+import { ConnectionScreen } from './src/screens/Auth';
 
 const App = () => {
+  const containerRef = React.useRef<NavigationContainerRef>();
+  const [theme, setTheme] = React.useState(DefaultTheme);
+  const [initialState, setInitialState] = React.useState<InitialState | undefined>();
+
+  const paperTheme = React.useMemo(() => {
+    const t = theme.dark ? PaperDarkTheme : PaperLightTheme;
+
+    return {
+      ...t,
+      colors: {
+        ...t.colors,
+        ...theme.colors,
+        surface: theme.colors.card,
+        accent: theme.dark ? 'rgb(255, 55, 95)' : 'rgb(255, 45, 85)'
+      }
+    };
+  }, [theme.colors, theme.dark]);
+
   return (
     <StoreProvider>
-      <MainPage />
+      <PaperProvider theme={paperTheme}>
+        {Platform.OS === 'ios' && <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />}
+        <NavigationContainer ref={containerRef} initialState={initialState} onStateChange={state => {}} theme={theme}>
+          <ConnectionScreen />
+        </NavigationContainer>
+      </PaperProvider>
     </StoreProvider>
-  )
-}
+  );
+};
 
-const MainPage = () => {
-  const { state, actions } = useStore();
-  const [isLoading, setLoading] = useState(true)
-
-  const setBaseURL = async () => {
-    let pathSrv: IBaseUrl = JSON.parse(await AsyncStorage.getItem('pathServer'));
-    if (!(pathSrv instanceof Object && 'protocol' in pathSrv)) pathSrv = undefined;
-
-    const url: IBaseUrl = state.baseUrl
-      || pathSrv
-      || { protocol: config.server.protocol, server: config.server.name, port: config.server.port, apiPath: config.apiPath };
-
-    AsyncStorage.setItem('pathServer', JSON.stringify(url)).then(() => actions.setBaseUrl(url));
-  }
-
-  useEffect(() => {
-    if (state.baseUrl !== undefined) setLoading(false);
-  }, [state.baseUrl])
-
-  if (isLoading) {
-    return (
-      <>
-        <AppLoading
-          onFinish={() => { }}
-          startAsync={setBaseURL}
-          onError={console.warn}
-        />
-        <ActivityIndicator size="large" color="#70667D" />
-        <Text>state: {JSON.stringify(state.baseUrl)}</Text>
-      </>
-    );
-  }
-
-  return (
-    <Loading />
-  )
-}
 export default App;
