@@ -18,6 +18,10 @@ export const authApi = {
 
   getUserStatus: async (): Promise<IUser | string> => get(`/me`),
 
+  // getDeviceStatusByUser
+
+  // `${baseUrl}/device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`,
+
 /*   fetchData: async <T>(name: string): Promise<T> => {
     return get(`/${name}`);
   },
