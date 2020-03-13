@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AsyncStorage, Text, ActivityIndicator } from 'react-native';
 import { AppLoading } from 'expo';
-import { Loading } from '../../pages';
+import AuthNavigator from '../../navigation/AuthNavigator';
 import { useStore } from '../../store';
 import config from '../../config';
 import { IBaseUrl } from '../../model';
@@ -39,5 +39,5 @@ export const ConnectionScreen = () => {
     );
   }
 
-  return <Loading />;
+  return <AuthNavigator />;
 };

@@ -1,23 +1,22 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { useStore } from '../../store';
-import { Documents } from './Documents';
-import { Settings } from './Settings';
-import Contacts from './References';
+import { Documents } from '../screens/App/Documents';
+import { Settings } from '../screens/App/Settings';
+import Contacts from '../screens/App/References';
 
-type AppStackParams = {
+type TabsStackParams = {
   Documents: undefined;
   References: undefined;
   Settings: undefined;
 };
 
-const AppBottomTabs = createMaterialBottomTabNavigator<AppStackParams>();
+const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
-export const MainScreen = () => {
+const TabsNavigator = () => {
   return (
-    <AppBottomTabs.Navigator barStyle={styles.tabBar}>
-      <AppBottomTabs.Screen
+    <TabsStack.Navigator barStyle={styles.tabBar}>
+      <TabsStack.Screen
         name="Documents"
         component={Documents}
         options={{
@@ -26,7 +25,7 @@ export const MainScreen = () => {
           tabBarColor: '#C9E7F8'
         }}
       />
-      <AppBottomTabs.Screen
+      <TabsStack.Screen
         name="References"
         component={Contacts}
         options={{
@@ -38,7 +37,7 @@ export const MainScreen = () => {
 
         }}
       />
-      <AppBottomTabs.Screen
+      <TabsStack.Screen
         name="Settings"
         component={Settings}
         options={{
@@ -47,7 +46,7 @@ export const MainScreen = () => {
           tabBarColor: '#FAD4D6'
         }}
       />
-    </AppBottomTabs.Navigator>
+    </TabsStack.Navigator>
   );
 };
 
@@ -63,3 +62,5 @@ const styles = StyleSheet.create({
     margin: 8
   }
 });
+
+export default TabsNavigator;

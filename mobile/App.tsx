@@ -1,12 +1,9 @@
 import React from 'react';
-import { ScrollView, AsyncStorage, YellowBox, Platform, StatusBar, I18nManager } from 'react-native';
+import { YellowBox, Platform, StatusBar } from 'react-native';
 import {
   Provider as PaperProvider,
   DefaultTheme as PaperLightTheme,
   DarkTheme as PaperDarkTheme,
-  Appbar,
-  List,
-  Divider
 } from 'react-native-paper';
 import {
   InitialState,
@@ -17,7 +14,8 @@ import {
   DarkTheme
 } from '@react-navigation/native';
 import { StoreProvider } from './src/store';
-import { ConnectionScreen } from './src/screens/Auth';
+import AuthNavigator from './src/navigation/AuthNavigator';
+import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
 
 const App = () => {
   const containerRef = React.useRef<NavigationContainerRef>();

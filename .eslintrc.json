@@ -1,0 +1,18 @@
+{
+  "extends": "satya164",
+  "settings": {
+    "react": { "version": "16" },
+    "import/core-modules": [
+      "@react-navigation/core",
+      "@react-navigation/native",
+      "@react-navigation/routers",
+      "@react-navigation/compat",
+      "@react-navigation/stack",
+      "@react-navigation/drawer",
+      "@react-navigation/bottom-tabs",
+      "@react-navigation/material-top-tabs",
+      "@react-navigation/material-bottom-tabs"
+    ]
+  },
+  "env": { "browser": true, "node": true }
+}
