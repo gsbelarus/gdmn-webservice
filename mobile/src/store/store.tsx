@@ -1,7 +1,8 @@
-import React, { Reducer, useReducer, useMemo } from 'react';
+import React from 'react';
 import { IAppState, IContextProps } from '../model';
-import { AppActions, TActions, useTypesafeActions } from './actions';
+import { AppActions } from './actions';
 import { reducer, initialState } from './reducer';
+import { useTypesafeActions } from './utils';
 
 const defaultAppState: IContextProps = {
   state: initialState,

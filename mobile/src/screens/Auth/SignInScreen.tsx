@@ -1,17 +1,11 @@
 import * as React from 'react';
 import { View, TextInput, ActivityIndicator, StyleSheet } from 'react-native';
 import { Title, Button } from 'react-native-paper';
-import { useTheme, ParamListBase } from '@react-navigation/native';
-import {
-  createStackNavigator,
-  HeaderBackButton,
-  StackNavigationProp,
-} from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 import { useStore } from '../../store';
 
 
 export const SignInScreen = () => {
-  // const { signIn } = React.useContext(AuthContext);
   const { state, actions } = useStore();
   const { colors } = useTheme();
 
