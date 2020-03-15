@@ -1,12 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { ParamListBase, useTheme } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 import { Title, Text, Button, IconButton } from 'react-native-paper';
-
-// type Props = {
-//   navigation: StackNavigationProp<ParamListBase>;
-// };
 
 type Props = {
   deviceRegistered?: boolean;
@@ -26,34 +21,35 @@ export const SplashScreen = (props: Props) => {
     <>
       <View style={styles.container}>
         <Title>Подключение к серверу</Title>
-        <Text style={{ color: '#888', fontSize: 15 }}>{serverName}</Text>
-
+        <Text style={{ marginBottom: 10, color: '#888', fontSize: 15 }}>{serverName}</Text>
         <Text style={{ color: '#888', fontSize: 15 }}>
-          {deviceRegistered === undefined ? 'undefined' : deviceRegistered ? 'Registered' : 'not Registered'}
+          Рег: {deviceRegistered === undefined ? 'undefined' : deviceRegistered ? 'Registered' : 'not Registered'}
         </Text>
         <Text style={{ color: '#888', fontSize: 15 }}>
-          {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'}
+          Лог: {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'}
         </Text>
+        <View style={{ justifyContent: 'center', height: 70, backgroundColor: colors.background }}>
+          {isError ? <Text style={{ color: '#cc5933', fontSize: 18 }}>Ошибка: {status}</Text> : null}
+          {isLoading && <ActivityIndicator size="large" color="#70667D" />}
+        </View>
         {!isLoading ? (
-          <Button onPress={connection} icon="autorenew" mode="contained" style={{ margin: 20 }}>
+          <Button onPress={connection} icon="autorenew" mode="contained" style={styles.button}>
             Подключиться
           </Button>
         ) : (
-          <>
-            <ActivityIndicator size="large" color="#70667D" />
-            <Button onPress={breakConnection} icon="block-helper" mode="contained">
-              Прервать
-            </Button>
-          </>
-        )}
-        {isError ? <Text style={{ color: '#888', fontSize: 18 }}>Ошибка: {status}</Text> : null}
+            <>
+              <Button onPress={breakConnection} icon="block-helper" mode="contained" style={styles.button}>
+                Прервать
+              </Button>
+            </>
+          )}
       </View>
       <View style={{ alignItems: 'flex-end', backgroundColor: colors.background }}>
         <IconButton
           icon="settings"
           size={30}
           onPress={() => console.log('Pressed')}
-          style={{ ...styles.button, backgroundColor: colors.primary, borderColor: colors.primary }}
+          style={{ ...styles.configButton, backgroundColor: colors.primary, borderColor: colors.primary }}
           color={colors.background}
         />
       </View>
@@ -67,12 +63,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  button: {
+  configButton: {
     margin: 15,
     borderRadius: 50,
     borderWidth: 10,
     height: 50,
     width: 50,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  button: {
+    borderRadius: 3,
+    borderWidth: 2,
+    height: 40,
+    width: 200,
     justifyContent: 'center',
     alignItems: 'center'
   }

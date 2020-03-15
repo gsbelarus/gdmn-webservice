@@ -1,16 +1,16 @@
-import React, { useEffect, useReducer, useCallback } from 'react';
-import { StyleSheet, View, ActivityIndicator, YellowBox } from 'react-native';
+import React, { useEffect, useReducer, useCallback, useMemo, useState } from 'react';
+import { useTheme } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
 import { authApi } from '../api/auth';
-import { timeout } from '../helpers/utils';
+import { timeout, createCancellableSignal } from '../helpers/utils';
 import { useStore } from '../store';
 import { IDataFetch, IServerResponse, IUser } from '../model';
-
-import config from '../config/index';
 import AppNavigator from '../navigation/AppNavigator';
-import { useTheme, ParamListBase } from '@react-navigation/native';
-import { StackNavigationProp, createStackNavigator } from '@react-navigation/stack';
 import { SplashScreen } from '../screens/Auth/SplashScreen';
 import { SignInScreen } from '../screens/Auth/SignInScreen';
+
+import config from '../config/index';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -69,8 +69,9 @@ const AuthNavigator = () => {
     state: { deviceRegistered, loggedIn, baseUrl },
     actions
   } = useStore();
-  const { colors } = useTheme();
+
   const [state, setState] = useReducer(reducer, initialState);
+  const { signal, cancel } = useMemo(() => createCancellableSignal(), [state.serverReq.isLoading]);
 
   console.disableYellowBox = !config.debug.showWarnings;
   /*
@@ -85,7 +86,7 @@ const AuthNavigator = () => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       // если нет начального состояния то обращаемся к серверу
       // TODO Таймаут вынести в конфиг
-      timeout(5000, authApi.getDeviceStatus())
+      timeout(signal, 5000, authApi.getDeviceStatus())
         .then((data: IServerResponse<boolean>) =>
           setState({ type: 'SET_RESPONSE', result: data.result, status: data.status })
         )
@@ -107,30 +108,26 @@ const AuthNavigator = () => {
 
     deviceRegistered
       ? // устройство зарегистрировано, проверяем пользователя
-        timeout(5000, authApi.getUserStatus())
-          .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
-          .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
+      timeout(signal, 5000, authApi.getUserStatus())
+        .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
+        .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [deviceRegistered]);
 
-  useEffect(() => {
-    // Устанавливаем начальное состояние
-    setState({ type: 'INIT' });
-  }, [loggedIn]);
+  // Устанавливаем начальное состояние
+  useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
-  const connection = useCallback(() => {
-    setState({ type: 'SET_CONNECTION' });
-  }, []);
+  const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
-  const breakConnection = useCallback(() => {
-    setState({ type: 'SET_CONNECTION' });
-  }, []);
+  const breakConnection = useCallback(() => cancel(), [state.serverReq.isLoading]);
 
   const SplashWithParams = () => (
     <SplashScreen
       {...{ breakConnection, connection, deviceRegistered, loggedIn }}
-      isLoading={state.serverReq!.isLoading}
-      serverName={`${baseUrl.server}:${baseUrl.port}`}
+      isLoading={state?.serverReq.isLoading}
+      isError={state?.serverReq?.isError}
+      status={state?.serverReq?.status}
+      serverName={`${baseUrl?.server}:${baseUrl?.port}`}
     />
   );
 
@@ -138,79 +135,21 @@ const AuthNavigator = () => {
     <Stack.Navigator>
       {deviceRegistered !== undefined && loggedIn !== undefined ? (
         !deviceRegistered ? (
-          <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} options={{headerShown: false}} />
+          // Устройство не зарегистрировано - открываем окно ввода кода
+          <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} options={{ headerShown: false }} />
         ) : loggedIn ? (
-          <Stack.Screen key="App" name="App" component={AppNavigator} options={{headerShown: false}} />
+          // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
+          <Stack.Screen key="App" name="App" component={AppNavigator} options={{ headerShown: false }} />
         ) : (
-          <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} options={{headerShown: false}} />
-        )
+              // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
+              <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} options={{ headerShown: false }} />
+            )
       ) : (
-        <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{headerShown: false}} />
-      )}
-      {/* ) : state.showSettings ? (
-    <Settings confirm={() => setState({ type: 'SETTINGS_FORM', showSettings: false })} />
-  ) : (
-    <>
-      <View style={{ ...styles.container, backgroundColor: colors.background }}>
-        <Title>Подключение к серверу</Title>
-        <Text style={{ color: '#888', fontSize: 15 }}>{`${baseUrl.server}:${baseUrl.port}`}</Text>
-
-        <Text style={{ color: '#888', fontSize: 15 }}>
-          {deviceRegistered === undefined ? 'undefined' : deviceRegistered ? 'Registered' : 'not Registered'}
-        </Text>
-        <Text style={{ color: '#888', fontSize: 15 }}>
-          {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'}
-        </Text>
-        {!state.serverReq?.isLoading ? (
-          <Button
-            onPress={() => setState({ type: 'SET_CONNECTION' })}
-            icon="autorenew"
-            mode="contained"
-            style={{ margin: 20 }}
-          >
-            Подключиться
-          </Button>
-        ) : (
-          <>
-            <ActivityIndicator size="large" color="#70667D" />
-            <Button onPress={() => setState({ type: 'SET_ERROR', text: 'прервано пользователем' })} icon="block-helper">
-              Прервать
-            </Button>
-          </>
+          // Обращение к серверу
+          <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ headerShown: false, animationTypeForReplace: 'pop' }} />
         )}
-        {state.serverReq?.isError ? (
-          <Text style={{ color: '#888', fontSize: 18 }}>Ошибка: {state.serverReq?.status}</Text>
-        ) : null}
-      </View>
-      <View style={{ alignItems: 'flex-end', backgroundColor: colors.background }}>
-        <IconButton
-          icon="settings"
-          size={30}
-          onPress={() => console.log('Pressed')}
-          style={{ ...styles.button, backgroundColor: colors.primary, borderColor: colors.primary }}
-          color={colors.background}
-        />
-      </View>
-    </>))  */}
     </Stack.Navigator>
   );
 };
 
 export default AuthNavigator;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  button: {
-    margin: 15,
-    borderRadius: 50,
-    borderWidth: 10,
-    height: 50,
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});

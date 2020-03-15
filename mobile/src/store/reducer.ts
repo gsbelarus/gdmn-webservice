@@ -1,6 +1,7 @@
 import { Reducer } from 'react';
 import { TActions, ActionTypes } from './actions';
 import { IAppState } from '../model';
+import { baseUrl } from '../helpers/utils';
 
 export const initialState: IAppState = {
   baseUrl: undefined,
@@ -12,7 +13,7 @@ export const initialState: IAppState = {
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
     case ActionTypes.DISCONNECT:
-      return initialState;
+      return { ...{ baseUrl: state.baseUrl, initialState } };
     case ActionTypes.LOG_OUT:
       return { ...state, userID: undefined, loggedIn: false };
     case ActionTypes.SET_BASEURL:

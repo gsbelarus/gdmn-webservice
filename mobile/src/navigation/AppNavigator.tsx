@@ -16,7 +16,7 @@ const AppNavigator = () => {
         name="BottomTabs"
         component={TabsNavigator}
         options={{
-          title: 'Mobile inventory'
+          title: 'Mobile inventory',
         }}
       />
     </Stack.Navigator>

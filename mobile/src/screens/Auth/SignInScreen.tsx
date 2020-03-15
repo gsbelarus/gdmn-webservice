@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { View, TextInput, ActivityIndicator, StyleSheet } from 'react-native';
 import { Title, Button, IconButton } from 'react-native-paper';
 import { useTheme } from '@react-navigation/native';
@@ -33,7 +33,7 @@ export const SignInScreen = () => {
         <IconButton
           icon="server"
           size={30}
-          onPress={() => console.log('Pressed')}
+          onPress={() => actions.disconnect()}
           style={{ ...styles.button, backgroundColor: colors.primary, borderColor: colors.primary }}
           color={colors.background}
         />
