@@ -29,14 +29,7 @@ export const styles = StyleSheet.create({
 		fontSize: 18,
 		height: 50,
 	},
-	submitButton: {
-		padding: 8,
-		margin: 15,
-		height: 50,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
 	buttonText:{
 		fontSize: 18,
-	}
+	},
 });
