@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage, TouchableOpacity } from 'react-native';
+import { View, StatusBar, Text, TouchableOpacity } from 'react-native';
 import Dialog from 'react-native-dialog';
 import { useStore } from '../store';
 import { IBaseUrl } from '../model';
+import { styles } from '../styles/global';
 
 export const Settings = (props: { confirm: () => void }): JSX.Element => {
   const [server, setServer] = useState<IBaseUrl>(undefined);
@@ -35,7 +36,7 @@ export const Settings = (props: { confirm: () => void }): JSX.Element => {
                 <Text numberOfLines={2}>IP-адрес сервера:</Text>
                 <Text numberOfLines={2}>{server?.server || ''}</Text>
               </View>
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity style={styles.rectangularButton}>
                 <Text
                   style={styles.buttonText}
                   onPress={() => setShowDialog(true)}
@@ -44,7 +45,7 @@ export const Settings = (props: { confirm: () => void }): JSX.Element => {
             </View>
             <View style={{ justifyContent: 'flex-end' }}>
               <TouchableOpacity
-                style={{ ...styles.button, ...styles.buttonConfirm }}
+                style={styles.rectangularButton}
                 onPress={() => props.confirm()}
               >
                 <Text style={styles.buttonText}>Готово</Text>
@@ -84,27 +85,3 @@ export const Settings = (props: { confirm: () => void }): JSX.Element => {
               />
             </Dialog.Container>
           </View> */}
-
-const styles = StyleSheet.create({
-  container: {
-    margin: 15,
-    marginTop: 30,
-    flex: 1,
-    flexDirection: 'column',
-  },
-  button: {
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    backgroundColor: '#2D3083',
-    justifyContent: 'center',
-    borderRadius: 7,
-    borderColor: '#212323',
-    height: 35,
-  },
-  buttonConfirm: {
-    height: 50
-  },
-  buttonText: {
-    color: '#FFF'
-  },
-});

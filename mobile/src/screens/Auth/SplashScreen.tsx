@@ -2,6 +2,7 @@ import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Title, Text, Button, IconButton } from 'react-native-paper';
+import { styles } from '../../styles/global';
 
 type Props = {
   deviceRegistered?: boolean;
@@ -19,7 +20,7 @@ export const SplashScreen = (props: Props) => {
   const { colors } = useTheme();
   return (
     <>
-      <View style={styles.container}>
+      <View style={{...styles.container, ...localeStyles.container}}>
         <Title>Подключение к серверу</Title>
         <Text style={{ marginBottom: 10, color: '#888', fontSize: 15 }}>{serverName}</Text>
         <Text style={{ color: '#888', fontSize: 15 }}>
@@ -33,12 +34,12 @@ export const SplashScreen = (props: Props) => {
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!isLoading ? (
-          <Button onPress={connection} icon="autorenew" mode="contained" style={styles.button}>
+          <Button onPress={connection} icon="autorenew" mode="contained" style={styles.rectangularButton}>
             Подключиться
           </Button>
         ) : (
             <>
-              <Button onPress={breakConnection} icon="block-helper" mode="contained" style={styles.button}>
+              <Button onPress={breakConnection} icon="block-helper" mode="contained" style={styles.rectangularButton}>
                 Прервать
               </Button>
             </>
@@ -49,7 +50,7 @@ export const SplashScreen = (props: Props) => {
           icon="settings"
           size={30}
           onPress={() => console.log('Pressed')}
-          style={{ ...styles.configButton, backgroundColor: colors.primary, borderColor: colors.primary }}
+          style={{ ...styles.circularButton, backgroundColor: colors.primary, borderColor: colors.primary }}
           color={colors.background}
         />
       </View>
@@ -57,27 +58,9 @@ export const SplashScreen = (props: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const localeStyles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
-  },
-  configButton: {
-    margin: 15,
-    borderRadius: 50,
-    borderWidth: 10,
-    height: 50,
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  button: {
-    borderRadius: 3,
-    borderWidth: 2,
-    height: 40,
-    width: 200,
-    justifyContent: 'center',
-    alignItems: 'center'
   }
 });
