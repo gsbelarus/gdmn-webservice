@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Button, Alert, ScrollView} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert, ScrollView} from 'react-native';
+import { Text, Button } from 'react-native-paper';
 import { useNavigation } from 'react-navigation-hooks';
 import { TextInput } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { useTheme } from '@react-navigation/native';
+import { styles } from '../styles/global';
 
 const ProductsListPage = (): JSX.Element => {
 
   const navigation = useNavigation();
+  const { colors } = useTheme();
   const [text, onChangeText] = useState('');
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -61,7 +65,7 @@ const ProductsListPage = (): JSX.Element => {
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={StyleSheet.absoluteFillObject}
             />
-            {scanned && <Button title={'Сканировать ещё раз'} onPress={() => setScanned(false)} />}
+            {scanned && <Button onPress={() => setScanned(false)} >Сканировать ещё раз</Button>}
           </>
           : <>
           <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>
@@ -95,13 +99,13 @@ const ProductsListPage = (): JSX.Element => {
               goods.find(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase()))
               ? goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
                 <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
-                  <View style={styles.productView}>
-                    <View style={styles.productTextView}>
-                      <View style={styles.productIdView}>
-                        <Text style={styles.productId}>{idx}</Text>
+                  <View style={localeStyles.productView}>
+                    <View style={localeStyles.productTextView}>
+                      <View style={localeStyles.productIdView}>
+                        <Text style={localeStyles.productId}>{idx}</Text>
                       </View>
-                      <View style={styles.productNameTextView}>
-                        <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
+                      <View style={localeStyles.productNameTextView}>
+                        <Text numberOfLines={5} style={localeStyles.productTitleView}>{item.name}</Text>
                       </View>
                     </View>
                   </View>
@@ -117,11 +121,7 @@ const ProductsListPage = (): JSX.Element => {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#DFE0FF',
-    flex: 1
-  },
+const localeStyles = StyleSheet.create({
   productView: {
     flexDirection: 'column'
   },
@@ -151,11 +151,6 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     flexGrow: 1
   },
-  input: {
-    borderColor: '#70667D',
-    borderWidth: 1,
-    fontSize: 18
-  }
 });
 
 export default ProductsListPage;

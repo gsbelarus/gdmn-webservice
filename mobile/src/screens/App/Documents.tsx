@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { styles } from '../../styles/global';
 
 type Item = { name: string; number: number; date: string };
 
@@ -14,13 +16,13 @@ const ContactItem = React.memo(({ item }: { item: { name: string; number: number
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.item, { backgroundColor: colors.card }]}>
-      <View style={styles.avatar}>
-        <Text style={styles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+    <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      <View style={localStyles.avatar}>
+        <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
       </View>
-      <View style={styles.details}>
-        <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[styles.number, { color: colors.text, opacity: 0.5 }]}>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
           {item.number} от {item.date}
         </Text>
       </View>
@@ -52,7 +54,7 @@ export const Documents = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -80,7 +82,4 @@ const styles = StyleSheet.create({
   number: {
     fontSize: 12
   },
-  separator: {
-    height: StyleSheet.hairlineWidth
-  }
 });

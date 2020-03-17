@@ -12,6 +12,7 @@ export default function SettingsItem({ label, value, onValueChange }: Props) {
   return (
     <View
       style={{
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -19,7 +20,7 @@ export default function SettingsItem({ label, value, onValueChange }: Props) {
         paddingVertical: 12,
       }}
     >
-      <Subheading>{label}</Subheading>
+      <Subheading numberOfLines={5} style={{width: '90%'}}>{label}</Subheading>
       <Switch value={value} onValueChange={onValueChange} />
     </View>
   );

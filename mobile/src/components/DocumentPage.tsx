@@ -1,25 +1,140 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView, Alert} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert} from 'react-native';
+import { Text } from 'react-native-paper';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { baseUrl } from '../helpers/utils';
 import statuses from '../assets/documentStatuses.json';
+import { FlatList } from 'react-native-gesture-handler';
+import { useTheme } from '@react-navigation/native';
+import { styles } from '../styles/global';
+
+interface IDocument {
+  id: string;
+  head: IHead;
+  lines: ILine[];
+}
+
+interface IHead {
+  doctype: number;
+  fromcontactId: number;
+  tocontactId: number;
+  date: string;
+  status: number;
+}
+
+interface ILine {
+  id: string;
+  goodId: number;
+  quantity: number;
+}
+
+interface IUser {
+  id: string;
+  userName: string;
+  companies?: string[];
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+const LineDocumentItem = React.memo(({ item }: { item: IDocument }) => {
+  const { colors } = useTheme();
+  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
+  const [dataContact, setDataContact] = useState([]);
+  const [dataDocTypes, setDataDocTypes] = useState([]);
+
+  useEffect(() => {
+    const getData = async() => {
+      setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
+      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('documenttypes')));
+    }
+    getData();
+  }, [])
+
+  return (
+    <View style={localeStyles.deleteView}>
+      <TouchableOpacity onPress={() => { /*navigation.navigate('ProductPage', {docId: item.id})*/}}>
+        <View style={localeStyles.productView}>
+          <View style={localeStyles.productTextView}>
+            <View style={localeStyles.productNameTextView}>
+              <Text numberOfLines={5} style={localeStyles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
+              <Text numberOfLines={5} style={localeStyles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
+              <Text numberOfLines={5} style={{...localeStyles.productTitleView, color: statusColors[item.head.status], fontWeight: 'bold' }}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
+            </View>
+          </View>
+          <View style={localeStyles.productNumView}>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+              <Text numberOfLines={5} style={localeStyles.productPriceView}>{item && item.head ? new Date(item.head.date).toLocaleDateString() : ''}</Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+      <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
+        <TouchableOpacity
+          style={localeStyles.deleteButton} 
+          onPress={async () => {
+            if(item.head.status === 2) {
+              Alert.alert(
+                'Предупреждение!',
+                'Документ со статусом "Отправлено" не может быть удалён.',
+                [
+                  {
+                    text: 'OK'
+                  },
+                ],
+              );
+            } else {
+              Alert.alert(
+                'Предупреждение!',
+                'Вы действительно хотите удалить этот документ? После удаления нельзя восстановить.',
+                [
+                  {
+                    text: 'OK',
+                    onPress: async() => {
+                      const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+                      await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
+                      //setData(JSON.parse(await AsyncStorage.getItem('docs')));
+                    }
+                  },
+                  {
+                    text: 'Отмена'
+                  },
+                ],
+              );
+            }
+          }}
+        >
+          <MaterialIcons
+            size={25}
+            color='#2D3083' 
+            name='delete-forever' 
+          />
+        </TouchableOpacity>
+        <View style={{...localeStyles.productNumView, alignSelf: 'flex-end'}}></View>
+      </View>
+    </View>
+  );
+});
+
+const ItemSeparator = () => {
+  const { colors } = useTheme();
+
+  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
+};
 
 const DocumentPage = (): JSX.Element => {
 
   const navigation = useNavigation();
-  const [data, setData] = useState([]);
-  const [dataContact, setDataContact] = useState([]);
-  const [dataDocTypes, setDataDocTypes] = useState([]);
-  const [user, setUser] = useState();
+  const [data, setData] = useState<IDocument[]>([]);
+  const [user, setUser] = useState<IUser>();
+  const ref = React.useRef<FlatList<IDocument>>(null);
 
-  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D']
+  const renderItem = ({ item }: { item: IDocument }) => <LineDocumentItem item={item} />;
 
   useFocusEffect(React.useCallback(() => {
     const getData = async() => {
       setData(JSON.parse(await AsyncStorage.getItem('docs')));
-      setDataContact(JSON.parse(await AsyncStorage.getItem('contacts')));
-      setDataDocTypes(JSON.parse(await AsyncStorage.getItem('documenttypes')));
       const getMe = await fetch(
         `${baseUrl}/me`,
         {
@@ -96,99 +211,36 @@ const DocumentPage = (): JSX.Element => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={{flex: 1}}>
-        {
-          data ? data.map( (item, idx) => <View style={styles.deleteView}  key={idx}>
-            <TouchableOpacity onPress={() => { navigation.navigate('ProductPage', {docId: item.id})}}>
-              <View style={styles.productView}>
-                <View style={styles.productTextView}>
-                  <View style={styles.productIdView}>
-                    <Text style={styles.productId}>{idx + 1}</Text>
-                  </View>
-                  <View style={styles.productNameTextView}>
-                    <Text numberOfLines={5} style={styles.productTitleView}>{item.head && dataDocTypes && dataDocTypes.find(type => type.id === item.head.doctype) ? dataDocTypes.find(type => type.id === item.head.doctype).name : ''}</Text>
-                    <Text numberOfLines={5} style={styles.productBarcodeView}>{item.head && dataContact && dataContact !== [] && dataContact.find(contact => contact.id === item.head.fromcontactId) ? dataContact.find(contact => contact.id === item.head.fromcontactId).name : ''}</Text>
-                    <Text numberOfLines={5} style={{...styles.productTitleView, color: statusColors[item.head.status], fontWeight: 'bold' }}>{item.head && statuses.find(status => status.id === item.head.status) ? statuses.find(status => status.id === item.head.status).name : ''}</Text>
-                  </View>
-                </View>
-                <View style={styles.productNumView}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <Text numberOfLines={5} style={styles.productPriceView}>{item && item.head ? new Date(item.head.date).toLocaleDateString() : ''}</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-              <TouchableOpacity
-                style={styles.deleteButton} 
-                onPress={async () => {
-                  if(item.head.status === 2) {
-                    Alert.alert(
-                      'Предупреждение!',
-                      'Документ со статусом "Отправлено" не может быть удалён.',
-                      [
-                        {
-                          text: 'OK'
-                        },
-                      ],
-                    );
-                  } else {
-                    Alert.alert(
-                      'Предупреждение!',
-                      'Вы действительно хотите удалить этот документ? После удаления нельзя восстановить.',
-                      [
-                        {
-                          text: 'OK',
-                          onPress: async() => {
-                            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-                            await AsyncStorage.setItem('docs', JSON.stringify(docs.filter(doc => doc.id !== item.id)));
-                            setData(JSON.parse(await AsyncStorage.getItem('docs')));
-                          }
-                        },
-                        {
-                          text: 'Отмена'
-                        },
-                      ],
-                    );
-                  }
-                }}
-              >
-                <MaterialIcons
-                  size={25}
-                  color='#2D3083' 
-                  name='delete-forever' 
-                />
-              </TouchableOpacity>
-              <View style={{...styles.productNumView, alignSelf: 'flex-end'}}></View>
-            </View>
-          </View>
-          )
-          : undefined
-        }
-      </ScrollView>
+    <View style={localeStyles.container}>
+      <FlatList
+        ref={ref}
+        data={data}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
+      />
       <View style={{ flexDirection: 'column', justifyContent: "flex-end", }}>
         <TouchableOpacity
-          style={styles.createButton} 
+          style={localeStyles.createButton} 
           onPress={() => navigation.navigate('DocumentFilterPage')}
         >
-          <Text style={styles.createButtonText}>Создать новый документ</Text>
+          <Text style={localeStyles.createButtonText}>Создать новый документ</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        style={styles.sendButton} 
+        style={localeStyles.sendButton} 
         onPress={async() => sendUpdateRequest()
           //await AsyncStorage.removeItem('docs');
         }
       >
-        <Text style={styles.sendButtonText}>Отправить</Text>
+        <Text style={localeStyles.sendButtonText}>Отправить</Text>
       </TouchableOpacity>
       <StatusBar barStyle = "light-content" />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const localeStyles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
     flex: 1

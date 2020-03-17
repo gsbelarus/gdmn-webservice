@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, Text, AsyncStorage, TouchableOpacity, Alert} from 'react-native';
+import { StyleSheet, View, StatusBar, AsyncStorage, Alert} from 'react-native';
+import { Text, Button } from 'react-native-paper';
 import { useNavigation } from 'react-navigation-hooks';
 import InputSpinner from "react-native-input-spinner";
+import { useTheme } from '@react-navigation/native';
+import { styles } from '../styles/global';
 
 const ProductDetailPage = (): JSX.Element => {
 
-  const navigation = useNavigation();
+  interface IRemain {
+    goodId: number;
+    quantity: number;
+    price: number;
+    contactId: number;
+  }
 
-  const [data, setData] = useState();
+  const navigation = useNavigation();
+  const { colors } = useTheme();
+
+  const [data, setData] = useState<IRemain>();
   const [nameProduct, setNameProduct] = useState();
   const [value, setValue] = useState(1);
 
@@ -19,24 +30,54 @@ const ProductDetailPage = (): JSX.Element => {
     getData();
   }, []);
 
+  const acceptAdditing = async () => {
+    const docs = JSON.parse(await AsyncStorage.getItem('docs'));
+    const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
+    const lineId = docLine.lines.findIndex(line => line.goodId === navigation.getParam('id'));
+    lineId < 0
+    ? undefined
+    : docLine.lines.splice(lineId, 1, {
+      id: docLine.lines[lineId].id,
+      goodId: navigation.getParam('id'),
+      quantity: docLine.lines[lineId].quantity + value
+    })
+    docs[docs.findIndex(item => item.id === docLine.id)] = {
+      ...docLine,
+      lines: lineId < 0 ? [
+        ...docLine.lines,
+        {
+          id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
+          goodId: navigation.getParam('id'),
+          quantity: value
+        }
+      ]
+      :
+      [
+        ...docLine.lines
+      ]
+    };
+    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+    navigation.navigate('ProductPage');
+  }
+
   return (
     <View style={styles.container}>
       <View style={{alignItems: 'center'}}>
-        {nameProduct ? <Text numberOfLines={5} style={styles.productName}>{nameProduct}</Text> : undefined}
+        {nameProduct ? <Text numberOfLines={5} style={localeStyles.productName}>{nameProduct}</Text> : undefined}
       </View>
-      <View style={styles.productPriceView}>
+      <View style={localeStyles.productPriceView}>
         <Text style={{fontSize: 17}}>Цена:</Text>
-        {data ? <Text style={styles.productPrice}>{data.price}</Text> : undefined}
+        {data ? <Text style={localeStyles.productPrice}>{data.price}</Text> : undefined}
       </View>
-      <View style={styles.productQuantityView}>
+      <View style={localeStyles.productQuantityView}>
         <Text style={{fontSize: 17}}>Количество:</Text>
-        {data ? <Text style={styles.productQuantity}>{data.quantity}</Text> : undefined}
+        {data ? <Text style={localeStyles.productQuantity}>{data.quantity}</Text> : undefined}
       </View>
-      <View style={styles.editQuantityView}>
+      <View style={localeStyles.editQuantityView}>
         <Text style={{fontSize: 17}}>Добавить количество:</Text>
         <InputSpinner 
           returnKeyType="done"
-          style={styles.inputSpinner}
+          style={localeStyles.inputSpinner}
           inputStyle={{fontSize: 20}}
           value={value}
           max={1000}
@@ -53,52 +94,18 @@ const ProductDetailPage = (): JSX.Element => {
           }}
         />
       </View>
-      <View style={styles.buttonOkView}>
-        <TouchableOpacity
-          style={styles.buttonOk} 
-          onPress={async () => {
-            const docs = JSON.parse(await AsyncStorage.getItem('docs'));
-            const docLine = docs.find(doc => doc.id === navigation.getParam('idDoc'));
-            const lineId = docLine.lines.findIndex(line => line.goodId === navigation.getParam('id'));
-            lineId < 0
-            ? undefined
-            : docLine.lines.splice(lineId, 1, {
-              id: docLine.lines[lineId].id,
-              goodId: navigation.getParam('id'),
-              quantity: docLine.lines[lineId].quantity + value
-            })
-            docs[docs.findIndex(item => item.id === docLine.id)] = {
-              ...docLine,
-              lines: lineId < 0 ? [
-                ...docLine.lines,
-                {
-                  id: docLine.lines.length !== 0 ? docLine.lines[docLine.lines.length - 1].id + 1 : 0,
-                  goodId: navigation.getParam('id'),
-                  quantity: value
-                }
-              ]
-              :
-              [
-                ...docLine.lines
-              ]
-            };
-            await AsyncStorage.setItem('docs', JSON.stringify(docs));
-            navigation.navigate('ProductPage');
-          }}
-        >
-          <Text style={styles.buttonOkText}>ОК</Text>
-        </TouchableOpacity>
-      </View>
+      <Button
+        onPress={acceptAdditing}
+        style={{...styles.rectangularButton, height: 35, alignItems: 'center'}}
+      >
+        Отправить
+      </Button>
       <StatusBar barStyle = "light-content" />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#DFE0FF',
-    flex: 1
-  },
+const localeStyles = StyleSheet.create({
   productName: {
     marginTop: 25,
     color: '#000000',
@@ -137,25 +144,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: 180
   },
-  buttonOkView: {
-    alignItems: 'center'
-  },
-  buttonOk: {
-    marginRight: 15,
-    backgroundColor: '#2D3083',
-    width: '20%',
-    height: 35,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 7,
-    borderColor: '#212323',
-    marginHorizontal: 15,
-    marginTop: 15
-  },
-  buttonOkText: {
-    color: '#FFFFFF',
-    fontSize: 16
-  }
 });
 
 export default ProductDetailPage;

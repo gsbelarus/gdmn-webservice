@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { styles } from '../../styles/global';
 
 type Item = { name: string; number: number };
 
@@ -62,15 +64,15 @@ const ContactItem = React.memo(
     const { colors } = useTheme();
 
     return (
-      <View style={[styles.item, { backgroundColor: colors.card }]}>
-        <View style={styles.avatar}>
-          <Text style={styles.letter}>
+      <View style={[localeStyles.item, { backgroundColor: colors.card }]}>
+        <View style={localeStyles.avatar}>
+          <Text style={localeStyles.letter}>
             {item.name.slice(0, 1).toUpperCase()}
           </Text>
         </View>
-        <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
-          <Text style={[styles.number, { color: colors.text, opacity: 0.5 }]}>
+        <View style={localeStyles.details}>
+          <Text style={[localeStyles.name, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[localeStyles.number, { color: colors.text, opacity: 0.5 }]}>
             {item.number}
           </Text>
         </View>
@@ -105,7 +107,7 @@ export default function Contacts() {
   );
 }
 
-const styles = StyleSheet.create({
+const localeStyles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -132,8 +134,5 @@ const styles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
   },
 });

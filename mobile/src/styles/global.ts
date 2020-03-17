@@ -32,4 +32,7 @@ export const styles = StyleSheet.create({
 	buttonText:{
 		fontSize: 18,
 	},
+	separator: {
+		height: StyleSheet.hairlineWidth
+	},
 });

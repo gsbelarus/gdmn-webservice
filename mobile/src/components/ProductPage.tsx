@@ -1,17 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView, Alert} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, ScrollView, Alert} from 'react-native';
+import { Text } from 'react-native-paper';
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
+import { useTheme } from '@react-navigation/native';
+import { styles } from '../styles/global';
+
+interface IContact {
+  id: number;
+  name: string;
+  type: number;
+}
+
+interface IRemain {
+  goodId: number;
+  quantity: number;
+  price: number;
+  contactId: number;
+}
+
+interface IDocumentType {
+  id: number;
+  name: string;
+}
+
+interface IDocument {
+  id: string;
+  head: IHead;
+  lines: ILine[];
+}
+
+interface IHead {
+  doctype: number;
+  fromcontactId: number;
+  tocontactId: number;
+  date: string;
+  status: number;
+}
+
+interface ILine {
+  id: string;
+  goodId: number;
+  quantity: number;
+}
 
 const ProductPage = (): JSX.Element => {
 
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   const [data, setData] = useState([]);
-  const [doc, setDoc] = useState();
-  const [docType, setDocType] = useState();
-  const [contact, setContact] = useState();
-  const [remains, setRemains] = useState();
+  const [doc, setDoc] = useState<IDocument>();
+  const [docType, setDocType] = useState<IDocumentType>();
+  const [contact, setContact] = useState<IContact>();
+  const [remains, setRemains] = useState<IRemain[]>();
 
   useFocusEffect(React.useCallback(() => {
     const getData = async() => {
@@ -33,28 +75,28 @@ const ProductPage = (): JSX.Element => {
   }, [doc])
 
   return (
-    <View style={styles.container}>
-      <View style={styles.documentHeader}>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{docType ? docType.name : ''}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{contact ? contact.name : ''}</Text>
-        <Text numberOfLines={5} style={styles.documentHeaderText}>{doc ? new Date(doc.head.date).toLocaleDateString() : ''}</Text>
+    <View style={localeStyles.container}>
+      <View style={localeStyles.documentHeader}>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{docType ? docType.name : ''}</Text>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{contact ? contact.name : ''}</Text>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{doc ? new Date(doc.head.date).toLocaleDateString() : ''}</Text>
       </View>
       <ScrollView style={{flex: 1}}>
         {
-          data.map( (item, idx) => <View style={styles.productView} key={idx}>
-            <View style={styles.productTextView}>
-              <View style={styles.productIdView}>
-                <Text style={styles.productId}>{idx + 1}</Text>
+          data.map( (item, idx) => <View style={localeStyles.productView} key={idx}>
+            <View style={localeStyles.productTextView}>
+              <View style={localeStyles.productIdView}>
+                <Text style={localeStyles.productId}>{idx + 1}</Text>
               </View>
-              <View style={styles.productNameTextView}>
-                <Text numberOfLines={5} style={styles.productTitleView}>{item.name}</Text>
-                <Text numberOfLines={5} style={styles.productBarcodeView}>{item.barcode}</Text>
+              <View style={localeStyles.productNameTextView}>
+                <Text numberOfLines={5} style={localeStyles.productTitleView}>{item.name}</Text>
+                <Text numberOfLines={5} style={localeStyles.productBarcodeView}>{item.barcode}</Text>
               </View>
               {
               doc?.head.status === 0
                 ? <View style={{ justifyContent: 'space-between'}}>
                   <TouchableOpacity
-                    style={styles.deleteButton} 
+                    style={localeStyles.deleteButton} 
                     onPress={async () => {
                       Alert.alert(
                         'Вы уверены, что хотите удалить?',
@@ -92,16 +134,16 @@ const ProductPage = (): JSX.Element => {
               }
             </View>
             
-            <View style={styles.productNumView}>
+            <View style={localeStyles.productNumView}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <Ionicons 
                   size={20}
                   color='#8C8D8F' 
                   name='md-pricetag' 
                 />
-                <Text numberOfLines={5} style={styles.productPriceView}>{remains?.find(remain => remain.goodId === item.id) ? remains?.find(remain => remain.goodId === item.id).price : ''}</Text>
+                <Text numberOfLines={5} style={localeStyles.productPriceView}>{remains?.find(remain => remain.goodId === item.id) ? remains?.find(remain => remain.goodId === item.id).price : ''}</Text>
               </View>
-              <Text numberOfLines={5} style={styles.productQuantityView}>{doc?.lines?.find(line => line.goodId === item.id) ? doc?.lines?.find(line => line.goodId === item.id).quantity : ''}</Text>
+              <Text numberOfLines={5} style={localeStyles.productQuantityView}>{doc?.lines?.find(line => line.goodId === item.id) ? doc?.lines?.find(line => line.goodId === item.id).quantity : ''}</Text>
             </View>
           </View>)
         }
@@ -110,7 +152,7 @@ const ProductPage = (): JSX.Element => {
         doc?.head.status === 1
         ? <View style={{marginTop: 10}}>
           <TouchableOpacity
-              style={styles.createButton} 
+              style={styles.circularButton} 
               onPress={ async() => {
                 const docId = navigation.getParam('docId');
                 const docs = JSON.parse(await AsyncStorage.getItem('docs'));
@@ -123,14 +165,14 @@ const ProductPage = (): JSX.Element => {
                 setDoc(JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === docId))
               }}
             >
-              <Text style={styles.createButtonText}>Сделать "Черновиком"</Text>
+              <Text style={styles.buttonText}>Сделать "Черновиком"</Text>
             </TouchableOpacity>
         </View>
         : doc?.head.status === 0
         ? <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10}}>
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
-              style={styles.editButton} 
+              style={styles.circularButton} 
               onPress={() => navigation.navigate('DocumentFilterPage', {docId: doc.id})}
             >
               <MaterialIcons
@@ -140,7 +182,7 @@ const ProductPage = (): JSX.Element => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.deleteDocumentButton} 
+              style={styles.circularButton} 
               onPress={async () => {
                 Alert.alert(
                   'Вы уверены, что хотите удалить?',
@@ -172,7 +214,7 @@ const ProductPage = (): JSX.Element => {
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', marginRight: 15}}>
           <TouchableOpacity
-                style={styles.addButton} 
+                style={styles.circularButton} 
                 onPress={() => {
                   Alert.alert(
                     'Подтвердите действие',
@@ -209,7 +251,7 @@ const ProductPage = (): JSX.Element => {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.addButton} 
+                style={styles.circularButton} 
                 onPress={() => navigation.navigate('ProductsListPage', {idDoc: navigation.getParam('docId'), contactId: doc.head.fromcontactId})}
               >
                 <MaterialIcons
@@ -222,7 +264,7 @@ const ProductPage = (): JSX.Element => {
         </View>
         : doc?.head.status === 3
         ? <TouchableOpacity
-        style={{...styles.deleteDocumentButton, marginVertical: 10}} 
+        style={{...localeStyles.deleteDocumentButton, marginVertical: 10}} 
         onPress={async () => {
           Alert.alert(
             'Вы уверены, что хотите удалить?',
@@ -258,7 +300,7 @@ const ProductPage = (): JSX.Element => {
   );
 }
 
-const styles = StyleSheet.create({
+const localeStyles = StyleSheet.create({
   container: {
     backgroundColor: '#DFE0FF',
     flex: 1
@@ -375,43 +417,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  editButton: {
-    marginLeft: 15,
-    borderRadius: 50,
-    borderColor: '#2D3083',
-    borderWidth: 1,
-    height: 50,
-    width: 50,
-    backgroundColor: '#2D3083',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  addButton: {
-    marginLeft: 10,
-    borderRadius: 50,
-    borderColor: '#2D3083',
-    borderWidth: 1,
-    height: 50,
-    width: 50,
-    backgroundColor: '#2D3083',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  createButton: {
-    marginHorizontal: 15,
-    marginBottom: 10,
-    backgroundColor: '#2D3083',
-    color: '#FFFFFF',
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: '#212323'
-  },
-  createButtonText: {
-    color: '#FFFFFF',
-    fontSize: 17
-  }
 });
 
 export default ProductPage;
