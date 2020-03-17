@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert, FlatList} from 'react-native';
 import { Text } from 'react-native-paper';
 import { useNavigation, useFocusEffect } from 'react-navigation-hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { baseUrl } from '../helpers/utils';
 import statuses from '../assets/documentStatuses.json';
-import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
 import { styles } from '../styles/global';
 
