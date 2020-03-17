@@ -22,11 +22,11 @@ export const SignInScreen = () => {
       <View style={styles.container}>
         <Title style={{ textAlign: 'center' }}>Вход пользователя</Title>
         <TextInput
-          placeholder="Username"
+          placeholder="Имя пользователя"
           style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
         />
         <TextInput
-          placeholder="Password"
+          placeholder="Пароль"
           secureTextEntry
           style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
         />

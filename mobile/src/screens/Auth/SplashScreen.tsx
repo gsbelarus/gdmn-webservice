@@ -20,7 +20,7 @@ export const SplashScreen = (props: Props) => {
   const { colors } = useTheme();
   return (
     <>
-      <View style={{...styles.container, ...localeStyles.container}}>
+      <View style={{ ...styles.container, ...localeStyles.container }}>
         <Title>Подключение к серверу</Title>
         <Text style={{ marginBottom: 10, color: '#888', fontSize: 15 }}>{serverName}</Text>
         <Text style={{ color: '#888', fontSize: 15 }}>
@@ -29,20 +29,18 @@ export const SplashScreen = (props: Props) => {
         <Text style={{ color: '#888', fontSize: 15 }}>
           Лог: {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'}
         </Text>
-        <View style={{ justifyContent: 'center', height: 70, backgroundColor: colors.background }}>
-          {isError ? <Text style={{ color: '#cc5933', fontSize: 18 }}>Ошибка: {status}</Text> : null}
+        <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
+          {isError ? <Text style={localeStyles.errorText}>Ошибка: {status}</Text> : null}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!isLoading ? (
-          <Button onPress={connection} icon="autorenew" mode="contained" style={styles.rectangularButton}>
+          <Button onPress={connection} icon="autorenew" mode="contained" style={[styles.rectangularButton, localeStyles.buttons]}>
             Подключиться
           </Button>
         ) : (
-            <>
-              <Button onPress={breakConnection} icon="block-helper" mode="contained" style={styles.rectangularButton}>
-                Прервать
-              </Button>
-            </>
+            <Button onPress={breakConnection} icon="block-helper" mode="contained" style={[styles.rectangularButton, localeStyles.buttons]}>
+              Прервать
+            </Button>
           )}
       </View>
       <View style={{ alignItems: 'flex-end', backgroundColor: colors.background }}>
@@ -62,5 +60,19 @@ const localeStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  buttons: {
+    width: 250
+  },
+  errorText: {
+    color: '#cc5933',
+    fontSize: 18
+  },
+  statusBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 70,
+    width: 250,
   }
 });
+

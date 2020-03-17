@@ -10,8 +10,7 @@ export const styles = StyleSheet.create({
 	},
 	rectangularButton: {
 		marginVertical: 15,
-		height: 50,
-		alignItems: 'center',
+    height: 50,
 		justifyContent: 'center',
 		borderRadius: 4,
 	},
@@ -21,7 +20,6 @@ export const styles = StyleSheet.create({
 		height: 50,
 		width: 50,
 		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	input: {
 		marginTop: 15,

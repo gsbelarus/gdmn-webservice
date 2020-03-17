@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "notes",
-    "slug": "notes",
+    "name": "mobile-inventory",
+    "slug": "mobile-inventory",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
