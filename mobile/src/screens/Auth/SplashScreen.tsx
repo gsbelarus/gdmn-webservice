@@ -30,7 +30,7 @@ export const SplashScreen = (props: Props) => {
           Лог: {loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'}
         </Text>
         <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
-          {isError ? <Text style={localeStyles.errorText}>Ошибка: {status}</Text> : null}
+          {isError && <Text style={localeStyles.errorText}>Ошибка: {status}</Text>}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!isLoading ? (

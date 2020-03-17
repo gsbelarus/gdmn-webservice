@@ -23,8 +23,8 @@ export interface IBaseUrl {
   apiPath: string;
 }
 
-export interface ICredentials {
-  username: string;
+export interface IUserCredentials {
+  userName: string;
   password: string;
 }
 

@@ -20,7 +20,7 @@ export default function SettingsItem({ label, value, onValueChange }: Props) {
         paddingVertical: 12,
       }}
     >
-      <Subheading numberOfLines={5} style={{width: '90%'}}>{label}</Subheading>
+      <Subheading numberOfLines={5} style={{width: '85%'}}>{label}</Subheading>
       <Switch value={value} onValueChange={onValueChange} />
     </View>
   );

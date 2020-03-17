@@ -1,7 +1,7 @@
 // import { authApi } from "./auth";
 import { baseUrl } from "../helpers/utils";
 
-export async function get<T>(path: string): Promise<T> {  
+export async function get<T>(path: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: "GET",
@@ -23,9 +23,12 @@ export async function post<T>(path: string, body: any): Promise<T> {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body
+      body: JSON.stringify({
+        userName: body.userName,
+        password: body.password
+      })
     });
-    return response.json();    
+    return response.json();
   } catch (err) {
     if (err.response) {
       throw new Error(err.response.data.message);
@@ -42,7 +45,7 @@ export async function put<T>(path: string, body: any): Promise<T> {
       credentials: "include",
       body
     });
-    return response.json();    
+    return response.json();
   } catch (err) {
     if (err.response) {
       throw new Error(err.response.data.message);
