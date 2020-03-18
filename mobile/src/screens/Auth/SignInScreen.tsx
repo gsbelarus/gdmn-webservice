@@ -138,7 +138,7 @@ const localeStyles = StyleSheet.create({
     textAlign: 'center'
   },
   buttons: {
-    width: 250
+    width: '100%'
   },
   errorText: {
     color: '#cc5933',

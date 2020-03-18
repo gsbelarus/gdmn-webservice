@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 	},
 	rectangularButton: {
 		marginVertical: 15,
-    height: 50,
+    	height: 50,
 		justifyContent: 'center',
 		borderRadius: 4,
 	},

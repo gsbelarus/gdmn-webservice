@@ -11,6 +11,7 @@ import { SplashScreen } from '../screens/Auth/SplashScreen';
 import { SignInScreen } from '../screens/Auth/SignInScreen';
 
 import config from '../config/index';
+import ConfigScreen from '../screens/Auth/Config';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -117,13 +118,21 @@ const AuthNavigator = () => {
   // Устанавливаем начальное состояние
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
+  useEffect(() => {
+    console.log(state.showSettings)
+  }, [state.showSettings])
+
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
   const breakConnection = useCallback(() => cancel(), [state.serverReq.isLoading]);
 
+  const showSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: true }), []);
+
+  const hideSettings = useCallback(() => setState({ type: 'INIT' }), []);
+
   const SplashWithParams = () => (
     <SplashScreen
-      {...{ breakConnection, connection, deviceRegistered, loggedIn }}
+      {...{ breakConnection, connection, deviceRegistered, loggedIn, showSettings }}
       isLoading={state?.serverReq.isLoading}
       isError={state?.serverReq?.isError}
       status={state?.serverReq?.status}
@@ -131,9 +140,19 @@ const AuthNavigator = () => {
     />
   );
 
+  const CongigWithParams = () => (
+    <ConfigScreen
+      {...{ hideSettings }}
+      serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
+      serverPort={baseUrl?.port}
+    />
+  );
+
   return (
     <Stack.Navigator>
-      {deviceRegistered !== undefined && loggedIn !== undefined ? (
+      {state.showSettings
+        ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{ headerShown: false }} />
+        : deviceRegistered !== undefined && loggedIn !== undefined ? (
         !deviceRegistered ? (
           // Устройство не зарегистрировано - открываем окно ввода кода
           <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} options={{ headerShown: false }} />

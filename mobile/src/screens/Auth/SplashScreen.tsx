@@ -13,10 +13,11 @@ type Props = {
   status?: string;
   connection?: () => void;
   breakConnection?: () => void;
+  showSettings?: () => void;
 };
 
 export const SplashScreen = (props: Props) => {
-  const { deviceRegistered, loggedIn, serverName, isLoading, isError, status, connection, breakConnection } = props;
+  const { deviceRegistered, loggedIn, serverName, isLoading, isError, status, connection, breakConnection, showSettings } = props;
   const { colors } = useTheme();
   return (
     <>
@@ -47,7 +48,7 @@ export const SplashScreen = (props: Props) => {
         <IconButton
           icon="settings"
           size={30}
-          onPress={() => console.log('Pressed')}
+          onPress={showSettings}
           style={{ ...styles.circularButton, backgroundColor: colors.primary, borderColor: colors.primary }}
           color={colors.background}
         />
@@ -62,7 +63,7 @@ const localeStyles = StyleSheet.create({
     justifyContent: 'center'
   },
   buttons: {
-    width: 250
+    width: '100%'
   },
   errorText: {
     color: '#cc5933',
@@ -72,7 +73,6 @@ const localeStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 70,
-    width: 250,
   }
 });
 
