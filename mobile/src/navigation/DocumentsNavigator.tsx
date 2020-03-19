@@ -1,19 +1,12 @@
 import React from 'react';
-import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authApi } from '../api/auth';
-import { timeout, createCancellableSignal } from '../helpers/utils';
-import { useStore } from '../store';
-import DocumentsList from '../screens/App/Documents/DocumentsList';
-import ViewDocument from '../screens/App/Documents/ViewDocument';
-import HeadDocument from '../screens/App/Documents/HeadDocument';
+import { DocumentsList, ViewDocument, HeadDocument } from '../screens/App/Documents/';
 
-import config from '../config/index';
 
 export type DocumentStackParamList = {
   DocumentsList: undefined;
-  ViewDocument: {docId: number};
+  ViewDocument: { docId: number };
   HeadDocument: undefined;
 };
 
@@ -23,9 +16,9 @@ const DocumentsNavigator = () => {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen key="DocumentsList" name="DocumentsList" component={DocumentsList} options={{ headerShown: false }} />
-      <Stack.Screen key="ViewDocument" name="ViewDocument" component={ViewDocument} options={{ headerShown: false }} initialParams={{docId: 0}} />
-      <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocument} options={{ headerShown: false }} />
+      <Stack.Screen key="DocumentsList" name="DocumentsList" component={DocumentsList} options={{ title: 'Документы' }} />
+      <Stack.Screen key="ViewDocument" name="ViewDocument" component={ViewDocument} initialParams={{ docId: 0 }} options={{ title: '' }} />
+      <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocument} options={{ title: '' }} />
     </Stack.Navigator>
   );
 };

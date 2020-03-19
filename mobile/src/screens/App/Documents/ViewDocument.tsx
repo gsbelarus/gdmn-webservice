@@ -12,70 +12,70 @@ import goods from '../../../mockData/Goods.json';
 import remains from '../../../mockData/Remains.json';
 
 const LineItem = React.memo(({ item, status }: { item: ILine, status: number }) => {
-	const { colors } = useTheme();
-	const good: IGood = goods.find(i => i.id === item.goodId)
- 
-	return (
-	<>
-		<View style={localeStyles.productTextView}>
-			<View style={localeStyles.productNameTextView}>
-				<Text numberOfLines={5} style={localeStyles.productTitleView}>{good.name}</Text>
-				<Text numberOfLines={5} style={localeStyles.productBarcodeView}>{good.barcode}</Text>
-			</View>
-			{
-			status === 0
-				?
-				<TouchableOpacity
-					style={{flex: 1, justifyContent: 'center', alignItems: 'flex-end'}} 
-					onPress={async () => {
-						Alert.alert(
-						'Вы уверены, что хотите удалить?',
-						'',
-						[
-							{
-								text: 'OK',
-								onPress: async() => {}
-							},
-							{
-								text: 'Отмена',
-								onPress: () => {}
-							},
-						]
-						);
-					}}
-				>
-					<MaterialIcons
-						size={25}
-						color='#2D3083' 
-						name='delete-forever' 
-					/>
-				</TouchableOpacity>
-				: undefined
-			}
-		</View>
-		
-		<View style={localeStyles.productNumView}>
-			<View style={{flex: 1, flexDirection: 'row'}}>
-				<Ionicons 
-					size={20}
-					color='#8C8D8F' 
-					name='md-pricetag' 
-				/>
-				<Text numberOfLines={5} style={localeStyles.productPriceView}>{remains?.find(remain => remain.goodId === good.id).price}</Text>
-			</View>
-			<Text numberOfLines={5} style={localeStyles.productQuantityView}>{item.quantity}</Text>
-		</View>
-	</>
-	);
- });
- 
- const ItemSeparator = () => {
-	const { colors } = useTheme();
- 
-	return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
- };
+  const { colors } = useTheme();
+  const good: IGood = goods.find(i => i.id === item.goodId)
 
-const ViewDocumentScreen = ({route, navigation}) => {
+  return (
+    <>
+      <View style={localeStyles.productTextView}>
+        <View style={localeStyles.productNameTextView}>
+          <Text numberOfLines={5} style={localeStyles.productTitleView}>{good.name}</Text>
+          <Text numberOfLines={5} style={localeStyles.productBarcodeView}>{good.barcode}</Text>
+        </View>
+        {
+          status === 0
+            ?
+            <TouchableOpacity
+              style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
+              onPress={async () => {
+                Alert.alert(
+                  'Вы уверены, что хотите удалить?',
+                  '',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: async () => { }
+                    },
+                    {
+                      text: 'Отмена',
+                      onPress: () => { }
+                    },
+                  ]
+                );
+              }}
+            >
+              <MaterialIcons
+                size={25}
+                color='#2D3083'
+                name='delete-forever'
+              />
+            </TouchableOpacity>
+            : undefined
+        }
+      </View>
+
+      <View style={localeStyles.productNumView}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <Ionicons
+            size={20}
+            color='#8C8D8F'
+            name='md-pricetag'
+          />
+          <Text numberOfLines={5} style={localeStyles.productPriceView}>{remains?.find(remain => remain.goodId === good.id).price}</Text>
+        </View>
+        <Text numberOfLines={5} style={localeStyles.productQuantityView}>{item.quantity}</Text>
+      </View>
+    </>
+  );
+});
+
+const ItemSeparator = () => {
+  const { colors } = useTheme();
+
+  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
+};
+
+const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const document: IDocument = documents.find(item => item.id === route.params.docId);
   const type: IDocumentType = documentTypes.find(item => item.id === document.head.doctype);
@@ -87,24 +87,24 @@ const ViewDocumentScreen = ({route, navigation}) => {
   const renderItem = ({ item }: { item: ILine }) => <LineItem item={item} status={document.head.status} />;
 
   return (
-		<View style={[styles.container, {padding: 0}]}>
-			<View style={localeStyles.documentHeader}>
-				<Text numberOfLines={5} style={localeStyles.documentHeaderText}>{type.name}</Text>
-				<Text numberOfLines={5} style={localeStyles.documentHeaderText}>{contact.name}</Text>
-				<Text numberOfLines={5} style={localeStyles.documentHeaderText}>{new Date(document.head.date).toLocaleDateString()}</Text>
-			</View>
-			<FlatList
-				ref={ref}
-				data={document.lines}
-				keyExtractor={(_, i) => String(i)}
-				renderItem={renderItem}
-				ItemSeparatorComponent={ItemSeparator}
-			/>
-		</View>
+    <View style={[styles.container, { padding: 0 }]}>
+      <View style={localeStyles.documentHeader}>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{type.name}</Text>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{contact.name}</Text>
+        <Text numberOfLines={5} style={localeStyles.documentHeaderText}>{new Date(document.head.date).toLocaleDateString()}</Text>
+      </View>
+      <FlatList
+        ref={ref}
+        data={document.lines}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
+      />
+    </View>
   );
 };
 
-export default ViewDocumentScreen;
+export { ViewDocumentScreen as ViewDocument };
 
 const localeStyles = StyleSheet.create({
   documentHeader: {

@@ -12,6 +12,7 @@ import { SignInScreen } from '../screens/Auth/SignInScreen';
 
 import config from '../config/index';
 import ConfigScreen from '../screens/Auth/Config';
+import TabsNavigator from './TabsNavigator';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -145,24 +146,24 @@ const AuthNavigator = () => {
   );
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator headerMode="none">
       {state.showSettings
-        ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{ headerShown: false }} />
+        ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{headerShown: true, headerBackTitleVisible: true}}/>
         : deviceRegistered !== undefined && loggedIn !== undefined ? (
-        !deviceRegistered ? (
-          // Устройство не зарегистрировано - открываем окно ввода кода
-          <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} options={{ headerShown: false }} />
-        ) : loggedIn ? (
-          // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
-          <Stack.Screen key="App" name="App" component={AppNavigator} options={{ headerShown: false }} />
+          !deviceRegistered ? (
+            // Устройство не зарегистрировано - открываем окно ввода кода
+            <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
+          ) : loggedIn ? (
+            // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
+            <Stack.Screen key="App" name="App" component={AppNavigator} />
+          ) : (
+                // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
+                <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
+              )
         ) : (
-              // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
-              <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} options={{ headerShown: false }} />
-            )
-      ) : (
-          // Обращение к серверу
-          <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ headerShown: false, animationTypeForReplace: 'pop' }} />
-        )}
+            // Обращение к серверу
+            <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
+          )}
     </Stack.Navigator>
   );
 };

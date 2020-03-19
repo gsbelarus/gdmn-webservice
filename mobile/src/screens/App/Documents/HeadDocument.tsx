@@ -8,10 +8,10 @@ const HeadDocumentScreen = () => {
   const { colors } = useTheme();
 
   return (
-	<View style={styles.container} >
-		<Title style={{ alignItems: 'center'}}>Head Document</Title>
-	</View>
+    <View style={styles.container} >
+      <Title style={{ alignItems: 'center' }}>Head Document</Title>
+    </View>
   );
 };
 
-export default HeadDocumentScreen;
+export { HeadDocumentScreen as HeadDocument };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import TabsNavigator from './TabsNavigator';
+import { NavigationEvents } from 'react-navigation';
 
 type RootStackParamList = {
   BottomTabs: undefined;
@@ -16,7 +17,8 @@ const AppNavigator = () => {
         name="BottomTabs"
         component={TabsNavigator}
         options={{
-          title: 'Mobile inventory',
+          headerShown: false,
+          // title: 'Mobile inventory',
         }}
       />
     </Stack.Navigator>

@@ -20,6 +20,7 @@ const TabsNavigator = () => {
         name="Documents"
         component={DocumentsNavigator}
         options={{
+          title: 'Документы',
           tabBarLabel: 'Документы',
           tabBarIcon: 'file-document-box',
           tabBarColor: '#C9E7F8'

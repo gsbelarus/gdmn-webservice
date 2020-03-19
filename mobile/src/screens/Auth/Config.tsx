@@ -16,48 +16,27 @@ const ConfigScreen = (props: Props) => {
   const [newServerPort, setNewServerPort] = useState(serverPort?.toString());
   const { colors } = useTheme();
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      }
-    );
-
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
   return (
     <KeyboardAvoidingView
-      style={[styles.container, isKeyboardVisible && { justifyContent: 'flex-start' }]}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : null}
     >
-    <Title style={{ alignItems: 'center'}}>Config</Title>
+      <Title style={{ textAlign: 'center' }}>Подключение к серверу</Title>
       <TextInput
         value={newServerName}
         onChangeText={setNewServerName}
+        placeholder="Адрес сервера"
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
       <TextInput
         value={newServerPort}
         onChangeText={setNewServerPort}
+        placeholder="Порт"
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
-      <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-        <Button  onPress={hideSettings} icon="check" mode="contained" style={[styles.rectangularButton, {flex:1, marginRight: 7}]} >Готово</Button>
-        <Button  onPress={hideSettings} icon="cancel" mode="contained" style={[styles.rectangularButton, {flex:1, marginLeft: 7}]} >Отмена</Button>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+        <Button onPress={hideSettings} icon="check" mode="contained" style={[styles.rectangularButton, { flex: 1, marginRight: 7 }]} >Готово</Button>
+        <Button onPress={hideSettings} icon="cancel" mode="contained" style={[styles.rectangularButton, { flex: 1, marginLeft: 7 }]} >Отмена</Button>
       </View>
     </KeyboardAvoidingView>
   );

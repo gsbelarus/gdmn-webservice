@@ -3,6 +3,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Title, Text, Button, IconButton } from 'react-native-paper';
 import { styles } from '../../styles/global';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type Props = {
   deviceRegistered?: boolean;

@@ -23,9 +23,9 @@ const ReferencesNavigator = () => {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen key="ReferencesList" name="ReferencesList" component={ReferencesList} options={{ headerShown: false }} />
-      <Stack.Screen key="ViewReference" name="ViewReference" component={ViewReference} options={{ headerShown: false }} />
-      <Stack.Screen key="DetailsReference" name="DetailsReference" component={DetailsReference} options={{ headerShown: false }} />
+      <Stack.Screen key="ReferencesList" name="ReferencesList" component={ReferencesList} options={{ title: 'Справочники' }} />
+      <Stack.Screen key="ViewReference" name="ViewReference" component={ViewReference} options={{ title: '' }} />
+      <Stack.Screen key="DetailsReference" name="DetailsReference" component={DetailsReference} options={{ title: '' }} />
     </Stack.Navigator>
   );
 };

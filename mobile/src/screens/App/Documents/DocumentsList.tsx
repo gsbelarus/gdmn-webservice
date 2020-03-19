@@ -8,7 +8,6 @@ import documentTypes from '../../../mockData/GD_DocumentType.json';
 import { styles } from '../../../styles/global';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 import { useNavigation } from '@react-navigation/native';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
@@ -20,21 +19,21 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity onPress={() => { navigation.navigate('ViewDocument', {docId: item.id})}}>
+    <TouchableOpacity onPress={() => { navigation.navigate('ViewDocument', { docId: item.id }) }}>
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-          <View style={[localStyles.avatar, {backgroundColor: statusColors[item.head.status]}]}>
-            <Text style={localStyles.letter}>
-              {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
-            </Text>
-          </View>
-          <View style={localStyles.details}>
-            <Text style={[localStyles.name, { color: colors.text }]}>
-              {DocumentTypes.find(type => type.id === item.head.doctype).name}
-            </Text>
-            <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
-              {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
-            </Text>
-          </View>
+        <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
+          <Text style={localStyles.letter}>
+            {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
+          </Text>
+        </View>
+        <View style={localStyles.details}>
+          <Text style={[localStyles.name, { color: colors.text }]}>
+            {DocumentTypes.find(type => type.id === item.head.doctype).name}
+          </Text>
+          <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
+            {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -64,7 +63,7 @@ const DocumentsListScreen = () => {
   );
 };
 
-export default DocumentsListScreen;
+export { DocumentsListScreen as DocumentsList };
 
 const localStyles = StyleSheet.create({
   item: {
