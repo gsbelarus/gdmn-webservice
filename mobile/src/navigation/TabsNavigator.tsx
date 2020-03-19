@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Settings } from '../screens/App/Settings';
-import Contacts from '../screens/App/References';
 import DocumentsNavigator from './DocumentsNavigator';
+import ReferencesNavigator from './ReferencesNavigator';
 
 type TabsStackParams = {
   Documents: undefined;
@@ -27,7 +27,7 @@ const TabsNavigator = () => {
       />
       <TabsStack.Screen
         name="References"
-        component={Contacts}
+        component={ReferencesNavigator}
         options={{
           tabBarLabel: 'Справочники',
           tabBarIcon: 'view-list',
