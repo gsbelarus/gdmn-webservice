@@ -11,9 +11,9 @@ import HeadDocument from '../screens/App/Documents/HeadDocument';
 
 import config from '../config/index';
 
-type DocumentStackParamList = {
+export type DocumentStackParamList = {
   DocumentsList: undefined;
-  ViewDocument: undefined;
+  ViewDocument: {docId: number};
   HeadDocument: undefined;
 };
 
@@ -24,7 +24,7 @@ const DocumentsNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen key="DocumentsList" name="DocumentsList" component={DocumentsList} options={{ headerShown: false }} />
-      <Stack.Screen key="ViewDocument" name="ViewDocument" component={ViewDocument} options={{ headerShown: false }} />
+      <Stack.Screen key="ViewDocument" name="ViewDocument" component={ViewDocument} options={{ headerShown: false }} initialParams={{docId: 0}} />
       <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocument} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

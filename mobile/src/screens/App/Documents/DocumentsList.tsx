@@ -1,37 +1,42 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData//GD_Contact.json';
-import documentTypes from '../../../mockData//GD_DocumentType.json';
+import documentTypes from '../../../mockData/GD_DocumentType.json';
 import { styles } from '../../../styles/global';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { useNavigation } from '@react-navigation/native';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
 const Contacts: IContact[] = contacts;
 
-const ContactItem = React.memo(({ item }: { item: IDocument }) => {
+const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
+  const navigation = useNavigation();
 
   return (
-    <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-      <View style={[localStyles.avatar, {backgroundColor: statusColors[item.head.status]}]}>
-        <Text style={localStyles.letter}>
-          {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
-        </Text>
+    <TouchableOpacity onPress={() => { navigation.navigate('ViewDocument', {docId: item.id})}}>
+      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+          <View style={[localStyles.avatar, {backgroundColor: statusColors[item.head.status]}]}>
+            <Text style={localStyles.letter}>
+              {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
+            </Text>
+          </View>
+          <View style={localStyles.details}>
+            <Text style={[localStyles.name, { color: colors.text }]}>
+              {DocumentTypes.find(type => type.id === item.head.doctype).name}
+            </Text>
+            <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
+              {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
+            </Text>
+          </View>
       </View>
-      <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>
-          {DocumentTypes.find(type => type.id === item.head.doctype).name}
-        </Text>
-        <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
-          {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
-        </Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -46,7 +51,7 @@ const DocumentsListScreen = () => {
 
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IDocument }) => <ContactItem item={item} />;
+  const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   return (
     <FlatList
