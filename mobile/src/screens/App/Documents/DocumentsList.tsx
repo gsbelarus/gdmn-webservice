@@ -2,28 +2,33 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useScrollToTop, useTheme } from '@react-navigation/native';
+import documents from '../../../mockData/Document.json';
+import contacts from '../../../mockData//GD_Contact.json';
+import documentTypes from '../../../mockData//GD_DocumentType.json';
 import { styles } from '../../../styles/global';
+import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 
-type Item = { name: string; number: number; date: string };
+const DocumentList: IDocument[] = documents;
+const DocumentTypes: IDocumentType[] = documentTypes;
+const Contacts: IContact[] = contacts;
 
-const DocumentList: Item[] = [
-  { name: 'Инвентаризация', number: 12, date: '2020-01-20' },
-  { name: 'Инвентаризация', number: 1, date: '2020-01-10' },
-  { name: 'Поступление', number: 7, date: '2020-01-12' }
-];
-
-const ContactItem = React.memo(({ item }: { item: { name: string; number: number; date: string } }) => {
+const ContactItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
+  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
   return (
     <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-      <View style={localStyles.avatar}>
-        <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+      <View style={[localStyles.avatar, {backgroundColor: statusColors[item.head.status]}]}>
+        <Text style={localStyles.letter}>
+          {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
+        </Text>
       </View>
       <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[localStyles.name, { color: colors.text }]}>
+          {DocumentTypes.find(type => type.id === item.head.doctype).name}
+        </Text>
         <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
-          {item.number} от {item.date}
+          {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
         </Text>
       </View>
     </View>
@@ -37,11 +42,11 @@ const ItemSeparator = () => {
 };
 
 const DocumentsListScreen = () => {
-  const ref = React.useRef<FlatList<Item>>(null);
+  const ref = React.useRef<FlatList<IDocument>>(null);
 
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: Item }) => <ContactItem item={item} />;
+  const renderItem = ({ item }: { item: IDocument }) => <ContactItem item={item} />;
 
   return (
     <FlatList
