@@ -118,10 +118,6 @@ const AuthNavigator = () => {
   // Устанавливаем начальное состояние
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
-  useEffect(() => {
-    console.log(state.showSettings)
-  }, [state.showSettings])
-
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
   const breakConnection = useCallback(() => cancel(), [state.serverReq.isLoading]);

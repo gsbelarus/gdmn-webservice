@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Documents } from '../screens/App/Documents';
 import { Settings } from '../screens/App/Settings';
 import Contacts from '../screens/App/References';
+import DocumentsNavigator from './DocumentsNavigator';
 
 type TabsStackParams = {
   Documents: undefined;
@@ -18,7 +18,7 @@ const TabsNavigator = () => {
     <TabsStack.Navigator barStyle={styles.tabBar}>
       <TabsStack.Screen
         name="Documents"
-        component={Documents}
+        component={DocumentsNavigator}
         options={{
           tabBarLabel: 'Документы',
           tabBarIcon: 'file-document-box',
