@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  StatusBar,
-  TouchableOpacity,
-  Text,
-  AsyncStorage,
-  Alert
-} from "react-native";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "react-navigation-hooks";
-import DatePicker from "@react-native-community/datetimepicker";
-import Swiper from "react-native-web-swiper";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Text, AsyncStorage, Alert } from 'react-native';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from 'react-navigation-hooks';
+import DatePicker from '@react-native-community/datetimepicker';
+import Swiper from 'react-native-web-swiper';
 
 const DocumentFilterPage = (): JSX.Element => {
   const navigation = useNavigation();
@@ -24,19 +16,17 @@ const DocumentFilterPage = (): JSX.Element => {
 
   const today = new Date();
 
-  const handleDate = (event, selectedDate)=> {
+  const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
- 
+
     setDate(currentDate);
     // setShow(Platform.OS === 'ios' ? true : false);
   };
 
   useEffect(() => {
     const getData = async () => {
-      const d_docTypes = JSON.parse(
-        await AsyncStorage.getItem("documenttypes")
-      );
-      const d_contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+      const d_docTypes = JSON.parse(await AsyncStorage.getItem('documenttypes'));
+      const d_contacts = JSON.parse(await AsyncStorage.getItem('contacts'));
       const newDT = d_docTypes.reduce(
         (arr, item) => {
           if (arr[arr.length - 1].length == 2) {
@@ -45,7 +35,7 @@ const DocumentFilterPage = (): JSX.Element => {
           arr[arr.length - 1].push(item);
           return arr;
         },
-        [[]]
+        [[]],
       );
       setDocTypes(newDT);
       const newC = d_contacts.reduce(
@@ -56,21 +46,15 @@ const DocumentFilterPage = (): JSX.Element => {
           arr[arr.length - 1].push(item);
           return arr;
         },
-        [[]]
+        [[]],
       );
       setContacts(newC);
 
-      const documentId = navigation.getParam("docId");
+      const documentId = navigation.getParam('docId');
       if (!!documentId) {
-        const doc = JSON.parse(await AsyncStorage.getItem("docs")).find(
-          item => item.id === documentId
-        );
-        setSelectedDocType(
-          d_docTypes.find(item => item.id === doc.head.doctype)!.id
-        );
-        setSelectedContact(
-          d_contacts.find(item => item.id === doc.head.fromcontactId)!.id
-        );
+        const doc = JSON.parse(await AsyncStorage.getItem('docs')).find(item => item.id === documentId);
+        setSelectedDocType(d_docTypes.find(item => item.id === doc.head.doctype)!.id);
+        setSelectedContact(d_contacts.find(item => item.id === doc.head.fromcontactId)!.id);
         setDate(new Date(doc.head.date));
       }
     };
@@ -82,21 +66,19 @@ const DocumentFilterPage = (): JSX.Element => {
       <View
         style={{
           flex: 1,
-          borderColor: "#B1B1B1",
+          borderColor: '#B1B1B1',
           borderRadius: 4,
           borderWidth: 1,
-          borderStyle: "solid"
+          borderStyle: 'solid',
         }}
         key={1}
       >
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: 'row' }}>
           <Text style={styles.subdivisionText}>Тип документа: </Text>
-          <Text style={{ ...styles.subdivisionText, fontWeight: "bold" }}>
-            {docTypes &&
-            docTypes.length !== 0 &&
-            docTypes.flat().find(i => i.id === selectedDocType)
+          <Text style={{ ...styles.subdivisionText, fontWeight: 'bold' }}>
+            {docTypes && docTypes.length !== 0 && docTypes.flat().find(i => i.id === selectedDocType)
               ? docTypes.flat().find(i => i.id === selectedDocType).name
-              : "Не выбрано"}
+              : 'Не выбрано'}
           </Text>
         </View>
         {docTypes && docTypes.length !== 0 ? (
@@ -105,43 +87,31 @@ const DocumentFilterPage = (): JSX.Element => {
               dotsTouchable: true,
               prevPos: false,
               nextPos: false,
-              dotsPos: "bottom"
+              dotsPos: 'bottom',
             }}
           >
             {docTypes.map((d, idx) => (
               <View style={styles.slide} key={idx}>
                 <TouchableOpacity
                   style={{
-                    height: 30
+                    height: 30,
                   }}
                   onPress={() => setSelectedDocType(d[0].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-1`}>
-                    <MaterialCommunityIcons
-                      name="checkbox-blank-circle"
-                      size={20}
-                      color={"#F1FA3F"}
-                    />
-                    <Text numberOfLines={5}>
-                      {d[0] && d[0].name ? d[0].name : ""}
-                    </Text>
+                    <MaterialCommunityIcons name="checkbox-blank-circle" size={20} color={'#F1FA3F'} />
+                    <Text numberOfLines={5}>{d[0] && d[0].name ? d[0].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
-                    height: 30
+                    height: 30,
                   }}
                   onPress={() => setSelectedDocType(d[1].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-2`}>
-                    <MaterialCommunityIcons
-                      name="checkbox-blank-circle"
-                      size={20}
-                      color={"#F1FA3F"}
-                    />
-                    <Text numberOfLines={5}>
-                      {d[1] && d[1].name ? d[1].name : ""}
-                    </Text>
+                    <MaterialCommunityIcons name="checkbox-blank-circle" size={20} color={'#F1FA3F'} />
+                    <Text numberOfLines={5}>{d[1] && d[1].name ? d[1].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -154,23 +124,21 @@ const DocumentFilterPage = (): JSX.Element => {
       <View
         style={{
           flex: 1,
-          borderColor: "#B1B1B1",
+          borderColor: '#B1B1B1',
           borderRadius: 4,
           borderWidth: 1,
-          borderStyle: "solid",
+          borderStyle: 'solid',
           marginTop: 15,
-          marginBottom: -60
+          marginBottom: -60,
         }}
         key={2}
       >
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: 'row' }}>
           <Text style={styles.subdivisionText}>Подразделение: </Text>
-          <Text style={{ ...styles.subdivisionText, fontWeight: "bold" }}>
-            {contacts &&
-            contacts.length !== 0 &&
-            contacts.flat().find(i => i.id === selectedContact)
+          <Text style={{ ...styles.subdivisionText, fontWeight: 'bold' }}>
+            {contacts && contacts.length !== 0 && contacts.flat().find(i => i.id === selectedContact)
               ? contacts.flat().find(i => i.id === selectedContact).name
-              : "Не выбрано"}
+              : 'Не выбрано'}
           </Text>
         </View>
         {contacts && contacts.length !== 0 ? (
@@ -179,7 +147,7 @@ const DocumentFilterPage = (): JSX.Element => {
               dotsTouchable: true,
               prevPos: false,
               nextPos: false,
-              dotsPos: "bottom"
+              dotsPos: 'bottom',
             }}
           >
             {contacts.map((d, idx) => (
@@ -187,35 +155,27 @@ const DocumentFilterPage = (): JSX.Element => {
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    alignItems: "center",
-                    justifyContent: "center"
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                   onPress={() => setSelectedContact(d[0].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-1`}>
-                    <MaterialCommunityIcons
-                      name="checkbox-blank-circle"
-                      size={20}
-                      color={"#F1FA3F"}
-                    />
-                    <Text>{d[0] && d[0].name ? d[0].name : ""}</Text>
+                    <MaterialCommunityIcons name="checkbox-blank-circle" size={20} color={'#F1FA3F'} />
+                    <Text>{d[0] && d[0].name ? d[0].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    alignItems: "center",
-                    justifyContent: "center"
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                   onPress={() => setSelectedContact(d[1].id)}
                 >
                   <View style={styles.slideTextView} key={`${idx}-2`}>
-                    <MaterialCommunityIcons
-                      name="checkbox-blank-circle"
-                      size={20}
-                      color={"#F1FA3F"}
-                    />
-                    <Text>{d[1] && d[1].name ? d[1].name : ""}</Text>
+                    <MaterialCommunityIcons name="checkbox-blank-circle" size={20} color={'#F1FA3F'} />
+                    <Text>{d[1] && d[1].name ? d[1].name : ''}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -226,20 +186,19 @@ const DocumentFilterPage = (): JSX.Element => {
         )}
       </View>
       <View style={{ flex: 1.5, marginTop: 80 }}>
-        {
-        !showCalendar ? 
-        <Text>{date}</Text>
-        :
-        <DatePicker
-          style={{ width: "100%" }}
-          mode="date"
-          value={date}
-          onChange={handleDate}
-          minimumDate={new Date(1990, 0, 1)}
-          maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-          // confirmBtnText="Ок"
-          // cancelBtnText="Отмена"
-          /* iconComponent={
+        {!showCalendar ? (
+          <Text>{date}</Text>
+        ) : (
+          <DatePicker
+            style={{ width: '100%' }}
+            mode="date"
+            value={date}
+            onChange={handleDate}
+            minimumDate={new Date(1990, 0, 1)}
+            maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
+            // confirmBtnText="Ок"
+            // cancelBtnText="Отмена"
+            /* iconComponent={
             <MaterialIcons 
               style={{
                 position: 'absolute',
@@ -268,24 +227,18 @@ const DocumentFilterPage = (): JSX.Element => {
           }}
           onDateChange={(newDate) => {setDate(newDate)}}
           */
-        />}
+          />
+        )}
         <View style={styles.buttonView}>
           <View style={{ flex: 1 }}>
             <TouchableOpacity
               style={styles.buttonOk}
               onPress={async () => {
-                if (
-                  selectedContact !== undefined &&
-                  selectedDocType !== undefined
-                ) {
-                  const docsObject = await AsyncStorage.getItem("docs");
-                  const docs = docsObject
-                    ? JSON.parse(await AsyncStorage.getItem("docs"))
-                    : [];
-                  if (!!navigation.getParam("docId")) {
-                    const doc = docs.find(
-                      item => item.id === navigation.getParam("docId")
-                    );
+                if (selectedContact !== undefined && selectedDocType !== undefined) {
+                  const docsObject = await AsyncStorage.getItem('docs');
+                  const docs = docsObject ? JSON.parse(await AsyncStorage.getItem('docs')) : [];
+                  if (!!navigation.getParam('docId')) {
+                    const doc = docs.find(item => item.id === navigation.getParam('docId'));
                     docs[docs.findIndex(item => item.id === doc.id)] = {
                       ...doc,
                       head: {
@@ -293,39 +246,34 @@ const DocumentFilterPage = (): JSX.Element => {
                         doctype: selectedDocType,
                         fromcontactId: selectedContact,
                         tocontactId: selectedContact,
-                        date: date.toString()
-                      }
+                        date: date.toString(),
+                      },
                     };
-                    await AsyncStorage.setItem("docs", JSON.stringify(docs));
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
                     navigation.goBack();
                   } else {
-                    const docId =
-                      docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
+                    const docId = docs.length !== 0 ? docs[docs.length - 1].id + 1 : 0;
                     docs.push({
                       id: docId,
                       head: {
                         doctype: selectedDocType,
                         fromcontactId: selectedContact,
                         tocontactId: selectedContact,
-                        date: date.toString()
+                        date: date.toString(),
                       },
-                      lines: []
+                      lines: [],
                     });
-                    await AsyncStorage.setItem("docs", JSON.stringify(docs));
-                    navigation.navigate("ProductPage", {
-                      docId: docId
+                    await AsyncStorage.setItem('docs', JSON.stringify(docs));
+                    navigation.navigate('ProductPage', {
+                      docId: docId,
                     });
                   }
                 } else {
-                  Alert.alert(
-                    "Предупреждение!",
-                    "Вы не выбрали тип документа или подразделение",
-                    [
-                      {
-                        text: "OK"
-                      }
-                    ]
-                  );
+                  Alert.alert('Предупреждение!', 'Вы не выбрали тип документа или подразделение', [
+                    {
+                      text: 'OK',
+                    },
+                  ]);
                 }
               }}
             >
@@ -333,10 +281,7 @@ const DocumentFilterPage = (): JSX.Element => {
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={styles.buttonCancel}
-              onPress={() => navigation.navigate("DocumentPage")}
-            >
+            <TouchableOpacity style={styles.buttonCancel} onPress={() => navigation.navigate('DocumentPage')}>
               <Text style={styles.buttonCancelText}>Отмена</Text>
             </TouchableOpacity>
           </View>
@@ -349,77 +294,77 @@ const DocumentFilterPage = (): JSX.Element => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     margin: 15,
     flex: 1,
-    justifyContent: "space-between"
+    justifyContent: 'space-between',
   },
   subdivisionText: {
     fontSize: 18,
     marginTop: 10,
-    marginLeft: 10
+    marginLeft: 10,
   },
   slide: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center"
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   slideTextView: {
     flex: 1,
     flexGrow: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     marginHorizontal: 5,
     marginRight: 5,
-    alignItems: "center",
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: "#FFF"
+    borderColor: '#FFF',
   },
   selectedSlideTextView: {
     flex: 1,
     flexGrow: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     marginHorizontal: 5,
     marginRight: 5,
-    alignItems: "center",
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: "#080",
-    backgroundColor: "#EEE"
+    borderColor: '#080',
+    backgroundColor: '#EEE',
   },
   buttonView: {
     flex: 1,
-    flexDirection: "row",
-    marginTop: 20
+    flexDirection: 'row',
+    marginTop: 20,
   },
   buttonOk: {
     marginRight: 15,
-    backgroundColor: "#2D3083",
+    backgroundColor: '#2D3083',
     height: 50,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 4,
-    borderColor: "#212323"
+    borderColor: '#212323',
   },
   buttonOkText: {
-    color: "#FFFFFF",
-    fontSize: 17
+    color: '#FFFFFF',
+    fontSize: 17,
   },
   buttonCancel: {
     marginLeft: 15,
-    backgroundColor: "#2D3083",
-    color: "#FFFFFF",
+    backgroundColor: '#2D3083',
+    color: '#FFFFFF',
     height: 50,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 4,
-    borderColor: "#212323"
+    borderColor: '#212323',
   },
   buttonCancelText: {
-    color: "#FFFFFF",
-    fontSize: 17
-  }
+    color: '#FFFFFF',
+    fontSize: 17,
+  },
 });
 
 export default DocumentFilterPage;

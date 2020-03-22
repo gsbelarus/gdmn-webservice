@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, KeyboardAvoidingView, Platform, Keyboard, TextInput } from 'react-native';
-import { Title, Button } from 'react-native-paper';
-import { styles } from '../../styles/global';
 import { useTheme } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
+import { Title, Button } from 'react-native-paper';
+
+import styles from '../../styles/global';
 
 type Props = {
   serverName?: string;
@@ -17,11 +18,8 @@ const ConfigScreen = (props: Props) => {
   const { colors } = useTheme();
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : null}
-    >
-      <Title style={{ textAlign: 'center' }}>Подключение к серверу</Title>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
+      <Title style={styles.title}>Настройка подключения</Title>
       <TextInput
         value={newServerName}
         onChangeText={setNewServerName}
@@ -35,11 +33,25 @@ const ConfigScreen = (props: Props) => {
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-        <Button onPress={hideSettings} icon="check" mode="contained" style={[styles.rectangularButton, { flex: 1, marginRight: 7 }]} >Готово</Button>
-        <Button onPress={hideSettings} icon="cancel" mode="contained" style={[styles.rectangularButton, { flex: 1, marginLeft: 7 }]} >Отмена</Button>
+        <Button
+          onPress={hideSettings}
+          icon="check"
+          mode="contained"
+          style={[styles.rectangularButton, { flex: 1, marginRight: 7 }]}
+        >
+          Готово
+        </Button>
+        <Button
+          onPress={hideSettings}
+          icon="cancel"
+          mode="contained"
+          style={[styles.rectangularButton, { flex: 1, marginLeft: 7 }]}
+        >
+          Отмена
+        </Button>
       </View>
     </KeyboardAvoidingView>
   );
 };
 
-export default ConfigScreen;
+export { ConfigScreen };

@@ -1,24 +1,15 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  View,
-  Button
-} from "react-native";
-import { useNavigation } from "react-navigation-hooks";
-import Constants from "expo-constants";
-import { baseUrl } from "../helpers/utils";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingView, View, Button } from 'react-native';
+import { useNavigation } from 'react-navigation-hooks';
+import Constants from 'expo-constants';
+import { baseUrl } from '../helpers/utils';
 import { authApi } from '../api/auth';
 import { useStore } from '../store';
-import config from "../config";
+import config from '../config';
 
 const LoginPage = (): JSX.Element => {
-  const [loginValue, setLoginValue] = useState("");
-  const [passwordValue, setPasswordValue] = useState("");
+  const [loginValue, setLoginValue] = useState('');
+  const [passwordValue, setPasswordValue] = useState('');
   const { navigate } = useNavigation();
   const { state, actions } = useStore();
 
@@ -28,90 +19,80 @@ const LoginPage = (): JSX.Element => {
       navigate('Auth');
       Alert.alert('Тест', '', [{ text: 'OK' }]);
     }
-  }, [state.deviceRegistered])
+  }, [state.deviceRegistered]);
 
   const isActivateDevice = async () => {
-    const data = await fetch(
-      `${baseUrl}/device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include"
-      }
-    ).then(res => res.json());
-    return data.status === 200 ? (data.result ? "ACTIVE" : "BLOCK") : "ERROR";
+    const data = await fetch(`${baseUrl}/device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    }).then(res => res.json());
+    return data.status === 200 ? (data.result ? 'ACTIVE' : 'BLOCK') : 'ERROR';
   };
 
   const account = async () => {
     const isBlock = await isActivateDevice();
-    if (isBlock === "ACTIVE") {
+    if (isBlock === 'ACTIVE') {
       const data = await fetch(`${baseUrl}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           userName: loginValue,
-          password: passwordValue
-        })
+          password: passwordValue,
+        }),
       }).then(res => res.json());
       if (data.status === 200) {
-        navigate("App");
+        navigate('App');
       } else {
-        return Alert.alert(data.result, "Неправильный логин или пароль", [
+        return Alert.alert(data.result, 'Неправильный логин или пароль', [
           {
-            text: "OK",
-            onPress: () => setPasswordValue("")
-          }
+            text: 'OK',
+            onPress: () => setPasswordValue(''),
+          },
         ]);
       }
-    } else if (isBlock === "BLOCK") {
-      return Alert.alert(
-        "Устройство заблокировано!",
-        "Обратитесь к администратору",
-        [
-          {
-            text: "OK",
-            onPress: () => setPasswordValue("")
-          }
-        ]
-      );
-    } else {
-      return Alert.alert("Неизвестная ошибка", "", [
+    } else if (isBlock === 'BLOCK') {
+      return Alert.alert('Устройство заблокировано!', 'Обратитесь к администратору', [
         {
-          text: "OK",
-          onPress: () => setPasswordValue("")
-        }
+          text: 'OK',
+          onPress: () => setPasswordValue(''),
+        },
+      ]);
+    } else {
+      return Alert.alert('Неизвестная ошибка', '', [
+        {
+          text: 'OK',
+          onPress: () => setPasswordValue(''),
+        },
       ]);
     }
   };
 
   const _disconnectAsync = async () => {
-    Alert.alert(
-      'Отключиться от сервера?', '',
-      [
-        {
-          text: 'Подтвердить',
-          onPress: async () => {
-            // const res = await authApi.logout();
-            // if (res.status === 200) {
-              actions.disconnect();
-              return;
-            // }
-            // return Alert.alert(
-            //   'Ошибка сервера', res.result,
-            //   [
-            //     {
-            //       text: 'OK'
-            //     },
-            //   ],
-            // );
-          }
+    Alert.alert('Отключиться от сервера?', '', [
+      {
+        text: 'Подтвердить',
+        onPress: async () => {
+          // const res = await authApi.logout();
+          // if (res.status === 200) {
+          actions.disconnect();
+          return;
+          // }
+          // return Alert.alert(
+          //   'Ошибка сервера', res.result,
+          //   [
+          //     {
+          //       text: 'OK'
+          //     },
+          //   ],
+          // );
         },
-        {
-          text: 'Отмена',
-        },
-      ],
-    );
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   };
 
   const server = `${config.server.name}:${config.server.port}`;
@@ -121,7 +102,7 @@ const LoginPage = (): JSX.Element => {
       <View style={styles.container}>
         <View style={styles.login}>
           <View style={styles.info}>
-            <Text style={{ color: "#888", fontSize: 18 }}>Подключение к серверу</Text>
+            <Text style={{ color: '#888', fontSize: 18 }}>Подключение к серверу</Text>
             <Button onPress={_disconnectAsync} title={server} />
           </View>
           <TextInput
@@ -133,7 +114,7 @@ const LoginPage = (): JSX.Element => {
             multiline={false}
             autoCapitalize="sentences"
             underlineColorAndroid="transparent"
-            selectionColor={"black"}
+            selectionColor={'black'}
             maxLength={20}
             returnKeyType="done"
             autoCorrect={false}
@@ -147,7 +128,7 @@ const LoginPage = (): JSX.Element => {
             multiline={false}
             autoCapitalize="sentences"
             underlineColorAndroid="transparent"
-            selectionColor={"black"}
+            selectionColor={'black'}
             maxLength={25}
             returnKeyType="done"
             autoCorrect={false}
@@ -164,38 +145,38 @@ const LoginPage = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     margin: 10,
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#E3EFF4",
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#E3EFF4',
     flex: 2,
-    justifyContent: "flex-start",
+    justifyContent: 'flex-start',
   },
   info: {
-    justifyContent: "center",
+    justifyContent: 'center',
     alignItems: 'center',
   },
   login: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   input: {
     margin: 5,
-    borderColor: "#2D3083",
+    borderColor: '#2D3083',
     borderWidth: 1,
     fontSize: 24,
-    height: 35
+    height: 35,
   },
   submitButton: {
-    backgroundColor: "#2D3083",
+    backgroundColor: '#2D3083',
     padding: 0,
     margin: 5,
     height: 50,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButtonText: {
-    color: "white",
-    fontSize: 18
+    color: 'white',
+    fontSize: 18,
   },
 });
 

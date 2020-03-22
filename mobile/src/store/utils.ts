@@ -1,16 +1,18 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import { Reducer, useReducer, useMemo } from 'react';
+
 import { TActions } from './actions';
 
 /**
  * Create an action that has a strongly typed string literal name with a strongly typed payload
  */
 export function createActionPayload<TypeAction, TypePayload>(
-  actionType: TypeAction
+  actionType: TypeAction,
 ): (payload: TypePayload) => ActionsWithPayload<TypeAction, TypePayload> {
   return (p: TypePayload): ActionsWithPayload<TypeAction, TypePayload> => {
     return {
       payload: p,
-      type: actionType
+      type: actionType,
     };
   };
 }
@@ -18,12 +20,10 @@ export function createActionPayload<TypeAction, TypePayload>(
 /**
  * Create an action with no payload
  */
-export function createAction<TypeAction>(
-  actionType: TypeAction
-): () => ActionsWithoutPayload<TypeAction> {
+export function createAction<TypeAction>(actionType: TypeAction): () => ActionsWithoutPayload<TypeAction> {
   return (): ActionsWithoutPayload<TypeAction> => {
     return {
-      type: actionType
+      type: actionType,
     };
   };
 }
@@ -46,18 +46,14 @@ export interface ActionsWithoutPayload<TypeAction> {
  * A very general type that means to be "an object with a many field created with createActionPayload and createAction
  */
 interface ActionCreatorsMapObject {
-  [key: string]: (
-    ...args: any[]
-  ) => ActionsWithPayload<any, any> | ActionsWithoutPayload<any>;
+  [key: string]: (...args: unknown[]) => ActionsWithPayload<unknown, unknown> | ActionsWithoutPayload<unknown>;
 }
 
 /**
  * Use this Type to merge several action object that has field created with createActionPayload or createAction
  * E.g. type ReducerWithActionFromTwoObjects = ActionsUnion<typeof ActionsObject1 &amp; typeof ActionsObject2>;
  */
-export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<
-  A[keyof A]
->;
+export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<A[keyof A]>;
 
 /* export const makeActionCreators = (dispatch, fns) => {
   return Object.entries(fns).reduce((hash, [name, fn]) => {
@@ -68,20 +64,21 @@ export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<
  */
 
 interface IAction {
-  [key: string]: (...args: any[]) => any;
+  [key: string]: (...args: unknown[]) => unknown;
 }
 
 export function useTypesafeActions<S, Actions extends IAction>(
   reducer: Reducer<S, TActions>,
   initialState: S,
-  actions: Actions
+  actions: Actions,
 ): [S, Actions] {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const boundActions = useMemo(() => {
-    function bindActionCreator(actionCreator: (...args: any[]) => any, dispatcher: typeof dispatch) {
-      return function(this: any) {
-        return dispatcher(actionCreator.apply(this as any, (arguments as unknown) as any[]));
+    function bindActionCreator(actionCreator: (...args: unknown[]) => unknown, dispatcher: typeof dispatch) {
+      return function(this: unknown) {
+        // eslint-disable-next-line prefer-rest-params
+        return dispatcher(actionCreator.apply(this, (arguments as unknown) as unknown[]));
       };
     }
 

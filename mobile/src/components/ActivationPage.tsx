@@ -2,64 +2,50 @@ import React, { useState, FC } from 'react';
 import { StyleSheet, View, StatusBar, TextInput, Alert, Button } from 'react-native';
 import SubTitle from './SubTitle';
 import Constants from 'expo-constants';
-import { useNavigation } from 'react-navigation-hooks'
+import { useNavigation } from 'react-navigation-hooks';
 import { baseUrl } from '../helpers/utils';
 
 const ActivationPage: FC = (): JSX.Element => {
-const {navigate} = useNavigation();
-const [inputValue, setInputValue] = useState('');
-const verifyCode = async () => {
-  const data = await fetch(
-    `${baseUrl}/device/verifyCode?code=${inputValue}`,
-    {
+  const { navigate } = useNavigation();
+  const [inputValue, setInputValue] = useState('');
+  const verifyCode = async () => {
+    const data = await fetch(`${baseUrl}/device/verifyCode?code=${inputValue}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-    }
-  ).then(res => res.json())
-  if (data.status === 200) {
-    await fetch(
-      `${baseUrl}/device/new`,
-      {
+    }).then(res => res.json());
+    if (data.status === 200) {
+      await fetch(`${baseUrl}/device/new`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           uid: Constants.deviceId,
-          userId: data.result
-        })
-      }
-    )
-    return Alert.alert(
-      'Корректный код!',
-      '',
-      [
+          userId: data.result,
+        }),
+      });
+      return Alert.alert('Корректный код!', '', [
         {
           text: 'OK',
-          onPress: () => navigate('Auth')
+          onPress: () => navigate('Auth'),
         },
-      ],
-    );
-  }
-  if (data === 404) {
-    return Alert.alert(
-      'Некорректный код!',
-      'Повторите ещё раз',
-      [
+      ]);
+    }
+    if (data === 404) {
+      return Alert.alert('Некорректный код!', 'Повторите ещё раз', [
         {
           text: 'OK',
-          onPress: () => setInputValue('')
+          onPress: () => setInputValue(''),
         },
-      ],
-    );
-  }
-}
+      ]);
+    }
+  };
 
-return (
+  return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.title}>
-        <SubTitle subtitle='Регистрация устройства' />
+        <SubTitle subtitle="Регистрация устройства" />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -79,16 +65,16 @@ return (
           onSubmitEditing={verifyCode}
         />
       </View>
-      <Button title="Отправить" onPress={verifyCode}/>
+      <Button title="Отправить" onPress={verifyCode} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#E3EFF4',
     flex: 1,
-    height: '100%'
+    height: '100%',
   },
   input: {
     borderWidth: 1,
@@ -98,15 +84,15 @@ const styles = StyleSheet.create({
     marginRight: 15,
     fontSize: 24,
     color: 'black',
-    fontWeight: '500'
+    fontWeight: '500',
   },
   inputContainer: {
     marginTop: 40,
-    paddingLeft: 15
+    paddingLeft: 15,
   },
   title: {
     marginRight: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 });
 

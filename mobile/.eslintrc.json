@@ -1,0 +1,53 @@
+{
+  "extends": [
+    "universe",
+    "universe/shared/typescript-analysis",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "prettier/react",
+    "eslint-config-prettier",
+    "plugin:react/recommended",
+    "plugin:react-native/all",
+    "plugin:jsx-a11y/strict",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:jest/recommended",
+    "@react-native-community"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react-hooks"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.d.ts"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      }
+    }
+  ],
+  "rules": {
+    "react-native/no-unused-styles": "off",
+    "flowtype/no-types-missing-file-annotation": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "no-use-before-define": "off",
+    "no-nested-ternary": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/interface-name-prefix": [1, { "prefixWithI": "always" }],
+    "import/named": "off",
+    "react-native/no-color-literals": "off",
+    "react-native/no-raw-text": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-fragments": [1, "syntax"],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".js", ".jsx", ".tsx", ".ts"]
+      }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}

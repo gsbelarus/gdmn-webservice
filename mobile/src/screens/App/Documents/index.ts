@@ -1,3 +1,3 @@
-export { DocumentsList } from './DocumentsList';
-export { ViewDocument } from './ViewDocument';
-export { HeadDocument } from './HeadDocument';
+export { DocumentsListScreen } from './DocumentsList';
+export { ViewDocumentScreen } from './ViewDocument';
+export { HeadDocumentScreen } from './HeadDocument';

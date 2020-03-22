@@ -1,12 +1,12 @@
 // import { authApi } from "./auth";
-import { baseUrl } from "../helpers/utils";
+import { baseUrl } from '../helpers/utils';
 
 export async function get<T>(path: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include"
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
     });
     return response.json();
   } catch (err) {
@@ -17,16 +17,13 @@ export async function get<T>(path: string): Promise<T> {
   }
 }
 
-export async function post<T>(path: string, body: any): Promise<T> {
+export async function post<T, U>(path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        userName: body.userName,
-        password: body.password
-      })
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body,
     });
     return response.json();
   } catch (err) {
@@ -37,13 +34,13 @@ export async function post<T>(path: string, body: any): Promise<T> {
   }
 }
 
-export async function put<T>(path: string, body: any): Promise<T> {
+export async function put<T>(path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'PUT',
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body,
     });
     return response.json();
   } catch (err) {

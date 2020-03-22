@@ -1,17 +1,21 @@
-import { get, post, put } from './http.service';
-import Constants from "expo-constants";
-import { IServerResponse, IUser, IUserCredentials, IDataFetch } from '../model';
+import Constants from 'expo-constants';
+
+import { IServerResponse, IUser, IUserCredentials } from '../model';
+import { get, post } from './http.service';
 
 export const authApi = {
-  login: async (userCredentials: IUserCredentials): Promise<IServerResponse<any>> => post('/login', { userName: userCredentials.userName, password: userCredentials.password }),
+  login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
+    post('/login', JSON.stringify({ userName: userCredentials.userName, password: userCredentials.password })),
 
-  logout: async (): Promise<IServerResponse<string>> => get(`/logout`),
+  logout: async (): Promise<IServerResponse<string>> => get('/logout'),
 
-  getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(`/me`),
+  getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get('/me'),
 
-  getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> => get(`/device/isExist?uid=${Constants.deviceId}`),
+  getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
+    get(`/device/isExist?uid=${Constants.deviceId}`),
 
-  getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> => get(`/device/isActive?uid=${Constants.deviceId}&userId=${userName}`),
+  getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
+    get(`/device/isActive?uid=${Constants.deviceId}&userId=${userName}`),
 
   // `${baseUrl}/device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`,
 

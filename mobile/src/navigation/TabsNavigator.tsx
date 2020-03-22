@@ -1,6 +1,7 @@
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+
 import { Settings } from '../screens/App/Settings';
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
@@ -23,7 +24,7 @@ const TabsNavigator = () => {
           title: 'Документы',
           tabBarLabel: 'Документы',
           tabBarIcon: 'file-document-box',
-          tabBarColor: '#C9E7F8'
+          tabBarColor: '#C9E7F8',
         }}
       />
       <TabsStack.Screen
@@ -34,8 +35,7 @@ const TabsNavigator = () => {
           tabBarIcon: 'view-list',
           tabBarColor: '#9FD5C9',
           tabBarBadge: true,
-          title: 'Test'
-
+          title: 'Test',
         }}
       />
       <TabsStack.Screen
@@ -44,7 +44,7 @@ const TabsNavigator = () => {
         options={{
           tabBarLabel: 'Настройки',
           tabBarIcon: 'settings-box',
-          tabBarColor: '#FAD4D6'
+          tabBarColor: '#FAD4D6',
         }}
       />
     </TabsStack.Navigator>
@@ -52,16 +52,16 @@ const TabsNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: 'white',
+  button: {
+    margin: 8,
   },
   buttons: {
     flexDirection: 'row',
-    padding: 10
+    padding: 10,
   },
-  button: {
-    margin: 8
-  }
+  tabBar: {
+    backgroundColor: 'white',
+  },
 });
 
 export default TabsNavigator;

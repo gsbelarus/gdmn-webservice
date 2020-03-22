@@ -1,4 +1,4 @@
-import { AppActions } from "../store";
+import { AppActions } from '../store';
 
 export interface IContextProps {
   state: IAppState;
@@ -32,8 +32,8 @@ export interface IAppState {
   baseUrl?: IBaseUrl;
   companyID?: string;
   userID?: string;
-  deviceRegistered?: boolean
-  deviceActive?: boolean
+  deviceRegistered?: boolean;
+  deviceActive?: boolean;
   loggedIn?: boolean;
 }
 

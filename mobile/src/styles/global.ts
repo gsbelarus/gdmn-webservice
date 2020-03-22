@@ -1,36 +1,41 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		padding: 15,
-	},
-	rectangularButton: {
-		marginVertical: 15,
-    	height: 50,
-		justifyContent: 'center',
-		borderRadius: 4,
-	},
-	circularButton: {
-		borderRadius: 50,
-		borderWidth: 1,
-		height: 50,
-		width: 50,
-		justifyContent: 'center',
-	},
-	input: {
-		marginTop: 15,
-		padding: 10,
-		fontSize: 18,
-		height: 50,
-	},
-	buttonText:{
-		fontSize: 18,
-	},
-	separator: {
-		height: StyleSheet.hairlineWidth
-	},
+const styles = StyleSheet.create({
+  buttonText: {
+    fontSize: 18,
+  },
+  circularButton: {
+    borderRadius: 50,
+    borderWidth: 1,
+    height: 50,
+    justifyContent: 'center',
+    width: 50,
+  },
+  container: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: 15,
+  },
+  input: {
+    fontSize: 18,
+    height: 50,
+    marginTop: 15,
+    padding: 10,
+  },
+  rectangularButton: {
+    borderRadius: 4,
+    height: 50,
+    justifyContent: 'center',
+    marginVertical: 15,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+  },
+  title: {
+    textAlign: 'center',
+  },
 });
+
+export default styles;

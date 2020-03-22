@@ -1,5 +1,7 @@
-*.json
+# *.json
 *.md
 dist
 build
 /coverage
+
+.sample

@@ -1,13 +1,13 @@
+import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useScrollToTop, useTheme } from '@react-navigation/native';
-import documents from '../../../mockData/Document.json';
+
 import contacts from '../../../mockData//GD_Contact.json';
+import documents from '../../../mockData/Document.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
-import { styles } from '../../../styles/global';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
-import { useNavigation } from '@react-navigation/native';
+import styles from '../../../styles/global';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
@@ -19,11 +19,17 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity onPress={() => { navigation.navigate('ViewDocument', { docId: item.id }) }}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate('ViewDocument', { docId: item.id });
+      }}
+    >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
           <Text style={localStyles.letter}>
-            {DocumentTypes.find(type => type.id === item.head.doctype).name.slice(0, 1).toUpperCase()}
+            {DocumentTypes.find(type => type.id === item.head.doctype)
+              .name.slice(0, 1)
+              .toUpperCase()}
           </Text>
         </View>
         <View style={localStyles.details}>
@@ -31,7 +37,8 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             {DocumentTypes.find(type => type.id === item.head.doctype).name}
           </Text>
           <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
-            {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
+            {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от
+            {new Date(item.head.date).toLocaleDateString()}
           </Text>
         </View>
       </View>
@@ -63,34 +70,34 @@ const DocumentsListScreen = () => {
   );
 };
 
-export { DocumentsListScreen as DocumentsList };
+export { DocumentsListScreen };
 
 const localStyles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8
-  },
   avatar: {
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-    backgroundColor: '#e91e63',
     alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  details: {
+    margin: 8,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
   },
   letter: {
     color: 'white',
-    fontWeight: 'bold'
-  },
-  details: {
-    margin: 8
+    fontWeight: 'bold',
   },
   name: {
+    fontSize: 14,
     fontWeight: 'bold',
-    fontSize: 14
   },
   number: {
-    fontSize: 12
+    fontSize: 12,
   },
 });

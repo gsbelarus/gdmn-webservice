@@ -1,38 +1,27 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Title, Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
-import { useTheme } from '@react-navigation/native';
-import { useStore } from '../../store';
-import { styles } from '../../styles/global';
-import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
-import { createCancellableSignal, timeout } from '../../helpers/utils';
-import { authApi } from '../../api/auth';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
-export const SignInScreen = () => {
-  const { state, actions } = useStore();
+import { authApi } from '../../api/auth';
+import { timeout } from '../../helpers/utils';
+import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
+import { useStore } from '../../store';
+import styles from '../../styles/global';
+
+const SignInScreen = () => {
+  const { actions } = useStore();
+  const { colors } = useTheme();
   const [lognState, setLoginState] = useState<IDataFetch>({ isLoading: false, isError: false, status: undefined });
   const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
   const [credential, setCredentials] = useState<IUserCredentials>({ userName: '', password: '' });
-  const { signal, cancel } = useMemo(() => createCancellableSignal(), [lognState.isLoading]);
-  const { colors } = useTheme();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      }
-    );
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      }
-    );
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
     return () => {
       keyboardDidHideListener.remove();
@@ -56,15 +45,19 @@ export const SignInScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!lognState.isLoading) return;
+    if (!lognState.isLoading) {
+      return;
+    }
 
-    timeout(signal, 5000, authApi.getDeviceStatusByUser(credential.userName))
+    timeout(5000, authApi.getDeviceStatusByUser(credential.userName))
       .then((data: IServerResponse<boolean | string>) => setServerResp(data))
-      .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }))
-  }, [lognState.isLoading]);
+      .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
+  }, [credential.userName, lognState.isLoading]);
 
   useEffect(() => {
-    if (!serverResp) return;
+    if (!serverResp) {
+      return;
+    }
 
     if (serverResp.status === 200 && !serverResp.result) {
       setLoginState({ isLoading: false, status: 'Пользователь заблокирован', isError: true });
@@ -72,24 +65,24 @@ export const SignInScreen = () => {
     }
 
     if (serverResp.status === 200 && serverResp.result) {
-      timeout(signal, 5000, authApi.login(credential))
-        .then((data: IServerResponse<any>) => {
+      timeout(5000, authApi.login(credential))
+        .then((data: IServerResponse<string>) => {
           data.status === 200
             ? actions.setUserStatus(true)
-            : setLoginState({ isLoading: false, status: data.result, isError: true })
+            : setLoginState({ isLoading: false, status: data.result, isError: true });
         })
-        .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }))
+        .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
       return;
     }
     // Иной вариант ответа
     setLoginState({ isLoading: false, status: serverResp.result as string, isError: true });
-  }, [serverResp])
+  }, [actions, credential, serverResp]);
 
   return (
     <>
       <KeyboardAvoidingView
-        style={[styles.container, isKeyboardVisible && { justifyContent: 'flex-start' }]}
-        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={[styles.container, isKeyboardVisible && localeStyles.contentWidthKbd]}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
         <View>
           {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> */}
@@ -108,7 +101,13 @@ export const SignInScreen = () => {
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           {/* </TouchableWithoutFeedback> */}
-          <Button mode="contained" disabled={lognState.isLoading} icon={"login"} onPress={logIn} style={styles.rectangularButton}>
+          <Button
+            mode="contained"
+            disabled={lognState.isLoading}
+            icon={'login'}
+            onPress={logIn}
+            style={styles.rectangularButton}
+          >
             Войти
           </Button>
         </View>
@@ -130,23 +129,28 @@ export const SignInScreen = () => {
   );
 };
 
+export { SignInScreen };
+
 const localeStyles = StyleSheet.create({
-  container: {
-    justifyContent: 'center'
-  },
-  title: {
-    textAlign: 'center'
-  },
   buttons: {
-    width: '100%'
+    width: '100%',
+  },
+  container: {
+    justifyContent: 'center',
+  },
+  contentWidthKbd: {
+    justifyContent: 'flex-start',
   },
   errorText: {
     color: '#cc5933',
-    fontSize: 18
+    fontSize: 18,
   },
   statusBox: {
     alignItems: 'center',
     // justifyContent: 'center',
-    height: 100
-  }
+    height: 100,
+  },
+  title: {
+    textAlign: 'center',
+  },
 });

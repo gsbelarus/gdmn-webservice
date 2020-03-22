@@ -1,15 +1,16 @@
-import * as React from 'react';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
+import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useScrollToTop, useTheme } from '@react-navigation/native';
-import { styles } from '../../styles/global';
+
+import styles from '../../styles/global';
 
 type Item = { name: string; number: number; date: string };
 
 const DocumentList: Item[] = [
   { name: 'Инвентаризация', number: 12, date: '2020-01-20' },
   { name: 'Инвентаризация', number: 1, date: '2020-01-10' },
-  { name: 'Поступление', number: 7, date: '2020-01-12' }
+  { name: 'Поступление', number: 7, date: '2020-01-12' },
 ];
 
 const ContactItem = React.memo(({ item }: { item: { name: string; number: number; date: string } }) => {
@@ -55,31 +56,31 @@ export const Documents = () => {
 };
 
 const localStyles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8
-  },
   avatar: {
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-    backgroundColor: '#e91e63',
     alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  details: {
+    margin: 8,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
   },
   letter: {
     color: 'white',
-    fontWeight: 'bold'
-  },
-  details: {
-    margin: 8
+    fontWeight: 'bold',
   },
   name: {
+    fontSize: 14,
     fontWeight: 'bold',
-    fontSize: 14
   },
   number: {
-    fontSize: 12
+    fontSize: 12,
   },
 });

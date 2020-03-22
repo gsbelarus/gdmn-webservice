@@ -1,12 +1,12 @@
 import { Reducer } from 'react';
-import { TActions, ActionTypes } from './actions';
+
 import { IAppState } from '../model';
-import { baseUrl } from '../helpers/utils';
+import { TActions, ActionTypes } from './actions';
 
 export const initialState: IAppState = {
   baseUrl: undefined,
   deviceRegistered: undefined,
-  loggedIn: undefined
+  loggedIn: undefined,
 };
 
 // TODO User Status переделать в LogIn

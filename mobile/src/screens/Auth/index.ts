@@ -1,3 +1,3 @@
-export { ConnectionScreen } from './ConnectionScreen';
-export { SignInScreen } from './SignInScreen';
 export { SplashScreen } from './SplashScreen';
+export { SignInScreen } from './SignInScreen';
+export { ConfigScreen } from './ConfigScreen';

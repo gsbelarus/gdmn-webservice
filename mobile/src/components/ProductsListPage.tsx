@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert, ScrollView} from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert, ScrollView } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useNavigation } from 'react-navigation-hooks';
 import { TextInput } from 'react-native-gesture-handler';
@@ -9,7 +9,6 @@ import { useTheme } from '@react-navigation/native';
 import { styles } from '../styles/global';
 
 const ProductsListPage = (): JSX.Element => {
-
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [text, onChangeText] = useState('');
@@ -22,31 +21,33 @@ const ProductsListPage = (): JSX.Element => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      const remains = JSON.parse(await AsyncStorage.getItem('remains')).filter(item => item.contactId === navigation.getParam('contactId'));
-      setGoods(JSON.parse(await AsyncStorage.getItem('goods')).filter(item => remains.find(remain => remain.goodId === item.id)));
+      const remains = JSON.parse(await AsyncStorage.getItem('remains')).filter(
+        item => item.contactId === navigation.getParam('contactId'),
+      );
+      setGoods(
+        JSON.parse(await AsyncStorage.getItem('goods')).filter(item =>
+          remains.find(remain => remain.goodId === item.id),
+        ),
+      );
     })();
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    Alert.alert(
-      'Штрих-код был отсканирован',
-      data,
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setDoScanned(false);
-            onChangeText(data);
-            setScanned(false)
-          }
+    Alert.alert('Штрих-код был отсканирован', data, [
+      {
+        text: 'OK',
+        onPress: () => {
+          setDoScanned(false);
+          onChangeText(data);
+          setScanned(false);
         },
-        {
-          text: 'CANCEL',
-          onPress: () => {}
-        }
-      ],
-    );
+      },
+      {
+        text: 'CANCEL',
+        onPress: () => {},
+      },
+    ]);
   };
 
   if (hasPermission === null) {
@@ -58,18 +59,18 @@ const ProductsListPage = (): JSX.Element => {
 
   return (
     <View style={styles.container}>
-      {
-        doScanned
-          ? <>
-            <BarCodeScanner
-              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-              style={StyleSheet.absoluteFillObject}
-            />
-            {scanned && <Button onPress={() => setScanned(false)} >Сканировать ещё раз</Button>}
-          </>
-          : <>
-          <View style={{justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15}}>
-            <View style={{flex: 1, marginRight: 15}}>
+      {doScanned ? (
+        <>
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
+        </>
+      ) : (
+        <>
+          <View style={{ justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15 }}>
+            <View style={{ flex: 1, marginRight: 15 }}>
               <TextInput
                 style={styles.input}
                 onChangeText={text => onChangeText(text)}
@@ -84,59 +85,70 @@ const ProductsListPage = (): JSX.Element => {
                 autoCorrect={false}
               />
             </View>
-            <TouchableOpacity
-              onPress={() => setDoScanned(true)}
-            >
-              <MaterialCommunityIcons
-                name="barcode-scan"
-                size={35}
-                color={'#9A9FA1'}
-              />
+            <TouchableOpacity onPress={() => setDoScanned(true)}>
+              <MaterialCommunityIcons name="barcode-scan" size={35} color={'#9A9FA1'} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={{flex: 2}}>
-            {
-              goods.find(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase()))
-              ? goods.filter(item => item.barcode.toLowerCase().includes(text.toLowerCase()) || item.name.toLowerCase().includes(text.toLowerCase())).map( (item, idx) => (
-                <TouchableOpacity key={idx} onPress={() => navigation.navigate('ProductDetailPage', {id: item.id, idDoc: navigation.getParam('idDoc')})}>
-                  <View style={localeStyles.productView}>
-                    <View style={localeStyles.productTextView}>
-                      <View style={localeStyles.productIdView}>
-                        <Text style={localeStyles.productId}>{idx}</Text>
-                      </View>
-                      <View style={localeStyles.productNameTextView}>
-                        <Text numberOfLines={5} style={localeStyles.productTitleView}>{item.name}</Text>
+          <ScrollView style={{ flex: 2 }}>
+            {goods.find(
+              item =>
+                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                item.name.toLowerCase().includes(text.toLowerCase()),
+            ) ? (
+              goods
+                .filter(
+                  item =>
+                    item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                    item.name.toLowerCase().includes(text.toLowerCase()),
+                )
+                .map((item, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    onPress={() =>
+                      navigation.navigate('ProductDetailPage', { id: item.id, idDoc: navigation.getParam('idDoc') })
+                    }
+                  >
+                    <View style={localeStyles.productView}>
+                      <View style={localeStyles.productTextView}>
+                        <View style={localeStyles.productIdView}>
+                          <Text style={localeStyles.productId}>{idx}</Text>
+                        </View>
+                        <View style={localeStyles.productNameTextView}>
+                          <Text numberOfLines={5} style={localeStyles.productTitleView}>
+                            {item.name}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>)
-              )
-              : <Text style={{fontSize: 17, textAlign: 'center'}}>Товар не найден</Text>
-            }
-          </ScrollView> 
-          <StatusBar barStyle = "light-content" />
+                  </TouchableOpacity>
+                ))
+            ) : (
+              <Text style={{ fontSize: 17, textAlign: 'center' }}>Товар не найден</Text>
+            )}
+          </ScrollView>
+          <StatusBar barStyle="light-content" />
         </>
-      }
+      )}
     </View>
   );
-}
+};
 
 const localeStyles = StyleSheet.create({
   productView: {
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5
+    margin: 5,
   },
   productIdView: {
     justifyContent: 'center',
-    alignItems: 'center'
-  }, 
+    alignItems: 'center',
+  },
   productId: {
     margin: 15,
     textAlignVertical: 'center',
-    color: '#000000'
+    color: '#000000',
   },
   productNameTextView: {
     marginTop: 5,
@@ -144,12 +156,12 @@ const localeStyles = StyleSheet.create({
     width: '90%',
     justifyContent: 'center',
     color: '#000000',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   productTitleView: {
     fontWeight: 'bold',
     textAlignVertical: 'center',
-    flexGrow: 1
+    flexGrow: 1,
   },
 });
 

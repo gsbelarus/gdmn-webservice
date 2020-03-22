@@ -1,7 +1,7 @@
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
+
 import TabsNavigator from './TabsNavigator';
-import { NavigationEvents } from 'react-navigation';
 
 type RootStackParamList = {
   BottomTabs: undefined;

@@ -1,18 +1,13 @@
-import React, { useEffect, useReducer, useCallback, useMemo, useState } from 'react';
-import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 
 import { authApi } from '../api/auth';
-import { timeout, createCancellableSignal } from '../helpers/utils';
-import { useStore } from '../store';
+import config from '../config/index';
+import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
 import { IDataFetch, IServerResponse, IUser } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
-import { SplashScreen } from '../screens/Auth/SplashScreen';
-import { SignInScreen } from '../screens/Auth/SignInScreen';
-
-import config from '../config/index';
-import ConfigScreen from '../screens/Auth/Config';
-import TabsNavigator from './TabsNavigator';
+import { SplashScreen, SignInScreen, ConfigScreen } from '../screens/Auth';
+import { useStore } from '../store';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -25,7 +20,7 @@ type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 interface ILoadingState {
-  serverResp?: IServerResponse<any>;
+  serverResp?: IServerResponse<boolean | IUser | string>;
   serverReq: IDataFetch;
   showSettings: boolean;
 }
@@ -35,7 +30,7 @@ type Action =
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
   | { type: 'SETTINGS_FORM'; showSettings: boolean }
-  | { type: 'SET_RESPONSE'; status: number; result: any };
+  | { type: 'SET_RESPONSE'; status: number; result: boolean | string | IUser };
 
 function reducer(state: ILoadingState, action: Action): ILoadingState {
   switch (action.type) {
@@ -51,7 +46,7 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
       return {
         ...state,
         serverResp: undefined,
-        serverReq: { ...state.serverReq, isError: false, status: undefined, isLoading: true }
+        serverReq: { ...state.serverReq, isError: false, status: undefined, isLoading: true },
       };
     default:
       return state;
@@ -61,18 +56,19 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
 const initialState: ILoadingState = {
   serverResp: undefined,
   serverReq: { isLoading: false, isError: false, status: undefined },
-  showSettings: false
+  showSettings: false,
 };
 
-const isUser = (obj: any): obj is IUser => obj instanceof Object && 'id' in obj;
+const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in obj;
 
 const AuthNavigator = () => {
   const {
     state: { deviceRegistered, loggedIn, baseUrl },
-    actions
+    actions,
   } = useStore();
 
   const [state, setState] = useReducer(reducer, initialState);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { signal, cancel } = useMemo(() => createCancellableSignal(), [state.serverReq.isLoading]);
 
   console.disableYellowBox = !config.debug.showWarnings;
@@ -88,84 +84,142 @@ const AuthNavigator = () => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       // если нет начального состояния то обращаемся к серверу
       // TODO Таймаут вынести в конфиг
-      timeout(signal, 5000, authApi.getDeviceStatus())
+      timeoutWithСancellation(signal, 5000, authApi.getDeviceStatus())
         .then((data: IServerResponse<boolean>) =>
-          setState({ type: 'SET_RESPONSE', result: data.result, status: data.status })
+          setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
-  }, [state.serverReq]);
+  }, [deviceRegistered, signal, state.serverReq]);
 
   useEffect(() => {
     if (state.serverResp) {
       // получен ответ от сервера - передаём результат в глобальный стейт
       // TODO Проверить если свойство result не передано
-      actions.setDeviceStatus(state.serverResp.result ?? false);
+      actions.setDeviceStatus(state.serverResp.result as boolean);
     }
-  }, [state.serverResp]);
+  }, [actions, state.serverResp]);
 
   useEffect(() => {
     // TODO проверить случай когда устройство не зарегистрировано
-    if (deviceRegistered === undefined) return;
+    if (deviceRegistered === undefined) {
+      return;
+    }
 
     deviceRegistered
       ? // устройство зарегистрировано, проверяем пользователя
-      timeout(signal, 5000, authApi.getUserStatus())
-        .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
-        .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
+        timeoutWithСancellation(signal, 5000, authApi.getUserStatus())
+          .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
+          .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
-  }, [deviceRegistered]);
+  }, [actions, deviceRegistered, signal]);
 
   // Устанавливаем начальное состояние
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
-  const breakConnection = useCallback(() => cancel(), [state.serverReq.isLoading]);
+  const breakConnection = useCallback(() => cancel(), [cancel]);
 
   const showSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: true }), []);
 
   const hideSettings = useCallback(() => setState({ type: 'INIT' }), []);
 
-  const SplashWithParams = () => (
-    <SplashScreen
-      {...{ breakConnection, connection, deviceRegistered, loggedIn, showSettings }}
-      isLoading={state?.serverReq.isLoading}
-      isError={state?.serverReq?.isError}
-      status={state?.serverReq?.status}
-      serverName={`${baseUrl?.server}:${baseUrl?.port}`}
-    />
+  const SplashWithParams = useCallback(
+    () => (
+      <SplashScreen
+        {...{ breakConnection, connection, deviceRegistered, loggedIn, showSettings }}
+        isLoading={state?.serverReq.isLoading}
+        isError={state?.serverReq?.isError}
+        status={state?.serverReq?.status}
+        serverName={`${baseUrl?.server}:${baseUrl?.port}`}
+      />
+    ),
+    [baseUrl, breakConnection, connection, deviceRegistered, loggedIn, showSettings, state],
   );
 
-  const CongigWithParams = () => (
-    <ConfigScreen
-      {...{ hideSettings }}
-      serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
-      serverPort={baseUrl?.port}
-    />
+  const CongigWithParams = useCallback(
+    () => (
+      <ConfigScreen
+        {...{ hideSettings }}
+        serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
+        serverPort={baseUrl?.port}
+      />
+    ),
+    [baseUrl, hideSettings],
   );
 
-  return (
-    <Stack.Navigator headerMode="none">
-      {state.showSettings
-        ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{headerShown: true, headerBackTitleVisible: true}}/>
-        : deviceRegistered !== undefined && loggedIn !== undefined ? (
-          !deviceRegistered ? (
-            // Устройство не зарегистрировано - открываем окно ввода кода
-            <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
-          ) : loggedIn ? (
-            // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
-            <Stack.Screen key="App" name="App" component={AppNavigator} />
-          ) : (
-                // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
-                <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
-              )
-        ) : (
-            // Обращение к серверу
-            <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
-          )}
-    </Stack.Navigator>
+  const ConfigComponent = useMemo(
+    () => (
+      <Stack.Screen
+        key="Config"
+        name="Config"
+        component={CongigWithParams}
+        options={{ headerShown: true, headerBackTitleVisible: true }}
+      />
+    ),
+    [CongigWithParams],
   );
+
+  const LoginComponent = useMemo(
+    () =>
+      loggedIn ? (
+        <Stack.Screen key="App" name="App" component={AppNavigator} />
+      ) : (
+        <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
+      ),
+    [loggedIn],
+  );
+
+  const RegisterComponent = useMemo(
+    () =>
+      !deviceRegistered ? (
+        <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
+      ) : (
+        LoginComponent
+      ),
+    [deviceRegistered, LoginComponent],
+  );
+
+  const AuthConfig = useMemo(
+    () =>
+      deviceRegistered && loggedIn ? (
+        RegisterComponent
+      ) : (
+        <Stack.Screen
+          key="Splash"
+          name="Splash"
+          component={SplashWithParams}
+          options={{ animationTypeForReplace: 'pop' }}
+        />
+      ),
+    [RegisterComponent, SplashWithParams, deviceRegistered, loggedIn],
+  );
+
+  return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;
 };
+
+//   return (
+//     <Stack.Navigator headerMode="none">
+//       {state.showSettings
+//         ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{ headerShown: true, headerBackTitleVisible: true }} />
+//         : deviceRegistered !== undefined && loggedIn !== undefined ? (
+//           !deviceRegistered ? (
+//             // Устройство не зарегистрировано - открываем окно ввода кода
+//             <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
+//           ) : loggedIn ? (
+//             // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
+//             <Stack.Screen key="App" name="App" component={AppNavigator} />
+//           ) : (
+//                 // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
+//                 <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
+//               )
+//         ) : (
+//             // Обращение к серверу
+//             <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
+//           )}
+//     </Stack.Navigator>
+//   );
+// };
 
 export default AuthNavigator;

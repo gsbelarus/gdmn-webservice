@@ -1,8 +1,9 @@
+import { useScrollToTop, useTheme } from '@react-navigation/native';
 import * as React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useScrollToTop, useTheme } from '@react-navigation/native';
-import { styles } from '../../../styles/global';
+
+import styles from '../../../styles/global';
 
 type Item = { name: string; number: number };
 
@@ -59,37 +60,29 @@ const CONTACTS: Item[] = [
   { name: 'Vincent Sandoval', number: 2606111495 },
 ];
 
-const ContactItem = React.memo(
-  ({ item }: { item: { name: string; number: number } }) => {
-    const { colors } = useTheme();
+const ContactItem = React.memo(({ item }: { item: { name: string; number: number } }) => {
+  const { colors } = useTheme();
 
-    return (
-      <View style={[localeStyles.item, { backgroundColor: colors.card }]}>
-        <View style={localeStyles.avatar}>
-          <Text style={localeStyles.letter}>
-            {item.name.slice(0, 1).toUpperCase()}
-          </Text>
-        </View>
-        <View style={localeStyles.details}>
-          <Text style={[localeStyles.name, { color: colors.text }]}>{item.name}</Text>
-          <Text style={[localeStyles.number, { color: colors.text, opacity: 0.5 }]}>
-            {item.number}
-          </Text>
-        </View>
+  return (
+    <View style={[localeStyles.item, { backgroundColor: colors.card }]}>
+      <View style={localeStyles.avatar}>
+        <Text style={localeStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
       </View>
-    );
-  }
-);
+      <View style={localeStyles.details}>
+        <Text style={[localeStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[localeStyles.number, { color: colors.text, opacity: 0.5 }]}>{item.number}</Text>
+      </View>
+    </View>
+  );
+});
 
 const ItemSeparator = () => {
   const { colors } = useTheme();
 
-  return (
-    <View style={[styles.separator, { backgroundColor: colors.border }]} />
-  );
+  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
 };
 
-function Contacts() {
+const ContactsScreen = () => {
   const ref = React.useRef<FlatList<Item>>(null);
 
   useScrollToTop(ref);
@@ -105,36 +98,36 @@ function Contacts() {
       ItemSeparatorComponent={ItemSeparator}
     />
   );
-}
-
-export default Contacts;
+};
 
 const localeStyles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-  },
   avatar: {
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-    backgroundColor: '#e91e63',
     alignItems: 'center',
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
     justifyContent: 'center',
+    width: 36,
+  },
+  details: {
+    margin: 8,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
   },
   letter: {
     color: 'white',
     fontWeight: 'bold',
   },
-  details: {
-    margin: 8,
-  },
   name: {
-    fontWeight: 'bold',
     fontSize: 14,
+    fontWeight: 'bold',
   },
   number: {
     fontSize: 12,
   },
 });
+
+export { ContactsScreen };
