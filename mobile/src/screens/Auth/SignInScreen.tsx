@@ -91,7 +91,7 @@ const SignInScreen = () => {
           <TextInput
             placeholder="Имя пользователя"
             value={credential.userName}
-            onChangeText={val => setCredentials({ ...credential, userName: val })}
+            onChangeText={(val) => setCredentials({ ...credential, userName: val })}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           <TextInput
