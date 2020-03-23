@@ -6,7 +6,7 @@ import { DocumentsListScreen, ViewDocumentScreen, HeadDocumentScreen } from '../
 export type DocumentStackParamList = {
   DocumentsListScreen: undefined;
   ViewDocument: { docId: number };
-  HeadDocument: undefined;
+  HeadDocument: { docId: number };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
