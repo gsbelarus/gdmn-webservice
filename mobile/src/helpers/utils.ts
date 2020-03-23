@@ -15,7 +15,7 @@ export const timeoutWithСancellation = <T>(signal: Promise<T>, ms: number, prom
 
     promise.then(resolve, reject);
 
-    signal.catch(err => {
+    signal.catch((err) => {
       clearTimeout(tmOut);
       reject(err);
     });

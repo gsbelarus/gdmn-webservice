@@ -3,7 +3,6 @@ import { StyleSheet, TextInput, Text, TouchableOpacity, Alert, KeyboardAvoidingV
 import { useNavigation } from 'react-navigation-hooks';
 import Constants from 'expo-constants';
 import { baseUrl } from '../helpers/utils';
-import { authApi } from '../api/auth';
 import { useStore } from '../store';
 import config from '../config';
 

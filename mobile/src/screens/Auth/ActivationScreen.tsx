@@ -6,7 +6,7 @@ import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper'
 // eslint-disable-next-line import/default
 import VirtualKeyboard from 'react-native-virtual-keyboard';
 
-import { authApi } from '../../api/auth';
+import authApi from '../../api/auth';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IServerResponse, IDataFetch } from '../../model';

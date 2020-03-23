@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { authApi } from '../../api/auth';
+import authApi from '../../api/auth';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
@@ -86,7 +86,6 @@ const SignInScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
         <View>
-          {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> */}
           <SubTitle>Вход пользователя</SubTitle>
           <TextInput
             placeholder="Имя пользователя"
@@ -98,10 +97,9 @@ const SignInScreen = () => {
             placeholder="Пароль"
             secureTextEntry
             value={credential.password}
-            onChangeText={val => setCredentials({ ...credential, password: val })}
+            onChangeText={(val) => setCredentials({ ...credential, password: val })}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
-          {/* </TouchableWithoutFeedback> */}
           <Button
             mode="contained"
             disabled={lognState.isLoading}

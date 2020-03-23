@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import { IServerResponse, IUser, IUserCredentials, INewDevice } from '../model';
 import { get, post } from './http.service';
 
-export const authApi = {
+const authApi = {
   login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
     post('/login', JSON.stringify({ userName: userCredentials.userName, password: userCredentials.password })),
 
@@ -36,3 +36,5 @@ export const authApi = {
       return put(`/${name}`, body);
     } */
 };
+
+export default authApi;
