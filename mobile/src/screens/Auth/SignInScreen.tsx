@@ -1,13 +1,24 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
-import { Title, Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
 import { authApi } from '../../api/auth';
+import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
 import { useStore } from '../../store';
 import styles from '../../styles/global';
+
+/*
+  Порядок работы:
+  1) Проверяем что пользователь активен
+    1.1 Если активен переходим к пунтку 2
+    1.2 Если не активен отображаем сообщение
+  2) Осуществляем вход
+    2.1) Вход удался -> вызываем actions.setUserStatus(true);
+    2.2) Вход не удался -> отображаем сообщение об ошибке
+*/
 
 const SignInScreen = () => {
   const { actions } = useStore();
@@ -28,16 +39,6 @@ const SignInScreen = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
-
-  /*
-    Порядок работы:
-    1) Проверяем что пользователь активен
-      1.1 Если активен переходим к пунтку 2
-      1.2 Если не активен отображаем сообщение
-    2) Осуществляем вход
-     2.1) Вход удался -> вызываем actions.setUserStatus(true);
-     2.2) Вход не удался -> отображаем сообщение об ошибке
-  */
 
   const logIn = useCallback(() => {
     Keyboard.dismiss();
@@ -86,7 +87,7 @@ const SignInScreen = () => {
       >
         <View>
           {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> */}
-          <Title style={localeStyles.title}>Вход пользователя</Title>
+          <SubTitle>Вход пользователя</SubTitle>
           <TextInput
             placeholder="Имя пользователя"
             value={credential.userName}
@@ -116,7 +117,7 @@ const SignInScreen = () => {
           {lognState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
       </KeyboardAvoidingView>
-      <View style={{ alignItems: 'flex-end', backgroundColor: colors.background }}>
+      <View style={styles.bottomButtons}>
         <IconButton
           icon="server"
           size={30}
@@ -128,8 +129,6 @@ const SignInScreen = () => {
     </>
   );
 };
-
-export { SignInScreen };
 
 const localeStyles = StyleSheet.create({
   buttons: {
@@ -147,10 +146,11 @@ const localeStyles = StyleSheet.create({
   },
   statusBox: {
     alignItems: 'center',
-    // justifyContent: 'center',
     height: 100,
   },
   title: {
     textAlign: 'center',
   },
 });
+
+export { SignInScreen };

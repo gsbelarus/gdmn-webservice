@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-import { IServerResponse, IUser, IUserCredentials } from '../model';
+import { IServerResponse, IUser, IUserCredentials, INewDevice } from '../model';
 import { get, post } from './http.service';
 
 export const authApi = {
@@ -17,6 +17,11 @@ export const authApi = {
   getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
     get(`/device/isActive?uid=${Constants.deviceId}&userId=${userName}`),
 
+  verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
+    get(`/device/verifyCode?code=${code}`),
+
+  addDevice: async (newDevice: INewDevice): Promise<IServerResponse<string>> =>
+    post('/device/new', JSON.stringify({ uid: newDevice.uid, userId: newDevice.userId })),
   // `${baseUrl}/device/isActive?uid=${Constants.deviceId}&userId=${loginValue}`,
 
   /*   fetchData: async <T>(name: string): Promise<T> => {

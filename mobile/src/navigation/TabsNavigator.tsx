@@ -2,9 +2,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Settings } from '../screens/App/Settings';
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
+import SettingsNavigator from './SettingsNavigator';
 
 type TabsStackParams = {
   Documents: undefined;
@@ -40,8 +40,9 @@ const TabsNavigator = () => {
       />
       <TabsStack.Screen
         name="Settings"
-        component={Settings}
+        component={SettingsNavigator}
         options={{
+          title: 'Настройки',
           tabBarLabel: 'Настройки',
           tabBarIcon: 'settings-box',
           tabBarColor: '#FAD4D6',

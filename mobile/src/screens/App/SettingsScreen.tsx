@@ -1,15 +1,24 @@
 import { useTheme } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { ScrollView, AsyncStorage, View } from 'react-native';
-import { Divider, Avatar, Button, Title } from 'react-native-paper';
+import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
+import { Divider, Avatar, Button } from 'react-native-paper';
 
 import { authApi } from '../../api/auth';
 import SettingsItem from '../../components/SettingsItem';
+import SubTitle from '../../components/SubTitle';
 import { useStore } from '../../store';
+import styles from '../../styles/global';
 
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
-export const Settings = () => {
+type SettingsStackParamList = {
+  SettingsList: undefined;
+};
+
+const Stack = createStackNavigator<SettingsStackParamList>();
+
+const SettingsScreen = () => {
   const { colors, dark } = useTheme();
   const { actions } = useStore();
 
@@ -22,16 +31,7 @@ export const Settings = () => {
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
-      <Title style={{ textAlign: 'center' }}>Пользователь</Title>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-        }}
-      >
+      <View style={localeStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
         <Button icon="logout" mode="contained" onPress={logOut}>
           Выход
@@ -55,3 +55,15 @@ export const Settings = () => {
     </ScrollView>
   );
 };
+
+const localeStyles = StyleSheet.create({
+  content: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+});
+
+export { SettingsScreen };

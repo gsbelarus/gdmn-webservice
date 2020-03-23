@@ -6,7 +6,7 @@ import config from '../config/index';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
 import { IDataFetch, IServerResponse, IUser } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
-import { SplashScreen, SignInScreen, ConfigScreen } from '../screens/Auth';
+import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useStore } from '../store';
 
 type AuthStackParamList = {
@@ -82,8 +82,6 @@ const AuthNavigator = () => {
   */
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
-      // если нет начального состояния то обращаемся к серверу
-      // TODO Таймаут вынести в конфиг
       timeoutWithСancellation(signal, 5000, authApi.getDeviceStatus())
         .then((data: IServerResponse<boolean>) =>
           setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
@@ -94,27 +92,22 @@ const AuthNavigator = () => {
 
   useEffect(() => {
     if (state.serverResp) {
-      // получен ответ от сервера - передаём результат в глобальный стейт
-      // TODO Проверить если свойство result не передано
       actions.setDeviceStatus(state.serverResp.result as boolean);
     }
   }, [actions, state.serverResp]);
 
   useEffect(() => {
-    // TODO проверить случай когда устройство не зарегистрировано
     if (deviceRegistered === undefined) {
       return;
     }
 
     deviceRegistered
-      ? // устройство зарегистрировано, проверяем пользователя
-        timeoutWithСancellation(signal, 5000, authApi.getUserStatus())
+      ? timeoutWithСancellation(signal, 5000, authApi.getUserStatus())
           .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [actions, deviceRegistered, signal]);
 
-  // Устанавливаем начальное состояние
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
@@ -174,7 +167,7 @@ const AuthNavigator = () => {
   const RegisterComponent = useMemo(
     () =>
       !deviceRegistered ? (
-        <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
+        <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={ActivationScreen} />
       ) : (
         LoginComponent
       ),
@@ -183,7 +176,7 @@ const AuthNavigator = () => {
 
   const AuthConfig = useMemo(
     () =>
-      deviceRegistered && loggedIn ? (
+      deviceRegistered !== undefined && loggedIn !== undefined ? (
         RegisterComponent
       ) : (
         <Stack.Screen
@@ -198,28 +191,5 @@ const AuthNavigator = () => {
 
   return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;
 };
-
-//   return (
-//     <Stack.Navigator headerMode="none">
-//       {state.showSettings
-//         ? <Stack.Screen key="Config" name="Config" component={CongigWithParams} options={{ headerShown: true, headerBackTitleVisible: true }} />
-//         : deviceRegistered !== undefined && loggedIn !== undefined ? (
-//           !deviceRegistered ? (
-//             // Устройство не зарегистрировано - открываем окно ввода кода
-//             <Stack.Screen key="DeviceRegister" name="DeviceRegister" component={SplashScreen} />
-//           ) : loggedIn ? (
-//             // Устройство зарегистрировано, вход пользователя осуществлён - открываем окно приложение
-//             <Stack.Screen key="App" name="App" component={AppNavigator} />
-//           ) : (
-//                 // Устройство зарегистрировано, вход пользователя не осуществлён - открываем окно входа пользователя
-//                 <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
-//               )
-//         ) : (
-//             // Обращение к серверу
-//             <Stack.Screen key="Splash" name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
-//           )}
-//     </Stack.Navigator>
-//   );
-// };
 
 export default AuthNavigator;

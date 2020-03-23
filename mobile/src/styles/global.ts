@@ -1,6 +1,9 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+  bottomButtons: {
+    alignItems: 'flex-end',
+  },
   buttonText: {
     fontSize: 18,
   },

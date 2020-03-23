@@ -1,8 +1,9 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
-import { Title, Button } from 'react-native-paper';
+import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
+import { Button } from 'react-native-paper';
 
+import SubTitle from '../../components/SubTitle';
 import styles from '../../styles/global';
 
 type Props = {
@@ -19,7 +20,7 @@ const ConfigScreen = (props: Props) => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
-      <Title style={styles.title}>Настройка подключения</Title>
+      <SubTitle>Настройка подключения</SubTitle>
       <TextInput
         value={newServerName}
         onChangeText={setNewServerName}
@@ -32,12 +33,12 @@ const ConfigScreen = (props: Props) => {
         placeholder="Порт"
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+      <View style={localeStyles.buttonsView}>
         <Button
           onPress={hideSettings}
           icon="check"
           mode="contained"
-          style={[styles.rectangularButton, { flex: 1, marginRight: 7 }]}
+          style={[styles.rectangularButton, localeStyles.button]}
         >
           Готово
         </Button>
@@ -45,7 +46,7 @@ const ConfigScreen = (props: Props) => {
           onPress={hideSettings}
           icon="cancel"
           mode="contained"
-          style={[styles.rectangularButton, { flex: 1, marginLeft: 7 }]}
+          style={[styles.rectangularButton, localeStyles.button]}
         >
           Отмена
         </Button>
@@ -53,5 +54,16 @@ const ConfigScreen = (props: Props) => {
     </KeyboardAvoidingView>
   );
 };
+
+const localeStyles = StyleSheet.create({
+  button: {
+    flex: 1,
+    marginLeft: 7,
+  },
+  buttonsView: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+});
 
 export { ConfigScreen };

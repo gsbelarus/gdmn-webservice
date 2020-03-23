@@ -28,6 +28,11 @@ export interface IUserCredentials {
   password: string;
 }
 
+export interface INewDevice {
+  uid: string;
+  userId: string;
+}
+
 export interface IAppState {
   baseUrl?: IBaseUrl;
   companyID?: string;
