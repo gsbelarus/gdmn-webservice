@@ -13,6 +13,7 @@
     "eslint:run": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "^2.1.0",
     "expo": "^36.0.2",
     "expo-barcode-scanner": "^8.0.0",
     "react": "16.13.1",
