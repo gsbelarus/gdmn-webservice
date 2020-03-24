@@ -1,0 +1,17 @@
+[
+  {
+		"id": 0,
+    "name": "Контакты",
+    "type": "contacts"
+	},
+	{
+		"id": 1,
+    "name": "Товары",
+    "type": "goods"
+	},
+	{
+		"id": 2,
+    "name": "Типы документов",
+    "type": "documentTypes"
+	}
+]

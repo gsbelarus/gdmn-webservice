@@ -51,3 +51,9 @@ export interface IGood {
   barcode: string;
   alias: string;
 }
+
+export interface IReference {
+  id: number;
+  name: string;
+  type: string;
+}
