@@ -17,6 +17,48 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
   const good: IGood = goods.find(i => i.id === item.goodId);
 
   return (
+    <View style={{flexDirection: 'row', justifyContent: 'space-around', marginVertical: 5 }}>
+      <View style={{marginLeft: 15}}>
+        <Text numberOfLines={5} style={localeStyles.productTitleView}>
+          {good.name}
+        </Text>
+        <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
+          {good.barcode}
+        </Text>
+      </View>
+      <View style={{flexGrow: 1, alignItems: 'flex-end', marginRight: 15}}>
+        <Text numberOfLines={5} style={localeStyles.productTitleView}>
+          {remains?.find(remain => remain.goodId === good.id).price}
+        </Text>
+        <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
+          {item.quantity}
+        </Text>
+      </View>
+      <View style={{marginRight: 5}}>
+        {status === 0 ? (
+          <TouchableOpacity
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
+            onPress={async () => {
+              Alert.alert('Вы уверены, что хотите удалить?', '', [
+                {
+                  text: 'OK',
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+          >
+            <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
+          </TouchableOpacity>
+        ) : (
+          undefined
+        )}
+      </View>
+    </View>
+  );
+
+  /*return (
     <>
       <View style={[localeStyles.productTextView, {backgroundColor: colors.card}]}>
         <View style={localeStyles.productNameTextView}>
@@ -60,7 +102,7 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
         </Text>
       </View>
     </>
-  );
+  );*/
 });
 
 const ItemSeparator = () => {
