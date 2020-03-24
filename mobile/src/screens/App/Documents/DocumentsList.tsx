@@ -1,7 +1,7 @@
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 
 import contacts from '../../../mockData//GD_Contact.json';
 import documents from '../../../mockData/Document.json';
@@ -51,7 +51,7 @@ const ItemSeparator = () => {
   return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
 };
 
-const DocumentsListScreen = () => {
+const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
 
   useScrollToTop(ref);
@@ -59,13 +59,16 @@ const DocumentsListScreen = () => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   return (
-    <FlatList
-      ref={ref}
-      data={DocumentList}
-      keyExtractor={(_, i) => String(i)}
-      renderItem={renderItem}
-      ItemSeparatorComponent={ItemSeparator}
-    />
+    <>
+      <FlatList
+        ref={ref}
+        data={DocumentList}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
+      />
+      <Button onPress={() => {navigation.navigate('CreateDocument')}}>Create Document</Button>
+    </>
   );
 };
 

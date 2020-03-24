@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -57,52 +57,6 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
       </View>
     </View>
   );
-
-  /*return (
-    <>
-      <View style={[localeStyles.productTextView, {backgroundColor: colors.card}]}>
-        <View style={localeStyles.productNameTextView}>
-          <Text numberOfLines={5} style={localeStyles.productTitleView}>
-            {good.name}
-          </Text>
-          <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
-            {good.barcode}
-          </Text>
-        </View>
-        {status === 0 ? (
-          <TouchableOpacity
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
-            onPress={async () => {
-              Alert.alert('Вы уверены, что хотите удалить?', '', [
-                {
-                  text: 'OK',
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
-            }}
-          >
-            <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
-          </TouchableOpacity>
-        ) : (
-          undefined
-        )}
-      </View>
-
-      <View style={[localeStyles.productNumView, {backgroundColor: colors.background}]}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <Ionicons size={20} color={colors.primary} name="md-pricetag" />
-          <Text numberOfLines={5} style={localeStyles.productPriceView}>
-            {remains?.find(remain => remain.goodId === good.id).price}
-          </Text>
-        </View>
-        <Text numberOfLines={5}>
-          {item.quantity}
-        </Text>
-      </View>
-    </>
-  );*/
 });
 
 const ItemSeparator = () => {
@@ -146,6 +100,18 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <View>
+        <TouchableOpacity
+          style={styles.circularButton}
+          onPress={() =>
+            navigation.navigate('ProductsListPage', {
+              idDoc: navigation.getParam('docId'),
+            })
+          }
+        >
+          <MaterialIcons size={25} color="#FFF" name="add" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

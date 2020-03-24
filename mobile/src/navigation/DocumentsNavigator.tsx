@@ -1,12 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { DocumentsListScreen, ViewDocumentScreen, HeadDocumentScreen } from '../screens/App/Documents';
+import { DocumentsListScreen, ViewDocumentScreen, HeadDocumentScreen, CreateDocumentScreen } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
   DocumentsListScreen: undefined;
   ViewDocument: { docId: number };
   HeadDocument: { docId: number };
+  CreateDocument: { docId?: number };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -28,6 +29,7 @@ const DocumentsNavigator = () => {
         options={{ title: '' }}
       />
       <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocumentScreen} options={{ title: '' }} />
+      <Stack.Screen key="CreateDocument" name="CreateDocument" component={CreateDocumentScreen} options={{ title: '' }} />
     </Stack.Navigator>
   );
 };
