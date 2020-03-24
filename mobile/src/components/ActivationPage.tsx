@@ -1,9 +1,10 @@
+import Constants from 'expo-constants';
 import React, { useState, FC } from 'react';
 import { StyleSheet, View, StatusBar, TextInput, Alert, Button } from 'react-native';
-import SubTitle from './SubTitle';
-import Constants from 'expo-constants';
 import { useNavigation } from 'react-navigation-hooks';
+
 import { baseUrl } from '../helpers/utils';
+import SubTitle from './SubTitle';
 
 const ActivationPage: FC = (): JSX.Element => {
   const { navigate } = useNavigation();
@@ -13,7 +14,7 @@ const ActivationPage: FC = (): JSX.Element => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-    }).then(res => res.json());
+    }).then((res) => res.json());
     if (data.status === 200) {
       await fetch(`${baseUrl}/device/new`, {
         method: 'POST',
@@ -77,22 +78,22 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   input: {
-    borderWidth: 1,
-    borderStyle: 'dashed',
     borderColor: '#3F4243',
-    marginTop: 100,
-    marginRight: 15,
-    fontSize: 24,
+    borderStyle: 'dashed',
+    borderWidth: 1,
     color: 'black',
+    fontSize: 24,
     fontWeight: '500',
+    marginRight: 15,
+    marginTop: 100,
   },
   inputContainer: {
     marginTop: 40,
     paddingLeft: 15,
   },
   title: {
-    marginRight: 10,
     alignItems: 'center',
+    marginRight: 10,
   },
 });
 

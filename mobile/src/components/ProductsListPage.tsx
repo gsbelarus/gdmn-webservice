@@ -1,11 +1,12 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '@react-navigation/native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, StatusBar, TouchableOpacity, AsyncStorage, Alert, ScrollView } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import { Text, Button } from 'react-native-paper';
 import { useNavigation } from 'react-navigation-hooks';
-import { TextInput } from 'react-native-gesture-handler';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { useTheme } from '@react-navigation/native';
+
 import { styles } from '../styles/global';
 
 const ProductsListPage = (): JSX.Element => {
@@ -22,11 +23,11 @@ const ProductsListPage = (): JSX.Element => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
       const remains = JSON.parse(await AsyncStorage.getItem('remains')).filter(
-        item => item.contactId === navigation.getParam('contactId'),
+        (item) => item.contactId === navigation.getParam('contactId'),
       );
       setGoods(
-        JSON.parse(await AsyncStorage.getItem('goods')).filter(item =>
-          remains.find(remain => remain.goodId === item.id),
+        JSON.parse(await AsyncStorage.getItem('goods')).filter((item) =>
+          remains.find((remain) => remain.goodId === item.id),
         ),
       );
     })();
@@ -73,7 +74,7 @@ const ProductsListPage = (): JSX.Element => {
             <View style={{ flex: 1, marginRight: 15 }}>
               <TextInput
                 style={styles.input}
-                onChangeText={text => onChangeText(text)}
+                onChangeText={(text) => onChangeText(text)}
                 value={text}
                 placeholder="Type here to enter title or barCode"
                 placeholderTextColor={'#9A9FA1'}
@@ -91,13 +92,13 @@ const ProductsListPage = (): JSX.Element => {
           </View>
           <ScrollView style={{ flex: 2 }}>
             {goods.find(
-              item =>
+              (item) =>
                 item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                 item.name.toLowerCase().includes(text.toLowerCase()),
             ) ? (
               goods
                 .filter(
-                  item =>
+                  (item) =>
                     item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                     item.name.toLowerCase().includes(text.toLowerCase()),
                 )
@@ -134,34 +135,34 @@ const ProductsListPage = (): JSX.Element => {
 };
 
 const localeStyles = StyleSheet.create({
-  productView: {
-    flexDirection: 'column',
+  productId: {
+    color: '#000000',
+    margin: 15,
+    textAlignVertical: 'center',
+  },
+  productIdView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  productNameTextView: {
+    color: '#000000',
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    marginHorizontal: 5,
+    marginTop: 5,
+    width: '90%',
   },
   productTextView: {
     flexDirection: 'row',
     margin: 5,
   },
-  productIdView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  productId: {
-    margin: 15,
-    textAlignVertical: 'center',
-    color: '#000000',
-  },
-  productNameTextView: {
-    marginTop: 5,
-    marginHorizontal: 5,
-    width: '90%',
-    justifyContent: 'center',
-    color: '#000000',
-    fontWeight: 'bold',
-  },
   productTitleView: {
+    flexGrow: 1,
     fontWeight: 'bold',
     textAlignVertical: 'center',
-    flexGrow: 1,
+  },
+  productView: {
+    flexDirection: 'column',
   },
 });
 

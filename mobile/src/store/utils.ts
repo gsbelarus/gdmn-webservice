@@ -76,7 +76,7 @@ export function useTypesafeActions<S, Actions extends IAction>(
 
   const boundActions = useMemo(() => {
     function bindActionCreator(actionCreator: (...args: unknown[]) => unknown, dispatcher: typeof dispatch) {
-      return function(this: unknown) {
+      return function (this: unknown) {
         // eslint-disable-next-line prefer-rest-params
         return dispatcher(actionCreator.apply(this, (arguments as unknown) as unknown[]));
       };

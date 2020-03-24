@@ -2,15 +2,20 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
-const SubTitle = ({ children }) => {
+interface IProps {
+  children?: unknown;
+  styles?: unknown;
+}
+
+const SubTitle = ({ children, styles }: IProps) => {
   return (
-    <View style={styles.titleContainer}>
-      <Text style={styles.titleText}>{children.toUpperCase()}</Text>
+    <View style={[localStyles.titleContainer, styles]}>
+      <Text style={localStyles.titleText}>{((children as string) || '').toUpperCase()}</Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   titleContainer: {
     marginTop: 0,
   },

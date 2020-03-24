@@ -60,8 +60,8 @@ const ActivationScreen = () => {
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
         <View style={styles.container}>
           <SubTitle>Активация устройства</SubTitle>
-          <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
-            {serverReq.isError && <Text style={localeStyles.errorText}>Ошибка: {serverReq.status}</Text>}
+          <View style={{ ...localStyles.statusBox, backgroundColor: colors.background }}>
+            {serverReq.isError && <Text style={localStyles.errorText}>Ошибка: {serverReq.status}</Text>}
             {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
           {/* <TextInput
@@ -78,7 +78,7 @@ const ActivationScreen = () => {
           keyboardType="decimal-pad"
           style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
         />} */}
-          <Text style={localeStyles.codeText}>{activationCode}</Text>
+          <Text style={localStyles.codeText}>{activationCode}</Text>
           <VirtualKeyboard color="black" pressMode="string" onPress={setActivationCode} />
           <Button
             mode="contained"
@@ -104,7 +104,7 @@ const ActivationScreen = () => {
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   buttons: {
     width: '100%',
   },

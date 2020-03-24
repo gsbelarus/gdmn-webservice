@@ -64,13 +64,13 @@ const ContactItem = React.memo(({ item }: { item: { name: string; number: number
   const { colors } = useTheme();
 
   return (
-    <View style={[localeStyles.item, { backgroundColor: colors.card }]}>
-      <View style={localeStyles.avatar}>
-        <Text style={localeStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+    <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      <View style={localStyles.avatar}>
+        <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
       </View>
-      <View style={localeStyles.details}>
-        <Text style={[localeStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[localeStyles.number, { color: colors.text, opacity: 0.5 }]}>{item.number}</Text>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>{item.number}</Text>
       </View>
     </View>
   );
@@ -100,7 +100,7 @@ export default function Contacts() {
   );
 }
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',

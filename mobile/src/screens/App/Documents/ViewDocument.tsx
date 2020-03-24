@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -14,27 +14,27 @@ import styles from '../../../styles/global';
 
 const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
   const { colors } = useTheme();
-  const good: IGood = goods.find(i => i.id === item.goodId);
+  const good: IGood = goods.find((i) => i.id === item.goodId);
 
   return (
-    <View style={{flexDirection: 'row', justifyContent: 'space-around', marginVertical: 5 }}>
-      <View style={{marginLeft: 15}}>
-        <Text numberOfLines={5} style={localeStyles.productTitleView}>
+    <View style={localStyles.listContainer}>
+      <View style={{ marginLeft: 15 }}>
+        <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
-        <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
+        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {good.barcode}
         </Text>
       </View>
-      <View style={{flexGrow: 1, alignItems: 'flex-end', marginRight: 15}}>
-        <Text numberOfLines={5} style={localeStyles.productTitleView}>
-          {remains?.find(remain => remain.goodId === good.id).price}
+      <View style={{ flexGrow: 1, alignItems: 'flex-end', marginRight: 15 }}>
+        <Text numberOfLines={5} style={localStyles.productTitleView}>
+          {remains?.find((remain) => remain.goodId === good.id).price}
         </Text>
-        <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
+        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {item.quantity}
         </Text>
       </View>
-      <View style={{marginRight: 5}}>
+      <View style={{ marginRight: 5 }}>
         {status === 0 ? (
           <TouchableOpacity
             style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
@@ -51,21 +51,19 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           >
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </View>
     </View>
   );
 
   /*return (
     <>
-      <View style={[localeStyles.productTextView, {backgroundColor: colors.card}]}>
-        <View style={localeStyles.productNameTextView}>
-          <Text numberOfLines={5} style={localeStyles.productTitleView}>
+      <View style={[localStyles.productTextView, {backgroundColor: colors.card}]}>
+        <View style={localStyles.productNameTextView}>
+          <Text numberOfLines={5} style={localStyles.productTitleView}>
             {good.name}
           </Text>
-          <Text numberOfLines={5} style={localeStyles.productBarcodeView}>
+          <Text numberOfLines={5} style={localStyles.productBarcodeView}>
             {good.barcode}
           </Text>
         </View>
@@ -90,10 +88,10 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
         )}
       </View>
 
-      <View style={[localeStyles.productNumView, {backgroundColor: colors.background}]}>
+      <View style={[localStyles.productNumView, {backgroundColor: colors.background}]}>
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <Ionicons size={20} color={colors.primary} name="md-pricetag" />
-          <Text numberOfLines={5} style={localeStyles.productPriceView}>
+          <Text numberOfLines={5} style={localStyles.productPriceView}>
             {remains?.find(remain => remain.goodId === good.id).price}
           </Text>
         </View>
@@ -113,9 +111,9 @@ const ItemSeparator = () => {
 
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const document: IDocument = documents.find(item => item.id === route.params.docId);
-  const type: IDocumentType = documentTypes.find(item => item.id === document.head.doctype);
-  const contact: IContact = contacts.find(item => item.id === document.head.tocontactId);
+  const document: IDocument = documents.find((item) => item.id === route.params.docId);
+  const type: IDocumentType = documentTypes.find((item) => item.id === document.head.doctype);
+  const contact: IContact = contacts.find((item) => item.id === document.head.tocontactId);
   const ref = React.useRef<FlatList<ILine>>(null);
 
   useScrollToTop(ref);
@@ -123,18 +121,20 @@ const ViewDocumentScreen = ({ route, navigation }) => {
   const renderItem = ({ item }: { item: ILine }) => <LineItem item={item} status={document.head.status} />;
 
   return (
-    <View style={[styles.container, { padding: 0, backgroundColor: colors.card }]}>
+    <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
       <TouchableOpacity
-        onPress={ () => { navigation.navigate('HeadDocument', { docId: document.id }); } }
+        onPress={() => {
+          navigation.navigate('HeadDocument', { docId: document.id });
+        }}
       >
-        <View style={[localeStyles.documentHeader, {backgroundColor: colors.primary}]}>
-          <Text numberOfLines={5} style={[localeStyles.documentHeaderText, {color: colors.card}]}>
+        <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {type.name}
           </Text>
-          <Text numberOfLines={5} style={[localeStyles.documentHeaderText, {color: colors.card}]}>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}
           </Text>
-          <Text numberOfLines={5} style={[localeStyles.documentHeaderText, {color: colors.card}]}>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {new Date(document.head.date).toLocaleDateString()}
           </Text>
         </View>
@@ -152,7 +152,10 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 
 export { ViewDocumentScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
+  container: {
+    padding: 0,
+  },
   documentHeader: {
     flexDirection: 'row',
     height: 50,
@@ -162,8 +165,13 @@ const localeStyles = StyleSheet.create({
     fontWeight: 'bold',
     marginHorizontal: 2,
     marginVertical: 5,
-    textAlignVertical: 'center',
     textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  listContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 5,
   },
   productBarcodeView: {
     marginTop: 5,

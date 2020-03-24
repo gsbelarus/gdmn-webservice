@@ -82,7 +82,7 @@ const SignInScreen = () => {
   return (
     <>
       <KeyboardAvoidingView
-        style={[styles.container, isKeyboardVisible && localeStyles.contentWidthKbd]}
+        style={[styles.container, isKeyboardVisible && localStyles.contentWidthKbd]}
         behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
         <View>
@@ -110,8 +110,8 @@ const SignInScreen = () => {
             Войти
           </Button>
         </View>
-        <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
-          {lognState.isError && <Text style={localeStyles.errorText}>Ошибка: {lognState.status}</Text>}
+        <View style={{ ...localStyles.statusBox, backgroundColor: colors.background }}>
+          {lognState.isError && <Text style={localStyles.errorText}>Ошибка: {lognState.status}</Text>}
           {lognState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
       </KeyboardAvoidingView>
@@ -128,7 +128,7 @@ const SignInScreen = () => {
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   buttons: {
     width: '100%',
   },

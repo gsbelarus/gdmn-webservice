@@ -51,12 +51,12 @@ const ConfigScreen = (props: Props) => {
         placeholder="Порт"
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
-      <View style={localeStyles.buttonsView}>
+      <View style={localStyles.buttonsView}>
         <Button
           onPress={setSettings}
           icon="check"
           mode="contained"
-          style={[styles.rectangularButton, localeStyles.button]}
+          style={[styles.rectangularButton, localStyles.button]}
         >
           Принять
         </Button>
@@ -64,7 +64,7 @@ const ConfigScreen = (props: Props) => {
           onPress={hideSettings}
           icon="cancel"
           mode="contained"
-          style={[styles.rectangularButton, localeStyles.button]}
+          style={[styles.rectangularButton, localStyles.button]}
         >
           Отмена
         </Button>
@@ -73,7 +73,7 @@ const ConfigScreen = (props: Props) => {
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   button: {
     flex: 1,
     marginLeft: 7,

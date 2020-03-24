@@ -4,24 +4,19 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import SubTitle from '../../../components/SubTitle';
+import ReferencesData from '../../../mockData/References.json';
 import { IReference } from '../../../model/inventory';
-// import styles from '../../../styles/global';
 
-interface IField {
-  id: string;
-  name: string;
-  [fieldName: string]: unknown;
-}
+const References: IReference[] = ReferencesData;
 
-const LineItem = React.memo(({ item }: { item: IField }) => {
+const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
+        navigation.navigate('Reference', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -30,29 +25,26 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.type}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 });
 
-const ViewReferenceScreen = ({ route }) => {
+const ReferenceListScreen = () => {
   const { colors } = useTheme();
 
-  const reference: IReference = route.params.item;
-
-  const ref = React.useRef<FlatList<IField>>(null);
+  const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
+  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{reference.name}</SubTitle>
-      <ItemSeparator />
       <FlatList
         ref={ref}
-        data={reference.data}
+        data={References}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -61,7 +53,7 @@ const ViewReferenceScreen = ({ route }) => {
   );
 };
 
-export { ViewReferenceScreen };
+export { ReferenceListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
@@ -76,7 +68,10 @@ const localStyles = StyleSheet.create({
     height: '100%',
   },
   details: {
-    margin: 10,
+    margin: 8,
+  },
+  fieldDesciption: {
+    opacity: 0.5,
   },
   item: {
     alignItems: 'center',
@@ -91,7 +86,7 @@ const localStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  title: {
-    padding: 10,
+  number: {
+    fontSize: 12,
   },
 });

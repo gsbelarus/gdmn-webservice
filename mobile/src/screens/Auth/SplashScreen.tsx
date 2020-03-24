@@ -29,13 +29,13 @@ const SplashScreen = (props: Props) => {
 
   return (
     <>
-      <View style={{ ...styles.container, ...localeStyles.container }}>
+      <View style={{ ...styles.container, ...localStyles.container }}>
         <SubTitle>Подключение к серверу</SubTitle>
-        <Text style={localeStyles.serverName}>{serverName}</Text>
+        <Text style={localStyles.serverName}>{serverName}</Text>
         {/*         <Text style={{ color: '#888', fontSize: 15 }}>Рег: {deviseStatus}</Text>
         <Text style={{ color: '#888', fontSize: 15 }}>Лог: {loginStatus}</Text> */}
-        <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
-          {isError && <Text style={localeStyles.errorText}>Ошибка: {status}</Text>}
+        <View style={{ ...localStyles.statusBox, backgroundColor: colors.background }}>
+          {isError && <Text style={localStyles.errorText}>Ошибка: {status}</Text>}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!isLoading ? (
@@ -43,7 +43,7 @@ const SplashScreen = (props: Props) => {
             onPress={connection}
             icon="autorenew"
             mode="contained"
-            style={[styles.rectangularButton, localeStyles.buttons]}
+            style={[styles.rectangularButton, localStyles.buttons]}
           >
             Подключиться
           </Button>
@@ -52,7 +52,7 @@ const SplashScreen = (props: Props) => {
             onPress={breakConnection}
             icon="block-helper"
             mode="contained"
-            style={[styles.rectangularButton, localeStyles.buttons]}
+            style={[styles.rectangularButton, localStyles.buttons]}
           >
             Прервать
           </Button>
@@ -71,7 +71,7 @@ const SplashScreen = (props: Props) => {
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   buttons: {
     width: '100%',
   },

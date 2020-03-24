@@ -22,7 +22,7 @@ const SettingsScreen = () => {
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
-      <View style={localeStyles.content}>
+      <View style={localStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
         <Button icon="logout" mode="contained" onPress={logOut}>
           Выход
@@ -47,7 +47,7 @@ const SettingsScreen = () => {
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   content: {
     alignItems: 'center',
     flexDirection: 'row',

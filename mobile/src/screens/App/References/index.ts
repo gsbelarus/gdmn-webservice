@@ -1,3 +1,3 @@
-export { DetailsReferenceScreen } from './DetailsReference';
-export { ReferencesListScreen } from './ReferencesList';
+export { ReferenceDetailScreen } from './ReferenceDetail';
+export { ReferenceListScreen } from './ReferenceList';
 export { ViewReferenceScreen } from './ViewReference';

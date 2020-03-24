@@ -52,8 +52,19 @@ export interface IGood {
   alias: string;
 }
 
+/* export interface IReference {
+  id: number;
+  name: string;
+  type: string;
+} */
+
 export interface IReference {
   id: number;
   name: string;
   type: string;
+  data: {
+    id: string;
+    name: string;
+    [fieldName: string]: unknown;
+  }[];
 }
