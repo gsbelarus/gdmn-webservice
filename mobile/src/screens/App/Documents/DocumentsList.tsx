@@ -37,8 +37,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             {DocumentTypes.find(type => type.id === item.head.doctype).name}
           </Text>
           <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
-            {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от
-            {new Date(item.head.date).toLocaleDateString()}
+            {Contacts.find(contact => contact.id === item.head.fromcontactId).name} от {new Date(item.head.date).toLocaleDateString()}
           </Text>
         </View>
       </View>

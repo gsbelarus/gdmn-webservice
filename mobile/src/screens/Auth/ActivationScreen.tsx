@@ -2,9 +2,11 @@ import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
-import { TextInput, Text, Button, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
+// eslint-disable-next-line import/default
+import VirtualKeyboard from 'react-native-virtual-keyboard';
 
-import { authApi } from '../../api/auth';
+import authApi from '../../api/auth';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IServerResponse, IDataFetch } from '../../model';
@@ -18,15 +20,15 @@ const ActivationScreen = () => {
   const [serverReq, setServerReq] = useState<IDataFetch>({ isLoading: false, isError: false, status: undefined });
   const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
 
-  const [inputValue, setInputValue] = useState('');
+  const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     if (serverReq?.isLoading) {
-      timeout(5000, authApi.verifyActivationCode(inputValue))
+      timeout(5000, authApi.verifyActivationCode(activationCode))
         .then((data: IServerResponse<string>) => setServerResp({ result: data.result, status: data.status }))
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
-  }, [inputValue, serverReq]);
+  }, [activationCode, serverReq]);
 
   useEffect(() => {
     if (serverResp === undefined) {
@@ -42,7 +44,7 @@ const ActivationScreen = () => {
       .then((data: IServerResponse<string>) => {
         if (data.status === 404) {
           setServerReq({ isLoading: false, isError: true, status: data.result as string });
-          setInputValue('');
+          setActivationCode('');
           return;
         }
         actions.setDeviceStatus(true);
@@ -54,14 +56,15 @@ const ActivationScreen = () => {
   }, [actions, serverResp]);
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
-      <View style={styles.container}>
-        <SubTitle>Активация устройства</SubTitle>
-        <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
-          {serverReq.isError && <Text style={localeStyles.errorText}>Ошибка: {serverReq.status}</Text>}
-          {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
-        </View>
-        <TextInput
+    <>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
+        <View style={styles.container}>
+          <SubTitle>Активация устройства</SubTitle>
+          <View style={{ ...localeStyles.statusBox, backgroundColor: colors.background }}>
+            {serverReq.isError && <Text style={localeStyles.errorText}>Ошибка: {serverReq.status}</Text>}
+            {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+          </View>
+          {/* <TextInput
           value={inputValue}
           onChangeText={setInputValue}
           placeholder="Введите код"
@@ -73,27 +76,45 @@ const ActivationScreen = () => {
           returnKeyType="done"
           autoCorrect={false}
           keyboardType="decimal-pad"
-          // blurOnSubmit={true}
-          // onSubmitEditing={verifyCode}
           style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+        />} */}
+          <Text style={localeStyles.codeText}>{activationCode}</Text>
+          <VirtualKeyboard color="black" pressMode="string" onPress={setActivationCode} />
+          <Button
+            mode="contained"
+            disabled={serverReq.isLoading}
+            icon={'login'}
+            onPress={() => setServerReq({ isLoading: true, isError: false, status: '' })}
+            style={styles.rectangularButton}
+          >
+            Отправить
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
+      <View style={styles.bottomButtons}>
+        <IconButton
+          icon="server"
+          size={30}
+          onPress={() => actions.disconnect()}
+          style={{ ...styles.circularButton, backgroundColor: colors.primary, borderColor: colors.primary }}
+          color={colors.background}
         />
-        <Button
-          mode="contained"
-          disabled={serverReq.isLoading}
-          icon={'login'}
-          onPress={() => setServerReq({ isLoading: true, isError: false, status: '' })}
-          style={styles.rectangularButton}
-        >
-          Отправить
-        </Button>
       </View>
-    </KeyboardAvoidingView>
+    </>
   );
 };
 
 const localeStyles = StyleSheet.create({
   buttons: {
     width: '100%',
+  },
+  codeText: {
+    borderColor: '#000000',
+    fontSize: 22,
+    fontWeight: 'bold',
+    height: 30,
+    marginTop: 15,
+    textAlign: 'center',
   },
   container: {
     alignItems: 'center',

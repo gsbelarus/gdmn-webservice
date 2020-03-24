@@ -13,7 +13,7 @@ const Stack = createStackNavigator<ReferenceStackParamList>();
 
 const ReferencesNavigator = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="ReferencesList">
       <Stack.Screen
         key="ReferencesList"
         name="ReferencesList"

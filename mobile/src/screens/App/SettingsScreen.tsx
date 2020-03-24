@@ -1,22 +1,13 @@
 import { useTheme } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
-import { authApi } from '../../api/auth';
+import authApi from '../../api/auth';
 import SettingsItem from '../../components/SettingsItem';
-import SubTitle from '../../components/SubTitle';
 import { useStore } from '../../store';
-import styles from '../../styles/global';
 
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
-
-type SettingsStackParamList = {
-  SettingsList: undefined;
-};
-
-const Stack = createStackNavigator<SettingsStackParamList>();
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();

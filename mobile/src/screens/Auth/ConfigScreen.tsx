@@ -1,22 +1,40 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
+import config from '../../config';
+import { IBaseUrl } from '../../model';
 import styles from '../../styles/global';
 
 type Props = {
   serverName?: string;
   serverPort?: number;
-  hideSettings?: () => void;
+  hideSettings: () => void;
+  changeSettings: (baseUrl: IBaseUrl) => void;
 };
 
 const ConfigScreen = (props: Props) => {
-  const { serverName, serverPort, hideSettings } = props;
+  const { serverName, serverPort, hideSettings, changeSettings } = props;
   const [newServerName, setNewServerName] = useState(serverName);
   const [newServerPort, setNewServerPort] = useState(serverPort?.toString());
   const { colors } = useTheme();
+
+  const setSettings = useCallback(() => {
+    const match = newServerName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
+    const protocol = match[1];
+    const server = match[2];
+
+    const url: IBaseUrl = {
+      apiPath: config.apiPath,
+      protocol,
+      port: parseInt(newServerPort, 10),
+      server,
+    };
+
+    changeSettings(url);
+  }, [changeSettings, newServerName, newServerPort]);
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
@@ -35,12 +53,12 @@ const ConfigScreen = (props: Props) => {
       />
       <View style={localeStyles.buttonsView}>
         <Button
-          onPress={hideSettings}
+          onPress={setSettings}
           icon="check"
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
         >
-          Готово
+          Принять
         </Button>
         <Button
           onPress={hideSettings}

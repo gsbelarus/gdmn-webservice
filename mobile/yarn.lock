@@ -12307,6 +12307,11 @@ react-native-view-shot@3.0.2:
   resolved "https://registry.yarnpkg.com/react-native-view-shot/-/react-native-view-shot-3.0.2.tgz#daccaec5b8038a680b17533ff7e72876e68c7d0d"
   integrity sha512-JZOkGo2jzSX2b7N6N2uDr0wQjSz+QmBtY8jzeo0XJY6bLOfaY5nmWyYxDmDRoSpKiFkGTCkyhUqNnjo6lXOtEw==
 
+react-native-virtual-keyboard@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-virtual-keyboard/-/react-native-virtual-keyboard-1.1.0.tgz#a484fd1a4effcd588eed539abb9c57a6fd7e0a7c"
+  integrity sha512-qcFzumzKdbu1iVtvQpYW4WTwTVljon9RRLbgFF6idWbq9Ez+tCVw/MMl1LcOffpCNJVY/bg2PsOqmFUNDa/eRA==
+
 react-native-web-swiper@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/react-native-web-swiper/-/react-native-web-swiper-2.1.0.tgz#5b321819ee17ff1f7bc4ffd89388acf24b7b7fb7"
