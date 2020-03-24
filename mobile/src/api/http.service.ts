@@ -1,4 +1,3 @@
-// import { authApi } from "./auth";
 import { baseUrl } from '../helpers/utils';
 
 export async function get<T>(path: string): Promise<T> {

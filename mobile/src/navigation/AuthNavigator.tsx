@@ -1,10 +1,11 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
+import { AsyncStorage } from 'react-native';
 
-import { authApi } from '../api/auth';
+import authApi from '../api/auth';
 import config from '../config/index';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
-import { IDataFetch, IServerResponse, IUser } from '../model';
+import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useStore } from '../store';
@@ -116,7 +117,22 @@ const AuthNavigator = () => {
 
   const showSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: true }), []);
 
-  const hideSettings = useCallback(() => setState({ type: 'INIT' }), []);
+  const hideSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: false }), []);
+
+  const changeSettings = useCallback(
+    (newBaseUrl: IBaseUrl) => {
+      AsyncStorage.setItem('pathServer', JSON.stringify(newBaseUrl))
+        .then(() => actions.setBaseUrl(newBaseUrl))
+        .catch(() => setState({ type: 'SETTINGS_FORM', showSettings: false }));
+    },
+    [actions],
+  );
+
+  useEffect(() => {
+    if (baseUrl !== undefined) {
+      setState({ type: 'SETTINGS_FORM', showSettings: false });
+    }
+  }, [baseUrl]);
 
   const SplashWithParams = useCallback(
     () => (
@@ -134,12 +150,12 @@ const AuthNavigator = () => {
   const CongigWithParams = useCallback(
     () => (
       <ConfigScreen
-        {...{ hideSettings }}
+        {...{ hideSettings, changeSettings }}
         serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
         serverPort={baseUrl?.port}
       />
     ),
-    [baseUrl, hideSettings],
+    [baseUrl, hideSettings, changeSettings],
   );
 
   const ConfigComponent = useMemo(
