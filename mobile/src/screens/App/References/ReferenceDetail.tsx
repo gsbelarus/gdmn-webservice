@@ -1,11 +1,10 @@
+import { useScrollToTop, useTheme } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import styles from '../../../styles/global';
 
 interface IEntity {
   id: string;
@@ -15,15 +14,14 @@ interface IEntity {
 
 const LineItem = React.memo(({ item }: { item: [string, string] }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
 
   return (
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item[0]}</Text>
-          <Text style={[localStyles.value, localStyles.fieldName, { color: colors.text }]}>{item[1]}</Text>
-        </View>
+    <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item[0]}</Text>
+        <Text style={[localStyles.value, localStyles.fieldName, { color: colors.text }]}>{item[1]}</Text>
       </View>
+    </View>
   );
 });
 
@@ -71,6 +69,9 @@ const localStyles = StyleSheet.create({
   details: {
     margin: 10,
   },
+  fieldName: {
+    opacity: 0.5,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -86,9 +87,6 @@ const localStyles = StyleSheet.create({
   },
   title: {
     padding: 10,
-  },
-  fieldName: {
-    opacity: 0.5,
   },
   value: {
     fontSize: 14,

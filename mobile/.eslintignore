@@ -10,4 +10,5 @@ web-report/
 .vscode/
 .sample
 
-/pages
+/src/_unused/
+

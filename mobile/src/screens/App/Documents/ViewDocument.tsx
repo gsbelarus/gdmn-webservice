@@ -100,9 +100,12 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{alignItems: 'flex-end'}}>
+      <View style={{ alignItems: 'flex-end' }}>
         <TouchableOpacity
-          style={[styles.circularButton, {margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary}]}
+          style={[
+            styles.circularButton,
+            { margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary },
+          ]}
           onPress={() =>
             navigation.navigate('ProductsListPage', {
               idDoc: navigation.getParam('docId'),
