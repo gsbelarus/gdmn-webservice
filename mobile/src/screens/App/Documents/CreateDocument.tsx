@@ -14,8 +14,9 @@ const CreateDocumentScreen = ({ route }) => {
   const [date, setDate] = useState(new Date());
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [selectedContact, setSelectedContact] = useState<number>();
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const { colors } = useTheme();
+
+const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -26,7 +27,7 @@ const CreateDocumentScreen = ({ route }) => {
   };
 
   const handleConfirm = date => {
-    setDate(date);
+    console.warn("A date has been picked: ", date);
     hideDatePicker();
   };
 
@@ -45,8 +46,9 @@ const CreateDocumentScreen = ({ route }) => {
         <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
           {documentTypes && documentTypes.length !== 0 ? (
-            documentTypes.map(item => (
+            documentTypes.map(( item, idx) => (
               <Chip
+                key={idx}
                 mode='outlined'
                 style={[{margin: 2}, selectedDocType === item.id ? {backgroundColor: colors.primary} : {}]}
                 onPress={() => setSelectedDocType(item.id)}
@@ -72,8 +74,9 @@ const CreateDocumentScreen = ({ route }) => {
         <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
           {contacts && contacts.length !== 0 ? (
-            contacts.map(item => (
+            contacts.map(( item, idx)  => (
               <Chip
+                key={idx}
                 mode='outlined'
                 style={[{margin: 2}, selectedContact === item.id ? {backgroundColor: colors.primary} : {}]}
                 onPress={() => setSelectedContact(item.id)}
@@ -87,14 +90,12 @@ const CreateDocumentScreen = ({ route }) => {
         </View>
       </View>
       <View>
-        <TouchableOpacity onPress={showDatePicker}>
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={{ fontSize: 20, color: "#5C5D5F" }}>
-              {date.toLocaleDateString()}
-            </Text>
-          </View>
+        <TouchableOpacity style={[styles.input, { flexDirection: 'row', backgroundColor: colors.card, alignItems: "center", margin: 0, padding: 0 }]} onPress={showDatePicker}>
+          <Text style={{ flex: 1, fontSize: 20, textAlign: 'center', color: colors.text, flexGrow: 4 }} >
+            {date.toLocaleDateString()}
+          </Text>
           <MaterialIcons
-            style={{ flex: 1 }}
+            style={{marginRight: 10}}
             size={30}
             color={colors.text}
             name="date-range"
