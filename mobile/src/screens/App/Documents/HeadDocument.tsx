@@ -1,7 +1,7 @@
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { Title, Text } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { Title, Text, Button, FAB, Portal } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -34,7 +34,7 @@ const ItemSeparator = () => {
   return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
 };
 
-const HeadDocumentScreen = ({ route }) => {
+const HeadDocumentScreen = ({ route, navigation }) => {
   const ref = React.useRef<FlatList<TField>>(null);
   const document: IDocument = documents.find((item) => item.id === route.params.docId);
   const type: IDocumentType = documentTypes.find((item) => item.id === document.head.doctype);
@@ -50,6 +50,9 @@ const HeadDocumentScreen = ({ route }) => {
     { title: 'Статус', value: status },
   ];
 
+const [openGroup, setOpenGroup] = useState(false);
+const { colors } = useTheme();
+
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: TField }) => <FieldItem item={item} />;
@@ -64,6 +67,58 @@ const HeadDocumentScreen = ({ route }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
+        <FAB.Group
+          visible
+          open={openGroup}
+          icon='playlist-edit'
+          fabStyle={{backgroundColor: colors.primary}}
+          actions={[
+            {
+              icon: 'pencil',
+              label: 'Изменить документ',
+              onPress: () => navigation.navigate('CreateDocument', { idDoc: route.params.docId })
+            },
+            {
+              icon: 'check',
+              label: 'Изменить статус на "Готово"',
+              onPress: () => {}
+            },
+            {
+              icon: 'delete',
+              label: 'Удалить документ',
+              onPress: async () => {
+                Alert.alert('Вы уверены, что хотите удалить?', '', [
+                  {
+                    text: 'OK',
+                    onPress: async () => {
+                      navigation.navigate('DocumentsListScreen');
+                    },
+                  },
+                  {
+                    text: 'Отмена',
+                    onPress: () => {},
+                  },
+                ]);
+              }
+            },
+          ]}
+          onStateChange={({ open }) => setOpenGroup(open)}
+        />        
+      
+      {/*<View>
+        <Button
+          mode="contained"
+          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
+        >Изменить характеристики</Button>
+        <Button
+          mode="contained"
+          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
+        >Изменить статус на "Готово"</Button>
+        <Button
+          mode="contained"
+          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
+        >Удалить документ</Button>
+      </View>*/}
     </View>
   );
 };
