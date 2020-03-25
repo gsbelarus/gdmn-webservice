@@ -8,7 +8,7 @@ import contacts from '../../../mockData//GD_Contact.json';
 import documents from '../../../mockData/Document.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
-// import styles from '../../../styles/global';
+import styles from '../../../styles/global';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
@@ -63,6 +63,8 @@ const DocumentsListScreen = ({ navigation }) => {
         ItemSeparatorComponent={ItemSeparator}
       />
       <Button
+        mode="contained"
+        style={[styles.rectangularButton, {marginHorizontal: 15}]}
         onPress={() => {
           navigation.navigate('CreateDocument');
         }}

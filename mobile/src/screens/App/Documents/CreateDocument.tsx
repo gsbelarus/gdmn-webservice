@@ -40,7 +40,7 @@ const CreateDocumentScreen = ({ route }) => {
           borderStyle: "solid",
           marginBottom: 15
         }}
-        key={1}
+        key={0}
       >
         <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
@@ -69,7 +69,7 @@ const CreateDocumentScreen = ({ route }) => {
         }}
         key={1}
       >
-        <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
+        <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
           {contacts && contacts.length !== 0 ? (
             contacts.map(item => (
