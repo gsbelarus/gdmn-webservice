@@ -76,7 +76,7 @@ const { colors } = useTheme();
             {
               icon: 'pencil',
               label: 'Изменить документ',
-              onPress: () => navigation.navigate('CreateDocument', { idDoc: route.params.docId })
+              onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId })
             },
             {
               icon: 'check',

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "react-navigation-hooks";
@@ -9,6 +9,7 @@ import { useTheme } from '@react-navigation/native';
 
 import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
+import documents from '../../../mockData/Document.json';
 
 const CreateDocumentScreen = ({ route }) => {
   const [date, setDate] = useState(new Date());
@@ -30,6 +31,15 @@ const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     console.warn("A date has been picked: ", date);
     hideDatePicker();
   };
+
+  useEffect(() => {
+    if(route.params.docId) {
+      const documet = documents.find(item => item.id === route.params.docId);
+      setSelectedDocType(documet.head.doctype);
+      setSelectedContact(documet.head.fromcontactId);
+      setDate(new Date(documet.head.date));
+    }
+  }, [])
 
   return (
     <View style={styles.container}>
