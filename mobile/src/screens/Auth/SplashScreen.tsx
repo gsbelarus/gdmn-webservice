@@ -23,17 +23,11 @@ const SplashScreen = (props: Props) => {
 
   const { colors } = useTheme();
 
-  /*   const deviseStatus =
-    deviceRegistered === undefined ? 'undefined' : deviceRegistered ? 'Registered' : 'not Registered';
-  const loginStatus = loggedIn === undefined ? 'undefined' : loggedIn ? 'logged' : 'not loggedIn'; */
-
   return (
     <>
       <View style={{ ...styles.container, ...localStyles.container }}>
         <SubTitle>Подключение к серверу</SubTitle>
         <Text style={localStyles.serverName}>{serverName}</Text>
-        {/*         <Text style={{ color: '#888', fontSize: 15 }}>Рег: {deviseStatus}</Text>
-        <Text style={{ color: '#888', fontSize: 15 }}>Лог: {loginStatus}</Text> */}
         <View
           style={{
             ...localStyles.statusBox,

@@ -1,15 +1,11 @@
-import {
-  useScrollToTop,
-  useTheme,
-  useNavigation
-} from "@react-navigation/native";
-import React from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
+import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 
-import ItemSeparator from "../../../components/ItemSeparator";
-import SubTitle from "../../../components/SubTitle";
-import { IReference } from "../../../model/inventory";
+import ItemSeparator from '../../../components/ItemSeparator';
+import SubTitle from '../../../components/SubTitle';
+import { IReference } from '../../../model/inventory';
 // import styles from '../../../styles/global';
 
 interface IField {
@@ -25,19 +21,15 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("ReferenceDetail", { item });
+        navigation.navigate('ReferenceDetail', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>
-            {item.name.slice(0, 1).toUpperCase()}
-          </Text>
+          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
         </View>
         <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>
-            {item.name}
-          </Text>
+          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -56,11 +48,7 @@ const ViewReferenceScreen = ({ route }) => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle
-        styles={[localStyles.title, { backgroundColor: colors.background }]}
-      >
-        {reference.name}
-      </SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{reference.name}</SubTitle>
       <ItemSeparator />
       <FlatList
         ref={ref}
@@ -77,33 +65,33 @@ export { ViewReferenceScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
-    alignItems: "center",
-    backgroundColor: "#e91e63",
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
     borderRadius: 18,
     height: 36,
-    justifyContent: "center",
-    width: 36
+    justifyContent: 'center',
+    width: 36,
   },
   content: {
-    height: "100%"
+    height: '100%',
   },
   details: {
-    margin: 10
+    margin: 10,
   },
   item: {
-    alignItems: "center",
-    flexDirection: "row",
-    padding: 8
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
   },
   letter: {
-    color: "white",
-    fontWeight: "bold"
+    color: 'white',
+    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   title: {
-    padding: 10
-  }
+    padding: 10,
+  },
 });

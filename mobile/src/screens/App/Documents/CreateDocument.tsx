@@ -1,10 +1,9 @@
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import DatePicker from 'react-native-modal-datetime-picker';
 import { Text, Button, Chip } from 'react-native-paper';
-import { useNavigation } from 'react-navigation-hooks';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -27,8 +26,8 @@ const CreateDocumentScreen = ({ route }) => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = (date) => {
-    console.warn('A date has been picked: ', date);
+  const handleConfirm = () => {
+    // console.warn('A date has been picked: ', newDate);
     hideDatePicker();
   };
 
@@ -39,7 +38,7 @@ const CreateDocumentScreen = ({ route }) => {
       setSelectedContact(documet.head.fromcontactId);
       setDate(new Date(documet.head.date));
     }
-  }, []);
+  }, [route.params]);
 
   return (
     <View style={styles.container}>
@@ -158,15 +157,6 @@ const localeStyles = StyleSheet.create({
     flex: 1,
     marginLeft: 7,
   },
-  button: {
-    flex: 1,
-    marginLeft: 7,
-  },
-  buttonView: {
-    flex: 1,
-    flexDirection: 'row',
-    marginTop: 20,
-  },
   buttonView: {
     flex: 1,
     flexDirection: 'row',
@@ -188,5 +178,8 @@ const localeStyles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     borderColor: '#FFF',
+  },
+  subdivisionText: {
+    textAlign: 'center',
   },
 });
