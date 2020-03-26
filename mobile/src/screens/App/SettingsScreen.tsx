@@ -1,13 +1,13 @@
-import { useTheme } from '@react-navigation/native';
-import React from 'react';
-import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
-import { Divider, Avatar, Button } from 'react-native-paper';
+import { useTheme } from "@react-navigation/native";
+import React from "react";
+import { ScrollView, AsyncStorage, View, StyleSheet } from "react-native";
+import { Divider, Avatar, Button } from "react-native-paper";
 
-import authApi from '../../api/auth';
-import SettingsItem from '../../components/SettingsItem';
-import { useStore } from '../../store';
+import authApi from "../../api/auth";
+import SettingsItem from "../../components/SettingsItem";
+import { useStore } from "../../store";
 
-const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
+const THEME_PERSISTENCE_KEY = "THEME_TYPE";
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
@@ -29,15 +29,23 @@ const SettingsScreen = () => {
         </Button>
       </View>
       <Divider />
-      <SettingsItem label="Синхронизировать" value={true} onValueChange={() => {}} />
+      <SettingsItem
+        label="Синхронизировать"
+        value={true}
+        onValueChange={() => {}}
+      />
       <Divider />
-      <SettingsItem label="Удалять документы после обработки на сервере" value={true} onValueChange={() => {}} />
+      <SettingsItem
+        label="Удалять документы после обработки на сервере"
+        value={true}
+        onValueChange={() => {}}
+      />
       <Divider />
       <SettingsItem
         label="Dark theme"
         value={dark}
         onValueChange={() => {
-          AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
+          AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? "light" : "dark");
 
           // Переделать в глобал стейт
           // setTheme(t => (t.dark ? DefaultTheme : DarkTheme));
@@ -49,12 +57,12 @@ const SettingsScreen = () => {
 
 const localStyles = StyleSheet.create({
   content: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
+    paddingVertical: 12
+  }
 });
 
 export { SettingsScreen };
