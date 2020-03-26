@@ -67,58 +67,43 @@ const { colors } = useTheme();
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-        <FAB.Group
-          visible
-          open={openGroup}
-          icon='playlist-edit'
-          fabStyle={{backgroundColor: colors.primary}}
-          actions={[
-            {
-              icon: 'pencil',
-              label: 'Изменить документ',
-              onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId })
-            },
-            {
-              icon: 'check',
-              label: 'Изменить статус на "Готово"',
-              onPress: () => {}
-            },
-            {
-              icon: 'delete',
-              label: 'Удалить документ',
-              onPress: async () => {
-                Alert.alert('Вы уверены, что хотите удалить?', '', [
-                  {
-                    text: 'OK',
-                    onPress: async () => {
-                      navigation.navigate('DocumentsListScreen');
-                    },
+      <FAB.Group
+        visible
+        open={openGroup}
+        icon='playlist-edit'
+        fabStyle={{backgroundColor: colors.primary}}
+        actions={[
+          {
+            icon: 'pencil',
+            label: 'Изменить документ',
+            onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId })
+          },
+          {
+            icon: 'check',
+            label: 'Изменить статус на "Готово"',
+            onPress: () => {}
+          },
+          {
+            icon: 'delete',
+            label: 'Удалить документ',
+            onPress: async () => {
+              Alert.alert('Вы уверены, что хотите удалить?', '', [
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    navigation.navigate('DocumentsListScreen');
                   },
-                  {
-                    text: 'Отмена',
-                    onPress: () => {},
-                  },
-                ]);
-              }
-            },
-          ]}
-          onStateChange={({ open }) => setOpenGroup(open)}
-        />        
-      
-      {/*<View>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Изменить характеристики</Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Изменить статус на "Готово"</Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Удалить документ</Button>
-      </View>*/}
+                },
+                {
+                  text: 'Отмена',
+                  onPress: () => {},
+                },
+              ]);
+            }
+          },
+        ]}
+        onStateChange={({ open }) => setOpenGroup(open)}
+      />
     </View>
   );
 };

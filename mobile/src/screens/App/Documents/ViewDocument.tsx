@@ -104,9 +104,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         <TouchableOpacity
           style={[styles.circularButton, {margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary}]}
           onPress={() =>
-            navigation.navigate('ProductsListPage', {
-              idDoc: navigation.getParam('docId'),
-            })
+            navigation.navigate('ProductsList')
           }
         >
           <MaterialIcons size={30} color={colors.card} name="add" />
