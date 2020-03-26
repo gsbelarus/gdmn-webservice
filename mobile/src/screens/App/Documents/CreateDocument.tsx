@@ -33,7 +33,7 @@ const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   };
 
   useEffect(() => {
-    if(route.params.docId) {
+    if(route.params?.docId) {
       const documet = documents.find(item => item.id === route.params.docId);
       setSelectedDocType(documet.head.doctype);
       setSelectedContact(documet.head.fromcontactId);
