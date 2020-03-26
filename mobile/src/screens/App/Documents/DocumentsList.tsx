@@ -11,12 +11,14 @@ import ItemSeparator from "../../../components/ItemSeparator";
 import contacts from "../../../mockData//GD_Contact.json";
 import documents from "../../../mockData/Document.json";
 import documentTypes from "../../../mockData/GD_DocumentType.json";
+import statuses from "../../../mockData/documentStatuses.json";
 import { IDocument, IDocumentType, IContact } from "../../../model/inventory";
 import styles from "../../../styles/global";
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
 const Contacts: IContact[] = contacts;
+const Statuses: IDocumentType[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
@@ -46,19 +48,30 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <Text style={[localStyles.name, { color: colors.text }]}>
             {DocumentTypes.find(type => type.id === item.head.doctype).name}
           </Text>
-          <Text
-            style={[
-              localStyles.number,
-              localStyles.field,
-              { color: colors.text }
-            ]}
-          >
-            {
-              Contacts.find(contact => contact.id === item.head.fromcontactId)
-                .name
-            }{" "}
-            от {new Date(item.head.date).toLocaleDateString()}
-          </Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={[
+                localStyles.number,
+                localStyles.field,
+                { color: colors.text }
+              ]}
+            >
+              {
+                Contacts.find(contact => contact.id === item.head.fromcontactId)
+                  .name
+              }{" "}
+              от {new Date(item.head.date).toLocaleDateString()}
+            </Text>
+            <Text
+              style={[
+                localStyles.number,
+                localStyles.field,
+                { color: statusColors[item.head.status] }
+              ]}
+            >
+              {Statuses.find(type => type.id === item.head.status).name}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -110,7 +123,8 @@ const localStyles = StyleSheet.create({
     height: "100%"
   },
   details: {
-    margin: 8
+    margin: 8,
+    width: '80%'
   },
   field: {
     opacity: 0.5
