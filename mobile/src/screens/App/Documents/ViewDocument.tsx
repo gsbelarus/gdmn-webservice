@@ -37,7 +37,11 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
       <View style={{ marginRight: 5 }}>
         {status === 0 ? (
           <TouchableOpacity
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
             onPress={async () => {
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
@@ -104,13 +108,14 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         <TouchableOpacity
           style={[
             styles.circularButton,
-            { margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary },
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
           ]}
-          onPress={() =>
-            navigation.navigate('ProductsListPage', {
-              idDoc: navigation.getParam('docId'),
-            })
-          }
+          onPress={() => navigation.navigate('ProductsList')}
         >
           <MaterialIcons size={30} color={colors.card} name="add" />
         </TouchableOpacity>

@@ -76,7 +76,10 @@ const HeadDocumentScreen = ({ route, navigation }) => {
           {
             icon: 'pencil',
             label: 'Изменить документ',
-            onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId }),
+            onPress: () =>
+              navigation.navigate('CreateDocument', {
+                docId: route.params.docId,
+              }),
           },
           {
             icon: 'check',
@@ -104,21 +107,6 @@ const HeadDocumentScreen = ({ route, navigation }) => {
         ]}
         onStateChange={({ open }) => setOpenGroup(open)}
       />
-
-      {/*<View>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Изменить характеристики</Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Изменить статус на "Готово"</Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, {marginBottom: 0, height: 40}]}
-        >Удалить документ</Button>
-      </View>*/}
     </View>
   );
 };

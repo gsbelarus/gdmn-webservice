@@ -1,9 +1,10 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import DatePicker from 'react-native-modal-datetime-picker';
 import { Text, Button, Chip } from 'react-native-paper';
+import { useNavigation } from 'react-navigation-hooks';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -32,7 +33,7 @@ const CreateDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    if (route.params.docId) {
+    if (route.params?.docId) {
       const documet = documents.find((item) => item.id === route.params.docId);
       setSelectedDocType(documet.head.doctype);
       setSelectedContact(documet.head.fromcontactId);
@@ -106,11 +107,25 @@ const CreateDocumentScreen = ({ route }) => {
         <TouchableOpacity
           style={[
             styles.input,
-            { flexDirection: 'row', backgroundColor: colors.card, alignItems: 'center', margin: 0, padding: 0 },
+            {
+              flexDirection: 'row',
+              backgroundColor: colors.card,
+              alignItems: 'center',
+              margin: 0,
+              padding: 0,
+            },
           ]}
           onPress={showDatePicker}
         >
-          <Text style={{ flex: 1, fontSize: 20, textAlign: 'center', color: colors.text, flexGrow: 4 }}>
+          <Text
+            style={{
+              flex: 1,
+              fontSize: 20,
+              textAlign: 'center',
+              color: colors.text,
+              flexGrow: 4,
+            }}
+          >
             {date.toLocaleDateString()}
           </Text>
           <MaterialIcons style={{ marginRight: 10 }} size={30} color={colors.text} name="date-range" />
@@ -143,6 +158,15 @@ const localeStyles = StyleSheet.create({
     flex: 1,
     marginLeft: 7,
   },
+  button: {
+    flex: 1,
+    marginLeft: 7,
+  },
+  buttonView: {
+    flex: 1,
+    flexDirection: 'row',
+    marginTop: 20,
+  },
   buttonView: {
     flex: 1,
     flexDirection: 'row',
@@ -164,10 +188,5 @@ const localeStyles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     borderColor: '#FFF',
-  },
-  subdivisionText: {
-    fontSize: 18,
-    marginLeft: 10,
-    marginTop: 10,
   },
 });

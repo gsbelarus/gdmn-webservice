@@ -34,7 +34,12 @@ const SplashScreen = (props: Props) => {
         <Text style={localStyles.serverName}>{serverName}</Text>
         {/*         <Text style={{ color: '#888', fontSize: 15 }}>Рег: {deviseStatus}</Text>
         <Text style={{ color: '#888', fontSize: 15 }}>Лог: {loginStatus}</Text> */}
-        <View style={{ ...localStyles.statusBox, backgroundColor: colors.background }}>
+        <View
+          style={{
+            ...localStyles.statusBox,
+            backgroundColor: colors.background,
+          }}
+        >
           {isError && <Text style={localStyles.errorText}>Ошибка: {status}</Text>}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
@@ -63,7 +68,11 @@ const SplashScreen = (props: Props) => {
           icon="settings"
           size={30}
           onPress={showSettings}
-          style={{ ...styles.circularButton, backgroundColor: colors.primary, borderColor: colors.primary }}
+          style={{
+            ...styles.circularButton,
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
+          }}
           color={colors.background}
         />
       </View>

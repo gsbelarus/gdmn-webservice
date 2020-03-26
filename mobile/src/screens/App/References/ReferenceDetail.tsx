@@ -72,6 +72,9 @@ const localStyles = StyleSheet.create({
   fieldName: {
     opacity: 0.5,
   },
+  fieldName: {
+    opacity: 0.5,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
