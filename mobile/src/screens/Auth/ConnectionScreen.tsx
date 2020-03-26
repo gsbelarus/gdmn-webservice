@@ -45,7 +45,7 @@ const ConnectionScreen = () => {
   }, [state.baseUrl]);
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#70667D" />;
+    return <ActivityIndicator style={{flex: 1, justifyContent: 'center'}} size="large" color="#70667D" />;
   }
 
   return <AuthNavigator />;
