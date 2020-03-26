@@ -1,9 +1,9 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import products from '../../../mockData/Goods.json';
@@ -46,12 +46,12 @@ const ProductsListScreen = () => {
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
 
   useEffect(() => {
-    const permission = async() => {
+    const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-    }
+    };
     permission();
-  }, [])
+  }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
@@ -73,68 +73,72 @@ const ProductsListScreen = () => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      {
-        hasPermission === null
-          ? <Text style={[styles.title]}>Запрос на получение доступа к камере</Text>
-          : hasPermission === false
-            ? <Text style={[styles.title]}>Нет доступа к камере</Text>
-            : undefined
-      }
-      {
-        doScanned
-        ? (
-            <>
-              <BarCodeScanner
-                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                style={StyleSheet.absoluteFillObject}
+      {hasPermission === null ? (
+        <Text style={styles.title}>Запрос на получение доступа к камере</Text>
+      ) : hasPermission === false ? (
+        <Text style={styles.title}>Нет доступа к камере</Text>
+      ) : undefined}
+      {doScanned ? (
+        <>
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
+        </>
+      ) : (
+        <>
+          <View style={{ justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15 }}>
+            <View style={{ flex: 1, marginRight: 15 }}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    fontSize: 14,
+                    backgroundColor: colors.card,
+                    color: colors.text,
+                    marginTop: 0,
+                    height: 30,
+                    paddingTop: 0,
+                  },
+                ]}
+                onChangeText={(text) => onChangeText(text)}
+                value={text}
+                placeholder="Введите шрих-код или название"
+                placeholderTextColor={colors.border}
+                multiline={false}
+                autoCapitalize="sentences"
+                underlineColorAndroid="transparent"
+                selectionColor={'black'}
+                returnKeyType="done"
+                autoCorrect={false}
               />
-              {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
-            </>
-          )
-        : (
-          <>
-            <View style={{ justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15 }}>
-              <View style={{ flex: 1, marginRight: 15 }}>
-                <TextInput
-                  style={[styles.input, {fontSize: 14, backgroundColor: colors.card, color: colors.text, marginTop: 0, height: 30, paddingTop: 0 }]}
-                  onChangeText={(text) => onChangeText(text)}
-                  value={text}
-                  placeholder="Введите шрих-код или название"
-                  placeholderTextColor={colors.border}
-                  multiline={false}
-                  autoCapitalize="sentences"
-                  underlineColorAndroid="transparent"
-                  selectionColor={'black'}
-                  returnKeyType="done"
-                  autoCorrect={false}
-                />
-              </View>
-              <TouchableOpacity onPress={() => setDoScanned(true)}>
-                <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
-              </TouchableOpacity>
             </View>
-            {
-              !products.find(
+            <TouchableOpacity onPress={() => setDoScanned(true)}>
+              <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+          {!products.find(
+            (item) =>
+              item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+              item.name.toLowerCase().includes(text.toLowerCase()),
+          ) ? (
+            <Text style={styles.title}>Не найдено</Text>
+          ) : (
+            <FlatList
+              ref={ref}
+              data={products.filter(
                 (item) =>
                   item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                  item.name.toLowerCase().includes(text.toLowerCase())
-              )
-              ? <Text style={[styles.title]}>Не найдено</Text>
-              : <FlatList
-                ref={ref}
-                data={products.filter(
-                  (item) =>
-                    item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                    item.name.toLowerCase().includes(text.toLowerCase())
-                )}
-                keyExtractor={(_, i) => String(i)}
-                renderItem={renderItem}
-                ItemSeparatorComponent={ItemSeparator}
-              />
-            }
-          </>
-        )
-      }
+                  item.name.toLowerCase().includes(text.toLowerCase()),
+              )}
+              keyExtractor={(_, i) => String(i)}
+              renderItem={renderItem}
+              ItemSeparatorComponent={ItemSeparator}
+            />
+          )}
+        </>
+      )}
     </View>
   );
 };

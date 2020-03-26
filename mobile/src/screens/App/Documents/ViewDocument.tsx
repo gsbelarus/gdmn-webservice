@@ -4,6 +4,7 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import ItemSeparator from '../../../components/ItemSeparator';
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
@@ -57,12 +58,6 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
   );
 });
 
-const ItemSeparator = () => {
-  const { colors } = useTheme();
-
-  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
-};
-
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const document: IDocument = documents.find((item) => item.id === route.params.docId);
@@ -82,15 +77,16 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         }}
       >
         <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {type.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {contact.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {new Date(document.head.date).toLocaleDateString()}
-          </Text>
+          <View>
+            <Text numberOfLines={1} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+              {type.name} от {new Date(document.head.date).toLocaleDateString()}
+            </Text>
+          </View>
+          <View>
+            <Text numberOfLines={1} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+              {contact.name}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
       <FlatList
@@ -100,12 +96,13 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{alignItems: 'flex-end'}}>
+      <View style={{ alignItems: 'flex-end' }}>
         <TouchableOpacity
-          style={[styles.circularButton, {margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary}]}
-          onPress={() =>
-            navigation.navigate('ProductsList')
-          }
+          style={[
+            styles.circularButton,
+            { margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary },
+          ]}
+          onPress={() => navigation.navigate('ProductsList')}
         >
           <MaterialIcons size={30} color={colors.card} name="add" />
         </TouchableOpacity>
@@ -121,16 +118,18 @@ const localStyles = StyleSheet.create({
     padding: 0,
   },
   documentHeader: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: 50,
+    padding: 0,
   },
   documentHeaderText: {
-    flex: 1,
+    // flex: 1,
     fontWeight: 'bold',
-    marginHorizontal: 2,
-    marginVertical: 5,
+    // marginHorizontal: 1,
+    // marginVertical: 1,
+    padding: 4,
     textAlign: 'center',
-    textAlignVertical: 'center',
+    // textAlignVertical: 'center',
   },
   listContainer: {
     flexDirection: 'row',
