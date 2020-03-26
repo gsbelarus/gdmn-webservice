@@ -1,7 +1,7 @@
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { Title, Text, Button, FAB, Portal } from 'react-native-paper';
+import { Title, Text, FAB } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -50,8 +50,8 @@ const HeadDocumentScreen = ({ route, navigation }) => {
     { title: 'Статус', value: status },
   ];
 
-const [openGroup, setOpenGroup] = useState(false);
-const { colors } = useTheme();
+  const [openGroup, setOpenGroup] = useState(false);
+  const { colors } = useTheme();
 
   useScrollToTop(ref);
 
@@ -70,18 +70,21 @@ const { colors } = useTheme();
       <FAB.Group
         visible
         open={openGroup}
-        icon='playlist-edit'
-        fabStyle={{backgroundColor: colors.primary}}
+        icon="playlist-edit"
+        fabStyle={{ backgroundColor: colors.primary }}
         actions={[
           {
             icon: 'pencil',
             label: 'Изменить документ',
-            onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId })
+            onPress: () =>
+              navigation.navigate('CreateDocument', {
+                docId: route.params.docId,
+              }),
           },
           {
             icon: 'check',
             label: 'Изменить статус на "Готово"',
-            onPress: () => {}
+            onPress: () => {},
           },
           {
             icon: 'delete',
@@ -99,7 +102,7 @@ const { colors } = useTheme();
                   onPress: () => {},
                 },
               ]);
-            }
+            },
           },
         ]}
         onStateChange={({ open }) => setOpenGroup(open)}
