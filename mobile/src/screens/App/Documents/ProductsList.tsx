@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import products from '../../../mockData/Goods.json';
@@ -22,7 +22,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+        <MaterialIcons name="shopping-cart" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
@@ -163,10 +163,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,

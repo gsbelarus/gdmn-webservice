@@ -2,6 +2,7 @@ import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/nativ
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import contacts from '../../../mockData//GD_Contact.json';
@@ -27,11 +28,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
-          <Text style={localStyles.letter}>
-            {DocumentTypes.find((type) => type.id === item.head.doctype)
-              .name.slice(0, 1)
-              .toUpperCase()}
-          </Text>
+          <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>
@@ -99,10 +96,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,

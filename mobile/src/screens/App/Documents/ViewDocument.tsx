@@ -18,6 +18,11 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
 
   return (
     <View style={localStyles.listContainer}>
+      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <MaterialIcons name="shopping-cart" size={20} color={'#FFF'} />
+        </View>
+      </View>
       <View style={{ marginLeft: 15 }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
@@ -130,7 +135,7 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 2,
     marginVertical: 5,
     textAlign: 'center',
-    textAlignVertical: 'center',
+    textAlignVertical: 'center'
   },
   listContainer: {
     flexDirection: 'row',
@@ -138,7 +143,8 @@ const localStyles = StyleSheet.create({
     marginVertical: 5,
   },
   productBarcodeView: {
-    marginTop: 5,
+    fontSize: 12,
+    opacity: 0.5,
   },
   productNameTextView: {
     fontWeight: 'bold',
@@ -147,26 +153,56 @@ const localStyles = StyleSheet.create({
     maxHeight: 75,
     minHeight: 45,
     textAlignVertical: 'center',
-    width: '75%',
+    width: '75%'
   },
   productNumView: {
     alignItems: 'center',
     flexDirection: 'row',
     height: 25,
     justifyContent: 'space-between',
-    paddingHorizontal: 30,
+    paddingHorizontal: 30
   },
   productPriceView: {
     marginLeft: 5,
   },
   productTextView: {
     flexDirection: 'row',
-    margin: 5,
+    margin: 5
   },
   productTitleView: {
     flexGrow: 1,
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 25,
+    fontSize: 14
+  },
+  avatar: {
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  content: {
+    height: '100%',
+  },
+  details: {
+    margin: 8,
+  },
+  fieldDesciption: {
+    opacity: 0.5,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
+  },
+  name: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  number: {
+    fontSize: 12,
   },
 });

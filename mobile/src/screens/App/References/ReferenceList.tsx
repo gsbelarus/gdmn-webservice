@@ -2,6 +2,7 @@ import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/nativ
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import ReferencesData from '../../../mockData/References.json';
@@ -21,7 +22,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
@@ -77,10 +78,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,
