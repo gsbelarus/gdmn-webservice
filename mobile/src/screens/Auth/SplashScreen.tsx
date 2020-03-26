@@ -1,10 +1,10 @@
-import { useTheme } from "@react-navigation/native";
-import React from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { Text, Button, IconButton } from "react-native-paper";
+import { useTheme } from '@react-navigation/native';
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { Text, Button, IconButton } from 'react-native-paper';
 
-import SubTitle from "../../components/SubTitle";
-import styles from "../../styles/global";
+import SubTitle from '../../components/SubTitle';
+import styles from '../../styles/global';
 
 type Props = {
   deviceRegistered?: boolean;
@@ -19,15 +19,7 @@ type Props = {
 };
 
 const SplashScreen = (props: Props) => {
-  const {
-    serverName,
-    isLoading,
-    isError,
-    status,
-    connection,
-    breakConnection,
-    showSettings
-  } = props;
+  const { serverName, isLoading, isError, status, connection, breakConnection, showSettings } = props;
 
   const { colors } = useTheme();
 
@@ -45,12 +37,10 @@ const SplashScreen = (props: Props) => {
         <View
           style={{
             ...localStyles.statusBox,
-            backgroundColor: colors.background
+            backgroundColor: colors.background,
           }}
         >
-          {isError && (
-            <Text style={localStyles.errorText}>Ошибка: {status}</Text>
-          )}
+          {isError && <Text style={localStyles.errorText}>Ошибка: {status}</Text>}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!isLoading ? (
@@ -81,7 +71,7 @@ const SplashScreen = (props: Props) => {
           style={{
             ...styles.circularButton,
             backgroundColor: colors.primary,
-            borderColor: colors.primary
+            borderColor: colors.primary,
           }}
           color={colors.background}
         />
@@ -92,26 +82,26 @@ const SplashScreen = (props: Props) => {
 
 const localStyles = StyleSheet.create({
   buttons: {
-    width: "100%"
+    width: '100%',
   },
   container: {
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
-    color: "#cc5933",
-    fontSize: 18
+    color: '#cc5933',
+    fontSize: 18,
   },
   serverName: {
-    color: "#888",
+    color: '#888',
     fontSize: 18,
-    marginBottom: 10
+    marginBottom: 10,
   },
   statusBox: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 70,
-    justifyContent: "center"
-  }
+    justifyContent: 'center',
+  },
 });
 
 export { SplashScreen };
