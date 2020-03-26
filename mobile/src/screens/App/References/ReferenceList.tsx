@@ -1,11 +1,15 @@
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import {
+  useScrollToTop,
+  useTheme,
+  useNavigation
+} from "@react-navigation/native";
+import React from "react";
+import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { Text } from "react-native-paper";
 
-import ItemSeparator from '../../../components/ItemSeparator';
-import ReferencesData from '../../../mockData/References.json';
-import { IReference } from '../../../model/inventory';
+import ItemSeparator from "../../../components/ItemSeparator";
+import ReferencesData from "../../../mockData/References.json";
+import { IReference } from "../../../model/inventory";
 
 const References: IReference[] = ReferencesData;
 
@@ -16,16 +20,28 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Reference', { item });
+        navigation.navigate("Reference", { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+          <Text style={localStyles.letter}>
+            {item.name.slice(0, 1).toUpperCase()}
+          </Text>
         </View>
         <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-          <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.type}</Text>
+          <Text style={[localStyles.name, { color: colors.text }]}>
+            {item.name}
+          </Text>
+          <Text
+            style={[
+              localStyles.number,
+              localStyles.fieldDesciption,
+              { color: colors.text }
+            ]}
+          >
+            {item.type}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -38,7 +54,9 @@ const ReferenceListScreen = () => {
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
+  const renderItem = ({ item }: { item: IReference }) => (
+    <ReferenceItem item={item} />
+  );
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -57,36 +75,36 @@ export { ReferenceListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
-    alignItems: 'center',
-    backgroundColor: '#e91e63',
+    alignItems: "center",
+    backgroundColor: "#e91e63",
     borderRadius: 18,
     height: 36,
-    justifyContent: 'center',
-    width: 36,
+    justifyContent: "center",
+    width: 36
   },
   content: {
-    height: '100%',
+    height: "100%"
   },
   details: {
-    margin: 8,
+    margin: 8
   },
   fieldDesciption: {
-    opacity: 0.5,
+    opacity: 0.5
   },
   item: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    padding: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    padding: 8
   },
   letter: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold"
   },
   name: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold"
   },
   number: {
-    fontSize: 12,
-  },
+    fontSize: 12
+  }
 });

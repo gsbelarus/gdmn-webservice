@@ -76,7 +76,10 @@ const HeadDocumentScreen = ({ route, navigation }) => {
           {
             icon: 'pencil',
             label: 'Изменить документ',
-            onPress: () => navigation.navigate('CreateDocument', { docId: route.params.docId }),
+            onPress: () =>
+              navigation.navigate('CreateDocument', {
+                docId: route.params.docId,
+              }),
           },
           {
             icon: 'check',

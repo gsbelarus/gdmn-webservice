@@ -4,7 +4,6 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import ItemSeparator from '../../../components/ItemSeparator';
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
@@ -38,7 +37,11 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
       <View style={{ marginRight: 5 }}>
         {status === 0 ? (
           <TouchableOpacity
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
             onPress={async () => {
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
@@ -57,6 +60,12 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
     </View>
   );
 });
+
+const ItemSeparator = () => {
+  const { colors } = useTheme();
+
+  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
+};
 
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
@@ -77,16 +86,15 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         }}
       >
         <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-          <View>
-            <Text numberOfLines={1} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {type.name} от {new Date(document.head.date).toLocaleDateString()}
-            </Text>
-          </View>
-          <View>
-            <Text numberOfLines={1} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {contact.name}
-            </Text>
-          </View>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+            {type.name}
+          </Text>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+            {contact.name}
+          </Text>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+            {new Date(document.head.date).toLocaleDateString()}
+          </Text>
         </View>
       </TouchableOpacity>
       <FlatList
@@ -100,7 +108,12 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         <TouchableOpacity
           style={[
             styles.circularButton,
-            { margin: 10, alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.primary },
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
           ]}
           onPress={() => navigation.navigate('ProductsList')}
         >
@@ -118,18 +131,16 @@ const localStyles = StyleSheet.create({
     padding: 0,
   },
   documentHeader: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     height: 50,
-    padding: 0,
   },
   documentHeaderText: {
-    // flex: 1,
+    flex: 1,
     fontWeight: 'bold',
-    // marginHorizontal: 1,
-    // marginVertical: 1,
-    padding: 4,
+    marginHorizontal: 2,
+    marginVertical: 5,
     textAlign: 'center',
-    // textAlignVertical: 'center',
+    textAlignVertical: 'center',
   },
   listContainer: {
     flexDirection: 'row',

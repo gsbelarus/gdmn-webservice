@@ -88,7 +88,14 @@ const ProductsListScreen = () => {
         </>
       ) : (
         <>
-          <View style={{ justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', margin: 15 }}>
+          <View
+            style={{
+              justifyContent: 'space-around',
+              flexDirection: 'row',
+              alignItems: 'center',
+              margin: 15,
+            }}
+          >
             <View style={{ flex: 1, marginRight: 15 }}>
               <TextInput
                 style={[
