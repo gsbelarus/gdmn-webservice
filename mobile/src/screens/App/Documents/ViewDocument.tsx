@@ -1,4 +1,4 @@
-import { MaterialIcons, Foundation } from '@expo/vector-icons';
+import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -22,7 +22,12 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
       style={localStyles.listContainer}
       onPress={() => navigation.navigate('ProductDetail', { prodId: item.goodId, docId, modeCor: true  })}
     >
-      <View style={{ marginLeft: 15 }}>
+      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <Feather name="box" size={20} color={'#FFF'} />
+        </View>
+      </View>
+      <View style={{ marginLeft: 15, width: '60%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -38,8 +43,8 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           {item.quantity}
         </Text>
       </View>
-      <View style={{ marginRight: 5 }}>
-        {status === 0 ? (
+      {status === 0 ? (
+        <View style={{ marginRight: 5 }}>
           <TouchableOpacity
             style={{
               flex: 1,
@@ -59,8 +64,8 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           >
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
-        ) : undefined}
-      </View>
+        </View>
+      ) : undefined}
     </TouchableOpacity>
   );
 });
@@ -239,43 +244,35 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 2,
     marginVertical: 5,
     textAlign: 'center',
-    textAlignVertical: 'center',
+    textAlignVertical: 'center'
   },
   listContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
+    marginVertical: 10,
+    width: '100%'
   },
   productBarcodeView: {
-    marginTop: 5,
-  },
-  productNameTextView: {
-    fontWeight: 'bold',
-    marginHorizontal: 5,
-    marginTop: 5,
-    maxHeight: 75,
-    minHeight: 45,
-    textAlignVertical: 'center',
-    width: '75%',
-  },
-  productNumView: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: 25,
-    justifyContent: 'space-between',
-    paddingHorizontal: 30,
-  },
-  productPriceView: {
-    marginLeft: 5,
-  },
-  productTextView: {
-    flexDirection: 'row',
-    margin: 5,
+    fontSize: 12,
+    opacity: 0.5,
   },
   productTitleView: {
     flexGrow: 1,
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 25,
+    fontSize: 14,
+  },
+  avatar: {
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginLeft: 5,
   },
 });
