@@ -1,8 +1,8 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import documents from '../../../mockData/Document.json';
@@ -52,6 +52,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 });
 
 const DocumentsListScreen = ({ navigation }) => {
+  const { colors } = useTheme();
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
@@ -66,15 +67,36 @@ const DocumentsListScreen = ({ navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <Button
-        mode="contained"
-        style={[styles.rectangularButton, { marginHorizontal: 15 }]}
-        onPress={() => {
-          navigation.navigate('CreateDocument');
-        }}
-      >
-        Create Document
-      </Button>
+      <View style={{ alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: 'row' }}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => {}}
+        >
+          <AntDesign size={30} color={colors.card} name="sync" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => navigation.navigate('CreateDocument')}
+        >
+          <MaterialIcons size={30} color={colors.card} name="add" />
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
