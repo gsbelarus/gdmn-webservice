@@ -54,11 +54,11 @@ const ProductsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ _, data }) => {
     setScanned(true);
-    Alert.alert('Штрих-код был отсканирован', data, [
+    Alert.alert('Подтвердить выбор?', data, [
       {
-        text: 'OK',
+        text: 'Принять',
         onPress: () => {
           setDoScanned(false);
           onChangeText(data);
@@ -66,8 +66,7 @@ const ProductsListScreen = () => {
         },
       },
       {
-        text: 'CANCEL',
-        onPress: () => {},
+        text: 'Отмена',
       },
     ]);
   };
