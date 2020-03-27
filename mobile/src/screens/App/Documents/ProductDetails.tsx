@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Alert } from "react-native";
-import { Text, Button } from "react-native-paper";
-import { useTheme } from "@react-navigation/native";
-import InputSpinner from "react-native-input-spinner";
+import { useTheme } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import InputSpinner from 'react-native-input-spinner';
+import { Text, Button } from 'react-native-paper';
 
-import SubTitle from "../../../components/SubTitle";
-import styles from "../../../styles/global";
-import products from "../../../mockData/Goods.json";
-import remains from "../../../mockData/Remains.json";
+import SubTitle from '../../../components/SubTitle';
+import products from '../../../mockData/Goods.json';
+import remains from '../../../mockData/Remains.json';
+import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const product = products.find(item => item.id === route.params.prodId);
-  const remain = remains.find(item => item.goodId === route.params.prodId);
+  const product = products.find((item) => item.id === route.params.prodId);
+  const remain = remains.find((item) => item.goodId === route.params.prodId);
   const [value, setValue] = useState(1);
 
   return (
@@ -22,15 +22,11 @@ const ProductDetailScreen = ({ route, navigation }) => {
         {
           backgroundColor: colors.card,
           padding: 0,
-          justifyContent: "flex-start"
-        }
+          justifyContent: 'flex-start',
+        },
       ]}
     >
-      <SubTitle
-        styles={[localeStyles.title, { backgroundColor: colors.background }]}
-      >
-        {product.name}
-      </SubTitle>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
       <View style={localeStyles.productPriceView}>
         <Text style={{ fontSize: 17 }}>Цена:</Text>
         <Text style={localeStyles.productPrice}>{remain.price}</Text>
@@ -53,7 +49,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
           colorRight={colors.primary}
           onChange={setValue}
           onMin={() => {
-            Alert.alert("Предупреждение", "Минимальное значение уже выбрано!");
+            Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
           }}
         />
       </View>
@@ -62,7 +58,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         style={{
           ...styles.rectangularButton,
           height: 35,
-          alignItems: "center"
+          alignItems: 'center',
         }}
       >
         Отправить
@@ -74,45 +70,45 @@ const ProductDetailScreen = ({ route, navigation }) => {
 export { ProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
-  title: {
-    padding: 10
+  editQuantityView: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    marginLeft: 15,
+    marginTop: 100,
   },
   inputSpinner: {
     marginTop: 5,
-    width: 180
+    width: 180,
   },
   productName: {
-    marginTop: 25,
-    color: "#000000",
-    fontWeight: "bold",
+    alignItems: 'center',
+    color: '#000000',
     fontSize: 19,
-    alignItems: "center"
-  },
-  productPriceView: {
-    marginLeft: 15,
-    marginTop: 45,
-    flexDirection: "row"
+    fontWeight: 'bold',
+    marginTop: 25,
   },
   productPrice: {
+    color: '#000000',
+    fontSize: 17,
     marginLeft: 5,
-    textAlignVertical: "center",
-    color: "#000000",
-    fontSize: 17
+    textAlignVertical: 'center',
   },
-  productQuantityView: {
+  productPriceView: {
+    flexDirection: 'row',
     marginLeft: 15,
-    marginTop: 15,
-    flexDirection: "row"
+    marginTop: 45,
   },
   productQuantity: {
+    color: '#000000',
+    fontSize: 17,
     marginLeft: 5,
-    color: "#000000",
-    fontSize: 17
   },
-  editQuantityView: {
+  productQuantityView: {
+    flexDirection: 'row',
     marginLeft: 15,
-    marginTop: 100,
-    flexDirection: "column",
-    alignItems: "center"
-  }
+    marginTop: 15,
+  },
+  title: {
+    padding: 10,
+  },
 });

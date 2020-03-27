@@ -1,26 +1,14 @@
-import { useTheme } from "@react-navigation/native";
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Keyboard
-} from "react-native";
-import {
-  Text,
-  Button,
-  IconButton,
-  ActivityIndicator
-} from "react-native-paper";
+import { useTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
+import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import authApi from "../../api/auth";
-import SubTitle from "../../components/SubTitle";
-import { timeout } from "../../helpers/utils";
-import { IUserCredentials, IDataFetch, IServerResponse } from "../../model";
-import { useStore } from "../../store";
-import styles from "../../styles/global";
+import authApi from '../../api/auth';
+import SubTitle from '../../components/SubTitle';
+import { timeout } from '../../helpers/utils';
+import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
+import { useStore } from '../../store';
+import styles from '../../styles/global';
 
 /*
   Порядок работы:
@@ -38,28 +26,20 @@ const SignInScreen = () => {
   const [lognState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
     isError: false,
-    status: undefined
+    status: undefined,
   });
-  const [serverResp, setServerResp] = useState<
-    IServerResponse<boolean | string>
-  >(undefined);
+  const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
   const [credential, setCredentials] = useState<IUserCredentials>({
-    userName: "",
-    password: ""
+    userName: '',
+    password: '',
   });
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => setKeyboardVisible(true)
-    );
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => setKeyboardVisible(false)
-    );
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
     return () => {
       keyboardDidHideListener.remove();
@@ -79,9 +59,7 @@ const SignInScreen = () => {
 
     timeout(5000, authApi.getDeviceStatusByUser(credential.userName))
       .then((data: IServerResponse<boolean | string>) => setServerResp(data))
-      .catch((err: Error) =>
-        setLoginState({ isLoading: false, status: err.message, isError: true })
-      );
+      .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
   }, [credential.userName, lognState.isLoading]);
 
   useEffect(() => {
@@ -92,8 +70,8 @@ const SignInScreen = () => {
     if (serverResp.status === 200 && !serverResp.result) {
       setLoginState({
         isLoading: false,
-        status: "Пользователь заблокирован",
-        isError: true
+        status: 'Пользователь заблокирован',
+        isError: true,
       });
       return;
     }
@@ -106,15 +84,15 @@ const SignInScreen = () => {
             : setLoginState({
                 isLoading: false,
                 status: data.result,
-                isError: true
+                isError: true,
               });
         })
         .catch((err: Error) =>
           setLoginState({
             isLoading: false,
             status: err.message,
-            isError: true
-          })
+            isError: true,
+          }),
         );
       return;
     }
@@ -122,48 +100,35 @@ const SignInScreen = () => {
     setLoginState({
       isLoading: false,
       status: serverResp.result as string,
-      isError: true
+      isError: true,
     });
   }, [actions, credential, serverResp]);
 
   return (
     <>
       <KeyboardAvoidingView
-        style={[
-          styles.container,
-          isKeyboardVisible && localStyles.contentWidthKbd
-        ]}
-        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={[styles.container, isKeyboardVisible && localStyles.contentWidthKbd]}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
         <View>
           <SubTitle>Вход пользователя</SubTitle>
           <TextInput
             placeholder="Имя пользователя"
             value={credential.userName}
-            onChangeText={val =>
-              setCredentials({ ...credential, userName: val })
-            }
-            style={[
-              styles.input,
-              { backgroundColor: colors.card, color: colors.text }
-            ]}
+            onChangeText={(val) => setCredentials({ ...credential, userName: val })}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           <TextInput
             placeholder="Пароль"
             secureTextEntry
             value={credential.password}
-            onChangeText={val =>
-              setCredentials({ ...credential, password: val })
-            }
-            style={[
-              styles.input,
-              { backgroundColor: colors.card, color: colors.text }
-            ]}
+            onChangeText={(val) => setCredentials({ ...credential, password: val })}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           <Button
             mode="contained"
             disabled={lognState.isLoading}
-            icon={"login"}
+            icon={'login'}
             onPress={logIn}
             style={styles.rectangularButton}
           >
@@ -173,17 +138,11 @@ const SignInScreen = () => {
         <View
           style={{
             ...localStyles.statusBox,
-            backgroundColor: colors.background
+            backgroundColor: colors.background,
           }}
         >
-          {lognState.isError && (
-            <Text style={localStyles.errorText}>
-              Ошибка: {lognState.status}
-            </Text>
-          )}
-          {lognState.isLoading && (
-            <ActivityIndicator size="large" color="#70667D" />
-          )}
+          {lognState.isError && <Text style={localStyles.errorText}>Ошибка: {lognState.status}</Text>}
+          {lognState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
       </KeyboardAvoidingView>
       <View style={styles.bottomButtons}>
@@ -194,7 +153,7 @@ const SignInScreen = () => {
           style={{
             ...styles.circularButton,
             backgroundColor: colors.primary,
-            borderColor: colors.primary
+            borderColor: colors.primary,
           }}
           color={colors.background}
         />
@@ -205,25 +164,25 @@ const SignInScreen = () => {
 
 const localStyles = StyleSheet.create({
   buttons: {
-    width: "100%"
+    width: '100%',
   },
   container: {
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   contentWidthKbd: {
-    justifyContent: "flex-start"
+    justifyContent: 'flex-start',
   },
   errorText: {
-    color: "#cc5933",
-    fontSize: 18
+    color: '#cc5933',
+    fontSize: 18,
   },
   statusBox: {
-    alignItems: "center",
-    height: 100
+    alignItems: 'center',
+    height: 100,
   },
   title: {
-    textAlign: "center"
-  }
+    textAlign: 'center',
+  },
 });
 
 export { SignInScreen };

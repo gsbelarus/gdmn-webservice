@@ -5,6 +5,7 @@
     "*/specs/**/*.ts"
   ],
   "exclude": [
-    "*/config/*.ts"
+    "*/config/*.ts",
+    "*/_unused/*"
   ]
 }
