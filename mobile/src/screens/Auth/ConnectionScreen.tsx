@@ -8,7 +8,7 @@ import AuthNavigator from '../../navigation/AuthNavigator';
 import { useStore } from '../../store';
 
 const ConnectionScreen = () => {
-  const { state, actions } = useStore();
+  const { state, actions, api } = useStore();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +31,10 @@ const ConnectionScreen = () => {
         };
 
       AsyncStorage.setItem('pathServer', JSON.stringify(url))
-        .then(() => actions.setBaseUrl(url))
+        .then(() => {
+          api.app.setUrl('test');
+          actions.setBaseUrl(url);
+        })
         .catch(() => setLoading(false));
     };
 
