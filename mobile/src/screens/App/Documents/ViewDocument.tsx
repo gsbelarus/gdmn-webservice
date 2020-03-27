@@ -112,7 +112,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+      <View style={{ flexDirection: 'row', justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly' }}>
         {
           document.head.status === 0 || document.head.status === 3
           ? <TouchableOpacity
