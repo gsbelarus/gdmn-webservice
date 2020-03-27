@@ -6,3 +6,5 @@ build
 
 .sample
 /config/*
+
+/_unused/*

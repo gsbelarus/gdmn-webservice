@@ -1,22 +1,17 @@
-import { useTheme } from "@react-navigation/native";
-import Constants from "expo-constants";
-import React, { useState, useEffect } from "react";
-import { View, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import {
-  Text,
-  Button,
-  ActivityIndicator,
-  IconButton
-} from "react-native-paper";
+import { useTheme } from '@react-navigation/native';
+import Constants from 'expo-constants';
+import React, { useState, useEffect } from 'react';
+import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
 // eslint-disable-next-line import/default
-import VirtualKeyboard from "react-native-virtual-keyboard";
+import VirtualKeyboard from 'react-native-virtual-keyboard';
 
-import authApi from "../../api/auth";
-import SubTitle from "../../components/SubTitle";
-import { timeout } from "../../helpers/utils";
-import { IServerResponse, IDataFetch } from "../../model";
-import { useStore } from "../../store";
-import styles from "../../styles/global";
+import authApi from '../../api/auth';
+import SubTitle from '../../components/SubTitle';
+import { timeout } from '../../helpers/utils';
+import { IServerResponse, IDataFetch } from '../../model';
+import { useStore } from '../../store';
+import styles from '../../styles/global';
 
 const ActivationScreen = () => {
   const { actions } = useStore();
@@ -25,23 +20,17 @@ const ActivationScreen = () => {
   const [serverReq, setServerReq] = useState<IDataFetch>({
     isLoading: false,
     isError: false,
-    status: undefined
+    status: undefined,
   });
-  const [serverResp, setServerResp] = useState<
-    IServerResponse<boolean | string>
-  >(undefined);
+  const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
 
-  const [activationCode, setActivationCode] = useState("");
+  const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     if (serverReq?.isLoading) {
       timeout(5000, authApi.verifyActivationCode(activationCode))
-        .then((data: IServerResponse<string>) =>
-          setServerResp({ result: data.result, status: data.status })
-        )
-        .catch((err: Error) =>
-          setServerReq({ isLoading: false, isError: true, status: err.message })
-        );
+        .then((data: IServerResponse<string>) => setServerResp({ result: data.result, status: data.status }))
+        .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
   }, [activationCode, serverReq]);
 
@@ -51,7 +40,7 @@ const ActivationScreen = () => {
     }
 
     if (serverResp.status === 404) {
-      setServerReq({ isLoading: false, isError: true, status: "Неверный код" });
+      setServerReq({ isLoading: false, isError: true, status: 'Неверный код' });
       return;
     }
 
@@ -59,17 +48,17 @@ const ActivationScreen = () => {
       5000,
       authApi.addDevice({
         uid: Constants.deviceId,
-        userId: serverResp.result as string
-      })
+        userId: serverResp.result as string,
+      }),
     )
       .then((data: IServerResponse<string>) => {
         if (data.status === 404) {
           setServerReq({
             isLoading: false,
             isError: true,
-            status: data.result as string
+            status: data.result as string,
           });
-          setActivationCode("");
+          setActivationCode('');
           return;
         }
         actions.setDeviceStatus(true);
@@ -82,26 +71,17 @@ const ActivationScreen = () => {
 
   return (
     <>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : null}
-      >
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
         <View style={styles.container}>
           <SubTitle>Активация устройства</SubTitle>
           <View
             style={{
               ...localStyles.statusBox,
-              backgroundColor: colors.background
+              backgroundColor: colors.background,
             }}
           >
-            {serverReq.isError && (
-              <Text style={localStyles.errorText}>
-                Ошибка: {serverReq.status}
-              </Text>
-            )}
-            {serverReq.isLoading && (
-              <ActivityIndicator size="large" color="#70667D" />
-            )}
+            {serverReq.isError && <Text style={localStyles.errorText}>Ошибка: {serverReq.status}</Text>}
+            {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
           {/* <TextInput
           value={inputValue}
@@ -118,18 +98,12 @@ const ActivationScreen = () => {
           style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
         />} */}
           <Text style={localStyles.codeText}>{activationCode}</Text>
-          <VirtualKeyboard
-            color="black"
-            pressMode="string"
-            onPress={setActivationCode}
-          />
+          <VirtualKeyboard color="black" pressMode="string" onPress={setActivationCode} />
           <Button
             mode="contained"
             disabled={serverReq.isLoading}
-            icon={"login"}
-            onPress={() =>
-              setServerReq({ isLoading: true, isError: false, status: "" })
-            }
+            icon={'login'}
+            onPress={() => setServerReq({ isLoading: true, isError: false, status: '' })}
             style={styles.rectangularButton}
           >
             Отправить
@@ -144,7 +118,7 @@ const ActivationScreen = () => {
           style={{
             ...styles.circularButton,
             backgroundColor: colors.primary,
-            borderColor: colors.primary
+            borderColor: colors.primary,
           }}
           color={colors.background}
         />
@@ -155,29 +129,29 @@ const ActivationScreen = () => {
 
 const localStyles = StyleSheet.create({
   buttons: {
-    width: "100%"
+    width: '100%',
   },
   codeText: {
-    borderColor: "#000000",
+    borderColor: '#000000',
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     height: 30,
     marginTop: 15,
-    textAlign: "center"
+    textAlign: 'center',
   },
   container: {
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
-    color: "#cc5933",
-    fontSize: 18
+    color: '#cc5933',
+    fontSize: 18,
   },
   statusBox: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 70,
-    justifyContent: "center"
-  }
+    justifyContent: 'center',
+  },
 });
 
 export { ActivationScreen };
