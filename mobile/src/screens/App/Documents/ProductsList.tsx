@@ -1,6 +1,6 @@
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
@@ -22,7 +22,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <MaterialIcons name="shopping-cart" size={20} color={'#FFF'} />
+          <MaterialIcons name="shopping-cart" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>

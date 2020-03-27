@@ -1,20 +1,16 @@
-import {
-  useScrollToTop,
-  useTheme,
-  useNavigation
-} from "@react-navigation/native";
-import React from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Text, Button } from "react-native-paper";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Button } from 'react-native-paper';
 
-import ItemSeparator from "../../../components/ItemSeparator";
-import contacts from "../../../mockData//GD_Contact.json";
-import documents from "../../../mockData/Document.json";
-import documentTypes from "../../../mockData/GD_DocumentType.json";
-import statuses from "../../../mockData/documentStatuses.json";
-import { IDocument, IDocumentType, IContact } from "../../../model/inventory";
-import styles from "../../../styles/global";
+import ItemSeparator from '../../../components/ItemSeparator';
+import documents from '../../../mockData/Document.json';
+import contacts from '../../../mockData/GD_Contact.json';
+import documentTypes from '../../../mockData/GD_DocumentType.json';
+import statuses from '../../../mockData/documentStatuses.json';
+import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import styles from '../../../styles/global';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
@@ -40,19 +36,13 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <Text style={[localStyles.name, { color: colors.text }]}>
             {DocumentTypes.find((type) => type.id === item.head.doctype).name}
           </Text>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
               {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
               {new Date(item.head.date).toLocaleDateString()}
             </Text>
-            <Text
-              style={[
-                localStyles.number,
-                localStyles.field,
-                { color: statusColors[item.head.status] }
-              ]}
-            >
-              {Statuses.find(type => type.id === item.head.status).name}
+            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
+              {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
         </View>
@@ -105,7 +95,7 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
-    width: '80%'
+    width: '80%',
   },
   field: {
     opacity: 0.5,
