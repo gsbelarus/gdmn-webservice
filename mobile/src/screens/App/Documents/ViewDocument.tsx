@@ -84,11 +84,6 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 
   return (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('HeadDocument', { docId: document.id });
-        }}
-      >
         <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {type.name}
@@ -99,8 +94,17 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {new Date(document.head.date).toLocaleDateString()}
           </Text>
+          <TouchableOpacity style={{justifyContent: 'center'}}>
+            <MaterialIcons
+              size={30}
+              color={colors.card}
+              name="chevron-right"
+              onPress={() => {
+                navigation.navigate('HeadDocument', { docId: document.id });
+              }}
+            />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
       <FlatList
         ref={ref}
         data={document.lines}
