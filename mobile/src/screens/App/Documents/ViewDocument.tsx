@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Dimensions, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
@@ -23,7 +23,7 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15, width: '70%' }}>
+      <View style={{ marginLeft: 15, width: Dimensions.get('window').width  <= 320 ? '55%' : '65%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -92,13 +92,10 @@ const ViewDocumentScreen = ({ route, navigation }) => {
       >
         <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {type.name}
+            {type.name} от {new Date(document.head.date).toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {new Date(document.head.date).toLocaleDateString()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -150,7 +147,7 @@ const localStyles = StyleSheet.create({
     margin: 8,
   },
   documentHeader: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: 50,
   },
   documentHeaderText: {
