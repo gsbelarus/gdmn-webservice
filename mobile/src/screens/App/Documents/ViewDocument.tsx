@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Foundation } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -109,77 +109,111 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         ItemSeparatorComponent={ItemSeparator}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            {
-              margin: 10,
-              alignItems: 'center',
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={async () => {
-            Alert.alert('Вы уверены, что хотите удалить?', '', [
-              {
-                text: 'OK',
-                onPress: async () => {
-                  navigation.navigate('DocumentsListScreen');
+        {
+          document.head.status === 0 || document.head.status === 3
+          ? <TouchableOpacity
+              style={[
+                styles.circularButton,
+                {
+                  margin: 10,
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
                 },
-              },
-              {
-                text: 'Отмена',
-                onPress: () => {},
-              },
-            ]);
-          }}
-        >
-          <MaterialIcons size={30} color={colors.card} name="delete" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            {
-              margin: 10,
-              alignItems: 'center',
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={() => navigation.navigate('CreateDocument', {
-            docId: route.params.docId,
-          })}
-        >
-          <MaterialIcons size={30} color={colors.card} name="edit" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            {
-              margin: 10,
-              alignItems: 'center',
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={() => {}}
-        >
-          <MaterialIcons size={30} color={colors.card} name="check" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            {
-              margin: 10,
-              alignItems: 'center',
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={() => navigation.navigate('ProductsList', { docId: document.id })}
-        >
-          <MaterialIcons size={30} color={colors.card} name="add" />
-        </TouchableOpacity>
+              ]}
+              onPress={async () => {
+                Alert.alert('Вы уверены, что хотите удалить?', '', [
+                  {
+                    text: 'OK',
+                    onPress: async () => {
+                      navigation.navigate('DocumentsListScreen');
+                    },
+                  },
+                  {
+                    text: 'Отмена',
+                    onPress: () => {},
+                  },
+                ]);
+              }}
+            >
+              <MaterialIcons size={30} color={colors.card} name="delete" />
+            </TouchableOpacity>
+          : undefined
+        }
+        {
+          document.head.status === 0
+          ? <TouchableOpacity
+              style={[
+                styles.circularButton,
+                {
+                  margin: 10,
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => navigation.navigate('CreateDocument', {
+                docId: route.params.docId,
+              })}
+            >
+              <MaterialIcons size={30} color={colors.card} name="edit" />
+            </TouchableOpacity>
+          : undefined
+        }
+        {
+          document.head.status === 0
+          ? <TouchableOpacity
+              style={[
+                styles.circularButton,
+                {
+                  margin: 10,
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => {}}
+            >
+              <MaterialIcons size={30} color={colors.card} name="check" />
+            </TouchableOpacity>
+          : undefined
+        }
+        {
+          document.head.status === 1
+          ? <TouchableOpacity
+              style={[
+                styles.circularButton,
+                {
+                  margin: 10,
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => {}}
+            >
+              <Foundation size={30} color={colors.card} name="clipboard-pencil" />
+            </TouchableOpacity>
+          : undefined
+        }
+        {
+          document.head.status === 0
+          ? <TouchableOpacity
+              style={[
+                styles.circularButton,
+                {
+                  margin: 10,
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => navigation.navigate('ProductsList', { docId: document.id })}
+            >
+              <MaterialIcons size={30} color={colors.card} name="add" />
+            </TouchableOpacity>
+          : undefined
+        }
       </View>
     </View>
   );
