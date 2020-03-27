@@ -1,7 +1,7 @@
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { Title, Text, FAB } from 'react-native-paper';
+import React from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Title, Text } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -9,6 +9,7 @@ import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 import styles from '../../../styles/global';
+import ItemSeparator from '../../../components/ItemSeparator';
 
 type TField = {
   title: string;
@@ -28,12 +29,6 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
   );
 });
 
-const ItemSeparator = () => {
-  const { colors } = useTheme();
-
-  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
-};
-
 const HeadDocumentScreen = ({ route, navigation }) => {
   const ref = React.useRef<FlatList<TField>>(null);
   const document: IDocument = documents.find((item) => item.id === route.params.docId);
@@ -50,9 +45,6 @@ const HeadDocumentScreen = ({ route, navigation }) => {
     { title: 'Статус', value: status },
   ];
 
-  const [openGroup, setOpenGroup] = useState(false);
-  const { colors } = useTheme();
-
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: TField }) => <FieldItem item={item} />;
@@ -66,46 +58,6 @@ const HeadDocumentScreen = ({ route, navigation }) => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-      />
-      <FAB.Group
-        visible
-        open={openGroup}
-        icon="playlist-edit"
-        fabStyle={{ backgroundColor: colors.primary }}
-        actions={[
-          {
-            icon: 'pencil',
-            label: 'Изменить документ',
-            onPress: () =>
-              navigation.navigate('CreateDocument', {
-                docId: route.params.docId,
-              }),
-          },
-          {
-            icon: 'check',
-            label: 'Изменить статус на "Готово"',
-            onPress: () => {},
-          },
-          {
-            icon: 'delete',
-            label: 'Удалить документ',
-            onPress: async () => {
-              Alert.alert('Вы уверены, что хотите удалить?', '', [
-                {
-                  text: 'OK',
-                  onPress: async () => {
-                    navigation.navigate('DocumentsListScreen');
-                  },
-                },
-                {
-                  text: 'Отмена',
-                  onPress: () => {},
-                },
-              ]);
-            },
-          },
-        ]}
-        onStateChange={({ open }) => setOpenGroup(open)}
       />
     </View>
   );

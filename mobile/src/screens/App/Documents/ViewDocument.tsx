@@ -108,7 +108,64 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{ alignItems: 'flex-end' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={async () => {
+            Alert.alert('Вы уверены, что хотите удалить?', '', [
+              {
+                text: 'OK',
+                onPress: async () => {
+                  navigation.navigate('DocumentsListScreen');
+                },
+              },
+              {
+                text: 'Отмена',
+                onPress: () => {},
+              },
+            ]);
+          }}
+        >
+          <MaterialIcons size={30} color={colors.card} name="delete" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => navigation.navigate('CreateDocument', {
+            docId: route.params.docId,
+          })}
+        >
+          <MaterialIcons size={30} color={colors.card} name="edit" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => {}}
+        >
+          <MaterialIcons size={30} color={colors.card} name="check" />
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.circularButton,
