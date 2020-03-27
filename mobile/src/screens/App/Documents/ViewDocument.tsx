@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -20,10 +20,10 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
     <View style={localStyles.listContainer}>
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <MaterialIcons name="shopping-cart" size={20} color={'#FFF'} />
+        <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15 }}>
+      <View style={{ marginLeft: 15, width: '70%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -39,8 +39,8 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           {item.quantity}
         </Text>
       </View>
-      <View style={{ marginRight: 5 }}>
         {status === 0 ? (
+      <View style={{ marginRight: 5 }}>
           <TouchableOpacity
             style={{
               flex: 1,
@@ -60,8 +60,8 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           >
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
+        </View>
         ) : undefined}
-      </View>
     </View>
   );
 });
@@ -149,42 +149,19 @@ const localStyles = StyleSheet.create({
   },
   listContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
+    marginVertical: 10,
+    width: '100%'
   },
   productBarcodeView: {
     fontSize: 12,
     opacity: 0.5,
-  },
-  productNameTextView: {
-    fontWeight: 'bold',
-    marginHorizontal: 5,
-    marginTop: 5,
-    maxHeight: 75,
-    minHeight: 45,
-    textAlignVertical: 'center',
-    width: '75%'
-  },
-  productNumView: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: 25,
-    justifyContent: 'space-between',
-    paddingHorizontal: 30
-  },
-  productPriceView: {
-    marginLeft: 5,
-  },
-  productTextView: {
-    flexDirection: 'row',
-    margin: 5
   },
   productTitleView: {
     flexGrow: 1,
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 25,
-    fontSize: 14
+    fontSize: 14,
   },
   avatar: {
     alignItems: 'center',
@@ -194,25 +171,9 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
-  content: {
-    height: '100%',
-  },
-  details: {
-    margin: 8,
-  },
-  fieldDesciption: {
-    opacity: 0.5,
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  number: {
-    fontSize: 12,
+    marginLeft: 5,
   },
 });
