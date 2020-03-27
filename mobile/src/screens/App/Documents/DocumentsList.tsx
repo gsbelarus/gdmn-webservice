@@ -6,7 +6,7 @@ import {
 import React from "react";
 import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, Button } from "react-native-paper";
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 
 import ItemSeparator from "../../../components/ItemSeparator";
 import contacts from "../../../mockData//GD_Contact.json";
@@ -77,7 +77,21 @@ const DocumentsListScreen = ({ navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{ alignItems: 'flex-end' }}>
+      <View style={{ alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: 'row' }}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => {}}
+        >
+          <AntDesign size={30} color={colors.card} name="sync" />
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.circularButton,
