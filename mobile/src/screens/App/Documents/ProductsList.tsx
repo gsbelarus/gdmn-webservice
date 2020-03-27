@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { useScrollToTop, useTheme, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -8,21 +8,23 @@ import { Text, Button, TextInput } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import products from '../../../mockData/Goods.json';
 import { IGood } from '../../../model/inventory';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import styles from '../../../styles/global';
 
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const docId = useRoute< RouteProp<DocumentStackParamList, 'ProductsList'> >().params?.docId;
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ProductDetail', { prodId: item.id });
+        navigation.navigate('ProductDetail', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+        <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>

@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme, useScrollToTop } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -12,12 +12,16 @@ import remains from '../../../mockData/Remains.json';
 import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
 import styles from '../../../styles/global';
 
-const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
+const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
   const { colors } = useTheme();
   const good: IGood = goods.find((i) => i.id === item.goodId);
+  const navigation = useNavigation();
 
   return (
-    <View style={localStyles.listContainer}>
+    <TouchableOpacity
+      style={localStyles.listContainer}
+      onPress={() => navigation.navigate('ProductDetail', { prodId: item.goodId, docId, modeCor: true  })}
+    >
       <View style={{ marginLeft: 15 }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
@@ -57,7 +61,7 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           </TouchableOpacity>
         ) : undefined}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -76,7 +80,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: ILine }) => <LineItem item={item} status={document.head.status} />;
+  const renderItem = ({ item }: { item: ILine }) => <LineItem item={item} status={document.head.status} docId={document.id} />;
 
   return (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
@@ -115,7 +119,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
               borderColor: colors.primary,
             },
           ]}
-          onPress={() => navigation.navigate('ProductsList')}
+          onPress={() => navigation.navigate('ProductsList', { docId: document.id })}
         >
           <MaterialIcons size={30} color={colors.card} name="add" />
         </TouchableOpacity>
