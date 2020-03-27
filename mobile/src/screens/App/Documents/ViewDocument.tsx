@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Dimensions, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
@@ -24,10 +24,10 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <Feather name="box" size={20} color={'#FFF'} />
+          <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15, width: '60%' }}>
+      <View style={{ marginLeft: 15, width: Dimensions.get('window').width  <= 320 ? '55%' : '65%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -89,27 +89,24 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 
   return (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {type.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {contact.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {new Date(document.head.date).toLocaleDateString()}
-          </Text>
-          <TouchableOpacity style={{justifyContent: 'center'}}>
-            <MaterialIcons
-              size={30}
-              color={colors.card}
-              name="chevron-right"
-              onPress={() => {
-                navigation.navigate('HeadDocument', { docId: document.id });
-              }}
-            />
-          </TouchableOpacity>
-        </View>
+      <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
+        <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+          {type.name} от {new Date(document.head.date).toLocaleDateString()}
+        </Text>
+        <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+          {contact.name}
+        </Text>
+        <TouchableOpacity style={{justifyContent: 'center'}}>
+          <MaterialIcons
+            size={30}
+            color={colors.card}
+            name="chevron-right"
+            onPress={() => {
+              navigation.navigate('HeadDocument', { docId: document.id });
+            }}
+          />
+        </TouchableOpacity>
+      </View>
       <FlatList
         ref={ref}
         data={document.lines}
@@ -231,37 +228,6 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 export { ViewDocumentScreen };
 
 const localStyles = StyleSheet.create({
-  container: {
-    padding: 0,
-  },
-  documentHeader: {
-    flexDirection: 'row',
-    height: 50,
-  },
-  documentHeaderText: {
-    flex: 1,
-    fontWeight: 'bold',
-    marginHorizontal: 2,
-    marginVertical: 5,
-    textAlign: 'center',
-    textAlignVertical: 'center'
-  },
-  listContainer: {
-    flexDirection: 'row',
-    marginVertical: 10,
-    width: '100%'
-  },
-  productBarcodeView: {
-    fontSize: 12,
-    opacity: 0.5,
-  },
-  productTitleView: {
-    flexGrow: 1,
-    fontWeight: 'bold',
-    maxHeight: 70,
-    minHeight: 25,
-    fontSize: 14,
-  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -270,9 +236,56 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
+  container: {
+    padding: 0,
+  },
+  content: {
+    height: '100%',
+  },
+  details: {
+    margin: 8,
+  },
+  documentHeader: {
+    flexDirection: 'column',
+    height: 50,
+  },
+  documentHeaderText: {
+    flex: 1,
+    fontWeight: 'bold',
+    marginHorizontal: 2,
+    marginVertical: 5,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  fieldDesciption: {
+    opacity: 0.5,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
     marginLeft: 5,
+  },
+  listContainer: {
+    flexDirection: 'row',
+    marginVertical: 10,
+    width: '100%',
+  },
+  name: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  number: {
+    fontSize: 12,
+  },
+  productBarcodeView: {
+    fontSize: 12,
+    opacity: 0.5,
+  },
+  productTitleView: {
+    flexGrow: 1,
+    fontSize: 14,
+    fontWeight: 'bold',
+    maxHeight: 70,
+    minHeight: 25,
   },
 });

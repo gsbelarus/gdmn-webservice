@@ -1,6 +1,6 @@
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
@@ -27,7 +27,9 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
         <Feather name="box" size={20} color={'#FFF'} />
       </View>
       <View style={localStyles.details}>
-        <Text numberOfLines={5} style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text numberOfLines={5} style={[localStyles.name, { color: colors.text }]}>
+          {item.name}
+        </Text>
         <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
       </View>
     </TouchableOpacity>

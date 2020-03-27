@@ -1,12 +1,8 @@
-import {
-  useScrollToTop,
-  useTheme,
-  useNavigation
-} from "@react-navigation/native";
-import React from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import ReferencesData from '../../../mockData/References.json';

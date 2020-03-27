@@ -55,14 +55,14 @@ const ProductDetailScreen = ({ route, navigation }) => {
           inputStyle={{ fontSize: 20 }}
           value={value}
           max={1000}
-          min={1}
+          min={0}
           step={1}
           colorLeft={colors.primary}
           colorRight={colors.primary}
           onChange={setValue}
-          onMin={() => {
-            Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
-          }}
+          // onMin={() => {
+          //   Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
+          // }}
         />
       </View>
       <Button
