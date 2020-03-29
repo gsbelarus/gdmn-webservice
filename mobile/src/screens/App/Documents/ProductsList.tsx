@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
@@ -16,18 +16,19 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
 
   return (
     <TouchableOpacity
+      style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
         navigation.navigate('ProductDetail', { prodId: item.id });
       }}
     >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
-        </View>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-          <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
-        </View>
+      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <Feather name="box" size={20} color={'#FFF'} />
+      </View>
+      <View style={localStyles.details}>
+        <Text numberOfLines={5} style={[localStyles.name, { color: colors.text }]}>
+          {item.name}
+        </Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -53,11 +54,11 @@ const ProductsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ _, data }) => {
     setScanned(true);
-    Alert.alert('Штрих-код был отсканирован', data, [
+    Alert.alert('Подтвердить выбор?', data, [
       {
-        text: 'OK',
+        text: 'Принять',
         onPress: () => {
           setDoScanned(false);
           onChangeText(data);
@@ -65,8 +66,7 @@ const ProductsListScreen = () => {
         },
       },
       {
-        text: 'CANCEL',
-        onPress: () => {},
+        text: 'Отмена',
       },
     ]);
   };
@@ -174,10 +174,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,

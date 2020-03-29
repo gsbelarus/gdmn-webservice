@@ -1,18 +1,21 @@
+import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import contacts from '../../../mockData//GD_Contact.json';
 import documents from '../../../mockData/Document.json';
+import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
+import statuses from '../../../mockData/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 import styles from '../../../styles/global';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
 const Contacts: IContact[] = contacts;
+const Statuses: IDocumentType[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
@@ -27,20 +30,21 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
-          <Text style={localStyles.letter}>
-            {DocumentTypes.find((type) => type.id === item.head.doctype)
-              .name.slice(0, 1)
-              .toUpperCase()}
-          </Text>
+          <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>
             {DocumentTypes.find((type) => type.id === item.head.doctype).name}
           </Text>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
-            {new Date(item.head.date).toLocaleDateString()}
-          </Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+              {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
+              {new Date(item.head.date).toLocaleDateString()}
+            </Text>
+            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
+              {Statuses.find((type) => type.id === item.head.status).name}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -48,6 +52,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 });
 
 const DocumentsListScreen = ({ navigation }) => {
+  const { colors } = useTheme();
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
@@ -62,15 +67,36 @@ const DocumentsListScreen = ({ navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <Button
-        mode="contained"
-        style={[styles.rectangularButton, { marginHorizontal: 15 }]}
-        onPress={() => {
-          navigation.navigate('CreateDocument');
-        }}
-      >
-        Create Document
-      </Button>
+      <View style={{ alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: 'row' }}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => ({})}
+        >
+          <AntDesign size={30} color={colors.card} name="sync" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            {
+              margin: 10,
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={() => navigation.navigate('CreateDocument')}
+        >
+          <MaterialIcons size={30} color={colors.card} name="add" />
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
@@ -91,6 +117,7 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
+    width: '80%',
   },
   field: {
     opacity: 0.5,
@@ -99,10 +126,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,

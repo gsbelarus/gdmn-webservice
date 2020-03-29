@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
@@ -26,7 +27,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={localStyles.letter}>{item.name.slice(0, 1).toUpperCase()}</Text>
+          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
@@ -82,10 +83,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 14,

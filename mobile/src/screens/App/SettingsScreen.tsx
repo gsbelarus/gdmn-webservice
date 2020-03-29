@@ -28,9 +28,9 @@ const SettingsScreen = () => {
         </Button>
       </View>
       <Divider />
-      <SettingsItem label="Синхронизировать" value={true} onValueChange={() => {}} />
+      <SettingsItem label="Синхронизировать" value={true} onValueChange={() => ({})} />
       <Divider />
-      <SettingsItem label="Удалять документы после обработки на сервере" value={true} onValueChange={() => {}} />
+      <SettingsItem label="Удалять документы после обработки на сервере" value={true} onValueChange={() => ({})} />
       <Divider />
       <SettingsItem
         label="Dark theme"

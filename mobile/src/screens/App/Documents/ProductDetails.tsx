@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
@@ -43,14 +43,14 @@ const ProductDetailScreen = ({ route, navigation }) => {
           inputStyle={{ fontSize: 20 }}
           value={value}
           max={1000}
-          min={1}
+          min={0}
           step={1}
           colorLeft={colors.primary}
           colorRight={colors.primary}
           onChange={setValue}
-          onMin={() => {
-            Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
-          }}
+          // onMin={() => {
+          //   Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
+          // }}
         />
       </View>
       <Button

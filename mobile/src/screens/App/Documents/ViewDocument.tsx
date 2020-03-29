@@ -1,7 +1,7 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Dimensions, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
@@ -18,7 +18,12 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
 
   return (
     <View style={localStyles.listContainer}>
-      <View style={{ marginLeft: 15 }}>
+      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+          <Feather name="box" size={20} color={'#FFF'} />
+        </View>
+      </View>
+      <View style={{ marginLeft: 15, width: Dimensions.get('window').width <= 320 ? '55%' : '65%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -34,8 +39,8 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           {item.quantity}
         </Text>
       </View>
-      <View style={{ marginRight: 5 }}>
-        {status === 0 ? (
+      {status === 0 ? (
+        <View style={{ marginRight: 5 }}>
           <TouchableOpacity
             style={{
               flex: 1,
@@ -55,8 +60,8 @@ const LineItem = React.memo(({ item, status }: { item: ILine; status: number }) 
           >
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
-        ) : undefined}
-      </View>
+        </View>
+      ) : undefined}
     </View>
   );
 });
@@ -87,13 +92,10 @@ const ViewDocumentScreen = ({ route, navigation }) => {
       >
         <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {type.name}
+            {type.name} от {new Date(document.head.date).toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {new Date(document.head.date).toLocaleDateString()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -127,11 +129,25 @@ const ViewDocumentScreen = ({ route, navigation }) => {
 export { ViewDocumentScreen };
 
 const localStyles = StyleSheet.create({
+  avatar: {
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
   container: {
     padding: 0,
   },
+  content: {
+    height: '100%',
+  },
+  details: {
+    margin: 8,
+  },
   documentHeader: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: 50,
   },
   documentHeaderText: {
@@ -142,39 +158,33 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
   },
-  listContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
+  fieldDesciption: {
+    opacity: 0.5,
   },
-  productBarcodeView: {
-    marginTop: 5,
-  },
-  productNameTextView: {
-    fontWeight: 'bold',
-    marginHorizontal: 5,
-    marginTop: 5,
-    maxHeight: 75,
-    minHeight: 45,
-    textAlignVertical: 'center',
-    width: '75%',
-  },
-  productNumView: {
+  item: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 25,
-    justifyContent: 'space-between',
-    paddingHorizontal: 30,
-  },
-  productPriceView: {
     marginLeft: 5,
   },
-  productTextView: {
+  listContainer: {
     flexDirection: 'row',
-    margin: 5,
+    marginVertical: 10,
+    width: '100%',
+  },
+  name: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  number: {
+    fontSize: 12,
+  },
+  productBarcodeView: {
+    fontSize: 12,
+    opacity: 0.5,
   },
   productTitleView: {
     flexGrow: 1,
+    fontSize: 14,
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 25,
