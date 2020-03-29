@@ -1,6 +1,6 @@
-import { baseUrl } from '../helpers/utils';
+// import { baseUrl } from '../helpers/utils';
 
-export async function get<T>(path: string): Promise<T> {
+export async function get<T>(baseUrl: string, path: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'GET',
@@ -16,7 +16,7 @@ export async function get<T>(path: string): Promise<T> {
   }
 }
 
-export async function post<T, U>(path: string, body: string): Promise<T> {
+export async function post<T, U>(baseUrl: string, path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
@@ -33,7 +33,7 @@ export async function post<T, U>(path: string, body: string): Promise<T> {
   }
 }
 
-export async function put<T>(path: string, body: string): Promise<T> {
+export async function put<T>(baseUrl: string, path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'PUT',

@@ -3,7 +3,6 @@ import React from 'react';
 import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
-import authApi from '../../api/auth';
 import SettingsItem from '../../components/SettingsItem';
 import { useStore } from '../../store';
 
@@ -11,10 +10,10 @@ const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions } = useStore();
+  const { actions, api } = useStore();
 
   const logOut = async () => {
-    const res = await authApi.logout();
+    const res = await api.auth.logout();
     if (res.status === 200) {
       actions.logOut();
     }

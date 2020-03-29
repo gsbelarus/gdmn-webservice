@@ -1,14 +1,12 @@
 import React from 'react';
 
-import { AppConfig } from '../api/app';
+import Api from '../api/Api';
 import { IAppState, IContextProps } from '../model';
 import { AppActions } from './actions';
 import { reducer, initialState } from './reducer';
 import { useTypesafeActions } from './utils';
 
-const appConfig = new AppConfig();
-
-const api = { app: appConfig };
+const api = new Api();
 
 const defaultAppState: IContextProps = {
   state: initialState,

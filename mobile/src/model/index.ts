@@ -1,16 +1,10 @@
+import Api from '../api/Api';
 import { AppActions } from '../store';
-
-export abstract class ApiMethod {
-  // constructor(parameters) {
-  // }
-}
-
-export type TApi = 'APP';
 
 export interface IContextProps {
   state: IAppState;
   actions: typeof AppActions;
-  api: { app: ApiMethod };
+  api: Api;
 }
 
 export interface IDataFetch {

@@ -11,8 +11,6 @@ import {
 } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { baseUrl } from '../helpers/utils';
-import { authApi } from '../api/auth';
 import { useStore } from '../store';
 
 const MainPage = (): JSX.Element => {
