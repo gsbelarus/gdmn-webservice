@@ -2,12 +2,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 import { AsyncStorage } from 'react-native';
 
+import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
 import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useStore } from '../store';
-import config from '../config';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -87,7 +87,6 @@ const AuthNavigator = () => {
         - осуществлён ли вход текущего пользователя, если нет то перевод на вход пользователя
   */
   useEffect(() => {
-    console.log('check effect', api.getUrl());
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus())
         .then((data: IServerResponse<boolean>) =>
