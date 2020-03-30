@@ -33,18 +33,18 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>
-            {DocumentTypes.find((type) => type.id === item.head.doctype).name}
-          </Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-              {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
-              {new Date(item.head.date).toLocaleDateString()}
+            <Text style={[localStyles.name, { color: colors.text }]}>
+              {DocumentTypes.find((type) => type.id === item.head.doctype).name}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
+          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+            {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
+            {new Date(item.head.date).toLocaleDateString()}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -59,7 +59,7 @@ const DocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: colors.card}}>
       <FlatList
         ref={ref}
         data={DocumentList}
@@ -97,7 +97,7 @@ const DocumentsListScreen = ({ navigation }) => {
           <MaterialIcons size={30} color={colors.card} name="add" />
         </TouchableOpacity>
       </View>
-    </>
+    </View>
   );
 };
 
@@ -117,7 +117,8 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
-    width: '80%',
+    marginRight: 0,
+    flex: 1,
   },
   field: {
     opacity: 0.5,

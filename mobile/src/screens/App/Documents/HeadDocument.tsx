@@ -1,7 +1,8 @@
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { Title, Text, FAB } from 'react-native-paper';
+import React from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -9,6 +10,8 @@ import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 import styles from '../../../styles/global';
+import ItemSeparator from '../../../components/ItemSeparator';
+import SubTitle from '../../../components/SubTitle';
 
 type TField = {
   title: string;
@@ -20,19 +23,16 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
 
   return (
     <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <MaterialCommunityIcons name="information-variant" size={20} color={'#FFF'} />
+      </View>
       <View style={localStyles.details}>
-        <Text style={[localStyles.title, { color: colors.text }]}>{item.title}</Text>
+        <Text style={[localStyles.title, localStyles.container, { color: colors.text }]}>{item.title}</Text>
         <Text style={[localStyles.value, localStyles.fieldName, { color: colors.text }]}>{item.value}</Text>
       </View>
     </View>
   );
 });
-
-const ItemSeparator = () => {
-  const { colors } = useTheme();
-
-  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
-};
 
 const HeadDocumentScreen = ({ route, navigation }) => {
   const ref = React.useRef<FlatList<TField>>(null);
@@ -41,6 +41,8 @@ const HeadDocumentScreen = ({ route, navigation }) => {
   const contactTo: IContact = contacts.find((item) => item.id === document.head.tocontactId);
   const contactFrom: IContact = contacts.find((item) => item.id === document.head.fromcontactId);
   const status: string = statuses.find((item) => item.id === document.head.status).name;
+  const { colors } = useTheme();
+
   const field: TField[] = [
     { title: 'Идентификатор', value: document.id },
     { title: 'Тип документа', value: type.name },
@@ -50,62 +52,19 @@ const HeadDocumentScreen = ({ route, navigation }) => {
     { title: 'Статус', value: status },
   ];
 
-  const [openGroup, setOpenGroup] = useState(false);
-  const { colors } = useTheme();
-
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: TField }) => <FieldItem item={item} />;
 
   return (
-    <View style={styles.container}>
-      <Title style={styles.title}>Характеристики документа</Title>
+    <View style={[styles.container, localStyles.container]}>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Характеристики документа</SubTitle>
       <FlatList
         ref={ref}
         data={field}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-      />
-      <FAB.Group
-        visible
-        open={openGroup}
-        icon="playlist-edit"
-        fabStyle={{ backgroundColor: colors.primary }}
-        actions={[
-          {
-            icon: 'pencil',
-            label: 'Изменить документ',
-            onPress: () =>
-              navigation.navigate('CreateDocument', {
-                docId: route.params.docId,
-              }),
-          },
-          {
-            icon: 'check',
-            label: 'Изменить статус на "Готово"',
-            onPress: () => {},
-          },
-          {
-            icon: 'delete',
-            label: 'Удалить документ',
-            onPress: async () => {
-              Alert.alert('Вы уверены, что хотите удалить?', '', [
-                {
-                  text: 'OK',
-                  onPress: async () => {
-                    navigation.navigate('DocumentsListScreen');
-                  },
-                },
-                {
-                  text: 'Отмена',
-                  onPress: () => {},
-                },
-              ]);
-            },
-          },
-        ]}
-        onStateChange={({ open }) => setOpenGroup(open)}
       />
     </View>
   );
@@ -114,20 +73,32 @@ const HeadDocumentScreen = ({ route, navigation }) => {
 export { HeadDocumentScreen };
 
 const localStyles = StyleSheet.create({
-  details: {
-    margin: 8,
+  container: {
+    padding: 0,
   },
-  fieldName: {
-    opacity: 0.5,
+  details: {
+    margin: 10,
   },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
   },
+  avatar: {
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  fieldName: {
+    opacity: 0.5,
+  },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
+    padding: 10,
   },
   value: {
     fontSize: 12,

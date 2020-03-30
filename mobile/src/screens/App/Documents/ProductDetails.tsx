@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
@@ -7,13 +7,25 @@ import { Text, Button } from 'react-native-paper';
 import SubTitle from '../../../components/SubTitle';
 import products from '../../../mockData/Goods.json';
 import remains from '../../../mockData/Remains.json';
+import documents from '../../../mockData/Document.json';
 import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
+
   const product = products.find((item) => item.id === route.params.prodId);
   const remain = remains.find((item) => item.goodId === route.params.prodId);
+  const document = documents.find((item) => item.id === route.params.docId);
   const [value, setValue] = useState(1);
+
+  useEffect(() => {
+    if(route.params.modeCor) {
+      const lineDocument = document.lines.find(line => line.goodId === route.params.prodId);
+      if(lineDocument) {
+        setValue(lineDocument.quantity)
+      }
+    }
+  }, [])
 
   return (
     <View
@@ -54,14 +66,11 @@ const ProductDetailScreen = ({ route, navigation }) => {
         />
       </View>
       <Button
-        onPress={() => navigation.goBack()}
-        style={{
-          ...styles.rectangularButton,
-          height: 35,
-          alignItems: 'center',
-        }}
+        onPress={() => navigation.navigate('ViewDocument', { docId: route.params.docId })}
+        mode='contained'
+        style={[styles.rectangularButton, localeStyles.button]}
       >
-        Отправить
+        Добавить
       </Button>
     </View>
   );
@@ -73,7 +82,6 @@ const localeStyles = StyleSheet.create({
   editQuantityView: {
     alignItems: 'center',
     flexDirection: 'column',
-    marginLeft: 15,
     marginTop: 100,
   },
   inputSpinner: {
@@ -110,5 +118,10 @@ const localeStyles = StyleSheet.create({
   },
   title: {
     padding: 10,
+  },
+  button: {
+    height: 35,
+    alignItems: 'center',
+    marginHorizontal: '25%',
   },
 });

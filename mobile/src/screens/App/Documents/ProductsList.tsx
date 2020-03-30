@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -8,17 +8,19 @@ import { Text, Button, TextInput } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import products from '../../../mockData/Goods.json';
 import { IGood } from '../../../model/inventory';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import styles from '../../../styles/global';
 
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const docId = useRoute< RouteProp<DocumentStackParamList, 'ProductsList'> >().params?.docId;
 
   return (
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('ProductDetail', { prodId: item.id });
+        navigation.navigate('ProductDetail', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
@@ -54,7 +56,7 @@ const ProductsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = ({ _, data }) => {
+  const handleBarCodeScanned = ( data: string) => {
     setScanned(true);
     Alert.alert('Подтвердить выбор?', data, [
       {
@@ -81,7 +83,7 @@ const ProductsListScreen = () => {
       {doScanned ? (
         <>
           <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            onBarCodeScanned={({type, data}) => scanned ? undefined : handleBarCodeScanned(data)}
             style={StyleSheet.absoluteFillObject}
           />
           {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
