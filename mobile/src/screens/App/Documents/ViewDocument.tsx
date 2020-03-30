@@ -27,7 +27,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15, width: Dimensions.get('window').width  <= 320 ? '55%' : '65%' }}>
+      <View style={{ marginLeft: 15, width: Dimensions.get('window').width <= 320 ? '55%' : '65%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>

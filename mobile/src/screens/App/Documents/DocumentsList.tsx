@@ -78,7 +78,7 @@ const DocumentsListScreen = ({ navigation }) => {
               borderColor: colors.primary,
             },
           ]}
-          onPress={() => {}}
+          onPress={() => ({})}
         >
           <AntDesign size={30} color={colors.card} name="sync" />
         </TouchableOpacity>

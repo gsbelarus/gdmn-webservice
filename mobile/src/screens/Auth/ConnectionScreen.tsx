@@ -8,7 +8,7 @@ import AuthNavigator from '../../navigation/AuthNavigator';
 import { useStore } from '../../store';
 
 const ConnectionScreen = () => {
-  const { state, actions } = useStore();
+  const { state, actions, api } = useStore();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,18 +31,21 @@ const ConnectionScreen = () => {
         };
 
       AsyncStorage.setItem('pathServer', JSON.stringify(url))
-        .then(() => actions.setBaseUrl(url))
+        .then(() => {
+          actions.setBaseUrl(url);
+        })
         .catch(() => setLoading(false));
     };
 
     setBaseURL();
-  }, [actions, state.baseUrl]);
+  }, [actions, api, state.baseUrl]);
 
   useEffect(() => {
     if (state.baseUrl !== undefined) {
+      api.setUrl(state.baseUrl);
       setLoading(false);
     }
-  }, [state.baseUrl]);
+  }, [api, state.baseUrl]);
 
   if (isLoading) {
     return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} size="large" color="#70667D" />;

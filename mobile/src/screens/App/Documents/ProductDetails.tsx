@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 

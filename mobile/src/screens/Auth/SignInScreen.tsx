@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import authApi from '../../api/auth';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
@@ -21,7 +20,7 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { actions } = useStore();
+  const { actions, api } = useStore();
   const { colors } = useTheme();
   const [lognState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
@@ -57,10 +56,10 @@ const SignInScreen = () => {
       return;
     }
 
-    timeout(5000, authApi.getDeviceStatusByUser(credential.userName))
+    timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
       .then((data: IServerResponse<boolean | string>) => setServerResp(data))
       .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
-  }, [credential.userName, lognState.isLoading]);
+  }, [api.auth, credential.userName, lognState.isLoading]);
 
   useEffect(() => {
     if (!serverResp) {
@@ -77,7 +76,7 @@ const SignInScreen = () => {
     }
 
     if (serverResp.status === 200 && serverResp.result) {
-      timeout(5000, authApi.login(credential))
+      timeout(5000, api.auth.login(credential))
         .then((data: IServerResponse<string>) => {
           data.status === 200
             ? actions.setUserStatus(true)
@@ -102,7 +101,7 @@ const SignInScreen = () => {
       status: serverResp.result as string,
       isError: true,
     });
-  }, [actions, credential, serverResp]);
+  }, [actions, api.auth, credential, serverResp]);
 
   return (
     <>

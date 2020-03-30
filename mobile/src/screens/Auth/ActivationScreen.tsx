@@ -6,7 +6,6 @@ import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper'
 // eslint-disable-next-line import/default
 import VirtualKeyboard from 'react-native-virtual-keyboard';
 
-import authApi from '../../api/auth';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IServerResponse, IDataFetch } from '../../model';
@@ -14,7 +13,7 @@ import { useStore } from '../../store';
 import styles from '../../styles/global';
 
 const ActivationScreen = () => {
-  const { actions } = useStore();
+  const { actions, api } = useStore();
   const { colors } = useTheme();
 
   const [serverReq, setServerReq] = useState<IDataFetch>({
@@ -28,11 +27,11 @@ const ActivationScreen = () => {
 
   useEffect(() => {
     if (serverReq?.isLoading) {
-      timeout(5000, authApi.verifyActivationCode(activationCode))
+      timeout(5000, api.auth.verifyActivationCode(activationCode))
         .then((data: IServerResponse<string>) => setServerResp({ result: data.result, status: data.status }))
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
-  }, [activationCode, serverReq]);
+  }, [activationCode, api.auth, serverReq]);
 
   useEffect(() => {
     if (serverResp === undefined) {
@@ -46,7 +45,7 @@ const ActivationScreen = () => {
 
     timeout(
       5000,
-      authApi.addDevice({
+      api.auth.addDevice({
         uid: Constants.deviceId,
         userId: serverResp.result as string,
       }),
@@ -67,7 +66,7 @@ const ActivationScreen = () => {
         console.log(JSON.stringify(err.message));
         setServerReq({ isLoading: false, isError: true, status: err.message });
       });
-  }, [actions, serverResp]);
+  }, [actions, api.auth, serverResp]);
 
   return (
     <>

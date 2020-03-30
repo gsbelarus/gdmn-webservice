@@ -2,8 +2,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 import { AsyncStorage } from 'react-native';
 
-import authApi from '../api/auth';
-import config from '../config/index';
+import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
 import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
@@ -38,16 +37,21 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
     case 'INIT':
       return initialState;
     case 'SETTINGS_FORM':
-      return { ...state, showSettings: action.showSettings };
+      return {
+        ...state,
+        showSettings: action.showSettings,
+        serverResp: undefined,
+        serverReq: { isError: false, status: undefined, isLoading: false },
+      };
     case 'SET_RESPONSE':
       return { ...state, serverResp: { result: action.result, status: action.status } };
     case 'SET_ERROR':
-      return { ...state, serverReq: { ...state.serverReq, isError: true, status: action.text, isLoading: false } };
+      return { ...state, serverReq: { isError: true, status: action.text, isLoading: false } };
     case 'SET_CONNECTION':
       return {
         ...state,
         serverResp: undefined,
-        serverReq: { ...state.serverReq, isError: false, status: undefined, isLoading: true },
+        serverReq: { isError: false, status: undefined, isLoading: true },
       };
     default:
       return state;
@@ -66,6 +70,7 @@ const AuthNavigator = () => {
   const {
     state: { deviceRegistered, loggedIn, baseUrl },
     actions,
+    api,
   } = useStore();
 
   const [state, setState] = useReducer(reducer, initialState);
@@ -83,13 +88,13 @@ const AuthNavigator = () => {
   */
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
-      timeoutWithСancellation(signal, 5000, authApi.getDeviceStatus())
+      timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus())
         .then((data: IServerResponse<boolean>) =>
           setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
-  }, [deviceRegistered, signal, state.serverReq]);
+  }, [api.auth, deviceRegistered, signal, state.serverReq]);
 
   useEffect(() => {
     if (state.serverResp) {
@@ -103,11 +108,11 @@ const AuthNavigator = () => {
     }
 
     deviceRegistered
-      ? timeoutWithСancellation(signal, 5000, authApi.getUserStatus())
+      ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
           .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
-  }, [actions, deviceRegistered, signal]);
+  }, [actions, api.auth, deviceRegistered, signal]);
 
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 
@@ -131,8 +136,9 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (baseUrl !== undefined) {
       setState({ type: 'SETTINGS_FORM', showSettings: false });
+      api.setUrl(baseUrl);
     }
-  }, [baseUrl]);
+  }, [api, baseUrl]);
 
   const SplashWithParams = useCallback(
     () => (
