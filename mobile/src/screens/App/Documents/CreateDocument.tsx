@@ -53,7 +53,7 @@ const CreateDocumentScreen = ({ route }) => {
         key={0}
       >
         <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 100 }}>
           {documentTypes && documentTypes.length !== 0 ? (
             documentTypes.map((item, idx) => (
               <Chip
@@ -70,7 +70,7 @@ const CreateDocumentScreen = ({ route }) => {
           ) : (
             <Text>Не найдено</Text>
           )}
-        </View>
+        </ScrollView>
       </View>
       <View
         style={{
@@ -83,7 +83,7 @@ const CreateDocumentScreen = ({ route }) => {
         key={1}
       >
         <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 80 }}>
+        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 100 }}>
           {contacts && contacts.length !== 0 ? (
             contacts.map((item, idx) => (
               <Chip
@@ -161,6 +161,7 @@ const localeStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     marginTop: 20,
+    alignItems: 'flex-end',
   },
   slide: {
     flex: 1,

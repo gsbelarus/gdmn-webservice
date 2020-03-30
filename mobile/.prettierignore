@@ -4,7 +4,5 @@ dist
 build
 /coverage
 
-.sample
-/config/*
-
-/_unused/*
+*.sample
+*/config/*

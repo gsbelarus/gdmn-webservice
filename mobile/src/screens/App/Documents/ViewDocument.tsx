@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Dimensions, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
