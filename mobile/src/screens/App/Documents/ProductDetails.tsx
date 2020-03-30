@@ -19,13 +19,13 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const [value, setValue] = useState(1);
 
   useEffect(() => {
-    if(route.params.modeCor) {
-      const lineDocument = document.lines.find(line => line.goodId === route.params.prodId);
-      if(lineDocument) {
-        setValue(lineDocument.quantity)
+    if (route.params.modeCor) {
+      const lineDocument = document.lines.find((line) => line.goodId === route.params.prodId);
+      if (lineDocument) {
+        setValue(lineDocument.quantity);
       }
     }
-  }, [])
+  }, []);
 
   return (
     <View
@@ -67,7 +67,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
       </View>
       <Button
         onPress={() => navigation.navigate('ViewDocument', { docId: route.params.docId })}
-        mode='contained'
+        mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >
         Добавить

@@ -16,7 +16,7 @@ export type DocumentStackParamList = {
   HeadDocument: { docId: number };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
-  ProductDetail: { prodId: number; docId: number, modeCor: boolean };
+  ProductDetail: { prodId: number; docId: number; modeCor: boolean };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
