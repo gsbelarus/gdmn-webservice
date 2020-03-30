@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import DatePicker from 'react-native-modal-datetime-picker';
 import { Text, Button, Chip } from 'react-native-paper';
 
@@ -53,7 +53,7 @@ const CreateDocumentScreen = ({ route }) => {
         key={0}
       >
         <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{maxHeight: 100}}>
           {documentTypes && documentTypes.length !== 0 ? (
             documentTypes.map((item, idx) => (
               <Chip
@@ -70,7 +70,7 @@ const CreateDocumentScreen = ({ route }) => {
           ) : (
             <Text>Не найдено</Text>
           )}
-        </View>
+        </ScrollView>
       </View>
       <View
         style={{
@@ -83,7 +83,7 @@ const CreateDocumentScreen = ({ route }) => {
         key={1}
       >
         <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}} style={{maxHeight: 100}}>
           {contacts && contacts.length !== 0 ? (
             contacts.map((item, idx) => (
               <Chip
@@ -100,7 +100,7 @@ const CreateDocumentScreen = ({ route }) => {
           ) : (
             <Text>Не найдено</Text>
           )}
-        </View>
+        </ScrollView>
       </View>
       <View>
         <TouchableOpacity
@@ -161,6 +161,7 @@ const localeStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     marginTop: 20,
+    alignItems: 'flex-end',
   },
   slide: {
     flex: 1,
