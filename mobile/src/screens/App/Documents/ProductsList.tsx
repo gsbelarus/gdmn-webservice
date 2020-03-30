@@ -14,7 +14,7 @@ import styles from '../../../styles/global';
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const docId = useRoute< RouteProp<DocumentStackParamList, 'ProductsList'> >().params?.docId;
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'ProductsList'>>().params?.docId;
 
   return (
     <TouchableOpacity
@@ -56,7 +56,7 @@ const ProductsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = ( data: string) => {
+  const handleBarCodeScanned = (data: string) => {
     setScanned(true);
     Alert.alert('Подтвердить выбор?', data, [
       {
@@ -83,7 +83,7 @@ const ProductsListScreen = () => {
       {doScanned ? (
         <>
           <BarCodeScanner
-            onBarCodeScanned={({type, data}) => scanned ? undefined : handleBarCodeScanned(data)}
+            onBarCodeScanned={({ type, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
             style={StyleSheet.absoluteFillObject}
           />
           {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}

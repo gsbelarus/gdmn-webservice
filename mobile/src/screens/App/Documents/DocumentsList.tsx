@@ -59,7 +59,7 @@ const DocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.card}}>
+    <View style={{ flex: 1, backgroundColor: colors.card }}>
       <FlatList
         ref={ref}
         data={DocumentList}

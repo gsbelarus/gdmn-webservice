@@ -83,7 +83,7 @@ const CreateDocumentScreen = ({ route }) => {
         key={1}
       >
         <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{maxHeight: 80}}>
+        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 80 }}>
           {contacts && contacts.length !== 0 ? (
             contacts.map((item, idx) => (
               <Chip
