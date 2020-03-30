@@ -27,7 +27,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15, width: Dimensions.get('window').width <= 320 ? '55%' : '65%' }}>
+      <View style={{ marginLeft: 15, width: '55%' }}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -90,13 +90,15 @@ const ViewDocumentScreen = ({ route, navigation }) => {
   return (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-        <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-          {type.name} от {new Date(document.head.date).toLocaleDateString()}
-        </Text>
-        <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-          {contact.name}
-        </Text>
-        <TouchableOpacity style={{justifyContent: 'center'}}>
+        <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 8, flex: 15}}>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+            {type.name} от {new Date(document.head.date).toLocaleDateString()}
+          </Text>
+          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+            {contact.name}
+          </Text>
+        </View>
+        <TouchableOpacity style={{justifyContent: 'center', marginRight: 15, flex: 1}}>
           <MaterialIcons
             size={30}
             color={colors.card}
@@ -246,14 +248,12 @@ const localStyles = StyleSheet.create({
     margin: 8,
   },
   documentHeader: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     height: 50,
   },
   documentHeaderText: {
     flex: 1,
     fontWeight: 'bold',
-    marginHorizontal: 2,
-    marginVertical: 5,
     textAlign: 'center',
     textAlignVertical: 'center',
   },
@@ -286,6 +286,6 @@ const localStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     maxHeight: 70,
-    minHeight: 25,
+    minHeight: 15,
   },
 });

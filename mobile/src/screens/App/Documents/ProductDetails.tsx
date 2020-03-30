@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
@@ -66,7 +66,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         />
       </View>
       <Button
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate('ViewDocument', { docId: route.params.docId })}
         mode='contained'
         style={[styles.rectangularButton, localeStyles.button]}
       >

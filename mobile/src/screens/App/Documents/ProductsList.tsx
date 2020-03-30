@@ -56,7 +56,7 @@ const ProductsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = ({ _, data }) => {
+  const handleBarCodeScanned = ( data: string) => {
     setScanned(true);
     Alert.alert('Подтвердить выбор?', data, [
       {
@@ -83,7 +83,7 @@ const ProductsListScreen = () => {
       {doScanned ? (
         <>
           <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            onBarCodeScanned={({type, data}) => scanned ? undefined : handleBarCodeScanned(data)}
             style={StyleSheet.absoluteFillObject}
           />
           {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
