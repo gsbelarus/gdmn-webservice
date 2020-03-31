@@ -9,7 +9,6 @@ export const initialState: IAppState = {
   loggedIn: undefined,
 };
 
-// TODO User Status переделать в LogIn
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
     case ActionTypes.DISCONNECT:

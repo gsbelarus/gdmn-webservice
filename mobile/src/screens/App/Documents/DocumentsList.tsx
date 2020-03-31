@@ -67,7 +67,7 @@ const DocumentsListScreen = ({ navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={[localStyles.directionRow, localStyles.alignItems]}>
+      <View style={localStyles.buttons}>
         <TouchableOpacity
           style={[
             styles.circularButton,
@@ -117,6 +117,11 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     margin: 10,
   },
+  buttons: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   details: {
     margin: 8,
     marginRight: 0,
@@ -124,7 +129,7 @@ const localStyles = StyleSheet.create({
   },
   directionRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
   field: {
     opacity: 0.5,

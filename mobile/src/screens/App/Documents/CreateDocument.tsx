@@ -36,69 +36,63 @@ const CreateDocumentScreen = ({ route }) => {
   }, [route.params]);
 
   return (
-    <View style={styles.container}>
-      <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-        <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-        <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-          {documentTypes && documentTypes.length !== 0 ? (
-            documentTypes.map((item, idx) => (
-              <Chip
-                key={idx}
-                mode="outlined"
-                style={[localeStyles.margin, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
-                onPress={() => setSelectedDocType(item.id)}
-                selected={selectedDocType === item.id}
-                selectedColor={selectedDocType === item.id ? colors.card : colors.text}
-              >
-                {item.name}
-              </Chip>
-            ))
-          ) : (
-            <Text>Не найдено</Text>
-          )}
-        </ScrollView>
-      </View>
-      <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-        <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-        <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-          {contacts && contacts.length !== 0 ? (
-            contacts.map((item, idx) => (
-              <Chip
-                key={idx}
-                mode="outlined"
-                style={[localeStyles.margin, selectedContact === item.id ? { backgroundColor: colors.primary } : {}]}
-                onPress={() => setSelectedContact(item.id)}
-                selected={selectedContact === item.id}
-                selectedColor={selectedContact === item.id ? colors.card : colors.text}
-              >
-                {item.name}
-              </Chip>
-            ))
-          ) : (
-            <Text>Не найдено</Text>
-          )}
-        </ScrollView>
-      </View>
-      <View>
-        <TouchableOpacity
-          style={[styles.input, localeStyles.containerDate]}
-          onPress={() => {
-            setOldDate(date);
-            setDatePickerVisibility(true);
-          }}
-        >
-          <Text
-            style={[
-              localeStyles.textDate,
-              {
-                color: colors.text,
-              },
-            ]}
+    <>
+      <View style={localeStyles.container}>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
+          <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
+          <TouchableOpacity
+            style={localeStyles.containerDate}
+            onPress={() => {
+              setOldDate(date);
+              setDatePickerVisibility(true);
+            }}
           >
-            {date.toLocaleDateString()}
-          </Text>
-          <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-        </TouchableOpacity>
+            <Text style={[localeStyles.textDate, { color: colors.text }]}>{date.toLocaleDateString()}</Text>
+            <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+          </TouchableOpacity>
+        </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
+          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+            {documentTypes && documentTypes.length !== 0 ? (
+              documentTypes.map((item, idx) => (
+                <Chip
+                  key={idx}
+                  mode="outlined"
+                  style={[localeStyles.margin, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
+                  onPress={() => setSelectedDocType(item.id)}
+                  selected={selectedDocType === item.id}
+                  selectedColor={selectedDocType === item.id ? colors.card : colors.text}
+                >
+                  {item.name}
+                </Chip>
+              ))
+            ) : (
+              <Text>Не найдено</Text>
+            )}
+          </ScrollView>
+        </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
+          <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
+          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+            {contacts && contacts.length !== 0 ? (
+              contacts.map((item, idx) => (
+                <Chip
+                  key={idx}
+                  mode="outlined"
+                  style={[localeStyles.margin, selectedContact === item.id ? { backgroundColor: colors.primary } : {}]}
+                  onPress={() => setSelectedContact(item.id)}
+                  selected={selectedContact === item.id}
+                  selectedColor={selectedContact === item.id ? colors.card : colors.text}
+                >
+                  {item.name}
+                </Chip>
+              ))
+            ) : (
+              <Text>Не найдено</Text>
+            )}
+          </ScrollView>
+        </View>
         {isDatePickerVisible &&
           (Platform.OS !== 'ios' ? (
             <DateTimePicker
@@ -166,7 +160,7 @@ const CreateDocumentScreen = ({ route }) => {
           Отмена
         </Button>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -177,7 +171,8 @@ const localeStyles = StyleSheet.create({
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
-    marginBottom: 15,
+    marginBottom: 10,
+    padding: 5,
   },
   button: {
     flex: 1,
@@ -191,8 +186,11 @@ const localeStyles = StyleSheet.create({
   buttonView: {
     flex: 1,
     flexDirection: 'row',
-    marginTop: 20,
     alignItems: 'flex-end',
+  },
+  container: {
+    margin: 10,
+    // padding: 0,
   },
   containerDate: {
     alignItems: 'center',
@@ -213,14 +211,15 @@ const localeStyles = StyleSheet.create({
     marginRight: 10,
   },
   scroll: {
-    maxHeight: 100,
+    maxHeight: 150,
   },
   scrollContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   subdivisionText: {
-    textAlign: 'center',
+    marginBottom: 5,
+    textAlign: 'left',
   },
   textDate: {
     flex: 1,
