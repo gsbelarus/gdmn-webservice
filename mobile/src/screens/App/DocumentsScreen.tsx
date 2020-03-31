@@ -23,7 +23,7 @@ const ContactItem = React.memo(({ item }: { item: { name: string; number: number
       </View>
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[localStyles.number, { color: colors.text, opacity: 0.5 }]}>
+        <Text style={[localStyles.number, localStyles.text, { color: colors.text }]}>
           {item.number} от {item.date}
         </Text>
       </View>
@@ -82,5 +82,8 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  text: {
+    opacity: 0.5,
   },
 });

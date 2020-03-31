@@ -33,7 +33,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
               {DocumentTypes.find((type) => type.id === item.head.doctype).name}
             </Text>
@@ -59,7 +59,7 @@ const DocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.card }}>
+    <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
         data={DocumentList}
@@ -67,13 +67,12 @@ const DocumentsListScreen = ({ navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{ alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: 'row' }}>
+      <View style={[localStyles.directionRow, localStyles.alignItems]}>
         <TouchableOpacity
           style={[
             styles.circularButton,
+            localStyles.button,
             {
-              margin: 10,
-              alignItems: 'center',
               backgroundColor: colors.primary,
               borderColor: colors.primary,
             },
@@ -85,9 +84,8 @@ const DocumentsListScreen = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.circularButton,
+            localStyles.button,
             {
-              margin: 10,
-              alignItems: 'center',
               backgroundColor: colors.primary,
               borderColor: colors.primary,
             },
@@ -104,6 +102,9 @@ const DocumentsListScreen = ({ navigation }) => {
 export { DocumentsListScreen };
 
 const localStyles = StyleSheet.create({
+  alignItems: {
+    alignItems: 'flex-end',
+  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -112,16 +113,24 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
-  content: {
-    height: '100%',
+  button: {
+    alignItems: 'center',
+    margin: 10,
   },
   details: {
     margin: 8,
     marginRight: 0,
     flex: 1,
   },
+  directionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
   field: {
     opacity: 0.5,
+  },
+  flex1: {
+    flex: 1,
   },
   item: {
     alignItems: 'center',

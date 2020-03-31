@@ -27,7 +27,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           <Feather name="box" size={20} color={'#FFF'} />
         </View>
       </View>
-      <View style={{ marginLeft: 15, width: '55%' }}>
+      <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good.name}
         </Text>
@@ -35,7 +35,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           {good.barcode}
         </Text>
       </View>
-      <View style={{ flexGrow: 1, alignItems: 'flex-end', marginRight: 15 }}>
+      <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {remains?.find((remain) => remain.goodId === good.id).price}
         </Text>
@@ -44,13 +44,9 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
         </Text>
       </View>
       {status === 0 ? (
-        <View style={{ marginRight: 5 }}>
+        <View style={localStyles.marginRight}>
           <TouchableOpacity
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-            }}
+            style={localStyles.buttonDelete}
             onPress={async () => {
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
@@ -92,7 +88,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
   return (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-        <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 8, flex: 15 }}>
+        <View style={localStyles.header}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {type.name} от {new Date(document.head.date).toLocaleDateString()}
           </Text>
@@ -100,7 +96,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
             {contact.name}
           </Text>
         </View>
-        <TouchableOpacity style={{ justifyContent: 'center', marginRight: 15, flex: 1 }}>
+        <TouchableOpacity style={localStyles.goDetailsHeader}>
           <MaterialIcons
             size={30}
             color={colors.card}
@@ -119,15 +115,20 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         ItemSeparatorComponent={ItemSeparator}
       />
       <View
-        style={{ flexDirection: 'row', justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly' }}
+        style={[
+          localStyles.flexDirectionRow,
+          // eslint-disable-next-line react-native/no-inline-styles
+          {
+            justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
+          },
+        ]}
       >
         {document.head.status === 0 || document.head.status === 3 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
+              localStyles.buttons,
               {
-                margin: 10,
-                alignItems: 'center',
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
               },
@@ -154,9 +155,8 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           <TouchableOpacity
             style={[
               styles.circularButton,
+              localStyles.buttons,
               {
-                margin: 10,
-                alignItems: 'center',
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
               },
@@ -174,9 +174,8 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           <TouchableOpacity
             style={[
               styles.circularButton,
+              localStyles.buttons,
               {
-                margin: 10,
-                alignItems: 'center',
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
               },
@@ -190,9 +189,8 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           <TouchableOpacity
             style={[
               styles.circularButton,
+              localStyles.buttons,
               {
-                margin: 10,
-                alignItems: 'center',
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
               },
@@ -206,9 +204,8 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           <TouchableOpacity
             style={[
               styles.circularButton,
+              localStyles.buttons,
               {
-                margin: 10,
-                alignItems: 'center',
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
               },
@@ -234,14 +231,17 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
+  buttonDelete: {
+    alignItems: 'flex-end',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  buttons: {
+    alignItems: 'center',
+    margin: 10,
+  },
   container: {
     padding: 0,
-  },
-  content: {
-    height: '100%',
-  },
-  details: {
-    margin: 8,
   },
   documentHeader: {
     flexDirection: 'row',
@@ -253,8 +253,24 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
   },
-  fieldDesciption: {
-    opacity: 0.5,
+  flexDirectionRow: {
+    flexDirection: 'row',
+  },
+  goDetailsHeader: {
+    flex: 1,
+    justifyContent: 'center',
+    marginRight: 15,
+  },
+  goodInfo: {
+    marginLeft: 15,
+    width: '55%',
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    flex: 15,
+    justifyContent: 'center',
+    padding: 8,
   },
   item: {
     alignItems: 'center',
@@ -266,12 +282,8 @@ const localStyles = StyleSheet.create({
     marginVertical: 10,
     width: '100%',
   },
-  name: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  number: {
-    fontSize: 12,
+  marginRight: {
+    marginRight: 15,
   },
   productBarcodeView: {
     fontSize: 12,
@@ -283,5 +295,10 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 15,
+  },
+  remainsInfo: {
+    alignItems: 'flex-end',
+    flexGrow: 1,
+    marginRight: 15,
   },
 });

@@ -83,46 +83,34 @@ const ProductsListScreen = () => {
       {doScanned ? (
         <>
           <BarCodeScanner
-            onBarCodeScanned={({ type, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+            onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
             style={StyleSheet.absoluteFillObject}
           />
           {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
         </>
       ) : (
         <>
-          <View
-            style={{
-              justifyContent: 'space-around',
-              flexDirection: 'row',
-              alignItems: 'center',
-              margin: 15,
-            }}
-          >
-            <View style={{ flex: 1, marginRight: 15 }}>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    fontSize: 14,
-                    backgroundColor: colors.card,
-                    color: colors.text,
-                    marginTop: 0,
-                    height: 30,
-                    paddingTop: 0,
-                  },
-                ]}
-                onChangeText={(text) => onChangeText(text)}
-                value={text}
-                placeholder="Введите шрих-код или название"
-                placeholderTextColor={colors.border}
-                multiline={false}
-                autoCapitalize="sentences"
-                underlineColorAndroid="transparent"
-                selectionColor={'black'}
-                returnKeyType="done"
-                autoCorrect={false}
-              />
-            </View>
+          <View style={localStyles.filter}>
+            <TextInput
+              style={[
+                styles.input,
+                localStyles.textInput,
+                {
+                  backgroundColor: colors.card,
+                  color: colors.text,
+                },
+              ]}
+              onChangeText={onChangeText}
+              value={text}
+              placeholder="Введите шрих-код или название"
+              placeholderTextColor={colors.border}
+              multiline={false}
+              autoCapitalize="sentences"
+              underlineColorAndroid="transparent"
+              selectionColor={'black'}
+              returnKeyType="done"
+              autoCorrect={false}
+            />
             <TouchableOpacity onPress={() => setDoScanned(true)}>
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
             </TouchableOpacity>
@@ -172,6 +160,12 @@ const localStyles = StyleSheet.create({
   fieldDesciption: {
     opacity: 0.5,
   },
+  filter: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    margin: 15,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -183,5 +177,12 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  textInput: {
+    fontSize: 14,
+    height: 30,
+    marginRight: 15,
+    marginTop: 0,
+    paddingTop: 0,
   },
 });

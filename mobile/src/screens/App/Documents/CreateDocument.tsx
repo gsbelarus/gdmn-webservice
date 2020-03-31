@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
@@ -37,24 +37,15 @@ const CreateDocumentScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          borderColor: colors.border,
-          borderRadius: 4,
-          borderWidth: 1,
-          borderStyle: 'solid',
-          marginBottom: 15,
-        }}
-        key={0}
-      >
+      <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
         <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 100 }}>
+        <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
           {documentTypes && documentTypes.length !== 0 ? (
             documentTypes.map((item, idx) => (
               <Chip
                 key={idx}
                 mode="outlined"
-                style={[{ margin: 2 }, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
+                style={[localeStyles.margin, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
                 onPress={() => setSelectedDocType(item.id)}
                 selected={selectedDocType === item.id}
                 selectedColor={selectedDocType === item.id ? colors.card : colors.text}
@@ -67,24 +58,15 @@ const CreateDocumentScreen = ({ route }) => {
           )}
         </ScrollView>
       </View>
-      <View
-        style={{
-          borderColor: colors.border,
-          borderRadius: 4,
-          borderWidth: 1,
-          borderStyle: 'solid',
-          marginBottom: 15,
-        }}
-        key={1}
-      >
+      <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
         <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }} style={{ maxHeight: 100 }}>
+        <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
           {contacts && contacts.length !== 0 ? (
             contacts.map((item, idx) => (
               <Chip
                 key={idx}
                 mode="outlined"
-                style={[{ margin: 2 }, selectedContact === item.id ? { backgroundColor: colors.primary } : {}]}
+                style={[localeStyles.margin, selectedContact === item.id ? { backgroundColor: colors.primary } : {}]}
                 onPress={() => setSelectedContact(item.id)}
                 selected={selectedContact === item.id}
                 selectedColor={selectedContact === item.id ? colors.card : colors.text}
@@ -99,33 +81,23 @@ const CreateDocumentScreen = ({ route }) => {
       </View>
       <View>
         <TouchableOpacity
-          style={[
-            styles.input,
-            {
-              flexDirection: 'row',
-              backgroundColor: colors.card,
-              alignItems: 'center',
-              margin: 0,
-              padding: 0,
-            },
-          ]}
+          style={[styles.input, localeStyles.containerDate]}
           onPress={() => {
-            setOldDate(date)
-            setDatePickerVisibility(true)
+            setOldDate(date);
+            setDatePickerVisibility(true);
           }}
         >
           <Text
-            style={{
-              flex: 1,
-              fontSize: 20,
-              textAlign: 'center',
-              color: colors.text,
-              flexGrow: 4,
-            }}
+            style={[
+              localeStyles.textDate,
+              {
+                color: colors.text,
+              },
+            ]}
           >
             {date.toLocaleDateString()}
           </Text>
-          <MaterialIcons style={{ marginRight: 10 }} size={30} color={colors.text} name="date-range" />
+          <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
         </TouchableOpacity>
         {isDatePickerVisible &&
           (Platform.OS !== 'ios' ? (
@@ -145,22 +117,21 @@ const CreateDocumentScreen = ({ route }) => {
             <Portal>
               <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
                 <View
-                  style={{
-                    backgroundColor: colors.card,
-                    borderRadius: 8,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    margin: 10,
-                    paddingVertical: 10,
-                  }}
+                  style={[
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                    },
+                    localeStyles.containerModalDatePicker,
+                  ]}
                 >
                   <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-around',
-                      borderBottomColor: colors.border,
-                      borderBottomWidth: 1,
-                    }}
+                    style={[
+                      localeStyles.buttonDatePicker,
+                      {
+                        borderBottomColor: colors.border,
+                      },
+                    ]}
                   >
                     <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
                     <Button
@@ -188,10 +159,10 @@ const CreateDocumentScreen = ({ route }) => {
           ))}
       </View>
       <View style={localeStyles.buttonView}>
-        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button, { marginLeft: 0 }]}>
+        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button]}>
           ОК
         </Button>
-        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button]}>
+        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}>
           Отмена
         </Button>
       </View>
@@ -202,9 +173,20 @@ const CreateDocumentScreen = ({ route }) => {
 export { CreateDocumentScreen };
 
 const localeStyles = StyleSheet.create({
+  areaChips: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    marginBottom: 15,
+  },
   button: {
     flex: 1,
     marginLeft: 7,
+  },
+  buttonDatePicker: {
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
   buttonView: {
     flex: 1,
@@ -212,24 +194,38 @@ const localeStyles = StyleSheet.create({
     marginTop: 20,
     alignItems: 'flex-end',
   },
-  slide: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  containerDate: {
     alignItems: 'center',
+    flexDirection: 'row',
+    margin: 0,
+    padding: 0,
   },
-  slideTextView: {
-    flex: 1,
-    flexGrow: 1,
-    flexDirection: 'row',
-    marginHorizontal: 5,
-    marginRight: 5,
-    alignItems: 'center',
+  containerModalDatePicker: {
+    borderRadius: 8,
     borderWidth: 1,
-    borderRadius: 4,
-    borderColor: '#FFF',
+    margin: 10,
+    paddingVertical: 10,
+  },
+  margin: {
+    margin: 2,
+  },
+  marginRight: {
+    marginRight: 10,
+  },
+  scroll: {
+    maxHeight: 100,
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   subdivisionText: {
+    textAlign: 'center',
+  },
+  textDate: {
+    flex: 1,
+    flexGrow: 4,
+    fontSize: 20,
     textAlign: 'center',
   },
 });

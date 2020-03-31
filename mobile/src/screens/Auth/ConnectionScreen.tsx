@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
 import config from '../../config';
@@ -48,10 +48,17 @@ const ConnectionScreen = () => {
   }, [api, state.baseUrl]);
 
   if (isLoading) {
-    return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} size="large" color="#70667D" />;
+    return <ActivityIndicator style={localStyles.container} size="large" color="#70667D" />;
   }
 
   return <AuthNavigator />;
 };
 
 export { ConnectionScreen };
+
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+});

@@ -5,9 +5,9 @@ import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
+import documents from '../../../mockData/Document.json';
 import products from '../../../mockData/Goods.json';
 import remains from '../../../mockData/Remains.json';
-import documents from '../../../mockData/Document.json';
 import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
@@ -31,28 +31,27 @@ const ProductDetailScreen = ({ route, navigation }) => {
     <View
       style={[
         styles.container,
+        localeStyles.container,
         {
           backgroundColor: colors.card,
-          padding: 0,
-          justifyContent: 'flex-start',
         },
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
       <View style={localeStyles.productPriceView}>
-        <Text style={{ fontSize: 17 }}>Цена:</Text>
+        <Text style={localeStyles.fontSize16}>Цена:</Text>
         <Text style={localeStyles.productPrice}>{remain.price}</Text>
       </View>
       <View style={localeStyles.productQuantityView}>
-        <Text style={{ fontSize: 16 }}>Количество:</Text>
+        <Text style={localeStyles.fontSize16}>Количество:</Text>
         <Text style={localeStyles.productQuantity}>{remain.quantity}</Text>
       </View>
       <View style={localeStyles.editQuantityView}>
-        <Text style={{ fontSize: 16 }}>Добавить количество:</Text>
+        <Text style={localeStyles.fontSize16}>Добавить количество:</Text>
         <InputSpinner
           returnKeyType="done"
           style={localeStyles.inputSpinner}
-          inputStyle={{ fontSize: 20 }}
+          inputStyle={localeStyles.fontSize20}
           value={value}
           max={1000}
           min={0}
@@ -79,10 +78,25 @@ const ProductDetailScreen = ({ route, navigation }) => {
 export { ProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    height: 35,
+    marginHorizontal: '25%',
+  },
+  container: {
+    justifyContent: 'flex-start',
+    padding: 0,
+  },
   editQuantityView: {
     alignItems: 'center',
     flexDirection: 'column',
     marginTop: 100,
+  },
+  fontSize16: {
+    fontSize: 16,
+  },
+  fontSize20: {
+    fontSize: 20,
   },
   inputSpinner: {
     marginTop: 5,
@@ -118,10 +132,5 @@ const localeStyles = StyleSheet.create({
   },
   title: {
     padding: 10,
-  },
-  button: {
-    height: 35,
-    alignItems: 'center',
-    marginHorizontal: '25%',
   },
 });
