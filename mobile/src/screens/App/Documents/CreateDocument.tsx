@@ -1,9 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import DatePicker from 'react-native-modal-datetime-picker';
-import { Text, Button, Chip } from 'react-native-paper';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
@@ -12,23 +12,17 @@ import styles from '../../../styles/global';
 
 const CreateDocumentScreen = ({ route }) => {
   const [date, setDate] = useState(new Date());
+  const [oldDate, setOldDate] = useState(new Date());
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [selectedContact, setSelectedContact] = useState<number>();
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = () => {
-    // console.warn('A date has been picked: ', newDate);
-    hideDatePicker();
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDatePickerVisibility(Platform.OS === 'ios');
+    setDate(currentDate);
   };
 
   useEffect(() => {
@@ -114,7 +108,10 @@ const CreateDocumentScreen = ({ route }) => {
               padding: 0,
             },
           ]}
-          onPress={showDatePicker}
+          onPress={() => {
+            setOldDate(date)
+            setDatePickerVisibility(true)
+          }}
         >
           <Text
             style={{
@@ -129,14 +126,63 @@ const CreateDocumentScreen = ({ route }) => {
           </Text>
           <MaterialIcons style={{ marginRight: 10 }} size={30} color={colors.text} name="date-range" />
         </TouchableOpacity>
-        <DatePicker
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-          locale="en_GB"
-          date={date}
-        />
+        {isDatePickerVisible &&
+          (Platform.OS !== 'ios' ? (
+            <DateTimePicker
+              testID="dateTimePicker"
+              timeZoneOffsetInMinutes={0}
+              value={date}
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+              mode="date"
+              locale="en_GB"
+            />
+          ) : (
+            <Portal>
+              <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
+                <View
+                  style={{
+                    backgroundColor: colors.card,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    margin: 10,
+                    paddingVertical: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-around',
+                      borderBottomColor: colors.border,
+                      borderBottomWidth: 1,
+                    }}
+                  >
+                    <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
+                    <Button
+                      onPress={() => {
+                        setDatePickerVisibility(false);
+                        setDate(oldDate);
+                      }}
+                    >
+                      Отмена
+                    </Button>
+                  </View>
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    timeZoneOffsetInMinutes={0}
+                    value={date}
+                    is24Hour={true}
+                    display="default"
+                    onChange={onChange}
+                    mode="date"
+                    locale="en_GB"
+                  />
+                </View>
+              </Modal>
+            </Portal>
+          ))}
       </View>
       <View style={localeStyles.buttonView}>
         <Button mode="contained" style={[styles.rectangularButton, localeStyles.button, { marginLeft: 0 }]}>
