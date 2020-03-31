@@ -15,9 +15,10 @@ const CreateDocumentScreen = ({ route }) => {
   const [oldDate, setOldDate] = useState(new Date());
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [selectedContact, setSelectedContact] = useState<number>();
-  const { colors } = useTheme();
-
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const today = new Date();
+  const { colors } = useTheme();
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -137,6 +138,8 @@ const CreateDocumentScreen = ({ route }) => {
               onChange={onChange}
               mode="date"
               locale="en_GB"
+              maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
+              minimumDate={new Date(1990, 0, 1)}
             />
           ) : (
             <Portal>
