@@ -134,12 +134,7 @@ const SignInScreen = () => {
             Войти
           </Button>
         </View>
-        <View
-          style={{
-            ...localStyles.statusBox,
-            backgroundColor: colors.background,
-          }}
-        >
+        <View style={localStyles.statusBox}>
           {lognState.isError && <Text style={localStyles.errorText}>Ошибка: {lognState.status}</Text>}
           {lognState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
