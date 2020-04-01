@@ -28,9 +28,9 @@ const LineItem = React.memo(({ item }: { item: [string, string] }) => {
 const ReferenceDetailScreen = ({ route }) => {
   const { colors } = useTheme();
 
-  const item: IEntity = route.params.item;
+  const itm: IEntity = route.params.item;
 
-  const fields = Object.entries(item);
+  const fields = Object.entries(itm);
 
   const ref = React.useRef<FlatList<[string, string]>>(null);
   useScrollToTop(ref);
@@ -39,7 +39,7 @@ const ReferenceDetailScreen = ({ route }) => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{item.name}</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{itm.name}</SubTitle>
       <ItemSeparator />
       <FlatList
         ref={ref}

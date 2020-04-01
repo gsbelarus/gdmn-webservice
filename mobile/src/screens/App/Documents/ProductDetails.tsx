@@ -25,7 +25,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         setValue(lineDocument.quantity);
       }
     }
-  }, []);
+  }, [document.lines, route.params.modeCor, route.params.prodId]);
 
   return (
     <View

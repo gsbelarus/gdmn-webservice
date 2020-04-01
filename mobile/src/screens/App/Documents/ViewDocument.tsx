@@ -151,7 +151,6 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 },
                 {
                   text: 'Отмена',
-                  onPress: () => {},
                 },
               ]);
             }}
@@ -188,7 +187,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => {}}
+            onPress={() => ({})}
           >
             <MaterialIcons size={30} color={colors.card} name="check" />
           </TouchableOpacity>
@@ -203,7 +202,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => {}}
+            onPress={() => ({})}
           >
             <Foundation size={30} color={colors.card} name="clipboard-pencil" />
           </TouchableOpacity>
