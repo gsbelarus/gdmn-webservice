@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { SettingsScreen } from '../screens/App/SettingsScreen';
+import { CompaniesScreen } from '../screens/App/CompaniesScreen';
 
 type CompanyStackParamList = {
   SelecteCompany: undefined;
@@ -12,7 +12,7 @@ const Stack = createStackNavigator<CompanyStackParamList>();
 const CompanyNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen key="SelecteCompany" name="SelecteCompany" component={SettingsScreen} options={{ title: '' }} />
+      <Stack.Screen key="SelecteCompany" name="SelecteCompany" component={CompaniesScreen} options={{ title: '' }} />
     </Stack.Navigator>
   );
 };

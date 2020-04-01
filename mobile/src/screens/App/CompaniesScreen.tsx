@@ -1,17 +1,22 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { Text, Chip } from 'react-native-paper';
+import { Text, Chip, Button } from 'react-native-paper';
+
+import styles from '../../styles/global';
+import SubTitle from '../../components/SubTitle';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
 
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   const companies = ['company1', 'company2', 'company3'];
 
   return (
     <>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Организации</SubTitle>
       <View style={localeStyles.container}>
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
           <Text style={localeStyles.subdivisionText}>Выберите организацию: </Text>
@@ -21,7 +26,7 @@ const CompaniesScreen = () => {
                 <Chip
                   key={idx}
                   mode="outlined"
-                  style={[localeStyles.margin, selectedCompany === item ? { backgroundColor: colors.primary } : {}]}
+                  style={[localeStyles.margin, localeStyles.chip, selectedCompany === item ? { backgroundColor: colors.primary } : {}]}
                   onPress={() => setSelectedCompany(item)}
                   selected={selectedCompany === item}
                   selectedColor={selectedCompany === item ? colors.card : colors.text}
@@ -33,6 +38,26 @@ const CompaniesScreen = () => {
               <Text>Не найдено</Text>
             )}
           </ScrollView>
+        </View>
+        <View style={localeStyles.buttonView}>
+          <Button
+            mode="contained"
+            style={[styles.rectangularButton, localeStyles.button]}
+            onPress={() => {
+              navigation.navigate('ViewDocument', { docId: 1 });
+            }}
+          >
+            ОК
+          </Button>
+          <Button
+            mode="contained"
+            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
+            onPress={() => {
+              navigation.navigate('DocumentsListScreen');
+            }}
+          >
+            Выход
+          </Button>
         </View>
       </View>
     </>
@@ -48,42 +73,30 @@ const localeStyles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     padding: 5,
+    alignItems: 'center',
   },
   button: {
     flex: 1,
     marginLeft: 7,
   },
-  buttonDatePicker: {
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   buttonView: {
-    flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
   },
   container: {
+    flex: 1,
     margin: 10,
-    // padding: 0,
-  },
-  containerDate: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    margin: 0,
-    padding: 0,
-  },
-  containerModalDatePicker: {
-    borderRadius: 8,
-    borderWidth: 1,
-    margin: 10,
-    paddingVertical: 10,
+    justifyContent: 'center',
   },
   margin: {
     margin: 2,
   },
   marginRight: {
     marginRight: 10,
+  },
+  chip: {
+    height: 50,
+    justifyContent: 'center',
+    fontSize: 18,
   },
   scroll: {
     maxHeight: 150,
@@ -93,13 +106,11 @@ const localeStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   subdivisionText: {
+    fontSize: 16,
     marginBottom: 5,
     textAlign: 'left',
   },
-  textDate: {
-    flex: 1,
-    flexGrow: 4,
-    fontSize: 20,
-    textAlign: 'center',
+  title: {
+    padding: 10,
   },
 });
