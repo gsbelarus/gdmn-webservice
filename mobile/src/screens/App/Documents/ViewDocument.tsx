@@ -15,6 +15,7 @@ import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const good: IGood = goods.find((i) => i.id === item.goodId);
 
   return (
@@ -48,6 +49,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
                   text: 'OK',
+                  onPress: () => navigation.navigate('DocumentsListScreen'),
                 },
                 {
                   text: 'Отмена',

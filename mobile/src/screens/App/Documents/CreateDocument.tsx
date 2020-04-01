@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
@@ -19,6 +19,7 @@ const CreateDocumentScreen = ({ route }) => {
 
   const today = new Date();
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -153,10 +154,22 @@ const CreateDocumentScreen = ({ route }) => {
           ))}
       </View>
       <View style={localeStyles.buttonView}>
-        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button]}>
+        <Button
+          mode="contained"
+          style={[styles.rectangularButton, localeStyles.button]}
+          onPress={() => {
+            navigation.navigate('ViewDocument', { docId: 1 });
+          }}
+        >
           ОК
         </Button>
-        <Button mode="contained" style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}>
+        <Button
+          mode="contained"
+          style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
+          onPress={() => {
+            navigation.navigate('DocumentsListScreen');
+          }}
+        >
           Отмена
         </Button>
       </View>
