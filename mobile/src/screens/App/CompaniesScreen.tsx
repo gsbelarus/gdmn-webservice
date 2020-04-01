@@ -1,18 +1,26 @@
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
-import styles from '../../styles/global';
 import SubTitle from '../../components/SubTitle';
+import { useStore } from '../../store';
+import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
 
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const { actions, api } = useStore();
 
   const companies = ['company1', 'company2', 'company3'];
+
+  const logOut = async () => {
+    const res = await api.auth.logout();
+    if (res.status === 200) {
+      actions.logOut();
+    }
+  };
 
   return (
     <>
@@ -26,7 +34,11 @@ const CompaniesScreen = () => {
                 <Chip
                   key={idx}
                   mode="outlined"
-                  style={[localeStyles.margin, localeStyles.chip, selectedCompany === item ? { backgroundColor: colors.primary } : {}]}
+                  style={[
+                    localeStyles.margin,
+                    localeStyles.chip,
+                    selectedCompany === item ? { backgroundColor: colors.primary } : {},
+                  ]}
                   onPress={() => setSelectedCompany(item)}
                   selected={selectedCompany === item}
                   selectedColor={selectedCompany === item ? colors.card : colors.text}
@@ -44,7 +56,7 @@ const CompaniesScreen = () => {
             mode="contained"
             style={[styles.rectangularButton, localeStyles.button]}
             onPress={() => {
-              navigation.navigate('ViewDocument', { docId: 1 });
+              actions.setCompanyID(selectedCompany);
             }}
           >
             ОК
@@ -52,9 +64,7 @@ const CompaniesScreen = () => {
           <Button
             mode="contained"
             style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-            onPress={() => {
-              navigation.navigate('DocumentsListScreen');
-            }}
+            onPress={logOut}
           >
             Выход
           </Button>
@@ -68,12 +78,12 @@ export { CompaniesScreen };
 
 const localeStyles = StyleSheet.create({
   areaChips: {
+    alignItems: 'center',
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
     marginBottom: 10,
     padding: 5,
-    alignItems: 'center',
   },
   button: {
     flex: 1,
@@ -82,21 +92,21 @@ const localeStyles = StyleSheet.create({
   buttonView: {
     flexDirection: 'row',
   },
+  chip: {
+    fontSize: 18,
+    height: 50,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
-    margin: 10,
     justifyContent: 'center',
+    margin: 10,
   },
   margin: {
     margin: 2,
   },
   marginRight: {
     marginRight: 10,
-  },
-  chip: {
-    height: 50,
-    justifyContent: 'center',
-    fontSize: 18,
   },
   scroll: {
     maxHeight: 150,
