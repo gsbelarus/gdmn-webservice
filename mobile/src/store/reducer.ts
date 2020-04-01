@@ -7,6 +7,7 @@ export const initialState: IAppState = {
   baseUrl: undefined,
   deviceRegistered: undefined,
   loggedIn: undefined,
+  companyID: undefined,
 };
 
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {

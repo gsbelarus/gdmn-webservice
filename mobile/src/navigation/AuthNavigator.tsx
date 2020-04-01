@@ -8,12 +8,14 @@ import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useStore } from '../store';
+import CompanyNavigator from './CompanyNavigator';
 
 type AuthStackParamList = {
   Splash: undefined;
   Config: undefined;
   DeviceRegister: undefined;
   LogIn: undefined;
+  SelectCompany: undefined;
   App: undefined;
 };
 
@@ -68,7 +70,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, loggedIn, baseUrl },
+    state: { deviceRegistered, loggedIn, baseUrl, companyID },
     actions,
     api,
   } = useStore();
@@ -153,7 +155,7 @@ const AuthNavigator = () => {
     [baseUrl, breakConnection, connection, deviceRegistered, loggedIn, showSettings, state],
   );
 
-  const CongigWithParams = useCallback(
+  const CongfigWithParams = useCallback(
     () => (
       <ConfigScreen
         {...{ hideSettings, changeSettings }}
@@ -169,21 +171,25 @@ const AuthNavigator = () => {
       <Stack.Screen
         key="Config"
         name="Config"
-        component={CongigWithParams}
+        component={CongfigWithParams}
         options={{ headerShown: true, headerBackTitleVisible: true }}
       />
     ),
-    [CongigWithParams],
+    [CongfigWithParams],
   );
 
   const LoginComponent = useMemo(
     () =>
       loggedIn ? (
-        <Stack.Screen key="App" name="App" component={AppNavigator} />
+        companyID !== undefined ? (
+          <Stack.Screen key="App" name="App" component={AppNavigator} />
+        ) : (
+          <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
+        )
       ) : (
         <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
       ),
-    [loggedIn],
+    [loggedIn, companyID],
   );
 
   const RegisterComponent = useMemo(

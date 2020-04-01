@@ -44,10 +44,11 @@ const getLogin = async (ctx: any) => {
   ctx.login(user);
 
   if (ctx.isAuthenticated()) {
+    delete user.password;
     ctx.status = 200;
     ctx.body = JSON.stringify({
       status: 200,
-      result: user ? user.id : false,
+      result: user ? user : false,
     });
     logger.info(`login user ${user}`);
   }

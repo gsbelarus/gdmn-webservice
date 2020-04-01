@@ -4,6 +4,7 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import ItemSeparator from '../../../components/ItemSeparator';
 import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
@@ -12,16 +13,12 @@ import remains from '../../../mockData/Remains.json';
 import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
 import styles from '../../../styles/global';
 
-const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
+const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
   const { colors } = useTheme();
   const good: IGood = goods.find((i) => i.id === item.goodId);
-  const navigation = useNavigation();
 
   return (
-    <TouchableOpacity
-      style={localStyles.listContainer}
-      onPress={() => navigation.navigate('ProductDetail', { prodId: item.goodId, docId, modeCor: true })}
-    >
+    <>
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
           <Feather name="box" size={20} color={'#FFF'} />
@@ -62,15 +59,26 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
           </TouchableOpacity>
         </View>
       ) : undefined}
-    </TouchableOpacity>
+    </>
   );
 });
 
-const ItemSeparator = () => {
-  const { colors } = useTheme();
+const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
+  const navigation = useNavigation();
 
-  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
-};
+  return status === 0 ? (
+    <TouchableOpacity
+      style={localStyles.listContainer}
+      onPress={() => navigation.navigate('ProductDetail', { prodId: item.goodId, docId, modeCor: true })}
+    >
+      <ContentItem item={item} status={status} />
+    </TouchableOpacity>
+  ) : (
+    <View style={localStyles.listContainer}>
+      <ContentItem item={item} status={status} />
+    </View>
+  );
+});
 
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
