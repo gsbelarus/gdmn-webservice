@@ -23,6 +23,9 @@ const SettingsScreen = () => {
     <ScrollView style={{ backgroundColor: colors.background }}>
       <View style={localStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
+        <Button mode="contained" onPress={() => actions.setCompanyID(undefined)}>
+          Сменить орг.
+        </Button>
         <Button icon="logout" mode="contained" onPress={logOut}>
           Выход
         </Button>
