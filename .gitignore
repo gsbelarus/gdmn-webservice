@@ -7,3 +7,7 @@ node_modules/.yarn-integrity
 !*/.vscode/tasks.json
 !*/.vscode/launch.json
 !*/.vscode/extensions.json
+
+#user's config
+dev.ts
+prod.ts

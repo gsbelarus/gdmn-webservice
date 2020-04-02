@@ -1,0 +1,52 @@
+[
+	{
+		"id": 0,
+		"name": "Buraya Alena",
+		"type": 2
+	},
+	{
+		"id": 1,
+		"name": "Shiralieva Samira",
+		"type": 2
+	},
+	{
+		"id": 2,
+		"name": "Kireev Anrey",
+		"type": 2
+	},
+	{
+		"id": 3,
+		"name": "Volkov Denis",
+		"type": 2
+	},
+	{
+		"id": 4,
+		"name": "Dubrova Mariya",
+		"type": 2
+	},
+	{
+		"id": 5,
+		"name": "Petrov Evgeniy",
+		"type": 2
+	},
+	{
+		"id": 6,
+		"name": "Sklad",
+		"type": 4
+	},
+	{
+		"id": 7,
+		"name": "Vitrina 1",
+		"type": 4
+	},
+	{
+		"id": 8,
+		"name": "Vitrina 2",
+		"type": 4
+	},
+	{
+		"id": 9,
+		"name": "Vitrina 3",
+		"type": 4
+	}
+]

@@ -1,70 +1,49 @@
-import React, { useEffect, useState } from "react";
-import Navigator from "./app/components/Navigator";
-import Constants from "expo-constants";
-import { StyleSheet, View, ActivityIndicator, YellowBox } from "react-native";
-import config from "./config";
+import { InitialState, NavigationContainerRef, NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import React from 'react';
+import { Platform, StatusBar } from 'react-native';
+import {
+  Provider as PaperProvider,
+  DefaultTheme as PaperLightTheme,
+  DarkTheme as PaperDarkTheme,
+} from 'react-native-paper';
 
-YellowBox.ignoreWarnings(["Require cycle:"]);
-
-type TStartState = "SIGN_OUT" | "NO_ACTIVATION" | "LOG_IN";
-export const path = `${config.server.name}:${config.server.port}/api/`;
+import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
+import { StoreProvider } from './src/store';
 
 const App = () => {
-  const [signedIn, setSignedIn] = useState<TStartState>("NO_ACTIVATION");
-  const [loading, setLoading] = useState(true);
-  
-  console.disableYellowBox = !config.debug.showWarnings;
-  
-  useEffect(() => {
-    const isExistDevice = async () => {
-      const data = await fetch(
-        `${path}device/isExist?uid=${Constants.deviceId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include"
-        }
-      ).then(res => res.json());
-      
-      data.status === 200 && data.result ? setSignedIn("SIGN_OUT") : undefined;
-      
-      if (data.status === 200 && data.result) {
-        const getMe = await fetch(`${path}me`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include"
-        }).then(res => res.json());
-        
-        setSignedIn(
-          getMe.status === 200 && getMe.result !== "not authenticated"
-            ? "LOG_IN"
-            : "SIGN_OUT"
-        );
-      }
-      
-      setLoading(false);
+  const containerRef = React.useRef<NavigationContainerRef>();
+  const [theme] = React.useState(DefaultTheme);
+  const [initialState] = React.useState<InitialState | undefined>();
+
+  const paperTheme = React.useMemo(() => {
+    const t = theme.dark ? PaperDarkTheme : PaperLightTheme;
+
+    return {
+      ...t,
+      colors: {
+        ...t.colors,
+        ...theme.colors,
+        surface: theme.colors.card,
+        accent: theme.dark ? 'rgb(255, 55, 95)' : 'rgb(255, 45, 85)',
+      },
     };
+  }, [theme.colors, theme.dark]);
 
-    isExistDevice();
-  }, []);
-
-  const Layout = Navigator(signedIn);
-
-  return loading ? (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color="#70667D" />
-    </View>
-  ) : (
-    <Layout />
+  return (
+    <StoreProvider>
+      <PaperProvider theme={paperTheme}>
+        {Platform.OS === 'ios' && <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />}
+        <NavigationContainer
+          ref={containerRef}
+          initialState={initialState}
+          theme={theme}
+          /* onStateChange={state => {}} */
+        >
+          <ConnectionScreen />
+        </NavigationContainer>
+      </PaperProvider>
+    </StoreProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#E3EFF4",
-    justifyContent: "center"
-  }
-});
 
 export default App;

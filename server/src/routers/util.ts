@@ -13,9 +13,10 @@ export const findByUserName = async (userName: string) => {
 };
 
 export const saveActivationCode = async (userId: string) => {
-  const code = Math.random()
-    .toString(36)
-    .substr(3, 6);
+  // const code = Math.random()
+  //   .toString(36)
+  //   .substr(3, 6);
+  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
   await writeFile(
     PATH_LOCAL_DB_ACTIVATION_CODES,
