@@ -1,9 +1,10 @@
 import Router from 'koa-router';
-import { IActivationCode, IDevice } from '../models';
-import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../rest';
-import { saveActivationCode } from './util';
+import { IActivationCode, IDevice } from '../models/models';
+import { readFile, writeFile } from '../utils/workWithFile';
+import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../server';
+import { saveActivationCode } from '../utils/util';
 import log4js from 'log4js';
+import { isExistDevice } from '../controllers/devices';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -15,7 +16,7 @@ router.get('/getActivationCode', ctx => getActivationCode(ctx));
 router.post('/new', ctx => newDevice(ctx));
 router.post('/lock', ctx => lockDevices(ctx));
 router.post('/remove', ctx => removeDevices(ctx));
-router.get('/isExist', ctx => isExistDevice(ctx));
+router.get('/isExist', isExistDevice);
 router.get('/isActive', ctx => isActiveDevice(ctx));
 router.get('/byUser', ctx => getDevicesByUser(ctx));
 
@@ -29,7 +30,7 @@ const verifyCode = async (ctx: any) => {
       await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 200, result: code.user });
-      logger.info('device activated successfully');
+      logger.info('device has been successfully activated');
     } else {
       ctx.status = 200;
       ctx.body = JSON.stringify({ status: 404, result: 'invalid activation code' });
@@ -69,8 +70,8 @@ const newDevice = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -96,8 +97,8 @@ const lockDevice = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -118,9 +119,9 @@ const lockDevices = async (ctx: any) => {
       logger.warn(`the device(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`);
     } else {
       const newDevices = allDevices?.map(device =>
-        uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId
-          ? { ...device, isBlock: true }
-          : device,
+        uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId ?
+          { ...device, isBlock: true } :
+          device,
       );
       await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
       ctx.body = JSON.stringify({ status: 200, result: 'devices locked successfully' });
@@ -128,8 +129,8 @@ const lockDevices = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -151,8 +152,8 @@ const removeDevice = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -181,8 +182,8 @@ const removeDevices = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -199,10 +200,10 @@ const isActiveDevice = async (ctx: any) => {
   }
 };
 
-const isExistDevice = async (ctx: any) => {
+/* const isExistDevice = async (ctx: any): Promise<any> => {
   const { uid } = ctx.query;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const idx = allDevices && allDevices.findIndex(device => device.uid === uid);
+  const idx = allDevices && allDevices.findIndex((device) => device.uid === uid);
   if (!allDevices || idx === undefined || idx < 0) {
     ctx.body = JSON.stringify({ status: 200, result: false });
     logger.warn(`the device(${uid}) is not exist`);
@@ -210,7 +211,7 @@ const isExistDevice = async (ctx: any) => {
     ctx.body = JSON.stringify({ status: 200, result: true });
     logger.info(`the device(${uid}) is exist`);
   }
-};
+}; */
 
 const getDevicesByUser = async (ctx: any) => {
   if (ctx.isAuthenticated()) {
@@ -219,17 +220,17 @@ const getDevicesByUser = async (ctx: any) => {
     ctx.body = JSON.stringify({
       status: 200,
       result:
-        !allDevices || !allDevices.length
-          ? []
-          : allDevices
-              .filter(device => device.user === userId)
-              .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+        !allDevices || !allDevices.length ?
+          [] :
+          allDevices
+            .filter(device => device.user === userId)
+            .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
     });
     logger.info('get devices by user successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 

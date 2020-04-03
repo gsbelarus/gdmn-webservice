@@ -1,9 +1,9 @@
 import Router from 'koa-router';
-import { ICompany, IUser } from '../models';
-import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../rest';
+import { ICompany, IUser } from '../models/models';
+import { readFile, writeFile } from '../utils/workWithFile';
+import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../server';
 import log4js from 'log4js';
-import { editeCompanies } from './util';
+import { editeCompanies } from '../utils/util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -23,9 +23,9 @@ const addCompany = async (ctx: any) => {
       await writeFile(
         PATH_LOCAL_DB_COMPANIES,
         JSON.stringify(
-          allCompanies
-            ? [...allCompanies, { id: title, title, admin: ctx.state.user.id }]
-            : [{ id: title, title, admin: ctx.state.user.id }],
+          allCompanies ?
+            [...allCompanies, { id: title, title, admin: ctx.state.user.id }] :
+            [{ id: title, title, admin: ctx.state.user.id }],
         ),
       );
       const res = await editeCompanies(ctx.state.user.id, [title]);
@@ -43,8 +43,8 @@ const addCompany = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -57,21 +57,21 @@ const getCompaniesByUser = async (ctx: any) => {
     ctx.body = JSON.stringify({
       status: 200,
       result:
-        !allCompanies || !allCompanies.length
-          ? []
-          : allCompanies
-              .filter(company => findUser?.companies?.find(item => item === company.id))!
-              .map(company => ({
-                companyName: company.title,
-                companyId: company.id,
-                userRole: company.admin === findUser?.id ? 'Admin' : '',
-              })),
+        !allCompanies || !allCompanies.length ?
+          [] :
+          allCompanies
+            .filter(company => findUser?.companies?.find(item => item === company.id))!
+            .map(company => ({
+              companyName: company.title,
+              companyId: company.id,
+              userRole: company.admin === findUser?.id ? 'Admin' : '',
+            })),
     });
     logger.info('get companies by user successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -89,8 +89,8 @@ const getProfile = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -116,8 +116,8 @@ const editeProfile = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 

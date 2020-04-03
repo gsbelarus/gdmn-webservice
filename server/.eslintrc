@@ -4,9 +4,21 @@
     "es6": true,
     "node": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+		"plugin:promise/recommended",
+		"plugin:sonarjs/recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "eslint-config-prettier",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["promise", "sonarjs", "@typescript-eslint", "prettier"],
   "globals": {},
   "parserOptions": {
+    "project": "tsconfig.json",
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
@@ -15,6 +27,7 @@
       "error",
       2
     ],
+    "@typescript-eslint/interface-name-prefix": [1, { "prefixWithI": "always" }],
     "linebreak-style": [
       "error",
       "unix"
@@ -22,19 +35,11 @@
     "quotes": [
       "error",
       "single"
-    ],
-    "semi": [
-      "error",
-      "never"
-    ],
-    "comma-dangle": [
-      "error",
-      "never"
-    ],
+    ],    
     "max-len": [
       "error",
       {
-        "code": 100
+        "code": 120
       }
     ],
     "no-extra-parens": "error",

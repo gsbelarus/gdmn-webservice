@@ -1,9 +1,9 @@
 import Router from 'koa-router';
-import { readFile, writeFile, removeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_MESSAGES } from '../rest';
+import { readFile, writeFile, removeFile } from '../utils/workWithFile';
+import { PATH_LOCAL_DB_MESSAGES } from '../server';
 import log4js from 'log4js';
 import { v1 as uuidv1 } from 'uuid';
-import { IMessage } from '../models';
+import { IMessage } from '../models/models';
 import { promises } from 'fs';
 
 const logger = log4js.getLogger('SERVER');
@@ -31,7 +31,7 @@ const newMessage = async (ctx: any) => {
       return;
     }
 
-    if (!(ctx.state.user.companies as string[]).find(item => item === companyId)) {
+    if (!ctx.state.user.companies as string[].find(item => item === companyId)) {
       ctx.body = JSON.stringify({
         status: 404,
         result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`,
@@ -51,7 +51,7 @@ const newMessage = async (ctx: any) => {
       body,
     };
 
-    if (msgObject instanceof Object && (msgObject as IMessage)) {
+    if (msgObject instanceof Object && msgObject as IMessage) {
       await writeFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${uuid}.json`, JSON.stringify(msgObject));
       ctx.body = JSON.stringify({
         status: 200,
@@ -62,22 +62,22 @@ const newMessage = async (ctx: any) => {
       ctx.status = 403;
       ctx.body = JSON.stringify({
         status: 404,
-        result: `incorrect format message`,
+        result: 'incorrect format message',
       });
-      logger.warn(`incorrect format message`);
+      logger.warn('incorrect format message');
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
 const getMessage = async (ctx: any) => {
   if (!ctx.isAuthenticated()) {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
     return;
   }
 
@@ -123,8 +123,8 @@ const removeMessage = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 

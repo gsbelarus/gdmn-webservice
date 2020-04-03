@@ -1,9 +1,9 @@
 import Router from 'koa-router';
-import { IUser, IDevice, IActivationCode } from '../models';
-import { readFile, writeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../rest';
+import { IUser, IDevice, IActivationCode } from '../models/models';
+import { readFile, writeFile } from '../utils/workWithFile';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import log4js from 'log4js';
-import { editeCompanies } from './util';
+import { editeCompanies } from '../utils/util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -26,20 +26,20 @@ const getUsersByDevice = async (ctx: any) => {
     ctx.body = JSON.stringify({
       status: 200,
       result:
-        !allDevices || !allDevices.length
-          ? []
-          : allDevices
-              .filter(device => device.uid === idDevice)
-              .map(device => {
-                const user = allUsers && allUsers.find(el => el.id === device.user);
-                return user ? { user: user.userName, state: device.isBlock ? 'blocked' : 'active' } : 'not found user';
-              }),
+        !allDevices || !allDevices.length ?
+          [] :
+          allDevices
+            .filter(device => device.uid === idDevice)
+            .map(device => {
+              const user = allUsers && allUsers.find(el => el.id === device.user);
+              return user ? { user: user.userName, state: device.isBlock ? 'blocked' : 'active' } : 'not found user';
+            }),
     });
     logger.info('get users by device successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -49,22 +49,22 @@ const getUsers = async (ctx: any) => {
     ctx.body = JSON.stringify({
       status: 200,
       result:
-        !allUsers || !allUsers.length
-          ? []
-          : allUsers.map(user => ({
-              id: user.id,
-              userName: user.userName,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              phoneNumber: user.phoneNumber,
-              creatorId: user.creatorId,
-            })),
+        !allUsers || !allUsers.length ?
+          [] :
+          allUsers.map(user => ({
+            id: user.id,
+            userName: user.userName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
+            creatorId: user.creatorId,
+          })),
     });
     logger.info('get users by device successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -90,8 +90,8 @@ const getUsersByCompany = async (ctx: any) => {
     logger.info('get users by company successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -123,8 +123,8 @@ const editeProfile = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -141,8 +141,8 @@ const addCompany = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -168,8 +168,8 @@ const removeUsers = async (ctx: any) => {
     logger.info('users removed successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
@@ -178,9 +178,9 @@ const removeUsersFromCompany = async (ctx: any) => {
     const { users, companyId } = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const newUsers = allUsers?.map(el =>
-      users.findIndex((u: any) => u === el.id) !== -1
-        ? { ...el, companies: el.companies?.filter(o => o !== companyId) }
-        : el,
+      users.findIndex((u: any) => u === el.id) !== -1 ?
+        { ...el, companies: el.companies?.filter(o => o !== companyId) } :
+        el,
     );
     /** Пока только удалим организацию у пользователей */
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
@@ -189,8 +189,8 @@ const removeUsersFromCompany = async (ctx: any) => {
     logger.info('users removed successfully');
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 

@@ -1,8 +1,8 @@
 import Router from 'koa-router';
 import log4js from 'log4js';
-import { readFile, writeFile } from '../workWithFile';
+import { readFile, writeFile } from '../utils/workWithFile';
 import dev from '../../config/dev';
-import { IGood, IContact, IDocumentType, IDocument } from '../models';
+import { IGood, IContact, IDocumentType, IDocument } from '../models/models';
 
 const PATH_GOODS = `${dev.FILES_PATH}\\Goods.json`;
 const PATH_DOCUMENT_TYPE = `${dev.FILES_PATH}\\GD_DocumentType.json`;

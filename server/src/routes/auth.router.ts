@@ -2,19 +2,19 @@ import Router from 'koa-router';
 import log4js from 'log4js';
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
-import { IUser } from '../models';
-import { PATH_LOCAL_DB_USERS } from '../rest';
-import { readFile, writeFile } from '../workWithFile';
-import { findByUserName } from './util';
+import { IUser } from '../models/models';
+import { PATH_LOCAL_DB_USERS } from '../server';
+import { readFile, writeFile } from '../utils/workWithFile';
+import { findByUserName } from '../utils/util';
 
-const router = new Router();
+const router = new Router({ prefix: '/auth' });
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-router.post('/auth/login', async ctx => getLogin(ctx));
-router.get('/auth/logout', async ctx => getSignOut(ctx));
-router.post('/auth/signup', ctx => signup(ctx));
-router.get('/auth/user', ctx => getUser(ctx));
+router.post('/login', async ctx => getLogin(ctx));
+router.get('/logout', async ctx => getSignOut(ctx));
+router.post('/signup', ctx => signup(ctx));
+router.get('/user', ctx => getUser(ctx));
 
 const getLogin = async (ctx: any) => {
   if (!ctx.isUnauthenticated()) {
@@ -89,25 +89,25 @@ const getSignOut = (ctx: any) => {
 
 const signup = async (ctx: any) => {
   const newUser = ctx.request.body as IUser;
-  if (!(await findByUserName(newUser.userName))) {
+  if (!await findByUserName(newUser.userName)) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     //  const code = await saveActivationCode(newUser.userName);
     await writeFile(
       PATH_LOCAL_DB_USERS,
       JSON.stringify(
-        allUsers
-          ? [...allUsers, { id: newUser.userName, ...newUser }]
-          : [
-              { id: newUser.userName, ...newUser },
-              {
-                id: 'gdmn',
-                userName: 'gdmn',
-                creatorId: newUser.userName,
-                password: 'gdmn',
-                companies: [],
-                code: 'jqgxmm',
-              },
-            ],
+        allUsers ?
+          [...allUsers, { id: newUser.userName, ...newUser }] :
+          [
+            { id: newUser.userName, ...newUser },
+            {
+              id: 'gdmn',
+              userName: 'gdmn',
+              creatorId: newUser.userName,
+              password: 'gdmn',
+              companies: [],
+              code: 'jqgxmm',
+            },
+          ],
       ),
     );
 
