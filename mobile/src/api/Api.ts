@@ -1,5 +1,6 @@
 import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
 import { get, post } from './http.service';
+import config from '../config';
 
 export default class Api {
   baseUrl: IBaseUrl;
@@ -21,11 +22,11 @@ export default class Api {
 
     getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/me'),
 
-    getDeviceStatus: async (deviceId: string): Promise<IServerResponse<boolean | string>> =>
-      get(this.getUrl(), `/device/isExist?uid=${deviceId}`),
+    getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
+      get(this.getUrl(), `/device/isExist?uid=${config.debug.deviceId}`),
 
-    getDeviceStatusByUser: async (payload: { userName: string; deviceId: string }): Promise<IServerResponse<boolean>> =>
-      get(this.getUrl(), `/device/isActive?uid=${payload.deviceId}&userId=${payload.userName}`),
+    getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
+      get(this.getUrl(), `/device/isActive?uid=${config.debug.deviceId}&userId=${userName}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
       get(this.getUrl(), `/device/verifyCode?code=${code}`),

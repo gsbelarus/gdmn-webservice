@@ -56,7 +56,7 @@ const SignInScreen = () => {
       return;
     }
 
-    timeout(5000, api.auth.getDeviceStatusByUser({ userName: credential.userName, deviceId: state.deviceId }))
+    timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
       .then((data: IServerResponse<boolean | string>) => setServerResp(data))
       .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
   }, [api.auth, credential.userName, lognState.isLoading, state.deviceId]);
