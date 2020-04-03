@@ -1,7 +1,6 @@
-import Constants from 'expo-constants';
-
 import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
 import { get, post } from './http.service';
+import config from '../config';
 
 export default class Api {
   baseUrl: IBaseUrl;
@@ -24,10 +23,10 @@ export default class Api {
     getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/me'),
 
     getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
-      get(this.getUrl(), `/device/isExist?uid=${Constants.deviceId}`),
+      get(this.getUrl(), `/device/isExist?uid=${config.debug.deviceId}`),
 
     getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
-      get(this.getUrl(), `/device/isActive?uid=${Constants.deviceId}&userId=${userName}`),
+      get(this.getUrl(), `/device/isActive?uid=${config.debug.deviceId}&userId=${userName}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
       get(this.getUrl(), `/device/verifyCode?code=${code}`),

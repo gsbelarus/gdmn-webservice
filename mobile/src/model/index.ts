@@ -42,6 +42,7 @@ export interface IAppState {
   deviceRegistered?: boolean;
   deviceActive?: boolean;
   loggedIn?: boolean;
+  deviceId?: string;
 }
 
 // перенести в общую папку common

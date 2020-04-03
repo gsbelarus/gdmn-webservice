@@ -80,6 +80,7 @@ const AuthNavigator = () => {
   const { signal, cancel } = useMemo(() => createCancellableSignal(), [state.serverReq.isLoading]);
 
   console.disableYellowBox = !config.debug.showWarnings;
+
   /*
     Порядок работы:
       1) Проверка регистрации устройства на сервере

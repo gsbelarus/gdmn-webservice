@@ -20,7 +20,7 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { actions, api } = useStore();
+  const { state, actions, api } = useStore();
   const { colors } = useTheme();
   const [lognState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
@@ -59,7 +59,7 @@ const SignInScreen = () => {
     timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
       .then((data: IServerResponse<boolean | string>) => setServerResp(data))
       .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
-  }, [api.auth, credential.userName, lognState.isLoading]);
+  }, [api.auth, credential.userName, lognState.isLoading, state.deviceId]);
 
   useEffect(() => {
     if (!serverResp) {
