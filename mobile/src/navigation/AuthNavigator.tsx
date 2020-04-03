@@ -1,6 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
+import Constants from 'expo-constants';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 import { AsyncStorage } from 'react-native';
+import * as uuidv4 from 'uuid/v4';
 
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
@@ -70,7 +72,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, loggedIn, baseUrl, companyID },
+    state: { deviceRegistered, loggedIn, baseUrl, companyID, deviceId },
     actions,
     api,
   } = useStore();
@@ -80,6 +82,27 @@ const AuthNavigator = () => {
   const { signal, cancel } = useMemo(() => createCancellableSignal(), [state.serverReq.isLoading]);
 
   console.disableYellowBox = !config.debug.showWarnings;
+
+  useEffect(() => {
+    const setDeviceID = async () => {
+      if (!deviceId) {
+        if (Constants.deviceId) {
+          actions.setDeviceID(Constants.deviceId);
+        } else {
+          if ((await AsyncStorage.getAllKeys()).find((key) => key === 'expo/deviceId')) {
+            actions.setDeviceID(await AsyncStorage.getItem('expo/deviceId'));
+          } else {
+            const newDeviceId = uuidv4();
+            actions.setDeviceID(newDeviceId);
+            await AsyncStorage.setItem('expo/deviceId', newDeviceId);
+          }
+        }
+      }
+    };
+
+    setDeviceID();
+  }, [actions, deviceId]);
+
   /*
     Порядок работы:
       1) Проверка регистрации устройства на сервере
@@ -90,13 +113,13 @@ const AuthNavigator = () => {
   */
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
-      timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus())
+      timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus(deviceId))
         .then((data: IServerResponse<boolean>) =>
           setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
-  }, [api.auth, deviceRegistered, signal, state.serverReq]);
+  }, [api.auth, deviceRegistered, signal, state.serverReq, deviceId]);
 
   useEffect(() => {
     if (state.serverResp) {

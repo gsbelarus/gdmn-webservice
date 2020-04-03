@@ -19,6 +19,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
+    "react-native-dialog": "^5.6.0",
     "react-native-dropdown-menu": "^2.0.0",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-input-spinner": "^1.2.10",
@@ -27,6 +28,8 @@
     "react-native-modal-datetime-picker": "^8.5.2",
     "react-native-paper": "^3.6.0",
     "react-native-reanimated": "~1.7.1",
+    "react-native-safe-area-context": "^0.7.3",
+    "react-native-screens": "^2.2.0",
     "react-native-vector-icons": "^6.6.0",
     "react-native-virtual-keyboard": "^1.1.0",
     "react-native-web": "^0.12.2",
@@ -35,9 +38,7 @@
     "react-navigation-hooks": "^1.1.0",
     "react-navigation-stack": "^2.3.10",
     "react-router-dom": "^5.1.2",
-    "react-native-dialog": "^5.6.0",
-    "react-native-safe-area-context": "^0.7.3",
-    "react-native-screens": "^2.2.0"
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
     "@react-native-community/eslint-config": "^1.0.0",

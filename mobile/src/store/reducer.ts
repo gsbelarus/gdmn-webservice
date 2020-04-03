@@ -8,6 +8,7 @@ export const initialState: IAppState = {
   deviceRegistered: undefined,
   loggedIn: undefined,
   companyID: undefined,
+  deviceId: undefined,
 };
 
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
@@ -26,6 +27,8 @@ export const reducer: Reducer<IAppState, TActions> = (state = initialState, acti
       return { ...state, companyID: action.payload };
     case ActionTypes.SET_USER_ID:
       return { ...state, userID: action.payload };
+    case ActionTypes.SET_DEVICE_ID:
+      return { ...state, deviceId: action.payload };
     default:
       return state;
   }
