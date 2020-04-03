@@ -10,7 +10,7 @@ const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions, api } = useStore();
+  const { state, actions, api } = useStore();
 
   const logOut = async () => {
     const res = await api.auth.logout();
@@ -31,16 +31,23 @@ const SettingsScreen = () => {
         </Button>
       </View>
       <Divider />
-      <SettingsItem label="Синхронизировать" value={true} onValueChange={() => ({})} />
+      <SettingsItem
+        label="Синхронизировать"
+        value={state.synchronization}
+        onValueChange={() => actions.setSynchonization(!state.synchronization)}
+      />
       <Divider />
-      <SettingsItem label="Удалять документы после обработки на сервере" value={true} onValueChange={() => ({})} />
+      <SettingsItem
+        label="Удалять документы после обработки на сервере"
+        value={state.autodeletingDocument}
+        onValueChange={() => actions.setAutodeletingDocument(!state.autodeletingDocument)}
+      />
       <Divider />
       <SettingsItem
         label="Dark theme"
         value={dark}
         onValueChange={() => {
-          AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
-
+          //AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
           // Переделать в глобал стейт
           // setTheme(t => (t.dark ? DefaultTheme : DarkTheme));
         }}

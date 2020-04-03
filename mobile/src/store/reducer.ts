@@ -8,12 +8,14 @@ export const initialState: IAppState = {
   deviceRegistered: undefined,
   loggedIn: undefined,
   companyID: undefined,
+  synchronization: false,
+  autodeletingDocument: false,
 };
 
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
     case ActionTypes.DISCONNECT:
-      return { ...{ baseUrl: state.baseUrl, initialState } };
+      return { ...{ baseUrl: state.baseUrl, synchronization: false, autodeletingDocument: false, initialState } };
     case ActionTypes.LOG_OUT:
       return { ...state, userID: undefined, loggedIn: false };
     case ActionTypes.SET_BASEURL:
@@ -26,6 +28,10 @@ export const reducer: Reducer<IAppState, TActions> = (state = initialState, acti
       return { ...state, companyID: action.payload };
     case ActionTypes.SET_USER_ID:
       return { ...state, userID: action.payload };
+    case ActionTypes.SET_SYNCHRONIZATION:
+      return { ...state, synchronization: action.payload };
+    case ActionTypes.SET_AUTODELETING_DOCUMENT:
+      return { ...state, autodeletingDocument: action.payload };
     default:
       return state;
   }

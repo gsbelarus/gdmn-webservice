@@ -9,6 +9,8 @@ export enum ActionTypes {
   SET_COMPANY_ID = 'SET_COMPANY_ID',
   SET_USER_ID = 'SET_USER_ID',
   SET_BASEURL = 'SET_BASEURL',
+  SET_SYNCHRONIZATION = 'SET_SYNCHRONIZATION',
+  SET_AUTODELETING_DOCUMENT = 'SET_AUTODELETING_DOCUMENT',
 }
 
 export const AppActions = {
@@ -21,6 +23,10 @@ export const AppActions = {
   setUserStatus: createActionPayload<ActionTypes.SET_USER_STATUS, boolean | undefined>(ActionTypes.SET_USER_STATUS),
   setCompanyID: createActionPayload<ActionTypes.SET_COMPANY_ID, string>(ActionTypes.SET_COMPANY_ID),
   setUserID: createActionPayload<ActionTypes.SET_USER_ID, string>(ActionTypes.SET_USER_ID),
+  setSynchonization: createActionPayload<ActionTypes.SET_SYNCHRONIZATION, boolean>(ActionTypes.SET_SYNCHRONIZATION),
+  setAutodeletingDocument: createActionPayload<ActionTypes.SET_AUTODELETING_DOCUMENT, boolean>(
+    ActionTypes.SET_AUTODELETING_DOCUMENT,
+  ),
 };
 
 export type TActions = ActionsUnion<typeof AppActions>;
