@@ -11,10 +11,10 @@ const router = new Router();
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-router.post('/login', async ctx => getLogin(ctx));
-router.get('/logout', async ctx => getSignOut(ctx));
-router.post('/signup', ctx => signup(ctx));
-router.get('/me', ctx => getMe(ctx));
+router.post('/auth/login', async ctx => getLogin(ctx));
+router.get('/auth/logout', async ctx => getSignOut(ctx));
+router.post('/auth/signup', ctx => signup(ctx));
+router.get('/auth/user', ctx => getUser(ctx));
 
 const getLogin = async (ctx: any) => {
   if (!ctx.isUnauthenticated()) {
@@ -23,7 +23,7 @@ const getLogin = async (ctx: any) => {
       status: 403,
       result: 'you are already logged in',
     });
-    logger.warn('this user has already logged in');
+    logger.warn('The User has already logged in');
     return;
   }
 
@@ -35,7 +35,7 @@ const getLogin = async (ctx: any) => {
     ctx.status = 404;
     ctx.body = JSON.stringify({
       status: 404,
-      result: 'wrong password or login',
+      result: 'wrong login or password',
     });
     logger.info('failed login attempt');
     return;
@@ -54,7 +54,9 @@ const getLogin = async (ctx: any) => {
   }
 };
 
-const getMe = async (ctx: any) => {
+/** Проверка текущего пользователя в сессии koa */
+
+const getUser = async (ctx: any) => {
   if (ctx.isAuthenticated()) {
     const user = ctx.state.user;
     delete user.password;
