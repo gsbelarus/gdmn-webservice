@@ -23,7 +23,7 @@ export const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
 export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
 export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
 
-export async function init (): Promise<void> {
+export async function init(): Promise<void> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
@@ -36,7 +36,10 @@ export async function init (): Promise<void> {
   };
 
   passport.serializeUser((user: IUser, done) => done(null, user.id));
-  passport.deserializeUser(async (id: string, done) => done(null, await findById(id) || undefined));
+  passport.deserializeUser((id: string, done) => {
+    (async () => done((await findById(id)) || undefined))();
+  });
+
   passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
 
   // Логи для Morgan

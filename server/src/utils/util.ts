@@ -22,15 +22,15 @@ const saveActivationCode = async (userId: string) => {
   await writeFile(
     PATH_LOCAL_DB_ACTIVATION_CODES,
     JSON.stringify(
-      allCodes ?
-        [...allCodes, { code, date: new Date().toString(), user: userId }] :
-        [{ code, date: Date().toString(), user: userId }],
+      allCodes
+        ? [...allCodes, { code, date: new Date().toString(), user: userId }]
+        : [{ code, date: Date().toString(), user: userId }],
     ),
   );
   return code;
 };
 
-const editeCompanies = async (userId: string, companies: string[]) => {
+const editCompanies = async (userId: string, companies: string[]) => {
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   const user = allUsers?.find(item => item.id === userId);
   const idx = user && allUsers && allUsers.findIndex(item => item.userName === user.userName);
@@ -56,4 +56,4 @@ const validateAuthCreds: VerifyFunction = async (userName: string, password: str
   }
 };
 
-export { validateAuthCreds, editeCompanies, saveActivationCode, findById, findByUserName };
+export { validateAuthCreds, editCompanies, saveActivationCode, findById, findByUserName };

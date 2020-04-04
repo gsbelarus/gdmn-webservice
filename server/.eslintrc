@@ -6,13 +6,15 @@
   },
   "extends": [
     "eslint:recommended",
-		"plugin:promise/recommended",
-		"plugin:sonarjs/recommended",
-		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
     "eslint-config-prettier",
-    "prettier"
+		"plugin:promise/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "prettier/@typescript-eslint",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["promise", "sonarjs", "@typescript-eslint", "prettier"],
@@ -23,10 +25,7 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": [
-      "error",
-      2
-    ],
+    "prettier/prettier": "error",
     "@typescript-eslint/interface-name-prefix": [1, { "prefixWithI": "always" }],
     "linebreak-style": [
       "error",
@@ -35,32 +34,23 @@
     "quotes": [
       "error",
       "single"
-    ],    
+    ],
     "max-len": [
       "error",
       {
         "code": 120
       }
     ],
-    "no-extra-parens": "error",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "sonarjs/no-duplicate-string": "off",
+    "no-extra-parens": "off",
     "arrow-parens": [
       "error",
       "as-needed"
     ],
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "ignore",
-        "named": "always"
-      }
-    ],
     "no-console": "off",
     "no-trailing-spaces": "error",
     "no-multi-spaces": "error",
-    "operator-linebreak": [
-      "error",
-      "after"
-    ],
     "comma-style": [
       "error",
       "last"
