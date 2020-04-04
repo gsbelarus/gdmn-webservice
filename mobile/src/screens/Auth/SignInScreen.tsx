@@ -4,7 +4,7 @@ import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard }
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
-import { timeout } from '../../helpers/utils';
+import { timeout, getValueFromStorage } from '../../helpers/utils';
 import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
 import { useStore } from '../../store';
 import styles from '../../styles/global';
@@ -46,6 +46,15 @@ const SignInScreen = () => {
     };
   }, []);
 
+  const finishLogin = async () => {
+    const synchronization = await getValueFromStorage(`${credential.userName}/SYNCHRONIZATION`);
+    const autodeletingDocument = await getValueFromStorage(`${credential.userName}/AUTODELETING_DOCUMENT`);
+    actions.setSynchonization(synchronization);
+    actions.setAutodeletingDocument(autodeletingDocument);
+    actions.setUserID(credential.userName);
+    actions.setUserStatus(true);
+  };
+
   const logIn = useCallback(() => {
     Keyboard.dismiss();
     setLoginState({ isError: false, isLoading: true, status: undefined });
@@ -79,7 +88,7 @@ const SignInScreen = () => {
       timeout(5000, api.auth.login(credential))
         .then((data: IServerResponse<string>) => {
           data.status === 200
-            ? actions.setUserStatus(true)
+            ? finishLogin()
             : setLoginState({
                 isLoading: false,
                 status: data.result,

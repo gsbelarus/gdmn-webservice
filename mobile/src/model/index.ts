@@ -43,8 +43,8 @@ export interface IAppState {
   deviceActive?: boolean;
   loggedIn?: boolean;
   deviceId?: string;
-  synchronization: boolean;
-  autodeletingDocument: boolean;
+  synchronization?: boolean;
+  autodeletingDocument?: boolean;
 }
 
 // перенести в общую папку common

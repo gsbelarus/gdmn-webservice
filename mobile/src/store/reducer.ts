@@ -1,5 +1,6 @@
 import { Reducer } from 'react';
 
+import { saveToStorage } from '../helpers/utils';
 import { IAppState } from '../model';
 import { TActions, ActionTypes } from './actions';
 
@@ -15,7 +16,12 @@ export const initialState: IAppState = {
 export const reducer: Reducer<IAppState, TActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
     case ActionTypes.DISCONNECT:
-      return { ...{ baseUrl: state.baseUrl, synchronization: false, autodeletingDocument: false, initialState } };
+      return {
+        ...{
+          baseUrl: state.baseUrl,
+          initialState,
+        },
+      };
     case ActionTypes.LOG_OUT:
       return { ...state, userID: undefined, loggedIn: false };
     case ActionTypes.SET_BASEURL:
@@ -29,8 +35,10 @@ export const reducer: Reducer<IAppState, TActions> = (state = initialState, acti
     case ActionTypes.SET_USER_ID:
       return { ...state, userID: action.payload };
     case ActionTypes.SET_SYNCHRONIZATION:
+      saveToStorage(JSON.stringify({ value: action.payload }), `${state.userID}/SYNCHRONIZATION`);
       return { ...state, synchronization: action.payload };
     case ActionTypes.SET_AUTODELETING_DOCUMENT:
+      saveToStorage(JSON.stringify({ value: action.payload }), `${state.userID}/AUTODELETING_DOCUMENT`);
       return { ...state, autodeletingDocument: action.payload };
     default:
       return state;

@@ -1,3 +1,5 @@
+import { AsyncStorage } from 'react-native';
+
 import config from '../config';
 
 export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
@@ -33,3 +35,16 @@ export function createCancellableSignal<T>() {
 
   return p;
 }
+
+export const saveToStorage = async (value: string, key: string) => {
+  await AsyncStorage.setItem(key, value);
+};
+
+export const getValueFromStorage = async (key: string) => {
+  try {
+    const result: boolean = JSON.parse(await AsyncStorage.getItem(key)).value as boolean;
+    return result;
+  } catch {
+    return false;
+  }
+};
