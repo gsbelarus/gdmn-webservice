@@ -40,9 +40,10 @@ export const saveToStorage = async (value: string, key: string) => {
   await AsyncStorage.setItem(key, value);
 };
 
-export const getValueFromStorage = async (key: string) => {
+export const getValueFromStorage = async (keys: string[]) => {
   try {
-    const result: boolean = JSON.parse(await AsyncStorage.getItem(key)).value as boolean;
+    const result = await AsyncStorage.multiGet(keys);
+    //const result: boolean = JSON.parse(await AsyncStorage.getItem(key)).value as boolean;
     return result;
   } catch {
     return false;

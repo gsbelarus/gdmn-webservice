@@ -47,10 +47,12 @@ const SignInScreen = () => {
   }, []);
 
   const finishLogin = async () => {
-    const synchronization = await getValueFromStorage(`${credential.userName}/SYNCHRONIZATION`);
-    const autodeletingDocument = await getValueFromStorage(`${credential.userName}/AUTODELETING_DOCUMENT`);
-    actions.setSynchonization(synchronization);
-    actions.setAutodeletingDocument(autodeletingDocument);
+    const result = await getValueFromStorage([
+      `${credential.userName}/SYNCHRONIZATION`,
+      `${credential.userName}/AUTODELETING_DOCUMENT`,
+    ]);
+    actions.setSynchonization(result?.[0][1] && JSON.parse(result[0][1]).value);
+    actions.setAutodeletingDocument(result?.[1][1] && JSON.parse(result[1][1]).value);
     actions.setUserID(credential.userName);
     actions.setUserStatus(true);
   };
