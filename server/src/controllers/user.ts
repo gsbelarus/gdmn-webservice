@@ -83,7 +83,7 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     const idx = allUsers && allUsers.findIndex(user => user.userName === newUser.userName);
     if (!allUsers || idx === undefined || idx < 0) {
-      ctx.body = JSON.stringify({ status: 404, result: `no such user(${newUser.userName})` });
+      ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
       logger.warn(`no such user(${newUser.userName})`);
     } else {
       await writeFile(
@@ -118,7 +118,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
       ctx.body = JSON.stringify({ status: 200, result: `organization(${companyId}) added to user(${userId})` });
       logger.info(`organization(${companyId}) added to user(${userId})`);
     } else {
-      ctx.body = JSON.stringify({ status: 404, result: `no such user(${userId})` });
+      ctx.body = JSON.stringify({ status: 400, result: `no such user(${userId})` });
       logger.warn(`no such user(${userId})`);
     }
   } else {

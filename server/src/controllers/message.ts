@@ -20,7 +20,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
     if (!ctx.state.user.companies) {
       ctx.body = JSON.stringify({
-        status: 404,
+        status: 400,
         result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`,
       });
       logger.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${companyId})`);
@@ -29,7 +29,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
     if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === companyId)) {
       ctx.body = JSON.stringify({
-        status: 404,
+        status: 400,
         result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`,
       });
       logger.warn(`The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`);
@@ -57,7 +57,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     } else {
       ctx.status = 403;
       ctx.body = JSON.stringify({
-        status: 404,
+        status: 400,
         result: 'incorrect format message',
       });
       logger.warn('incorrect format message');
@@ -95,9 +95,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   } catch (e) {
     logger.trace(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
     console.log(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
-    ctx.status = 404;
+    ctx.status = 400;
     ctx.body = JSON.stringify({
-      status: 404,
+      status: 400,
       result: 'file or directory not found',
     });
   }
@@ -113,8 +113,8 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
       ctx.body = JSON.stringify({ status: 200, result: 'OK' });
       logger.info('get message');
     } else {
-      ctx.status = 404;
-      ctx.body = JSON.stringify({ status: 404, result: 'error' });
+      ctx.status = 400;
+      ctx.body = JSON.stringify({ status: 400, result: 'error' });
       logger.warn('could not delete file');
     }
   } else {

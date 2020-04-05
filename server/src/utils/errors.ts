@@ -7,6 +7,6 @@ class ServerError extends Error {}
 export const errors = {
   UnauthorizedError, // 401
   ForbiddenError, // 403
-  NotFoundError, // 404
+  NotFoundError, // 400
   ServerError, // 500
 };
