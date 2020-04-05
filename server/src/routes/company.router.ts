@@ -1,12 +1,11 @@
 import Router from 'koa-router';
-import { addCompany, editProfile } from '../controllers/user';
-import { getCompaniesByUser, getProfile } from '../controllers/company';
+import { getCompaniesByUser, getCompanyProfile, addCompany, editCompanyProfile } from '../controllers/company';
+import { authMiddleware } from '../middleware/authRequired';
 
 const router = new Router({ prefix: '/company' });
 
-router.post('/new', addCompany);
-router.get('/byUser', getCompaniesByUser);
-router.get('/profile', getProfile);
-router.post('/editeProfile', editProfile);
-
+router.post('/new', authMiddleware, addCompany);
+router.get('/byUser', authMiddleware, getCompaniesByUser);
+router.get('/profile', authMiddleware, getCompanyProfile);
+router.put('/profile', authMiddleware, editCompanyProfile);
 export default router;

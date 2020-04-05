@@ -5,7 +5,7 @@ import { VerifyFunction } from 'passport-local';
 
 const findById = async (id: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  return data ? data.find(user => user.id === id) : undefined;
+  return data?.find(user => user.id === id);
 };
 
 const findByUserName = async (userName: string) => {
@@ -48,6 +48,7 @@ const editCompanies = async (userId: string, companies: string[]) => {
 
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await findByUserName(userName);
+
   // TODO: use password hash
   if (!user || user.password !== password) {
     done(null, false);

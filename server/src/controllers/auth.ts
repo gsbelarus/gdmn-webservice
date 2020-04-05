@@ -5,79 +5,64 @@ import { IUser } from '../models/models';
 import { PATH_LOCAL_DB_USERS } from '../server';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { findByUserName } from '../utils/util';
-import { ParameterizedContext } from 'koa';
+import { ParameterizedContext, Next } from 'koa';
+import { IResponse } from '../models/requests';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-const logIn = async (ctx: ParameterizedContext): Promise<void> => {
+const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   if (!ctx.isUnauthenticated()) {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({
-      status: 403,
-      result: 'you are already logged in',
-    });
     logger.warn('User has already logged in');
-    return;
+    const res: IResponse<string> = { status: 400, result: 'you are already logged in' };
+    ctx.throw(400, JSON.stringify(res));
   }
 
-  const user = (await promisify(cb => {
-    koaPassport.authenticate('local', cb);
-  })()) as IUser | false;
+  const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
-    ctx.status = 404;
-    ctx.body = JSON.stringify({
-      status: 404,
-      result: 'wrong login or password',
-    });
     logger.info('failed login attempt');
-    return;
+    const res: IResponse<string> = { status: 400, result: 'incorrect login or password' };
+    ctx.throw(400, JSON.stringify(res));
   }
 
   ctx.login(user);
 
   if (ctx.isAuthenticated()) {
     delete user.password;
+
+    logger.info(`user ${user} successfully logged in`);
+
+    const res: IResponse<boolean | IUser> = { status: 200, result: user ? user : false };
+
     ctx.status = 200;
-    ctx.body = JSON.stringify({
-      status: 200,
-      result: user ? user : false,
-    });
-    logger.info(`login user ${user}`);
+    ctx.body = JSON.stringify(res);
   }
 };
 
 /** Проверка текущего пользователя в сессии koa */
-const getUser = (ctx: ParameterizedContext): void => {
-  if (ctx.isAuthenticated()) {
-    const user = ctx.state.user;
-    delete user.password;
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: user });
-    logger.info(`user authenticated: ${ctx.state.user.userName}`);
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'not authenticated' });
-    logger.info('is unauthenticated');
-  }
+const getCurrentUser = (ctx: ParameterizedContext): void => {
+  logger.info(`user authenticated: ${ctx.state.user.userName}`);
+
+  const user = ctx.state.user;
+
+  delete user.password;
+
+  const res: IResponse<IUser> = { status: 200, result: user };
+
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 const logOut = (ctx: ParameterizedContext): void => {
-  if (ctx.isAuthenticated()) {
-    const user = ctx.state.user.userName;
-    ctx.logout();
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'sign out successful' });
-    logger.info(`user ${user} sign out successful`);
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({
-      status: 403,
-      result: 'left before or didn’t enter',
-    });
-    logger.warn('left before or didn’t enter');
-  }
+  const user = ctx.state.user.userName;
+  logger.info(`user ${user} successfully logged out`);
+
+  ctx.logout();
+
+  const res: IResponse<string> = { status: 200, result: 'successfully logged out' };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
@@ -106,15 +91,12 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 
     ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser });
-    logger.info('sign up successful');
+    logger.info('signed up successful');
   } else {
-    ctx.status = 404;
-    ctx.body = JSON.stringify({
-      status: 404,
-      result: 'such user already exists',
-    });
-    logger.info('such user already exists');
+    logger.info('a user already exists');
+    const res: IResponse<string> = { status: 400, result: 'a user already exists' };
+    ctx.throw(400, JSON.stringify(res));
   }
 };
 
-export { signUp, logIn, logOut, getUser };
+export { signUp, logIn, logOut, getCurrentUser };

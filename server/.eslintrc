@@ -31,10 +31,6 @@
       "error",
       "unix"
     ],
-    "quotes": [
-      "error",
-      "single"
-    ],
     "max-len": [
       "error",
       {

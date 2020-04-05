@@ -36,8 +36,14 @@ export async function init(): Promise<void> {
   };
 
   passport.serializeUser((user: IUser, done) => done(null, user.id));
-  passport.deserializeUser((id: string, done) => {
-    (async () => done((await findById(id)) || undefined))();
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
   });
 
   passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));

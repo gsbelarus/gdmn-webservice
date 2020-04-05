@@ -14,7 +14,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
   switch (param.command) {
 
     case 'GET_USER_DATA':
-      resFetch = await fetch(`http://localhost:3649/api/me`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`http://localhost:3649/api/auth/user`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -38,7 +38,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         userName: param.userName,
         password: param.password
       });
-      resFetch = await fetch(`http://localhost:3649/api/login`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/auth/login`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -58,7 +58,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         password: param.password,
         creatorId: param.userName
       });
-      resFetch = await fetch(`http://localhost:3649/api/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -152,10 +152,9 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
 
     case 'UPDATE_COMPANY':
       body = JSON.stringify({
-        id: param.companyId,
         title: param.companyName
       });
-      resFetch = await fetch(`http://localhost:3649/api/company/editeProfile`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/company/profile?companyId=${param.companyId}`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
@@ -172,7 +171,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
 
       body = JSON.stringify(param.user);
 
-      resFetch = await fetch(`http://localhost:3649/api/user/edite`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`http://localhost:3649/api/user/profile`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.status === 200) {
