@@ -1,14 +1,17 @@
 import Koa from 'koa';
+import fs from 'fs';
+import path from 'path';
 import koaCors from '@koa/cors';
-import router from './routers';
+import router from './routes';
 import session from 'koa-session';
 import passport from 'koa-passport';
-import { Strategy as LocalStrategy, VerifyFunction } from 'passport-local';
-import { IUser } from './models';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { IUser } from './models/models';
 import bodyParser from 'koa-bodyparser';
+import morganlogger from 'koa-morgan';
 
 import log4js from 'log4js';
-import { findByUserName, findById } from './routers/util';
+import { findById, validateAuthCreds } from './utils/util';
 import dev from '../config/dev';
 
 const logger = log4js.getLogger('SERVER');
@@ -20,7 +23,7 @@ export const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
 export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
 export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
 
-export async function init() {
+export async function init(): Promise<void> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
@@ -33,11 +36,27 @@ export async function init() {
   };
 
   passport.serializeUser((user: IUser, done) => done(null, user.id));
-  passport.deserializeUser(async (id: string, done) => done(null, (await findById(id)) || undefined));
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  });
+
   passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
 
-  // .use(bodyParser())
+  // Логи для Morgan
+  const logPath = path.join(process.cwd(), '/logs/');
+  if (!fs.existsSync(logPath)) {
+    fs.mkdirSync(logPath);
+  }
+  const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
+
   app
+    .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(CONFIG, app))
     .use(bodyParser())
     .use(passport.initialize())
@@ -46,20 +65,8 @@ export async function init() {
     .use(router.routes())
     .use(router.allowedMethods());
 
-  const port = 3649;
-
   logger.trace('Starting listener ...');
-  await new Promise(resolve => app.listen(port, () => resolve()));
+  await new Promise(resolve => app.listen(dev.PORT, () => resolve()));
   logger.trace('Started');
-  console.log(`Rest started on http://localhost:${port}`);
+  console.info(`🚀 Server is running on on http://localhist:${dev.PORT}`);
 }
-
-const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
-  const user = await findByUserName(userName);
-  // TODO: use password hash
-  if (!user || user.password !== password) {
-    done(null, false);
-  } else {
-    done(null, user);
-  }
-};

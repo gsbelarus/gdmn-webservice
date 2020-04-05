@@ -1,21 +1,17 @@
-import Router from 'koa-router';
-import { readFile, writeFile, removeFile } from '../workWithFile';
-import { PATH_LOCAL_DB_MESSAGES } from '../rest';
+import { readFile, writeFile, removeFile } from '../utils/workWithFile';
+import { PATH_LOCAL_DB_MESSAGES } from '../server';
 import log4js from 'log4js';
 import { v1 as uuidv1 } from 'uuid';
-import { IMessage } from '../models';
+import { IMessage } from '../models/models';
 import { promises } from 'fs';
+import { ParameterizedContext } from 'koa';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-const router = new Router();
+const remove = async (company: string, uid: string) => removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`);
 
-router.post('/messages', ctx => newMessage(ctx));
-router.get('/messages', ctx => getMessage(ctx));
-router.delete('/messages/:companyId/:id', ctx => removeMessage(ctx));
-
-const newMessage = async (ctx: any) => {
+const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const {
       head: { companyId, consumer },
@@ -31,7 +27,7 @@ const newMessage = async (ctx: any) => {
       return;
     }
 
-    if (!(ctx.state.user.companies as string[]).find(item => item === companyId)) {
+    if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === companyId)) {
       ctx.body = JSON.stringify({
         status: 404,
         result: `The User (${ctx.state.user.id}) does not belong to the Company (${companyId})`,
@@ -62,22 +58,22 @@ const newMessage = async (ctx: any) => {
       ctx.status = 403;
       ctx.body = JSON.stringify({
         status: 404,
-        result: `incorrect format message`,
+        result: 'incorrect format message',
       });
-      logger.warn(`incorrect format message`);
+      logger.warn('incorrect format message');
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
-const getMessage = async (ctx: any) => {
+const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (!ctx.isAuthenticated()) {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
     return;
   }
 
@@ -86,7 +82,7 @@ const getMessage = async (ctx: any) => {
 
   try {
     const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
-    for (const newFile of nameFiles) {
+    for await (const newFile of nameFiles) {
       const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
       result.push((data as unknown) as IMessage);
     }
@@ -107,7 +103,7 @@ const getMessage = async (ctx: any) => {
   }
 };
 
-const removeMessage = async (ctx: any) => {
+const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const { companyId, id: uid } = ctx.params;
     const result = await remove(companyId, uid);
@@ -123,11 +119,9 @@ const removeMessage = async (ctx: any) => {
     }
   } else {
     ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: `access denied` });
-    logger.warn(`access denied`);
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
   }
 };
 
-const remove = async (company: string, uid: string) => removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`);
-
-export default router;
+export { newMessage, removeMessage, getMessage };

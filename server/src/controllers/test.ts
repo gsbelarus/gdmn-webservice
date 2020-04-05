@@ -1,8 +1,8 @@
-import Router from 'koa-router';
 import log4js from 'log4js';
-import { readFile, writeFile } from '../workWithFile';
+import { readFile } from '../utils/workWithFile';
 import dev from '../../config/dev';
-import { IGood, IContact, IDocumentType, IDocument } from '../models';
+import { IGood, IContact, IDocumentType, IDocument } from '../models/models';
+import { ParameterizedContext } from 'koa';
 
 const PATH_GOODS = `${dev.FILES_PATH}\\Goods.json`;
 const PATH_DOCUMENT_TYPE = `${dev.FILES_PATH}\\GD_DocumentType.json`;
@@ -10,13 +10,10 @@ const PATH_CONTACT = `${dev.FILES_PATH}\\GD_Contact.json`;
 const PATH_DOCUMENT = `${dev.FILES_PATH}\\Document.json`;
 const PATH_REMAINS = `${dev.FILES_PATH}\\Remains.json`;
 
-const router = new Router({ prefix: '/test' });
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-router.get('/all', async ctx => getAllData(ctx));
-
-const getAllData = async (ctx: any) => {
+const getAllData = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const goods: IGood[] | undefined = await readFile(PATH_GOODS);
     const documenttypes: IDocumentType[] | undefined = await readFile(PATH_DOCUMENT_TYPE);
@@ -32,4 +29,4 @@ const getAllData = async (ctx: any) => {
   }
 };
 
-export default router;
+export { getAllData };

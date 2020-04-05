@@ -1,10 +1,12 @@
 import Api from '../api/Api';
+import Sync from '../api/Sync';
 import { AppActions } from '../store';
 
 export interface IContextProps {
   state: IAppState;
   actions: typeof AppActions;
   api: Api;
+  sync: Sync;
 }
 
 export interface IDataFetch {
