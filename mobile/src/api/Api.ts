@@ -1,6 +1,6 @@
+import config from '../config';
 import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
 import { get, post } from './http.service';
-import config from '../config';
 
 export default class Api {
   baseUrl: IBaseUrl;
