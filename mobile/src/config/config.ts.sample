@@ -7,6 +7,7 @@ export default {
   apiPath: 'api',
   debug: {
     showWarnings: true,
-    useMockup: true
+    useMockup: true,
+    deviceId: '11B67E8B-9D5D-4D39-B22B-72FE93154536',
   }
 };

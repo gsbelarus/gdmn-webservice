@@ -1,3 +1,4 @@
-export default {
+export default
+  PORT = 3649,
   FILES_PATH: "c:\\DB"
 };

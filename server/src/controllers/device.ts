@@ -21,7 +21,7 @@ const isExistDevice = async (ctx: ParameterizedContext): Promise<void> => {
     logger.warn(`device(${uid}) does not exist`);
   } else {
     result = { status: 200, result: true };
-    logger.info(`device(${uid}) does not exist`);
+    logger.info(`device(${uid}) exists`);
   }
   ctx.body = JSON.stringify(result);
 };
