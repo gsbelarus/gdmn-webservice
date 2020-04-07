@@ -19,7 +19,7 @@ const makeUser = (user: IUser) => ({
 
 const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
-    const { idDevice } = ctx.query;
+    const idDevice: string = ctx.params.id;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     ctx.body = JSON.stringify({
@@ -59,7 +59,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
-    const { companyId } = ctx.query;
+    const companyId: string = ctx.params.id;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     ctx.body = JSON.stringify({
       status: 200,
@@ -79,9 +79,10 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
+    const userId: string = ctx.params.id;
     const newUser = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const idx = allUsers && allUsers.findIndex(user => user.userName === newUser.userName);
+    const idx = allUsers && allUsers.findIndex(user => user.id === userId);
     if (!allUsers || idx === undefined || idx < 0) {
       ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
       logger.warn(`no such user(${newUser.userName})`);
@@ -157,10 +158,12 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
-    const { users, companyId } = ctx.request.body;
+    const companyId: string = ctx.params.id;
+    const { users } = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    console.log(companyId)
     const newUsers = allUsers?.map(el =>
-      users.findIndex((u: any) => u === el.id) !== -1
+      users.findIndex((u: string) => u === el.id) !== -1
         ? { ...el, companies: el.companies?.filter(o => o !== companyId) }
         : el,
     );
