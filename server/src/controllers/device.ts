@@ -1,11 +1,10 @@
 import { ParameterizedContext } from 'koa';
-import { IDevice, IActivationCode } from '../models/models';
+import { IDevice } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
-import { PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
+import { PATH_LOCAL_DB_DEVICES } from '../server';
 
 import log4js from 'log4js';
 import { IResponse } from '../models/requests';
-import { saveActivationCode } from '../utils/util';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -24,39 +23,6 @@ const isExistDevice = async (ctx: ParameterizedContext): Promise<void> => {
     logger.info(`device(${uid}) exists`);
   }
   ctx.body = JSON.stringify(result);
-};
-
-const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const code = data && data.find(el => el.code === ctx.query.code);
-  let result: IResponse<string>;
-
-  if (code) {
-    const date = new Date(code.date);
-    date.setDate(date.getDate() + 7);
-    ctx.status = 200;
-    if (date >= new Date()) {
-      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
-      result = { status: 200, result: code.user };
-      logger.info('device has been successfully activated');
-    } else {
-      result = { status: 202, result: 'invalid activation code' };
-      logger.warn('invalid activation code');
-    }
-  } else {
-    ctx.status = 200;
-    result = { status: 202, result: 'invalid activation code' };
-    logger.warn('invalid activation code');
-  }
-  ctx.body = JSON.stringify(result);
-};
-
-const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId = ctx.query.user;
-  const code = await saveActivationCode(userId);
-  ctx.status = 200;
-  ctx.body = JSON.stringify({ status: 200, result: code });
-  logger.info('activation code generated successfully');
 };
 
 const newDevice = async (ctx: ParameterizedContext): Promise<void> => {

@@ -1,10 +1,10 @@
 import log4js from 'log4js';
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
-import { IUser } from '../models/models';
-import { PATH_LOCAL_DB_USERS } from '../server';
+import { IUser, IActivationCode } from '../models/models';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import { readFile, writeFile } from '../utils/workWithFile';
-import { findByUserName } from '../utils/util';
+import { findByUserName, saveActivationCode } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
 import { IResponse } from '../models/requests';
 
@@ -12,7 +12,7 @@ const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
-  if (!ctx.isUnauthenticated()) {
+  if (ctx.isAuthenticated()) {
     logger.warn('User has already logged in');
     const res: IResponse<string> = { status: 400, result: 'you are already logged in' };
     ctx.throw(400, JSON.stringify(res));
@@ -99,4 +99,37 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { signUp, logIn, logOut, getCurrentUser };
+const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
+  const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
+  const code = data && data.find(el => el.code === ctx.query.code);
+  let result: IResponse<string>;
+
+  if (code) {
+    const date = new Date(code.date);
+    date.setDate(date.getDate() + 7);
+    ctx.status = 200;
+    if (date >= new Date()) {
+      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
+      result = { status: 200, result: code.user };
+      logger.info('device has been successfully activated');
+    } else {
+      result = { status: 202, result: 'invalid activation code' };
+      logger.warn('invalid activation code');
+    }
+  } else {
+    ctx.status = 200;
+    result = { status: 202, result: 'invalid activation code' };
+    logger.warn('invalid activation code');
+  }
+  ctx.body = JSON.stringify(result);
+};
+
+const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
+  const userId = ctx.query.user;
+  const code = await saveActivationCode(userId);
+  ctx.status = 200;
+  ctx.body = JSON.stringify({ status: 200, result: code });
+  logger.info('activation code generated successfully');
+};
+
+export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };
