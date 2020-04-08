@@ -35,24 +35,23 @@ const newDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const companyId: string = ctx.params.id;
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    ctx.body = JSON.stringify({
-      status: 200,
-      result:
-        allUsers &&
-        allUsers
-          .filter(user => user.companies && user.companies.length && user.companies.find(org => org === companyId))
-          .map(makeUser),
-    });
-    logger.info('get users by company successfully');
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    logger.warn('access denied');
-  }
+const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
+  const idDevice: string = ctx.params.id;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result:
+      !allDevices || !allDevices.length
+        ? []
+        : allDevices
+            .filter(device => device.uid === idDevice)
+            .map(device => {
+              const user = allUsers && allUsers.find(el => el.id === device.user);
+              return user ? { user: user.userName, state: device.isBlock ? 'blocked' : 'active' } : 'not found user';
+            }),
+  });
+  logger.info('get users by device successfully');
 };
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
@@ -264,4 +263,4 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   logger.info('get devices by user successfully');
 };
 
-export { newDevice, getDevice, getUsersByCompany, editeDevice, removeDevice };
+export { newDevice, getDevice, getUsersByDevice, editeDevice, removeDevice };
