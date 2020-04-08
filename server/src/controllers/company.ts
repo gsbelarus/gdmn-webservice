@@ -10,7 +10,7 @@ const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { title } = ctx.query;
+  const title: string = ctx.request.body.title;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
   if (!(allCompanies && allCompanies.find(company => company.title === title))) {
     await writeFile(
@@ -37,7 +37,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompaniesByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId } = ctx.query;
+  const userId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   const findUser = allUsers?.find(user => user.id === userId);
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
@@ -59,7 +59,7 @@ const getCompaniesByUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId } = ctx.query;
+  const companyId: string = ctx.params.id;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
   const result = allCompanies && allCompanies.find(company => company.id === companyId);
 
@@ -74,7 +74,7 @@ const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId } = ctx.query;
+  const companyId: string = ctx.params.id;
   const newCompany = ctx.request.body;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
   const idx = allCompanies && allCompanies.findIndex(company => company.id === companyId);

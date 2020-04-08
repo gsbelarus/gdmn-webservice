@@ -15,6 +15,7 @@
 # production
 /build
 /dist
+/logs
 
 # vsCode
 .vscode/*

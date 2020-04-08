@@ -11,7 +11,7 @@ const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
 const isExistDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { uid } = ctx.query;
+  const { uid } = ctx.params.id;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid);
   let result: IResponse<boolean>;
@@ -196,7 +196,8 @@ const removeDevices = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const isActiveDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { uid, userId } = ctx.query;
+  const uid: string = ctx.params.id;
+  const { userId } = ctx.query;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
   if (!allDevices || idx === undefined || idx < 0) {
@@ -223,7 +224,7 @@ const isActiveDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
 const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
-    const { userId } = ctx.query;
+    const userId: string = ctx.params.id;
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     ctx.body = JSON.stringify({
       status: 200,

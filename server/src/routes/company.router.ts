@@ -4,8 +4,8 @@ import { authMiddleware } from '../middleware/authRequired';
 
 const router = new Router({ prefix: '/company' });
 
-router.post('/new', authMiddleware, addCompany);
-router.get('/byUser', authMiddleware, getCompaniesByUser);
-router.get('/profile', authMiddleware, getCompanyProfile);
-router.put('/profile', authMiddleware, editCompanyProfile);
+router.post('/', authMiddleware, addCompany);
+router.get('/user/:id', authMiddleware, getCompaniesByUser);
+router.get('/:id', authMiddleware, getCompanyProfile);
+router.put('/:id', authMiddleware, editCompanyProfile);
 export default router;
