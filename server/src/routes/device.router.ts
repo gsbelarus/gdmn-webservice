@@ -12,13 +12,13 @@ import {
 
 const router = new Router({ prefix: '/device' });
 
-router.get('/verifyCode', verifyCode);
-router.get('/getActivationCode', getActivationCode);
-router.post('/new', newDevice);
-router.post('/lock', lockDevices);
-router.post('/remove', removeDevices);
-router.get('/isExist', isExistDevice);
-router.get('/isActive', isActiveDevice);
-router.get('/byUser', getDevicesByUser);
+router.post('/verify-code', verifyCode);
+router.post('/activation-code', getActivationCode);
+router.post('/', newDevice);
+router.put('/lock', lockDevices);
+router.delete('/', removeDevices);
+router.get('/:id/exists', isExistDevice);
+router.get('/:id/active', isActiveDevice);
+router.get('/user/:id', getDevicesByUser);
 
 export default router;

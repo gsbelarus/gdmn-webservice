@@ -159,9 +159,8 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
 const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const companyId: string = ctx.params.id;
-    const { users } = ctx.request.body;
+    const users: string[] = ctx.request.body?.users;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    console.log(companyId)
     const newUsers = allUsers?.map(el =>
       users.findIndex((u: string) => u === el.id) !== -1
         ? { ...el, companies: el.companies?.filter(o => o !== companyId) }
