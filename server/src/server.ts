@@ -68,5 +68,5 @@ export async function init(): Promise<void> {
   logger.trace('Starting listener ...');
   await new Promise(resolve => app.listen(dev.PORT, () => resolve()));
   logger.trace('Started');
-  console.info(`🚀 Server is running on on http://localhist:${dev.PORT}`);
+  console.info(`🚀 Server is running on on http://localhost:${dev.PORT}`);
 }

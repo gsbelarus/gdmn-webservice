@@ -15,12 +15,12 @@ export default class Api {
     login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
       post(
         this.getUrl(),
-        '/login',
+        '/auth/login',
         JSON.stringify({ userName: userCredentials.userName, password: userCredentials.password }),
       ),
-    logout: async (): Promise<IServerResponse<string>> => get(this.getUrl(), '/logout'),
+    logout: async (): Promise<IServerResponse<string>> => get(this.getUrl(), '/auth/logout'),
 
-    getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/me'),
+    getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/auth/user'),
 
     getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
       get(this.getUrl(), `/device/isExist?uid=${config.debug.deviceId}`),

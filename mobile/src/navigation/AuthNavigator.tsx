@@ -101,6 +101,7 @@ const AuthNavigator = () => {
 
   useEffect(() => {
     if (state.serverResp) {
+      // TODO вызов 3 раза
       actions.setDeviceStatus(state.serverResp.result as boolean);
     }
   }, [actions, state.serverResp]);
@@ -109,7 +110,6 @@ const AuthNavigator = () => {
     if (deviceRegistered === undefined) {
       return;
     }
-
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
           .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
