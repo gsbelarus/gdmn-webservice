@@ -15,7 +15,6 @@ router.put('/lock', lockDevices);
 router.delete('/', removeDevices);
 router.get('/:id', getDevice);
 router.get('/:id/user', getDeviceByCurrentUser);
-// router.get('/:id/active', isActiveDevice);
 router.get('/user/:id', getDevicesByUser);
 
 export default router;
