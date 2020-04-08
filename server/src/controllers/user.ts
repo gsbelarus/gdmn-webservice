@@ -8,7 +8,7 @@ import { editCompanies } from '../utils/util';
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
-const makeUser = (user: IUser) => ({
+export const makeUser = (user: IUser) => ({
   id: user.id,
   userName: user.userName,
   firstName: user.firstName,
