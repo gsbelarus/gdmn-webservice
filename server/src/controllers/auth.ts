@@ -12,7 +12,7 @@ const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
-  if (!ctx.isUnauthenticated()) {
+  if (ctx.isAuthenticated()) {
     logger.warn('User has already logged in');
     const res: IResponse<string> = { status: 400, result: 'you are already logged in' };
     ctx.throw(400, JSON.stringify(res));
