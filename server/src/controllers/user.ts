@@ -57,6 +57,22 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
+const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
+  if (ctx.isAuthenticated()) {
+    const userId: string = ctx.params.id;
+    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    ctx.body = JSON.stringify({
+      status: 200,
+      result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
+    });
+    logger.info('get users by device successfully');
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
+  }
+};
+
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const companyId: string = ctx.params.id;
@@ -129,6 +145,27 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
+const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+  if (ctx.isAuthenticated()) {
+    const userId: string = ctx.params.id;
+    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+    ctx.body = JSON.stringify({
+      status: 200,
+      result:
+        !allDevices || !allDevices.length
+          ? []
+          : allDevices
+              .filter(device => device.user === userId)
+              .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+    });
+    logger.info('get devices by user successfully');
+  } else {
+    ctx.status = 403;
+    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    logger.warn('access denied');
+  }
+};
+
 const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const { users } = ctx.request.body;
@@ -178,4 +215,4 @@ const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> 
   }
 };
 
-export { addCompany, editProfile, getUsersByDevice, getUsers, removeUsersFromCompany, removeUsers, getUsersByCompany };
+export { addCompany, editProfile, getUsersByDevice, getUsers, getProfile, removeUsersFromCompany, getDevicesByUser, removeUsers, getUsersByCompany };
