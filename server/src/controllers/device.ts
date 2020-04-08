@@ -6,7 +6,6 @@ import { PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_US
 import log4js from 'log4js';
 import { IResponse } from '../models/requests';
 import { saveActivationCode } from '../utils/util';
-import { makeUser } from './user';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
