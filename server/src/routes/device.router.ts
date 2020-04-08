@@ -1,8 +1,6 @@
 import Router from 'koa-router';
 import {
   isExistDevice,
-  verifyCode,
-  getActivationCode,
   newDevice,
   lockDevices,
   removeDevices,
@@ -12,8 +10,6 @@ import {
 
 const router = new Router({ prefix: '/device' });
 
-router.post('/verify-code', verifyCode);
-router.post('/activation-code', getActivationCode);
 router.post('/', newDevice);
 router.put('/lock', lockDevices);
 router.delete('/', removeDevices);
