@@ -11,4 +11,4 @@ node_modules/.yarn-integrity
 #user's config
 dev.ts
 prod.ts
-*/log/*
+server/logs/*
