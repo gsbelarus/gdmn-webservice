@@ -33,9 +33,8 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
     logger.info(`user ${user} successfully logged in`);
 
-    const res: IResponse<boolean | IUser> = { status: 200, result: user ? user : false };
+    const res: IResponse<boolean | IUser> = { status: 200, result: user || false };
 
-    ctx.status = 200;
     ctx.body = JSON.stringify(res);
   }
 };
@@ -50,7 +49,6 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   const res: IResponse<IUser> = { status: 200, result: user };
 
-  ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
 
@@ -61,7 +59,6 @@ const logOut = (ctx: ParameterizedContext): void => {
   ctx.logout();
 
   const res: IResponse<string> = { status: 200, result: 'successfully logged out' };
-  ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
 
@@ -89,7 +86,6 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       ),
     );
 
-    ctx.status = 200;
     ctx.body = JSON.stringify({ status: 200, result: newUser });
     logger.info('signed up successful');
   } else {
@@ -107,7 +103,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   if (code) {
     const date = new Date(code.date);
     date.setDate(date.getDate() + 7);
-    ctx.status = 200;
+
     if (date >= new Date()) {
       await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
       result = { status: 200, result: code.user };
@@ -117,7 +113,6 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
       logger.warn('invalid activation code');
     }
   } else {
-    ctx.status = 200;
     result = { status: 202, result: 'invalid activation code' };
     logger.warn('invalid activation code');
   }
@@ -127,7 +122,6 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const userId = ctx.query.user;
   const code = await saveActivationCode(userId);
-  ctx.status = 200;
   ctx.body = JSON.stringify({ status: 200, result: code });
   logger.info('activation code generated successfully');
 };

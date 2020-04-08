@@ -133,13 +133,13 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
     const { users } = ctx.request.body;
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const newUsers = allUsers?.filter(el => !users.findIndex((u: any) => u.id === el.id));
+    const newUsers = allUsers?.filter(el => !users.findIndex((u: IUser) => u.id === el.id));
 
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    const newDevices = allDevices?.filter(el => !users.findIndex((u: any) => u.id === el.user));
+    const newDevices = allDevices?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
 
     const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-    const newCodes = allCodes?.filter(el => !users.findIndex((u: any) => u.id === el.user));
+    const newCodes = allCodes?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
 
     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
 
