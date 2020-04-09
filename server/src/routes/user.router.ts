@@ -1,11 +1,5 @@
 import Router from 'koa-router';
-import {
-  getDevicesByUser,
-  getUsers,
-  getProfile,
-  removeUsers,
-  editProfile,
-} from '../controllers/user';
+import { getDevicesByUser, getUsers, getProfile, removeUsers, editProfile } from '../controllers/user';
 import { authMiddleware } from '../middleware/authRequired';
 
 const router = new Router({ prefix: '/user' });
