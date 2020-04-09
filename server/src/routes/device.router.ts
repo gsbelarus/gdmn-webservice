@@ -9,7 +9,7 @@ import {
 } from '../controllers/device';
 import { authMiddleware } from '../middleware/authRequired';
 
-const router = new Router({ prefix: '/device' });
+const router = new Router({ prefix: '/devices' });
 
 router.post('/', authMiddleware, addDevice);
 router.get('/:id', getDevice);
