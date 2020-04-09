@@ -6,7 +6,8 @@ const router = new Router({ prefix: '/device' });
 
 router.post('/', authMiddleware, newDevice);
 router.get('/:id', getDevice);
-router.get('/:id/user', authMiddleware, getUsersByDevice);
+router.get('/:id/user', authMiddleware, getDeviceByCurrentUser);
+// router.get('/:id/user', authMiddleware, getUsersByDevice);
 router.patch('/:id', authMiddleware, editeDevice);
 router.delete('/:id', authMiddleware, removeDevice);
 

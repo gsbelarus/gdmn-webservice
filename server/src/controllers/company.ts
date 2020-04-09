@@ -5,6 +5,7 @@ import log4js from 'log4js';
 import { editCompanies } from '../utils/util';
 import { ParameterizedContext } from 'koa';
 import { IResponse } from '../models/requests';
+import { makeUser } from './user';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -34,28 +35,6 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
     logger.warn(`a company (${title}) already exists`);
     ctx.body = JSON.stringify({ status: 400, result: `a company (${title}) already exists` });
   }
-};
-
-const getCompaniesByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const findUser = allUsers?.find(user => user.id === userId);
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-
-  ctx.body = JSON.stringify({
-    status: 200,
-    result:
-      !allCompanies || !allCompanies.length
-        ? []
-        : allCompanies
-            .filter(company => findUser?.companies?.find(item => item === company.id))
-            ?.map(company => ({
-              companyName: company.title,
-              companyId: company.id,
-              userRole: company.admin === findUser?.id ? 'Admin' : '',
-            })),
-  });
-  logger.info("'get companies by user' successfully executed");
 };
 
 const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -96,4 +75,18 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
   ctx.body = JSON.stringify({ status: 200, result: 'a company edited successfully' });
 };
 
-export { addCompany, editCompanyProfile, getCompanyProfile, getCompaniesByUser };
+const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
+  const companyId: string = ctx.params.id;
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result:
+      allUsers &&
+      allUsers
+        .filter(user => user.companies && user.companies.length && user.companies.find(org => org === companyId))
+        .map(makeUser),
+  });
+  logger.info('get users by company successfully');
+};
+
+export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany };
