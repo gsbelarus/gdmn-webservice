@@ -1,20 +1,14 @@
 import Router from 'koa-router';
-import {
-  getDevice,
-  getDeviceByCurrentUser,
-  lockDevices,
-  newDevice,
-  removeDevices,
-  getDevicesByUser,
-} from '../controllers/device';
+import { newDevice, getDevice, getUsersByDevice, editeDevice, removeDevice } from '../controllers/device';
+import { authMiddleware } from '../middleware/authRequired';
 
 const router = new Router({ prefix: '/device' });
 
-router.post('/', newDevice);
-router.put('/lock', lockDevices);
-router.delete('/', removeDevices);
+router.post('/', authMiddleware, newDevice);
 router.get('/:id', getDevice);
-router.get('/:id/user', getDeviceByCurrentUser);
-router.get('/user/:id', getDevicesByUser);
+router.get('/:id/user', authMiddleware, getDeviceByCurrentUser);
+// router.get('/:id/user', authMiddleware, getUsersByDevice);
+router.patch('/:id', authMiddleware, editeDevice);
+router.delete('/:id', authMiddleware, removeDevice);
 
 export default router;
