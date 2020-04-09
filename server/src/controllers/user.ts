@@ -43,18 +43,22 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    ctx.body = JSON.stringify({
-      status: 200,
-      result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
-    });
-    logger.info('get users by device successfully');
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    logger.warn('access denied');
-  }
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
+  });
+  logger.info('get users by device successfully');
+};
+
+const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
+  const userId: string = ctx.params.id;
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
+  });
+  logger.info('get users by device successfully');
 };
 
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -78,36 +82,30 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const userId: string = ctx.params.id;
-    const newUser = ctx.request.body;
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const idx = allUsers && allUsers.findIndex(user => user.id === userId);
-    if (!allUsers || idx === undefined || idx < 0) {
-      ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
-      logger.warn(`no such user(${newUser.userName})`);
-    } else {
-      await writeFile(
-        PATH_LOCAL_DB_USERS,
-        JSON.stringify([
-          ...allUsers.slice(0, idx),
-          {
-            ...allUsers[idx],
-            lastName: newUser.lastName,
-            firstName: newUser.firstName,
-            phoneNumber: newUser.phoneNumber,
-            password: newUser.password,
-          },
-          ...allUsers.slice(idx + 1),
-        ]),
-      );
-      ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
-      logger.info('user edited successfully');
-    }
+  const userId: string = ctx.params.id;
+  const newUser = ctx.request.body;
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  const idx = allUsers && allUsers.findIndex(user => user.id === userId);
+  if (!allUsers || idx === undefined || idx < 0) {
+    ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
+    logger.warn(`no such user(${newUser.userName})`);
   } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    logger.warn('access denied');
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify([
+        ...allUsers.slice(0, idx),
+        {
+          ...allUsers[idx],
+          lastName: newUser.lastName,
+          firstName: newUser.firstName,
+          phoneNumber: newUser.phoneNumber,
+          password: newUser.password,
+        },
+        ...allUsers.slice(idx + 1),
+      ]),
+    );
+    ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
+    logger.info('user edited successfully');
   }
 };
 
@@ -129,31 +127,40 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
+const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const userId: string = ctx.params.id;
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  ctx.body = JSON.stringify({
+    status: 200,
+    result:
+      !allDevices || !allDevices.length
+        ? []
+        : allDevices
+            .filter(device => device.user === userId)
+            .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+  });
+  logger.info('get devices by user successfully');
+};
+
 const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const { users } = ctx.request.body;
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    const newUsers = allUsers?.filter(el => !users.findIndex((u: IUser) => u.id === el.id));
+  const { users } = ctx.request.body;
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  const newUsers = allUsers?.filter(el => !users.findIndex((u: IUser) => u.id === el.id));
 
-    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    const newDevices = allDevices?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const newDevices = allDevices?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
 
-    const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-    const newCodes = allCodes?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
+  const newCodes = allCodes?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
 
-    await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
+  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
 
-    await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
+  await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
 
-    await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes));
+  await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes));
 
-    ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-    logger.info('users removed successfully');
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    logger.warn('access denied');
-  }
+  ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
+  logger.info('users removed successfully');
 };
 
 const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -178,4 +185,4 @@ const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> 
   }
 };
 
-export { addCompany, editProfile, getUsersByDevice, getUsers, removeUsersFromCompany, removeUsers, getUsersByCompany };
+export { getDevicesByUser, getUsers, getProfile, removeUsers, editProfile };
