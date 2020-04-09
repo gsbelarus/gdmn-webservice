@@ -4,8 +4,8 @@ import { authMiddleware } from '../middleware/authRequired';
 
 const router = new Router({ prefix: '/user' });
 
-router.get('/:id/device', authMiddleware, getDevicesByUser);
 router.get('/', authMiddleware, getUsers);
+router.get('/:id/devices', authMiddleware, getDevicesByUser);
 router.put('/:id', authMiddleware, getProfile);
 router.delete('/:id', authMiddleware, removeUsers);
 router.patch('/:id', authMiddleware, editProfile);
