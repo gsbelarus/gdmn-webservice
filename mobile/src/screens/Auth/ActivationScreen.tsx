@@ -1,5 +1,5 @@
+import config from '../../config';
 import { useTheme } from '@react-navigation/native';
-import Constants from 'expo-constants';
 import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
@@ -46,8 +46,8 @@ const ActivationScreen = () => {
     timeout(
       5000,
       api.auth.addDevice({
-        uid: Constants.deviceId,
-        userId: serverResp.result as string,
+        uid: config.debug.deviceId,
+        user: serverResp.result as string,
       }),
     )
       .then((data: IServerResponse<string>) => {

@@ -38,6 +38,11 @@ export interface IDevice {
   state: string;
 }
 
+export interface INewDevice {
+  uid: string;
+  user: string;
+}
+
 export interface IAppState {
   baseUrl?: IBaseUrl;
   companyID?: string;
