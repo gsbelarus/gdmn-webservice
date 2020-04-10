@@ -6,7 +6,7 @@ const router = new Router({ prefix: '/users' });
 
 router.get('/', authMiddleware, getUsers);
 router.get('/:id/devices', authMiddleware, getDevicesByUser);
-router.put('/:id', authMiddleware, getProfile);
+router.get('/:id', authMiddleware, getProfile);
 router.delete('/:id', authMiddleware, removeUsers);
 router.patch('/:id', authMiddleware, editProfile);
 
