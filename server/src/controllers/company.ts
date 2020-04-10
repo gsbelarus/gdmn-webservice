@@ -13,27 +13,29 @@ logger.level = 'trace';
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const title: string = ctx.request.body.title;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  if (!(allCompanies && allCompanies.find(company => company.title === title))) {
-    await writeFile(
-      PATH_LOCAL_DB_COMPANIES,
-      JSON.stringify(
-        allCompanies
-          ? [...allCompanies, { id: title, title, admin: ctx.state.user.id }]
-          : [{ id: title, title, admin: ctx.state.user.id }],
-      ),
-    );
-    const res = await editCompanies(ctx.state.user.id, [title]);
-    // const res1 = await editCompanies('gdmn', [title]);
-    if (res === 0) {
-      ctx.body = JSON.stringify({ status: 200, result: title });
-      logger.info('new company added successfully');
-    } else {
-      ctx.body = JSON.stringify({ status: 400, result: `a user (${ctx.state.user.id}) already exists` });
-      logger.warn(`a user (${ctx.state.user.id}) already exists`);
-    }
-  } else {
+
+  if (allCompanies?.filter(el => el.title === title)) {
     logger.warn(`a company (${title}) already exists`);
-    ctx.body = JSON.stringify({ status: 400, result: `a company (${title}) already exists` });
+    const res: IResponse<string> = { status: 400, result: `a company (${title}) already exists` };
+    ctx.throw(400, JSON.stringify(res));
+  }
+
+  await writeFile(
+    PATH_LOCAL_DB_COMPANIES,
+    JSON.stringify(
+      allCompanies
+        ? [...allCompanies, { id: title, title, admin: ctx.state.user.id }]
+        : [{ id: title, title, admin: ctx.state.user.id }],
+    ),
+  );
+  const res = await editCompanies(ctx.state.user.id, [title]);
+  // const res1 = await editCompanies('gdmn', [title]);
+  if (res === 0) {
+    ctx.body = JSON.stringify({ status: 200, result: title });
+    logger.info('new company added successfully');
+  } else {
+    ctx.body = JSON.stringify({ status: 400, result: `a user (${ctx.state.user.id}) already exists` });
+    logger.warn(`a user (${ctx.state.user.id}) already exists`);
   }
 };
 
