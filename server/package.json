@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "ts-node ./src/index.ts",
     "dev": "nodemon src/index.ts",
-    "checkup": "yarn run prettier:fix && run eslint:fix",
+    "checkup": "yarn run prettier:fix && eslint:fix",
     "prettier:check": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",
     "eslint:run": "eslint \"src/**/*.ts\"",
