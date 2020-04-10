@@ -33,7 +33,6 @@ export interface IMessage {
     id: string;
     producer: string;
     consumer: string;
-    companyId: string;
     dateTime: string;
   };
   body: {
