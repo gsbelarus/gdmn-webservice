@@ -1,5 +1,5 @@
 import config from '../config';
-import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
+import { IServerResponse, IUser, IUserCredentials, IDevice, IBaseUrl, IMessageInfo, IMessage } from '../model';
 import { get, post } from './http.service';
 
 export default class Api {
@@ -12,7 +12,7 @@ export default class Api {
   getUrl = () => `${this.baseUrl.protocol}${this.baseUrl.server}:${this.baseUrl.port}/${this.baseUrl.apiPath}`;
 
   auth = {
-    login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
+    login: async (userCredentials: IUserCredentials): Promise<IServerResponse<IUser | false>> =>
       post(
         this.getUrl(),
         '/auth/login',
@@ -22,16 +22,28 @@ export default class Api {
 
     getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/auth/user'),
 
-    getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
-      get(this.getUrl(), `/device/isExist?uid=${config.debug.deviceId}`),
-
-    getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
-      get(this.getUrl(), `/device/isActive?uid=${config.debug.deviceId}&userId=${userName}`),
+    getDevice: async (id: string): Promise<IServerResponse<IDevice | string>> =>
+    get(this.getUrl(), `/devices/${config.debug.deviceId}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
-      get(this.getUrl(), `/device/verifyCode?code=${code}`),
+      post(this.getUrl(), `/devices/code`, JSON.stringify({ code })),
 
-    addDevice: async (newDevice: INewDevice): Promise<IServerResponse<string>> =>
-      post(this.getUrl(), '/device/new', JSON.stringify({ uid: newDevice.uid, userId: newDevice.userId })),
+    addDevice: async (newDevice: IDevice): Promise<IServerResponse<string>> =>
+      post(this.getUrl(), '/devices/', JSON.stringify({ uid: newDevice.uid, user: newDevice.user })),
+
+    getCurrentUser: async (): Promise<IServerResponse<IUser>> =>
+      get(this.getUrl(), `/auth/user`),
+
   };
+
+  data = {
+    getData: async (): Promise<IServerResponse<any>> =>
+      get(this.getUrl(), `/test/all`),
+
+    sendMessages: async (companyId: string, consumer: string, body: string): Promise<IServerResponse<IMessageInfo>> =>
+      post(this.getUrl(), '/messages/', JSON.stringify({ companyId, consumer, body })),
+
+    getMessages: async (companyId: string): Promise<IServerResponse<IMessage[]>> =>
+      get(this.getUrl(), `/messages/`),
+  }
 }

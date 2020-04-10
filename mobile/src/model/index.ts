@@ -32,9 +32,10 @@ export interface IUserCredentials {
   password: string;
 }
 
-export interface INewDevice {
+export interface IDevice {
   uid: string;
-  userId: string;
+  user: string;
+  state: string;
 }
 
 export interface IAppState {
@@ -56,3 +57,26 @@ export interface IUser {
   lastName?: string;
   phoneNumber?: string;
 }
+
+export interface IMessageInfo{
+  uid: string;
+  date: Date;
+}
+
+export interface IMessage {
+  head: {
+    id: string;
+    producer: string;
+    consumer: string;
+    companyId: string;
+    dateTime: string;
+  };
+  body: {
+    type: string;
+    payload: {
+      name: string;
+      params: string[];
+    };
+  };
+}
+
