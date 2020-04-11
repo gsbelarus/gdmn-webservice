@@ -9,13 +9,14 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { IUser } from './models/models';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
+import log from './utils/logger';
 
-import log4js from 'log4js';
 import { findById, validateAuthCreds } from './utils/util';
 import dev from '../config/dev';
 
-const logger = log4js.getLogger('SERVER');
-logger.level = 'trace';
+// import log4js from 'log4js';
+// const logger = log4js.getLogger('SERVER');
+// logger.level = 'trace';
 
 export const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
 export const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
@@ -65,8 +66,8 @@ export async function init(): Promise<void> {
     .use(router.routes())
     .use(router.allowedMethods());
 
-  logger.trace('Starting listener ...');
+  log.info('Starting listener ...');
   await new Promise(resolve => app.listen(dev.PORT, () => resolve()));
-  logger.trace('Started');
-  console.info(`🚀 Server is running on on http://localhost:${dev.PORT}`);
+  // log.info('Started');
+  log.info(`Server is running on http://localhost:${dev.PORT}`);
 }

@@ -1,11 +1,8 @@
 import { IUser, IDevice, IActivationCode } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
-import log4js from 'log4js';
 import { ParameterizedContext } from 'koa';
-
-const logger = log4js.getLogger('SERVER');
-logger.level = 'trace';
+import log from '../utils/logger';
 
 export const makeUser = (user: IUser) => ({
   id: user.id,
@@ -22,7 +19,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     status: 200,
     result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
   });
-  logger.info('get users by device successfully');
+  log.info('get users by device successfully');
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -32,7 +29,7 @@ const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
     status: 200,
     result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
   });
-  logger.info('getUser successfully returned');
+  log.info('getUser successfully returned');
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -42,7 +39,7 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const idx = allUsers && allUsers.findIndex(user => user.id === userId);
   if (!allUsers || idx === undefined || idx < 0) {
     ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
-    logger.warn(`no such user(${newUser.userName})`);
+    log.warn(`no such user(${newUser.userName})`);
   } else {
     await writeFile(
       PATH_LOCAL_DB_USERS,
@@ -59,7 +56,7 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
       ]),
     );
     ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
-    logger.info('user edited successfully');
+    log.info('user edited successfully');
   }
 };
 
@@ -75,7 +72,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
             .filter(device => device.user === userId)
             .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
   });
-  logger.info('get devices by user successfully');
+  log.info('get devices by user successfully');
 };
 
 const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
@@ -96,7 +93,7 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
   await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes));
 
   ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-  logger.info('users removed successfully');
+  log.info('users removed successfully');
 };
 
 // const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -113,11 +110,11 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
 //     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
 
 //     ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-//     logger.info('users removed successfully');
+//     log.info('users removed successfully');
 //   } else {
 //     ctx.status = 403;
 //     ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-//     logger.warn('access denied');
+//     log.warn('access denied');
 //   }
 // };
 

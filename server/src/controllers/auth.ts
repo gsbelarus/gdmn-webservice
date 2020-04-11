@@ -1,4 +1,3 @@
-import log4js from 'log4js';
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
 import { IUser, IActivationCode } from '../models/models';
@@ -7,13 +6,11 @@ import { readFile, writeFile } from '../utils/workWithFile';
 import { findByUserName, saveActivationCode } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
 import { IResponse } from '../models/requests';
-
-const logger = log4js.getLogger('SERVER');
-logger.level = 'trace';
+import log from '../utils/logger';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   if (ctx.isAuthenticated()) {
-    logger.warn('User has already logged in');
+    log.info('User has already logged in');
     const res: IResponse<string> = { status: 400, result: 'you are already logged in' };
     ctx.throw(400, JSON.stringify(res));
   }
@@ -21,7 +18,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
-    logger.info('failed login attempt');
+    log.info('failed login attempt');
     const res: IResponse<string> = { status: 400, result: 'incorrect login or password' };
     ctx.throw(400, JSON.stringify(res));
   }
@@ -31,7 +28,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   if (ctx.isAuthenticated()) {
     delete user.password;
 
-    logger.info(`user ${user} successfully logged in`);
+    log.info(`user ${user} successfully logged in`);
 
     const res: IResponse<boolean | IUser> = { status: 200, result: user || false };
 
@@ -41,7 +38,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
 /** Проверка текущего пользователя в сессии koa */
 const getCurrentUser = (ctx: ParameterizedContext): void => {
-  logger.info(`user authenticated: ${ctx.state.user.userName}`);
+  log.info(`user authenticated: ${ctx.state.user.userName}`);
 
   const user = ctx.state.user;
 
@@ -54,7 +51,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
 const logOut = (ctx: ParameterizedContext): void => {
   const user = ctx.state.user.userName;
-  logger.info(`user ${user} successfully logged out`);
+  log.info(`user ${user} successfully logged out`);
 
   ctx.logout();
 
@@ -87,9 +84,9 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     );
 
     ctx.body = JSON.stringify({ status: 200, result: newUser });
-    logger.info('signed up successful');
+    log.info('signed up successful');
   } else {
-    logger.info('a user already exists');
+    log.info('a user already exists');
     const res: IResponse<string> = { status: 400, result: 'a user already exists' };
     ctx.throw(400, JSON.stringify(res));
   }
@@ -107,14 +104,14 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
     if (date >= new Date()) {
       await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
       result = { status: 200, result: code.user };
-      logger.info('device has been successfully activated');
+      log.info('device has been successfully activated');
     } else {
       result = { status: 202, result: 'invalid activation code' };
-      logger.warn('invalid activation code');
+      log.warn('invalid activation code');
     }
   } else {
     result = { status: 202, result: 'invalid activation code' };
-    logger.warn('invalid activation code');
+    log.warn('invalid activation code');
   }
   ctx.body = JSON.stringify(result);
 };
@@ -123,7 +120,7 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const userId = ctx.query.user;
   const code = await saveActivationCode(userId);
   ctx.body = JSON.stringify({ status: 200, result: code });
-  logger.info('activation code generated successfully');
+  log.info('activation code generated successfully');
 };
 
 export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };
