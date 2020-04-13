@@ -19,7 +19,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   if (!user) {
     log.info('failed login attempt');
-    const res: IResponse<string> = { status: 400, result: 'incorrect login or password' };
+    const res: IResponse<string> = { status: 400, result: 'не верный пользователь и\\или пароль ' };
     ctx.throw(400, JSON.stringify(res));
   }
 

@@ -7,15 +7,37 @@ import { IResponse } from '../models/requests';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const uid: string = ctx.params.id;
+  const { userName } = ctx.query;
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const device = allDevices?.find(device => device.uid === uid);
 
-  const result: IResponse<boolean> = { status: device ? 200 : 400, result: !!device };
-  log.info(`device (${uid})${device ? '' : ' does not'} exist`);
+  let device: IDevice | undefined = undefined;
+  let result = undefined;
 
-  ctx.status = device ? 200 : 400;
-  ctx.body = JSON.stringify(result);
+  if (userName) {
+    // Проверяем по пользователю
+    device = allDevices?.find(device => device.uid === uid && device.user === userName);
+
+    if (!device) {
+      log.warn(`the device (${uid}) is not assigned to the user)`);
+      result = { status: 400, result: `the device (${uid}) is not assigned to the user` };
+      ctx.throw(400, JSON.stringify(result));
+    }
+
+    log.info(`device status for current user:${device?.isBlock || ' not'} active`);
+    result = { status: 200, result: !device?.isBlock };
+    ctx.body = JSON.stringify(result);
+    return;
+  }
+
+  device = allDevices?.find(device => device.uid === uid);
+
+  if (!device) {
+    log.warn('no such company');
+    const res: IResponse<string> = { status: 400, result: 'device does not exist' };
+    ctx.throw(400, JSON.stringify(res));
+  }
+  ctx.body = JSON.stringify({ status: 200, result: 'device exist' });
 };
 
 const getDeviceByCurrentUser = async (ctx: ParameterizedContext): Promise<void> => {
