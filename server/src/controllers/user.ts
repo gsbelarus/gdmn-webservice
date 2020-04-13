@@ -1,12 +1,9 @@
 import { IUser, IDevice, IActivationCode } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
-import log4js from 'log4js';
 import { ParameterizedContext } from 'koa';
+import log from '../utils/logger';
 import { IResponse } from '../models/requests';
-
-const logger = log4js.getLogger('SERVER');
-logger.level = 'trace';
 
 export const makeUser = (user: IUser) => ({
   id: user.id,
@@ -24,7 +21,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     status: 200,
     result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
   });
-  logger.info('get users by device successfully');
+  log.info('get users by device successfully');
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -32,15 +29,15 @@ const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   const user = allUsers && allUsers.find(user => user.id === userId);
   if (!allUsers || user === undefined) {
-    ctx.body = JSON.stringify({ status: 400, result: `no such user(${userId})` });
-    logger.warn(`no such user(${userId})`);
-  } else {
-    ctx.body = JSON.stringify({
-      status: 200,
-      result: makeUser(user),
-    });
-    logger.info('getUser successfully returned');
+    log.info(`no such user`);
+    const res: IResponse<string> = { status: 400, result: 'no such user' };
+    ctx.throw(400, JSON.stringify(res));
   }
+  log.info('getUser successfully returned');
+  ctx.body = JSON.stringify({
+    status: 200,
+    result: makeUser(user),
+  });
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -48,24 +45,26 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const newUser = ctx.request.body;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   const idx = allUsers && allUsers.findIndex(user => user.id === userId);
+
   if (!allUsers || idx === undefined || idx < 0) {
-    ctx.body = JSON.stringify({ status: 400, result: `no such user(${newUser.userName})` });
-    logger.warn(`no such user(${newUser.userName})`);
-  } else {
-    await writeFile(
-      PATH_LOCAL_DB_USERS,
-      JSON.stringify([
-        ...allUsers.slice(0, idx),
-        {
-          ...allUsers[idx],
-          ...newUser,
-        },
-        ...allUsers.slice(idx + 1),
-      ]),
-    );
-    ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
-    logger.info('user edited successfully');
+    log.warn(`no such user(${newUser.userName})`);
+    const res: IResponse<string> = { status: 400, result: 'no such user' };
+    ctx.throw(400, JSON.stringify(res));
   }
+
+  await writeFile(
+    PATH_LOCAL_DB_USERS,
+    JSON.stringify([
+      ...allUsers.slice(0, idx),
+      {
+        ...allUsers[idx],
+        ...newUser,
+      },
+      ...allUsers.slice(idx + 1),
+    ]),
+  );
+  ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
+  log.info('user edited successfully');
 };
 
 const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -80,7 +79,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
             .filter(device => device.user === userId)
             .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
   });
-  logger.info('get devices by user successfully');
+  log.info('get devices by user successfully');
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -89,7 +88,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const newUsers = allUsers?.filter(el => userId !== el.id);
 
   if (allUsers === newUsers) {
-    logger.warn('no such user');
+    log.warn('no such user');
     const res: IResponse<string> = { status: 400, result: 'no such user' };
     ctx.throw(400, JSON.stringify(res));
   }
@@ -107,7 +106,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
   ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-  logger.info('users removed successfully');
+  log.info('users removed successfully');
 };
 
 // const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -124,11 +123,11 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 //     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
 
 //     ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-//     logger.info('users removed successfully');
+//     log.info('users removed successfully');
 //   } else {
 //     ctx.status = 403;
 //     ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-//     logger.warn('access denied');
+//     log.warn('access denied');
 //   }
 // };
 
