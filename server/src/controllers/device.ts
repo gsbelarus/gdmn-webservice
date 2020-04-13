@@ -12,7 +12,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const device = allDevices?.find(device => device.uid === uid);
 
   const result: IResponse<boolean> = { status: device ? 200 : 400, result: !!device };
-  log.warn(`device (${uid}) ${device || 'does not'} exist`);
+  log.info(`device (${uid})${device ? '' : ' does not'} exist`);
 
   ctx.status = device ? 200 : 400;
   ctx.body = JSON.stringify(result);
