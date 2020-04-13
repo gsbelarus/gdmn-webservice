@@ -124,68 +124,6 @@ const lockDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const lockDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const { uIds, userId } = ctx.request.body;
-    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    if (
-      !uIds ||
-      !userId ||
-      !allDevices?.filter(device => uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId)
-        .length
-    ) {
-      ctx.body = JSON.stringify({
-        status: 200,
-        result: `the devices(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`,
-      });
-      log.warn(`the device(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`);
-    } else {
-      const newDevices = allDevices?.map(device =>
-        uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId
-          ? { ...device, isBlock: true }
-          : device,
-      );
-      await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
-      ctx.body = JSON.stringify({ status: 200, result: 'devices locked successfully' });
-      log.info('devices locked successfully');
-    }
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    log.warn('access denied');
-  }
-};
-
-const removeDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    const { uIds, userId } = ctx.request.body;
-    const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-    if (
-      !uIds ||
-      !userId ||
-      !allDevices?.filter(device => uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId)
-        .length
-    ) {
-      ctx.body = JSON.stringify({
-        status: 200,
-        result: `the devices(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`,
-      });
-      log.warn(`the device(${JSON.stringify(uIds)}) is not assigned to the user(${userId})`);
-    } else {
-      const newDevices = allDevices?.filter(
-        device => !(uIds.findIndex((u: string) => u === device.uid) > -1 && device.user === userId),
-      );
-      await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
-      ctx.body = JSON.stringify({ status: 200, result: 'devices removed successfully' });
-      log.info('devices removed successfully');
-    }
-  } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-    log.warn('access denied');
-  }
-};
-
 const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   const userId: string = ctx.params.id;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
@@ -206,8 +144,6 @@ export {
   getDeviceByCurrentUser,
   getDevicesByUser,
   getUsersByDevice,
-  removeDevices,
-  lockDevices,
   addDevice,
   lockDevice,
   editDevice,

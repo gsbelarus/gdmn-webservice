@@ -8,6 +8,7 @@ export const readFile = async (filename: string) => {
     const data = JSON.parse(result);
     log.info(`Successful reading: ${filename}`);
     if (Array.isArray(data) && data.length) return data;
+    if (data instanceof Object) return data;
     return;
   } catch (e) {
     log.verbose(`Error reading data to file ${filename} - ${e}`);

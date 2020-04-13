@@ -27,7 +27,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   );
   const res = await editCompanies(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);
-  if (res === 0) {
+  if (res) {
     ctx.body = JSON.stringify({ status: 200, result: title });
     log.info('new company added successfully');
   } else {
@@ -53,7 +53,7 @@ const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
 const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const companyId: string = ctx.params.id;
-  const newCompany = ctx.request.body;
+  const editPart = ctx.request.body;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
   const idx = allCompanies && allCompanies.findIndex(company => company.id === companyId);
 
@@ -62,11 +62,13 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
     const res: IResponse<string> = { status: 400, result: 'no such company' };
     ctx.throw(400, JSON.stringify(res));
   }
+  delete editPart.admin;
+  delete editPart.id;
   await writeFile(
     PATH_LOCAL_DB_COMPANIES,
     JSON.stringify([
       ...allCompanies.slice(0, idx),
-      { id: allCompanies[idx].id, admin: allCompanies[idx].admin, ...newCompany },
+      { ...allCompanies[idx], ...editPart },
       ...allCompanies.slice(idx + 1),
     ]),
   );

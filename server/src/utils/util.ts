@@ -49,7 +49,7 @@ const editCompanies = async (userId: string, companies: string[]) => {
       ...allUsers.slice(idx + 1),
     ]),
   );
-  return 0;
+  return 1;
 };
 
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {

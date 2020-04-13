@@ -63,7 +63,6 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const newUser = ctx.request.body as IUser;
   if (!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    //  const code = await saveActivationCode(newUser.userName);
     await writeFile(
       PATH_LOCAL_DB_USERS,
       JSON.stringify(
@@ -77,7 +76,6 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
                 creatorId: newUser.userName,
                 password: 'gdmn',
                 companies: [],
-                code: 'jqgxmm',
               },
             ],
       ),
