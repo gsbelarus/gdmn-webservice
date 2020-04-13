@@ -3,6 +3,7 @@ import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import log4js from 'log4js';
 import { ParameterizedContext } from 'koa';
+import { IResponse } from '../models/requests';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -13,6 +14,7 @@ export const makeUser = (user: IUser) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   phoneNumber: user.phoneNumber,
+  companies: user.companies,
   creatorId: user.creatorId,
 });
 
@@ -26,13 +28,19 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  // const userId: string = ctx.params.id;
+  const userId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  ctx.body = JSON.stringify({
-    status: 200,
-    result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
-  });
-  logger.info('getUser successfully returned');
+  const user = allUsers && allUsers.find(user => user.id === userId);
+  if (!allUsers || user === undefined) {
+    ctx.body = JSON.stringify({ status: 400, result: `no such user(${userId})` });
+    logger.warn(`no such user(${userId})`);
+  } else {
+    ctx.body = JSON.stringify({
+      status: 200,
+      result: makeUser(user),
+    });
+    logger.info('getUser successfully returned');
+  }
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -50,10 +58,7 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
         ...allUsers.slice(0, idx),
         {
           ...allUsers[idx],
-          lastName: newUser.lastName,
-          firstName: newUser.firstName,
-          phoneNumber: newUser.phoneNumber,
-          password: newUser.password,
+          ...newUser,
         },
         ...allUsers.slice(idx + 1),
       ]),
@@ -78,22 +83,28 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   logger.info('get devices by user successfully');
 };
 
-const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const { users } = ctx.request.body;
+const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const userId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const newUsers = allUsers?.filter(el => !users.findIndex((u: IUser) => u.id === el.id));
+  const newUsers = allUsers?.filter(el => userId !== el.id);
+
+  if (allUsers === newUsers) {
+    logger.warn('no such user');
+    const res: IResponse<string> = { status: 400, result: 'no such user' };
+    ctx.throw(400, JSON.stringify(res));
+  }
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const newDevices = allDevices?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const newDevices = allDevices?.filter(el => userId !== el.user);
 
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const newCodes = allCodes?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const newCodes = allCodes?.filter(el => userId !== el.user);
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
+  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers ?? []));
 
-  await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
+  if (allDevices !== newDevices) await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices ?? []));
 
-  await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes));
+  if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
   ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
   logger.info('users removed successfully');
@@ -121,4 +132,4 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
 //   }
 // };
 
-export { getDevicesByUser, getUsers, getProfile, removeUsers, editProfile };
+export { getDevicesByUser, getUsers, getProfile, removeUser, editProfile };

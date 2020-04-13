@@ -7,5 +7,5 @@ const router = new Router({ prefix: '/companies' });
 router.post('/', authMiddleware, addCompany);
 router.get('/:id', authMiddleware, getCompanyProfile);
 router.put('/:id', authMiddleware, editCompanyProfile);
-router.put('/:id/users', authMiddleware, getUsersByCompany);
+router.get('/:id/users', authMiddleware, getUsersByCompany);
 export default router;
