@@ -3,6 +3,7 @@ import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import log4js from 'log4js';
 import { ParameterizedContext } from 'koa';
+import { IResponse } from '../models/requests';
 
 const logger = log4js.getLogger('SERVER');
 logger.level = 'trace';
@@ -57,10 +58,7 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
         ...allUsers.slice(0, idx),
         {
           ...allUsers[idx],
-          lastName: newUser.lastName,
-          firstName: newUser.firstName,
-          phoneNumber: newUser.phoneNumber,
-          password: newUser.password,
+          ...newUser,
         },
         ...allUsers.slice(idx + 1),
       ]),
@@ -86,21 +84,27 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { user } = ctx.request.body;
+  const userId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const newUsers = allUsers?.find(el => user === el.id);
+  const newUsers = allUsers?.filter(el => userId !== el.id);
+
+  if (allUsers === newUsers) {
+    logger.warn('no such user');
+    const res: IResponse<string> = { status: 400, result: 'no such user' };
+    ctx.throw(400, JSON.stringify(res));
+  }
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const newDevices = allDevices?.find(el => user === el.user);
+  const newDevices = allDevices?.filter(el => userId !== el.user);
 
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const newCodes = allCodes?.find(el => user === el.user);
+  const newCodes = allCodes?.filter(el => userId !== el.user);
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
+  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers ?? []));
 
-  await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices));
+  if (allDevices !== newDevices) await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices ?? []));
 
-  await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes));
+  if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
   ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
   logger.info('users removed successfully');
