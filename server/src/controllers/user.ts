@@ -13,6 +13,7 @@ export const makeUser = (user: IUser) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   phoneNumber: user.phoneNumber,
+  companies: user.companies,
   creatorId: user.creatorId,
 });
 
@@ -26,13 +27,19 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  // const userId: string = ctx.params.id;
+  const userId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  ctx.body = JSON.stringify({
-    status: 200,
-    result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
-  });
-  logger.info('getUser successfully returned');
+  const user = allUsers && allUsers.find(user => user.id === userId);
+  if (!allUsers || user === undefined) {
+    ctx.body = JSON.stringify({ status: 400, result: `no such user(${userId})` });
+    logger.warn(`no such user(${userId})`);
+  } else {
+    ctx.body = JSON.stringify({
+      status: 200,
+      result: makeUser(user),
+    });
+    logger.info('getUser successfully returned');
+  }
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -78,16 +85,16 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   logger.info('get devices by user successfully');
 };
 
-const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const { users } = ctx.request.body;
+const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { user } = ctx.request.body;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const newUsers = allUsers?.filter(el => !users.findIndex((u: IUser) => u.id === el.id));
+  const newUsers = allUsers?.find(el => user === el.id);
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const newDevices = allDevices?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const newDevices = allDevices?.find(el => user === el.user);
 
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const newCodes = allCodes?.filter(el => !users.findIndex((u: IUser) => u.id === el.user));
+  const newCodes = allCodes?.find(el => user === el.user);
 
   await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
 
@@ -121,4 +128,4 @@ const removeUsers = async (ctx: ParameterizedContext): Promise<void> => {
 //   }
 // };
 
-export { getDevicesByUser, getUsers, getProfile, removeUsers, editProfile };
+export { getDevicesByUser, getUsers, getProfile, removeUser, editProfile };
