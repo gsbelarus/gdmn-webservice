@@ -83,7 +83,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
+  const { id: userId } = ctx.params;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   const newUsers = allUsers?.filter(el => userId !== el.id);
 
@@ -109,6 +109,27 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('users removed successfully');
 };
 
+const addCompanyToUser = async (userId: string, companies: string[]) => {
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  const user = allUsers?.filter(item => item.id === userId)[0];
+
+  if (!(user && allUsers)) return;
+
+  const idx = allUsers.findIndex(item => item.userName === user.userName);
+
+  if (!allUsers || idx === undefined || idx < 0) return 1;
+
+  await writeFile(
+    PATH_LOCAL_DB_USERS,
+    JSON.stringify([
+      ...allUsers.slice(0, idx),
+      { ...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies },
+      ...allUsers.slice(idx + 1),
+    ]),
+  );
+  return 1;
+};
+
 // const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
 //   if (ctx.isAuthenticated()) {
 //     const companyId: string = ctx.params.id;
@@ -131,4 +152,4 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 //   }
 // };
 
-export { getDevicesByUser, getUsers, getProfile, removeUser, editProfile };
+export { getDevicesByUser, getUsers, getProfile, removeUser, editProfile, addCompanyToUser };

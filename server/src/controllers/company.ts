@@ -1,14 +1,18 @@
 import { ICompany, IUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../server';
-import { editCompanies } from '../utils/util';
 import { ParameterizedContext } from 'koa';
 import { IResponse } from '../models/requests';
-import { makeUser } from './user';
+import { makeUser, addCompanyToUser } from './user';
 import log from '../utils/logger';
 
+/**
+ * Добавление новой организации
+ * @param {string} title - наименование организации
+ * @return title, наименование организации
+ * */
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const title: string = ctx.request.body.title;
+  const { title } = ctx.request.body;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
 
   if (allCompanies?.filter(el => el.title === title)) {
@@ -25,7 +29,8 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
         : [{ id: title, title, admin: ctx.state.user.id }],
     ),
   );
-  const res = await editCompanies(ctx.state.user.id, [title]);
+  /* Добавлям к текущему пользователю создаваемую организацию */
+  const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);
   if (res) {
     ctx.body = JSON.stringify({ status: 200, result: title });
