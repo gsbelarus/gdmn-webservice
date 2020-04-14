@@ -66,7 +66,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-native": "^3.8.1",
-    "expo-cli": "^3.17.18",
+    "expo-cli": "^3.17.24",
     "prettier": "^2.0.2",
     "tslint": "^6.1.0",
     "tslint-config-airbnb": "^5.11.2",

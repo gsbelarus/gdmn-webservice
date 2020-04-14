@@ -30,11 +30,17 @@ const saveActivationCode = async (userId: string) => {
   return code;
 };
 
+/* Непонятно что делает функция */
 const editCompanies = async (userId: string, companies: string[]) => {
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const user = allUsers?.find(item => item.id === userId);
-  const idx = user && allUsers && allUsers.findIndex(item => item.userName === user.userName);
-  if (!allUsers || idx === undefined || idx < 0) return 0;
+  const user = allUsers?.filter(item => item.id === userId)[0];
+
+  if (!(user && allUsers)) return;
+
+  const idx = allUsers.findIndex(item => item.userName === user.userName);
+
+  if (!allUsers || idx === undefined || idx < 0) return 1;
+
   await writeFile(
     PATH_LOCAL_DB_USERS,
     JSON.stringify([
