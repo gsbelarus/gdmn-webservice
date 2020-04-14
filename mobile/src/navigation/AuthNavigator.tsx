@@ -4,7 +4,7 @@ import { AsyncStorage } from 'react-native';
 
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
-import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
+import { IDataFetch, IServerResponse, IUser, IBaseUrl, IDevice } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useStore } from '../store';
@@ -22,7 +22,7 @@ type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 interface ILoadingState {
-  serverResp?: IServerResponse<boolean | IUser | string>;
+  serverResp?: IServerResponse<boolean | IUser | string | IDevice>;
   serverReq: IDataFetch;
   showSettings: boolean;
 }
@@ -32,7 +32,7 @@ type Action =
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
   | { type: 'SETTINGS_FORM'; showSettings: boolean }
-  | { type: 'SET_RESPONSE'; status: number; result: boolean | string | IUser };
+  | { type: 'SET_RESPONSE'; status: number; result: boolean | string | IUser | IDevice };
 
 function reducer(state: ILoadingState, action: Action): ILoadingState {
   switch (action.type) {
@@ -91,8 +91,8 @@ const AuthNavigator = () => {
   */
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
-      timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus())
-        .then((data: IServerResponse<boolean>) =>
+      timeoutWithСancellation(signal, 5000, api.auth.getDevice())
+        .then((data: IServerResponse<IDevice | string>) =>
           setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));

@@ -22,7 +22,7 @@ export default class Api {
 
     getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/auth/user'),
 
-    getDevice: async (id: string): Promise<IServerResponse<IDevice | string>> =>
+    getDevice: async (): Promise<IServerResponse<IDevice | string>> =>
       get(this.getUrl(), `/devices/${config.debug.deviceId}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
