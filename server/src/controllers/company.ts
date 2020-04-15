@@ -17,8 +17,8 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCompanies?.filter(el => el.title === title)) {
     log.warn(`a company (${title}) already exists`);
-    const res: IResponse<string> = { status: 400, result: `a company (${title}) already exists` };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 409, result: `a company (${title}) already exists` };
+    ctx.throw(409, JSON.stringify(res));
   }
 
   await writeFile(
@@ -33,10 +33,10 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);
   if (res) {
-    ctx.body = JSON.stringify({ status: 200, result: title });
+    ctx.body = JSON.stringify({ status: 201, result: title });
     log.info('new company added successfully');
   } else {
-    ctx.body = JSON.stringify({ status: 400, result: `a user (${ctx.state.user.id}) already exists` });
+    ctx.body = JSON.stringify({ status: 409, result: `a user (${ctx.state.user.id}) already exists` });
     log.warn(`a user (${ctx.state.user.id}) already exists`);
   }
 };
@@ -48,8 +48,8 @@ const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allCompanies || !result) {
     log.warn('no such company');
-    const res: IResponse<string> = { status: 400, result: 'no such company' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 422, result: 'no such company' };
+    ctx.throw(422, JSON.stringify(res));
   }
 
   log.info('get profile company successfully');
@@ -64,8 +64,8 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allCompanies || idx === undefined || idx < 0) {
     log.warn('no such company');
-    const res: IResponse<string> = { status: 400, result: 'no such company' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 422, result: 'no such company' };
+    ctx.throw(422, JSON.stringify(res));
   }
   delete editPart.admin;
   delete editPart.id;

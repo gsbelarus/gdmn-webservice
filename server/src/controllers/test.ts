@@ -20,8 +20,7 @@ const getAllData = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.body = JSON.stringify({ status: 200, result: [goods, remains, documenttypes, contacts, docs] });
     log.info('get all data');
   } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'you are already logged in' });
+    ctx.body = JSON.stringify({ status: 401, result: 'you are already logged in' });
     log.warn('this user has already logged in');
   }
 };

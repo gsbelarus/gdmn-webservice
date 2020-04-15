@@ -13,7 +13,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!ctx.state.user.companies) {
     ctx.body = JSON.stringify({
-      status: 400,
+      status: 403,
       result: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     });
     log.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${head.companyId})`);
@@ -22,7 +22,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === head.companyId)) {
     ctx.body = JSON.stringify({
-      status: 400,
+      status: 403,
       result: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     });
     log.warn(`The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`);
@@ -43,12 +43,11 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (msgObject instanceof Object && (msgObject as IMessage)) {
     await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
     ctx.body = JSON.stringify({
-      status: 200,
+      status: 201,
       result: { uid: uuid, date: new Date() },
     });
     log.info(`new message in queue: ${uuid}`);
   } else {
-    ctx.status = 403;
     ctx.body = JSON.stringify({
       status: 400,
       result: 'incorrect format message',
@@ -76,9 +75,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   } catch (e) {
     log.verbose(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
     console.log(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
-    ctx.status = 400;
+    ctx.status = 404;
     ctx.body = JSON.stringify({
-      status: 400,
+      status: 404,
       result: 'file or directory not found',
     });
   }
@@ -89,12 +88,12 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const result = await remove(companyId, uid);
 
   if (result === 'OK') {
-    ctx.status = 200;
-    ctx.body = JSON.stringify({ status: 200, result: 'OK' });
+    ctx.status = 204;
+    ctx.body = JSON.stringify({ status: 204, result: 'OK' });
     log.info('get message');
   } else {
-    ctx.status = 400;
-    ctx.body = JSON.stringify({ status: 400, result: 'error' });
+    ctx.status = 422;
+    ctx.body = JSON.stringify({ status: 422, result: 'error' });
     log.warn('could not delete file');
   }
 };

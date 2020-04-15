@@ -9,18 +9,12 @@ import { IResponse } from '../models/requests';
 import log from '../utils/logger';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
-  if (ctx.isAuthenticated()) {
-    log.info('User has already logged in');
-    const res: IResponse<string> = { status: 400, result: 'you are already logged in' };
-    ctx.throw(400, JSON.stringify(res));
-  }
-
   const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
     log.info('failed login attempt');
-    const res: IResponse<string> = { status: 400, result: 'не верный пользователь и\\или пароль ' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 404, result: 'не верный пользователь и\\или пароль ' };
+    ctx.throw(404, JSON.stringify(res));
   }
 
   ctx.login(user);
@@ -81,12 +75,12 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       ),
     );
 
-    ctx.body = JSON.stringify({ status: 200, result: newUser });
+    ctx.body = JSON.stringify({ status: 201, result: newUser });
     log.info('signed up successful');
   } else {
     log.info('a user already exists');
-    const res: IResponse<string> = { status: 400, result: 'a user already exists' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 404, result: 'a user already exists' };
+    ctx.throw(404, JSON.stringify(res));
   }
 };
 
@@ -104,11 +98,11 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
       result = { status: 200, result: code.user };
       log.info('device has been successfully activated');
     } else {
-      result = { status: 202, result: 'invalid activation code' };
+      result = { status: 404, result: 'invalid activation code' };
       log.warn('invalid activation code');
     }
   } else {
-    result = { status: 202, result: 'invalid activation code' };
+    result = { status: 404, result: 'invalid activation code' };
     log.warn('invalid activation code');
   }
   ctx.body = JSON.stringify(result);
