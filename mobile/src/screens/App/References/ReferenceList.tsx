@@ -1,12 +1,14 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import ReferencesData from '../../../mockData/References.json';
 import { IReference } from '../../../model/inventory';
+import styles from '../../../styles/global';
+import { useStore } from '../../../store';
 
 const References: IReference[] = ReferencesData;
 
@@ -35,11 +37,62 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
+  const { state } = useStore();
+  const [resUpd, setResUpd] = useState();
 
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
+
+  const sendUpdateRequest = async () => {
+    const result = await fetch(
+      `${state.baseUrl}messages`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          head: {
+            companyId: state.companyID
+          },
+          body: {
+            type: "cmd",
+            payload: {
+              name: "get_references",
+              params: [
+                "documenttypes", "goodgroups", "goods", "remains", "contacts"
+              ]
+            }
+          }
+        })
+      }
+    ).then(res => res.json());
+    if(result.status === 201) {
+      setResUpd(result.result);
+      Alert.alert(
+        'Успех!',
+        '',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ]
+      )
+    } else {
+      Alert.alert(
+        'Запрос не был отправлен',
+        '',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ]
+      )
+    }
+  }
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -50,6 +103,21 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <View style={{ alignItems: 'flex-end' }}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            localStyles.buttons,
+            {
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={sendUpdateRequest}
+        >
+          <AntDesign size={30} color={colors.card} name="sync" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -64,6 +132,10 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
+  },
+  buttons: {
+    alignItems: 'center',
+    margin: 10,
   },
   content: {
     height: '100%',
