@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -11,6 +11,7 @@ import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
 import styles from '../../../styles/global';
+import { useStore } from '../../../store';
 
 const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
@@ -56,7 +57,56 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
+  const { state } = useStore();
+  const [data, setData] = useState([]);
+
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
+
+  const sendUpdateRequest = async () => {
+    const result = await fetch(
+      `${state.baseUrl}messages`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          head: {
+            companyId: state.companyID
+          },
+          body: {
+            type: "cmd",
+            payload: {
+              name: "post_documents",
+              params: data
+            }
+          }
+        })
+      }
+    ).then(res => res.json());
+    if(result.status === 200) {
+      Alert.alert(
+        'Успех!',
+        '',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ]
+      )
+    } else {
+      Alert.alert(
+        'Запрос не был отправлен',
+        '',
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          },
+        ]
+      )
+    }
+  }
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
@@ -77,7 +127,7 @@ const DocumentsListScreen = ({ navigation }) => {
               borderColor: colors.primary,
             },
           ]}
-          onPress={() => ({})}
+          onPress={sendUpdateRequest}
         >
           <AntDesign size={30} color={colors.card} name="sync" />
         </TouchableOpacity>
