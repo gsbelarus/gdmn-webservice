@@ -1,4 +1,4 @@
-import { ICompany, IUser } from '../models/models';
+import { ICompany, IUser, IMakeUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../server';
 import { ParameterizedContext } from 'koa';
@@ -17,27 +17,25 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCompanies?.filter(el => el.title === title)) {
     log.warn(`a company (${title}) already exists`);
-    const res: IResponse<string> = { status: 409, result: `a company (${title}) already exists` };
+    const res: IResponse<string> = { result: true, error: `a company (${title}) already exists` };
     ctx.throw(409, JSON.stringify(res));
   }
 
-  await writeFile(
-    PATH_LOCAL_DB_COMPANIES,
-    JSON.stringify(
-      allCompanies
-        ? [...allCompanies, { id: title, title, admin: ctx.state.user.id }]
-        : [{ id: title, title, admin: ctx.state.user.id }],
-    ),
-  );
+  const newCompany: ICompany = { id: title, title, admin: ctx.state.user.id };
+
+  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(allCompanies ? [...allCompanies, newCompany] : [newCompany]));
   /* Добавлям к текущему пользователю создаваемую организацию */
   const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);
   if (res) {
-    ctx.body = JSON.stringify({ status: 201, result: title });
+    const result: IResponse<ICompany> = { result: false, data: newCompany };
     log.info('new company added successfully');
+    ctx.status = 201;
+    ctx.body = JSON.stringify(result);
   } else {
-    ctx.body = JSON.stringify({ status: 409, result: `a user (${ctx.state.user.id}) already exists` });
     log.warn(`a user (${ctx.state.user.id}) already exists`);
+    const res: IResponse<string> = { result: true, error: `a user (${ctx.state.user.id}) already exists` };
+    ctx.throw(409, JSON.stringify(res));
   }
 };
 
@@ -46,14 +44,16 @@ const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
   const result = allCompanies && allCompanies.find(company => company.id === companyId);
 
-  if (!allCompanies || !result) {
+  if (!result) {
     log.warn('no such company');
-    const res: IResponse<string> = { status: 422, result: 'no such company' };
+    const res: IResponse<string> = { result: true, error: 'no such company' };
     ctx.throw(422, JSON.stringify(res));
   }
 
   log.info('get profile company successfully');
-  ctx.body = JSON.stringify({ status: 200, result });
+  const res: IResponse<ICompany> = { result: false, data: result };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -64,35 +64,36 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allCompanies || idx === undefined || idx < 0) {
     log.warn('no such company');
-    const res: IResponse<string> = { status: 422, result: 'no such company' };
+    const res: IResponse<string> = { result: true, error: 'no such company' };
     ctx.throw(422, JSON.stringify(res));
   }
-  delete editPart.admin;
-  delete editPart.id;
+
+  const company: ICompany = { id: allCompanies[idx].id, ...editPart, admin: allCompanies[idx].admin };
+
   await writeFile(
     PATH_LOCAL_DB_COMPANIES,
-    JSON.stringify([
-      ...allCompanies.slice(0, idx),
-      { ...allCompanies[idx], ...editPart },
-      ...allCompanies.slice(idx + 1),
-    ]),
+    JSON.stringify([...allCompanies.slice(0, idx), company, ...allCompanies.slice(idx + 1)]),
   );
   log.info('a company edited successfully');
-  ctx.body = JSON.stringify({ status: 200, result: 'a company edited successfully' });
+  const res: IResponse<ICompany> = { result: false, data: company };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const companyId: string = ctx.params.id;
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  ctx.body = JSON.stringify({
-    status: 200,
-    result:
-      allUsers &&
-      allUsers
-        .filter(user => user.companies && user.companies.length && user.companies.find(org => org === companyId))
-        .map(makeUser),
-  });
   log.info('get users by company successfully');
+  const res: IResponse<IMakeUser[]> = {
+    result: false,
+    data: !allUsers
+      ? []
+      : allUsers
+          .filter(user => user.companies && user.companies.length && user.companies.find(org => org === companyId))
+          .map(makeUser),
+  };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany };
