@@ -15,12 +15,12 @@ export default class Api {
     login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
       post(
         this.getUrl(),
-        '/auth/login',
+        `/auth/login?deviceId=${config.debug.deviceId}`,
         JSON.stringify({ userName: userCredentials.userName, password: userCredentials.password }),
       ),
-    logout: async (): Promise<IServerResponse<string>> => get(this.getUrl(), '/auth/logout'),
+    logout: async (): Promise<IServerResponse<string>> => get(this.getUrl(), `/auth/logout?deviceId=${config.debug.deviceId}`),
 
-    getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), '/auth/user'),
+    getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
 
     getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
       get(this.getUrl(), `/devices/${config.debug.deviceId}`),
@@ -29,7 +29,7 @@ export default class Api {
       get(this.getUrl(), `/devices/${config.debug.deviceId}?userName=${userName}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
-      get(this.getUrl(), `/auth/device/code=${code}`),
+      get(this.getUrl(), `/auth/device/code=${code}?deviceId=${config.debug.deviceId}`),
 
     addDevice: async (newDevice: INewDevice): Promise<IServerResponse<string>> =>
       post(this.getUrl(), '/devices/new', JSON.stringify({ uid: newDevice.uid, userId: newDevice.userId })),
