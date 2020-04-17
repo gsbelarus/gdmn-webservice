@@ -19,9 +19,9 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
     device = allDevices?.find(device => device.uid === uid && device.user === userName);
 
     if (!device) {
-      log.warn(`the device (${uid}) is not assigned to the user)`);
-      result = { status: 400, result: `the device (${uid}) is not assigned to the user` };
-      ctx.throw(400, JSON.stringify(result));
+      log.warn(`the device (${uid}) is not assigned to the user`);
+      result = { status: 422, result: `the device (${uid}) is not assigned to the user` };
+      ctx.throw(422, JSON.stringify(result));
     }
 
     log.info(`device status for current user:${device?.isBlock || ' not'} active`);
@@ -34,8 +34,8 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!device) {
     log.warn('no such company');
-    const res: IResponse<string> = { status: 400, result: 'device does not exist' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 422, result: 'device does not exist' };
+    ctx.throw(422, JSON.stringify(res));
   }
   ctx.body = JSON.stringify({ status: 200, result: 'device exist' });
 };
@@ -54,7 +54,7 @@ const getDeviceByCurrentUser = async (ctx: ParameterizedContext): Promise<void> 
     result = { status: 200, result: !device?.isBlock };
   } else {
     log.warn(`the device (${uid}) is not assigned to the current user)`);
-    result = { status: 200, result: `the device (${uid}) is not assigned to the current user` };
+    result = { status: 422, result: `the device (${uid}) is not assigned to the current user` };
   }
   ctx.body = JSON.stringify(result);
 };
@@ -69,10 +69,10 @@ const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
         allDevices ? [...allDevices, { uid, user: userId, isBlock: false }] : [{ uid, user: userId, isBlock: false }],
       ),
     );
-    ctx.body = JSON.stringify({ status: 200, result: 'a new device has been added' });
+    ctx.body = JSON.stringify({ status: 201, result: 'a new device has been added' });
     log.info('a new device has been added');
   } else {
-    ctx.body = JSON.stringify({ status: 400, result: `the device(${uid}) is assigned to the user(${userId})` });
+    ctx.body = JSON.stringify({ status: 409, result: `the device(${uid}) is assigned to the user(${userId})` });
     log.warn(`the device(${uid}) is assigned to the user(${userId})`);
   }
 };
@@ -110,11 +110,11 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
   if (!allDevices || idx === undefined || idx < 0) {
-    ctx.body = JSON.stringify({ status: 200, result: `the device(${uid}) is not assigned to the user(${userId})` });
+    ctx.body = JSON.stringify({ status: 422, result: `the device(${uid}) is not assigned to the user(${userId})` });
     log.warn(`the device(${uid}) is not assigned to the user(${userId})`);
   } else {
     await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]));
-    ctx.body = JSON.stringify({ status: 200, result: 'device removed successfully' });
+    ctx.body = JSON.stringify({ status: 204, result: 'device removed successfully' });
     log.info('device removed successfully');
   }
 };
@@ -125,7 +125,7 @@ const lockDevice = async (ctx: ParameterizedContext): Promise<void> => {
     const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
     const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
     if (!allDevices || idx === undefined || idx < 0) {
-      ctx.body = JSON.stringify({ status: 400, result: `the device(${uid}) is not assigned to the user(${userId})` });
+      ctx.body = JSON.stringify({ status: 422, result: `the device(${uid}) is not assigned to the user(${userId})` });
       log.warn(`the device(${uid}) is not assigned to the user(${userId})`);
     } else {
       await writeFile(
@@ -140,8 +140,7 @@ const lockDevice = async (ctx: ParameterizedContext): Promise<void> => {
       log.info('device locked successfully');
     }
   } else {
-    ctx.status = 403;
-    ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
+    ctx.body = JSON.stringify({ status: 401, result: 'access denied' });
     log.warn('access denied');
   }
 };

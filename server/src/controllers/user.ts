@@ -30,8 +30,8 @@ const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const user = allUsers && allUsers.find(user => user.id === userId);
   if (!allUsers || user === undefined) {
     log.info(`no such user`);
-    const res: IResponse<string> = { status: 400, result: 'no such user' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 404, result: 'no such user' };
+    ctx.throw(404, JSON.stringify(res));
   }
   log.info('getUser successfully returned');
   ctx.body = JSON.stringify({
@@ -48,8 +48,8 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allUsers || idx === undefined || idx < 0) {
     log.warn(`no such user(${newUser.userName})`);
-    const res: IResponse<string> = { status: 400, result: 'no such user' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 422, result: 'no such user' };
+    ctx.throw(422, JSON.stringify(res));
   }
 
   await writeFile(
@@ -89,8 +89,8 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allUsers === newUsers) {
     log.warn('no such user');
-    const res: IResponse<string> = { status: 400, result: 'no such user' };
-    ctx.throw(400, JSON.stringify(res));
+    const res: IResponse<string> = { status: 422, result: 'no such user' };
+    ctx.throw(422, JSON.stringify(res));
   }
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
@@ -105,7 +105,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
-  ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
+  ctx.body = JSON.stringify({ status: 204, result: 'users removed successfully' });
   log.info('users removed successfully');
 };
 
