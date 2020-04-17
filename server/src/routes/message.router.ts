@@ -1,11 +1,11 @@
 import Router from 'koa-router';
 import { newMessage, getMessage, removeMessage } from '../controllers/message';
-import { authMiddleware } from '../middleware/authRequired';
+import { chainMiddleware } from '../middleware/chainMiddleware';
 
 const router = new Router({ prefix: '/messages' });
 
-router.post('/', authMiddleware, newMessage);
-router.get('/', authMiddleware, getMessage);
-router.delete('/:companyId/:id', authMiddleware, removeMessage);
+router.post('/', chainMiddleware, newMessage);
+router.get('/', chainMiddleware, getMessage);
+router.delete('/:companyId/:id', chainMiddleware, removeMessage);
 
 export default router;

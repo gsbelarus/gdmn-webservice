@@ -7,15 +7,15 @@ import {
   getUsersByDevice,
   getDeviceByCurrentUser,
 } from '../controllers/device';
-import { authMiddleware } from '../middleware/authRequired';
+import { chainMiddleware } from '../middleware/chainMiddleware';
 
 const router = new Router({ prefix: '/devices' });
 
-router.post('/', authMiddleware, addDevice);
+router.post('/', chainMiddleware, addDevice);
 router.get('/:id', getDevice);
-router.get('/:id/currentuser', authMiddleware, getDeviceByCurrentUser);
-router.get('/:id/users', authMiddleware, getUsersByDevice);
-router.patch('/:id', authMiddleware, editDevice);
-router.delete('/:id', authMiddleware, removeDevice);
+router.get('/:id/currentuser', chainMiddleware, getDeviceByCurrentUser);
+router.get('/:id/users', chainMiddleware, getUsersByDevice);
+router.patch('/:id', chainMiddleware, editDevice);
+router.delete('/:id', chainMiddleware, removeDevice);
 
 export default router;
