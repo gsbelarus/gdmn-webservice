@@ -7,15 +7,17 @@ import {
   getUsersByDevice,
   getDeviceByCurrentUser,
 } from '../controllers/device';
-import { chainMiddleware } from '../middleware/chainMiddleware';
+import compose from 'koa-compose';
+import { authMiddleware } from '../middleware/authRequired';
+import { deviceMiddleware } from '../middleware/deviceRequired';
 
 const router = new Router({ prefix: '/devices' });
 
-router.post('/', chainMiddleware, addDevice);
+router.post('/', compose([authMiddleware, deviceMiddleware]), addDevice);
 router.get('/:id', getDevice);
-router.get('/:id/currentuser', chainMiddleware, getDeviceByCurrentUser);
-router.get('/:id/users', chainMiddleware, getUsersByDevice);
-router.patch('/:id', chainMiddleware, editDevice);
-router.delete('/:id', chainMiddleware, removeDevice);
+router.get('/:id/currentuser', compose([authMiddleware, deviceMiddleware]), getDeviceByCurrentUser);
+router.get('/:id/users', compose([authMiddleware, deviceMiddleware]), getUsersByDevice);
+router.patch('/:id', compose([authMiddleware, deviceMiddleware]), editDevice);
+router.delete('/:id', compose([authMiddleware, deviceMiddleware]), removeDevice);
 
 export default router;
