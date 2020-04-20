@@ -96,4 +96,34 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   ctx.body = JSON.stringify(res);
 };
 
-export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany };
+const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
+  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
+  const result: IResponse<ICompany[]> = {
+    result: true,
+    data: !allCompanies || !allCompanies.length ? [] : allCompanies,
+  };
+  log.info('get companies successfully');
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
+};
+
+const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
+  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
+  const newCompanies = allCompanies?.filter(el => id !== el.id);
+
+  if (allCompanies === newCompanies) {
+    log.warn('no such company');
+    const res: IResponse<string> = { result: false, error: 'no such company' };
+    ctx.throw(422, JSON.stringify(res));
+  }
+
+  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(newCompanies ?? []));
+
+  const result: IResponse<undefined> = { result: true };
+  ctx.status = 204;
+  ctx.body = JSON.stringify(result);
+  log.info('company removed successfully');
+};
+
+export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany, getCompanies, deleteCompany };
