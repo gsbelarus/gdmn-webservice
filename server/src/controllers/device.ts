@@ -118,7 +118,7 @@ const editDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allDevices || idx === undefined || idx < 0) {
     log.warn('no such device');
-    const res: IResponse<string> = { result: true, error: 'no such device' };
+    const res: IResponse<string> = { result: false, error: 'no such device' };
     ctx.throw(422, JSON.stringify(res));
   }
 

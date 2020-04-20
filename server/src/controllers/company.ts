@@ -17,7 +17,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCompanies?.filter(el => el.title === title)) {
     log.warn(`a company (${title}) already exists`);
-    const res: IResponse<string> = { result: true, error: `a company (${title}) already exists` };
+    const res: IResponse<string> = { result: false, error: `a company (${title}) already exists` };
     ctx.throw(409, JSON.stringify(res));
   }
 
@@ -28,13 +28,13 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);
   if (res) {
-    const result: IResponse<ICompany> = { result: false, data: newCompany };
+    const result: IResponse<ICompany> = { result: true, data: newCompany };
     log.info('new company added successfully');
     ctx.status = 201;
     ctx.body = JSON.stringify(result);
   } else {
     log.warn(`a user (${ctx.state.user.id}) already exists`);
-    const res: IResponse<string> = { result: true, error: `a user (${ctx.state.user.id}) already exists` };
+    const res: IResponse<string> = { result: false, error: `a user (${ctx.state.user.id}) already exists` };
     ctx.throw(409, JSON.stringify(res));
   }
 };
@@ -46,12 +46,12 @@ const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!result) {
     log.warn('no such company');
-    const res: IResponse<string> = { result: true, error: 'no such company' };
+    const res: IResponse<string> = { result: false, error: 'no such company' };
     ctx.throw(422, JSON.stringify(res));
   }
 
   log.info('get profile company successfully');
-  const res: IResponse<ICompany> = { result: false, data: result };
+  const res: IResponse<ICompany> = { result: true, data: result };
   ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
@@ -64,7 +64,7 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allCompanies || idx === undefined || idx < 0) {
     log.warn('no such company');
-    const res: IResponse<string> = { result: true, error: 'no such company' };
+    const res: IResponse<string> = { result: false, error: 'no such company' };
     ctx.throw(422, JSON.stringify(res));
   }
 
@@ -75,7 +75,7 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
     JSON.stringify([...allCompanies.slice(0, idx), company, ...allCompanies.slice(idx + 1)]),
   );
   log.info('a company edited successfully');
-  const res: IResponse<ICompany> = { result: false, data: company };
+  const res: IResponse<ICompany> = { result: true, data: company };
   ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
@@ -85,7 +85,7 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   log.info('get users by company successfully');
   const res: IResponse<IMakeUser[]> = {
-    result: false,
+    result: true,
     data: !allUsers
       ? []
       : allUsers

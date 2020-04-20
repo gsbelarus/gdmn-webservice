@@ -15,7 +15,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (!ctx.state.user.companies) {
     log.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${head.companyId})`);
     const result: IResponse<string> = {
-      result: true,
+      result: false,
       error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     };
     ctx.throw(403, JSON.stringify(result));
@@ -24,7 +24,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === head.companyId)) {
     log.warn(`The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`);
     const result: IResponse<string> = {
-      result: true,
+      result: false,
       error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     };
     ctx.throw(403, JSON.stringify(result));
@@ -45,7 +45,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
     log.info(`new message in queue: ${uuid}`);
     const result: IResponse<{ uid: string; date: Date }> = {
-      result: false,
+      result: true,
       data: { uid: uuid, date: new Date() },
     };
     ctx.status = 201;
@@ -53,7 +53,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   } else {
     log.warn('incorrect format message');
     const result: IResponse<string> = {
-      result: true,
+      result: false,
       error: `incorrect format message`,
     };
     ctx.throw(400, JSON.stringify(result));
@@ -81,7 +81,7 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
     log.verbose(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
     console.log(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
     const result: IResponse<string> = {
-      result: true,
+      result: false,
       error: `file or directory not found`,
     };
     ctx.throw(404, JSON.stringify(result));
@@ -101,7 +101,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
     log.info('get message');
   } else {
     const result: IResponse<string> = {
-      result: true,
+      result: false,
       error: `could not delete file`,
     };
     ctx.throw(422, JSON.stringify(result));

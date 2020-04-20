@@ -49,7 +49,7 @@ const logOut = (ctx: ParameterizedContext): void => {
 
   ctx.logout();
 
-  const res: IResponse<string> = { result: true, data: 'successfully logged out' };
+  const res: IResponse<undefined> = { result: true };
   ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
