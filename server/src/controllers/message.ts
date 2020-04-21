@@ -94,10 +94,6 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (result === 'OK') {
     ctx.status = 204;
-    const result: IResponse<undefined> = {
-      result: true,
-    };
-    ctx.body = JSON.stringify(result);
     log.info('get message');
   } else {
     const result: IResponse<string> = {

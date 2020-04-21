@@ -15,7 +15,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { title } = ctx.request.body;
   const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
 
-  if (allCompanies?.filter(el => el.title === title)) {
+  if (allCompanies?.some(el => el.title === title)) {
     log.warn(`a company (${title}) already exists`);
     const res: IResponse<string> = { result: false, error: `a company (${title}) already exists` };
     ctx.throw(409, JSON.stringify(res));
@@ -118,12 +118,22 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(422, JSON.stringify(res));
   }
 
+  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  if (allUsers?.some(user => user.companies?.some(comapny => comapny === id))) {
+    await writeFile(
+      PATH_LOCAL_DB_USERS,
+      JSON.stringify(
+        allUsers.map(user => {
+          return { ...user, companies: user.companies?.filter(company => company !== id) };
+        }),
+      ),
+    );
+  }
+
   await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(newCompanies ?? []));
 
-  const result: IResponse<undefined> = { result: true };
-  ctx.status = 204;
-  ctx.body = JSON.stringify(result);
   log.info('company removed successfully');
+  ctx.status = 204;
 };
 
 export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany, getCompanies, deleteCompany };

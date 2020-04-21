@@ -7,7 +7,7 @@ import { IResponse } from '../models/requests';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const uid: string = ctx.params.id;
-  const { userName } = ctx.query;
+  const { userName } = ctx.request.body;
 
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
 
@@ -34,11 +34,34 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   device = allDevices?.find(device => device.uid === uid);
 
   if (!device) {
-    log.warn('no such company');
+    log.warn('device does not exist');
     result = { result: false, error: 'device does not exist' };
     ctx.throw(422, JSON.stringify(result));
   }
   result = { result: true, data: device };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
+};
+
+interface IDeviceState {
+  uid: string;
+  user: string;
+  state: string;
+}
+
+const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+
+  const result: IResponse<Array<string | IDeviceState>> = {
+    result: true,
+    data:
+      !allDevices || !allDevices.length
+        ? []
+        : allDevices.map(device => {
+            return { uid: device.user, user: device.user, state: device.isBlock ? 'blocked' : 'active' };
+          }),
+  };
+  log.info(`get devices successfully`);
   ctx.status = 200;
   ctx.body = JSON.stringify(result);
 };
@@ -121,8 +144,7 @@ const editDevice = async (ctx: ParameterizedContext): Promise<void> => {
     const res: IResponse<string> = { result: false, error: 'no such device' };
     ctx.throw(422, JSON.stringify(res));
   }
-
-  const device: IDevice = { id: uid, user: userId, ...editPart };
+  const device: IDevice = { uid: uid, user: userId, ...editPart };
 
   await writeFile(
     PATH_LOCAL_DB_DEVICES,
@@ -139,18 +161,18 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { userId } = ctx.request.body;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
-  let result: IResponse<string | undefined>;
 
   if (!allDevices || idx === undefined || idx < 0) {
     log.warn(`the device(${uid}) is not assigned to the user(${userId})`);
-    result = { result: false, error: `the device(${uid}) is not assigned to the user(${userId})` };
+    const result: IResponse<string> = {
+      result: false,
+      error: `the device(${uid}) is not assigned to the user(${userId})`,
+    };
     ctx.throw(422, JSON.stringify(result));
   } else {
     await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]));
     log.info('device removed successfully');
-    result = { result: true };
     ctx.status = 204;
-    ctx.body = JSON.stringify(result);
   }
 };
 
@@ -195,4 +217,4 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('get devices by user successfully');
 };*/
 
-export { getDevice, getDeviceByCurrentUser, getUsersByDevice, addDevice, editDevice, removeDevice };
+export { getDevice, getDevices, getDeviceByCurrentUser, getUsersByDevice, addDevice, editDevice, removeDevice };

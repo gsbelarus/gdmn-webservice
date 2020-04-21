@@ -53,6 +53,9 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(422, JSON.stringify(res));
   }
 
+  delete newUser.id;
+  delete newUser.creatorId;
+  delete newUser.password;
   const user = { ...allUsers[idx], ...newUser };
 
   await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify([...allUsers.slice(0, idx), user, ...allUsers.slice(idx + 1)]));
@@ -107,9 +110,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
-  const result: IResponse<undefined> = { result: true };
   ctx.status = 204;
-  ctx.body = JSON.stringify(result);
   log.info('users removed successfully');
 };
 

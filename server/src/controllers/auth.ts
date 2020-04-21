@@ -19,15 +19,13 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   ctx.login(user);
 
-  if (ctx.isAuthenticated()) {
-    delete user.password;
+  delete user.password;
 
-    log.info(`user ${user} successfully logged in`);
+  log.info(`user ${user} successfully logged in`);
 
-    const res: IResponse<IUser> = { result: true, data: user };
-    ctx.status = 200;
-    ctx.body = JSON.stringify(res);
-  }
+  const res: IResponse<IUser> = { result: true, data: user };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 /** Проверка текущего пользователя в сессии koa */
@@ -55,16 +53,22 @@ const logOut = (ctx: ParameterizedContext): void => {
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const newUser = ctx.request.body as IUser;
+  let newUser = ctx.request.body as IUser;
   if (!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    newUser = {
+      id: newUser.userName,
+      ...newUser,
+      companies: [],
+      creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
+    };
     await writeFile(
       PATH_LOCAL_DB_USERS,
       JSON.stringify(
         allUsers
-          ? [...allUsers, { id: newUser.userName, ...newUser }]
+          ? [...allUsers, newUser]
           : [
-              { id: newUser.userName, ...newUser },
+              newUser,
               {
                 id: 'gdmn',
                 userName: 'gdmn',
@@ -89,7 +93,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const code = data && data.find(el => el.code === ctx.query.code);
+  const code = data && data.find(el => el.code === ctx.request.body.code);
   let result: IResponse<string>;
   let status: number;
 
@@ -98,7 +102,10 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
     date.setDate(date.getDate() + 7);
 
     if (date >= new Date()) {
-      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
+      await writeFile(
+        PATH_LOCAL_DB_ACTIVATION_CODES,
+        JSON.stringify(data?.filter(el => el.code !== ctx.request.body.code)),
+      );
       status = 200;
       result = { result: true, data: code.user };
       log.info('device has been successfully activated');
@@ -117,7 +124,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId = ctx.query.user;
+  const { userId } = ctx.request.body;
   const code = await saveActivationCode(userId);
   ctx.status = 200;
   const result: IResponse<string> = { result: true, data: code };
