@@ -5,11 +5,13 @@ import { StyleSheet } from 'react-native';
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
+import SellDocumentsNavigator from './SellDocumentsNavigator';
 
 type TabsStackParams = {
   Documents: undefined;
   References: undefined;
   Settings: undefined;
+  SellDocuments: undefined;
 };
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
@@ -17,6 +19,16 @@ const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 const TabsNavigator = () => {
   return (
     <TabsStack.Navigator barStyle={styles.tabBar}>
+      <TabsStack.Screen
+        name="SellDocuments"
+        component={SellDocumentsNavigator}
+        options={{
+          title: 'Отвес-накладные',
+          tabBarLabel: 'Отвесы',
+          tabBarIcon: 'file-document-box',
+          tabBarColor: '#CEE7E3',
+        }}
+      />
       <TabsStack.Screen
         name="Documents"
         component={DocumentsNavigator}
