@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Picker } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
 import documents from '../../../mockData/otves/Document.json';
@@ -58,25 +58,21 @@ const CreateSellDocumentScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localeStyles.subdivisionText}>Экспедитор: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {contacts && contacts.length !== 0 ? (
-              contacts.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[localeStyles.margin, selectedExpeditor === item.id ? { backgroundColor: colors.primary } : {}]}
-                  onPress={() => setSelectedExpeditor(item.id)}
-                  selected={selectedExpeditor === item.id}
-                  selectedColor={selectedExpeditor === item.id ? colors.card : colors.text}
-                >
-                  {item.name}
-                </Chip>
-              ))
+          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+           {contacts && contacts.length !== 0 ? (
+              <Picker
+                selectedValue={selectedExpeditor}
+                style={{ height: 50, width: 150 }}
+                onValueChange={(itemValue, itemIndex) => setSelectedExpeditor(itemValue)}
+              >
+              {contacts.map((item) => (
+                <Picker.Item label={item.name} value={item.id} />
+                ) 
+              )}  
+              </Picker>
             ) : (
               <Text>Не найдено</Text>
             )}
-          </ScrollView>
         </View>
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
