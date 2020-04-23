@@ -113,6 +113,23 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
           />
         </TouchableOpacity>
       </View>
+      <View style={localStyles.listContainer}>
+      <View style={localStyles.headProductTitle}>
+        <Text style={localStyles.productBarcodeView}>
+          Наименование ТМЦ
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfoTitle}>
+        <Text style={localStyles.productBarcodeView}>
+          Заявка
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfoTitle}>
+        <Text style={localStyles.productBarcodeView}>
+          Кол-во
+        </Text>
+      </View>
+      </View>
       <FlatList
         ref={ref}
         data={document.lines}
@@ -305,5 +322,14 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     flexGrow: 1,
     marginRight: 15,
+  },
+  headProductTitle: {
+    width: '55%',
+    alignItems: 'center',
+    marginLeft: 30,
+  },
+  remainsInfoTitle: {
+    alignItems: 'center' ,
+    marginLeft: 10,
   },
 });
