@@ -13,21 +13,19 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   if (!user) {
     log.info('failed login attempt');
-    const res: IResponse<string> = { status: 404, result: 'не верный пользователь и\\или пароль ' };
+    const res: IResponse<string> = { result: false, error: 'не верный пользователь и\\или пароль ' };
     ctx.throw(404, JSON.stringify(res));
   }
 
   ctx.login(user);
 
-  if (ctx.isAuthenticated()) {
-    delete user.password;
+  delete user.password;
 
-    log.info(`user ${user} successfully logged in`);
+  log.info(`user ${user} successfully logged in`);
 
-    const res: IResponse<boolean | IUser> = { status: 200, result: user || false };
-
-    ctx.body = JSON.stringify(res);
-  }
+  const res: IResponse<IUser> = { result: true, data: user };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(res);
 };
 
 /** Проверка текущего пользователя в сессии koa */
@@ -38,8 +36,8 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   delete user.password;
 
-  const res: IResponse<IUser> = { status: 200, result: user };
-
+  const res: IResponse<IUser> = { result: true, data: user };
+  ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
 
@@ -49,21 +47,28 @@ const logOut = (ctx: ParameterizedContext): void => {
 
   ctx.logout();
 
-  const res: IResponse<string> = { status: 200, result: 'successfully logged out' };
+  const res: IResponse<undefined> = { result: true };
+  ctx.status = 200;
   ctx.body = JSON.stringify(res);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const newUser = ctx.request.body as IUser;
+  let newUser = ctx.request.body as IUser;
   if (!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+    newUser = {
+      id: newUser.userName,
+      ...newUser,
+      companies: [],
+      creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
+    };
     await writeFile(
       PATH_LOCAL_DB_USERS,
       JSON.stringify(
         allUsers
-          ? [...allUsers, { id: newUser.userName, ...newUser }]
+          ? [...allUsers, newUser]
           : [
-              { id: newUser.userName, ...newUser },
+              newUser,
               {
                 id: 'gdmn',
                 userName: 'gdmn',
@@ -75,43 +80,55 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       ),
     );
 
-    ctx.body = JSON.stringify({ status: 201, result: newUser });
+    const res = { result: true, data: newUser };
+    ctx.status = 201;
+    ctx.body = JSON.stringify(res);
     log.info('signed up successful');
   } else {
     log.info('a user already exists');
-    const res: IResponse<string> = { status: 404, result: 'a user already exists' };
-    ctx.throw(404, JSON.stringify(res));
+    const res: IResponse<string> = { result: false, error: 'a user already exists' };
+    ctx.throw(400, JSON.stringify(res));
   }
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const code = data && data.find(el => el.code === ctx.query.code);
+  const code = data && data.find(el => el.code === ctx.request.body.code);
   let result: IResponse<string>;
+  let status: number;
 
   if (code) {
     const date = new Date(code.date);
     date.setDate(date.getDate() + 7);
 
     if (date >= new Date()) {
-      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(data?.filter(el => el.code !== ctx.query.code)));
-      result = { status: 200, result: code.user };
+      await writeFile(
+        PATH_LOCAL_DB_ACTIVATION_CODES,
+        JSON.stringify(data?.filter(el => el.code !== ctx.request.body.code)),
+      );
+      status = 200;
+      result = { result: true, data: code.user };
       log.info('device has been successfully activated');
     } else {
-      result = { status: 404, result: 'invalid activation code' };
+      status = 404;
+      result = { result: false, error: 'invalid activation code' };
       log.warn('invalid activation code');
     }
   } else {
-    result = { status: 404, result: 'invalid activation code' };
+    status = 404;
+    result = { result: false, error: 'invalid activation code' };
     log.warn('invalid activation code');
   }
+  ctx.status = status;
   ctx.body = JSON.stringify(result);
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId = ctx.query.user;
+  const { userId } = ctx.request.body;
   const code = await saveActivationCode(userId);
-  ctx.body = JSON.stringify({ status: 200, result: code });
+  ctx.status = 200;
+  const result: IResponse<string> = { result: true, data: code };
+  ctx.body = JSON.stringify(result);
   log.info('activation code generated successfully');
 };
 

@@ -1,4 +1,4 @@
-import { IUser, IDevice, IActivationCode } from '../models/models';
+import { IUser, IDevice, IActivationCode, IMakeUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import { ParameterizedContext } from 'koa';
@@ -17,11 +17,13 @@ export const makeUser = (user: IUser) => ({
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  ctx.body = JSON.stringify({
-    status: 200,
-    result: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
-  });
+  const result: IResponse<IMakeUser[]> = {
+    result: true,
+    data: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
+  };
   log.info('get users by device successfully');
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -30,14 +32,13 @@ const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const user = allUsers && allUsers.find(user => user.id === userId);
   if (!allUsers || user === undefined) {
     log.info(`no such user`);
-    const res: IResponse<string> = { status: 404, result: 'no such user' };
+    const res: IResponse<string> = { result: false, error: 'no such user' };
     ctx.throw(404, JSON.stringify(res));
   }
   log.info('getUser successfully returned');
-  ctx.body = JSON.stringify({
-    status: 200,
-    result: makeUser(user),
-  });
+  const result: IResponse<IMakeUser> = { result: true, data: makeUser(user) };
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -48,38 +49,42 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!allUsers || idx === undefined || idx < 0) {
     log.warn(`no such user(${newUser.userName})`);
-    const res: IResponse<string> = { status: 422, result: 'no such user' };
+    const res: IResponse<string> = { result: false, error: 'no such user' };
     ctx.throw(422, JSON.stringify(res));
   }
 
-  await writeFile(
-    PATH_LOCAL_DB_USERS,
-    JSON.stringify([
-      ...allUsers.slice(0, idx),
-      {
-        ...allUsers[idx],
-        ...newUser,
-      },
-      ...allUsers.slice(idx + 1),
-    ]),
-  );
-  ctx.body = JSON.stringify({ status: 200, result: 'user edited successfully' });
+  delete newUser.id;
+  delete newUser.creatorId;
+  delete newUser.password;
+  const user = { ...allUsers[idx], ...newUser };
+
+  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify([...allUsers.slice(0, idx), user, ...allUsers.slice(idx + 1)]));
+  const result: IResponse<IMakeUser> = { result: true, data: user };
   log.info('user edited successfully');
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
 };
+
+interface IDeviceState {
+  uid: string;
+  state: string;
+}
 
 const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   const userId: string = ctx.params.id;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  ctx.body = JSON.stringify({
-    status: 200,
-    result:
+  const result: IResponse<IDeviceState[]> = {
+    result: true,
+    data:
       !allDevices || !allDevices.length
         ? []
         : allDevices
             .filter(device => device.user === userId)
             .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
-  });
+  };
   log.info('get devices by user successfully');
+  ctx.status = 200;
+  ctx.body = JSON.stringify(result);
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -89,7 +94,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allUsers === newUsers) {
     log.warn('no such user');
-    const res: IResponse<string> = { status: 422, result: 'no such user' };
+    const res: IResponse<string> = { result: false, error: 'no such user' };
     ctx.throw(422, JSON.stringify(res));
   }
 
@@ -105,7 +110,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
 
-  ctx.body = JSON.stringify({ status: 204, result: 'users removed successfully' });
+  ctx.status = 204;
   log.info('users removed successfully');
 };
 

@@ -1,4 +1,5 @@
 export interface IResponse<T> {
-  status: number;
-  result: T;
+  result: boolean;
+  error?: T;
+  data?: T;
 }
