@@ -5,12 +5,9 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import ReferencesData from '../../../mockData/References.json';
 import { IReference } from '../../../model/inventory';
-import { useAuthStore } from '../../../store';
+import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-
-const References: IReference[] = ReferencesData;
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   const { colors } = useTheme();
@@ -38,6 +35,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
+  const { state: AppState } = useAppStore();
   const [resUpd, setResUpd] = useState();
 
   const ref = React.useRef<FlatList<IReference>>(null);
@@ -85,7 +83,7 @@ const ReferenceListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={References}
+        data={AppState.references}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
