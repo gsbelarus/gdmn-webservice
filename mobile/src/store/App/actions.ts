@@ -1,4 +1,4 @@
-import { IHead, ILine } from '../../model/inventory';
+import { IHead, ILine, IDocument } from '../../model/inventory';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
@@ -12,9 +12,7 @@ export enum ActionAppTypes {
 
 export const AppActions = {
   disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
-  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, { head: IHead; lines: ILine[] }>(
-    ActionAppTypes.NEW_DOCUMENT,
-  ),
+  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
   ),

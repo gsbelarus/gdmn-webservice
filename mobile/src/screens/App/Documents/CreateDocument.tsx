@@ -14,7 +14,7 @@ const CreateDocumentScreen = ({ route }) => {
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [selectedContact, setSelectedContact] = useState<number>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const { state } = useAppStore();
+  const { state, actions } = useAppStore();
 
   const today = new Date();
   const { colors } = useTheme();
@@ -157,7 +157,22 @@ const CreateDocumentScreen = ({ route }) => {
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
           onPress={() => {
-            navigation.navigate('ViewDocument', { docId: 1 });
+            const id =
+              state.documents.reduce((document, currDocument) => {
+                return document.id > currDocument.id ? document : currDocument;
+              }).id + 1;
+            actions.newDocument({
+              id,
+              head: {
+                doctype: selectedDocType,
+                fromcontactId: selectedContact,
+                tocontactId: selectedContact,
+                date: date.toString(),
+                status: 0,
+              },
+              lines: [],
+            });
+            navigation.navigate('ViewDocument', { docId: id });
           }}
         >
           ОК

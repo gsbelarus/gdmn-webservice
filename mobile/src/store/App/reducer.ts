@@ -21,15 +21,9 @@ export const initialState: IAppState = {
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
   switch (action.type) {
     case ActionAppTypes.DISCONNECT:
-      console.log('disconnet');
       return { ...initialState };
     case ActionAppTypes.NEW_DOCUMENT: {
-      console.log('action for add new document');
-      const id =
-        state.documents.reduce((document, currDocument) => {
-          return document.id > currDocument.id ? document : currDocument;
-        }).id + 1;
-      return { ...state, documents: [...state.documents, { id, ...action.payload }] };
+      return { ...state, documents: [...state.documents, action.payload] };
     }
     case ActionAppTypes.EDIT_DOCUMENT:
       return {
