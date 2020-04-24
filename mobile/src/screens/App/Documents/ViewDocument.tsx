@@ -5,17 +5,14 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/Document.json';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
-import goods from '../../../mockData/Goods.json';
-import remains from '../../../mockData/Remains.json';
 import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
   const { colors } = useTheme();
-  const good: IGood = goods.find((i) => i.id === item.goodId);
+  const { state } = useAppStore();
+  const good: IGood = state.goods.find((i) => i.id === item.goodId);
 
   return (
     <>
@@ -34,7 +31,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
-          {remains?.find((remain) => remain.goodId === good.id).price}
+          {state.remains?.find((remain) => remain.goodId === good.id).price}
         </Text>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {item.quantity}
@@ -82,9 +79,10 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
 
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const document: IDocument = documents.find((item) => item.id === route.params.docId);
-  const type: IDocumentType = documentTypes.find((item) => item.id === document.head.doctype);
-  const contact: IContact = contacts.find((item) => item.id === document.head.tocontactId);
+  const { state } = useAppStore();
+  const document: IDocument = state.documents.find((item) => item.id === route.params.docId);
+  const type: IDocumentType = state.documentTypes.find((item) => item.id === document.head.doctype);
+  const contact: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
   const ref = React.useRef<FlatList<ILine>>(null);
 
   useScrollToTop(ref);

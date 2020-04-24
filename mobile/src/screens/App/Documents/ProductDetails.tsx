@@ -5,17 +5,16 @@ import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData/Document.json';
-import products from '../../../mockData/Goods.json';
-import remains from '../../../mockData/Remains.json';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const { state } = useAppStore();
 
-  const product = products.find((item) => item.id === route.params.prodId);
-  const remain = remains.find((item) => item.goodId === route.params.prodId);
-  const document = documents.find((item) => item.id === route.params.docId);
+  const product = state.goods.find((item) => item.id === route.params.prodId);
+  const remain = state.remains.find((item) => item.goodId === route.params.prodId);
+  const document = state.documents.find((item) => item.id === route.params.docId);
   const [value, setValue] = useState(1);
 
   useEffect(() => {

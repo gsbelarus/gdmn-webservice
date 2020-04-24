@@ -5,21 +5,18 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { IDocument, IDocumentType } from '../../../model/inventory';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const DocumentTypes: IDocumentType[] = documentTypes;
-const Contacts: IContact[] = contacts;
 const Statuses: IDocumentType[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
+  const { state } = useAppStore();
 
   return (
     <TouchableOpacity
@@ -34,14 +31,14 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {DocumentTypes.find((type) => type.id === item.head.doctype).name}
+              {state.documentTypes.find((type) => type.id === item.head.doctype).name}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
+            {state.contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
             {new Date(item.head.date).toLocaleDateString()}
           </Text>
         </View>
