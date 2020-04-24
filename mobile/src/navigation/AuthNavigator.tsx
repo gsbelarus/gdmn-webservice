@@ -7,7 +7,7 @@ import { createCancellableSignal, timeoutWithСancellation } from '../helpers/ut
 import { IDataFetch, IServerResponse, IUser, IBaseUrl, IDevice } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
-import { useStore } from '../store';
+import { useAuthStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
 
 type AuthStackParamList = {
@@ -73,7 +73,7 @@ const AuthNavigator = () => {
     state: { deviceRegistered, loggedIn, baseUrl, companyID },
     actions,
     api,
-  } = useStore();
+  } = useAuthStore();
 
   const [state, setState] = useReducer(reducer, initialState);
   // eslint-disable-next-line react-hooks/exhaustive-deps

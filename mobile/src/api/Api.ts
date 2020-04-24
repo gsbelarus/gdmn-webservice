@@ -1,5 +1,14 @@
 import config from '../config';
-import { IServerResponse, IUser, IUserCredentials, IDevice, IBaseUrl, IMessageInfo, IMessage, INewDevice } from '../model';
+import {
+  IServerResponse,
+  IUser,
+  IUserCredentials,
+  IDevice,
+  IBaseUrl,
+  IMessageInfo,
+  IMessage,
+  INewDevice,
+} from '../model';
 import { get, post } from './http.service';
 
 export default class Api {
@@ -26,24 +35,21 @@ export default class Api {
       get(this.getUrl(), `/devices/${config.debug.deviceId}`),
 
     verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
-      post(this.getUrl(), `/devices/code`, JSON.stringify({ code })),
+      post(this.getUrl(), '/devices/code', JSON.stringify({ code })),
 
     addDevice: async (newDevice: INewDevice): Promise<IServerResponse<string>> =>
       post(this.getUrl(), '/devices/', JSON.stringify({ uid: newDevice.uid, user: newDevice.user })),
 
-    getCurrentUser: async (): Promise<IServerResponse<IUser>> =>
-      get(this.getUrl(), `/auth/user`),
-
+    getCurrentUser: async (): Promise<IServerResponse<IUser>> => get(this.getUrl(), '/auth/user'),
   };
 
   data = {
-    getData: async (): Promise<IServerResponse<any>> =>
-      get(this.getUrl(), `/test/all`),
+    getData: async (): Promise<IServerResponse<any>> => get(this.getUrl(), '/test/all'),
 
     sendMessages: async (companyId: string, consumer: string, body: string): Promise<IServerResponse<IMessageInfo>> =>
       post(this.getUrl(), '/messages/', JSON.stringify({ companyId, consumer, body })),
 
     getMessages: async (companyId: string): Promise<IServerResponse<IMessage[]>> =>
-      get(this.getUrl(), `/messages/`),
-  }
+      get(this.getUrl(), `/messages/${companyId}`),
+  };
 }

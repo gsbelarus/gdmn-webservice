@@ -7,8 +7,8 @@ import { Text } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import ReferencesData from '../../../mockData/References.json';
 import { IReference } from '../../../model/inventory';
+import { useAuthStore } from '../../../store';
 import styles from '../../../styles/global';
-import { useStore } from '../../../store';
 
 const References: IReference[] = ReferencesData;
 
@@ -37,7 +37,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
-  const { state } = useStore();
+  const { state } = useAuthStore();
   const [resUpd, setResUpd] = useState();
 
   const ref = React.useRef<FlatList<IReference>>(null);
@@ -46,53 +46,40 @@ const ReferenceListScreen = () => {
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const result = await fetch(
-      `${state.baseUrl}messages`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({
-          head: {
-            companyId: state.companyID
+    const result = await fetch(`${state.baseUrl}messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        head: {
+          companyId: state.companyID,
+        },
+        body: {
+          type: 'cmd',
+          payload: {
+            name: 'get_references',
+            params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
           },
-          body: {
-            type: "cmd",
-            payload: {
-              name: "get_references",
-              params: [
-                "documenttypes", "goodgroups", "goods", "remains", "contacts"
-              ]
-            }
-          }
-        })
-      }
-    ).then(res => res.json());
-    if(result.status === 201) {
+        },
+      }),
+    }).then((res) => res.json());
+    if (result.status === 201) {
       setResUpd(result.result);
-      Alert.alert(
-        'Успех!',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => {}
-          },
-        ]
-      )
+      Alert.alert('Успех!', '', [
+        {
+          text: 'OK',
+          onPress: () => {},
+        },
+      ]);
     } else {
-      Alert.alert(
-        'Запрос не был отправлен',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => {}
-          },
-        ]
-      )
+      Alert.alert('Запрос не был отправлен', '', [
+        {
+          text: 'OK',
+          onPress: () => {},
+        },
+      ]);
     }
-  }
+  };
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

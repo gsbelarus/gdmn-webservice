@@ -6,7 +6,7 @@ import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper'
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
-import { useStore } from '../../store';
+import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
 
 /*
@@ -20,7 +20,7 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { state, actions, api } = useStore();
+  const { state, actions, api } = useAuthStore();
   const { colors } = useTheme();
   const [lognState, setLoginState] = useState<IDataFetch>({
     isLoading: false,

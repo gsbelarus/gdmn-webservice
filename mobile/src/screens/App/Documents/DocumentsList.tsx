@@ -5,15 +5,13 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/Document.json';
 import contacts from '../../../mockData/GD_Contact.json';
 import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-import { useStore } from '../../../store';
 
-const DocumentList: IDocument[] = documents;
 const DocumentTypes: IDocumentType[] = documentTypes;
 const Contacts: IContact[] = contacts;
 const Statuses: IDocumentType[] = statuses;
@@ -57,62 +55,52 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
-  const { state } = useStore();
+  const { state } = useAuthStore();
+  const { state: appState } = useAppStore();
   const [data, setData] = useState([]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const result = await fetch(
-      `${state.baseUrl}messages`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({
-          head: {
-            companyId: state.companyID
+    const result = await fetch(`${state.baseUrl}messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        head: {
+          companyId: state.companyID,
+        },
+        body: {
+          type: 'cmd',
+          payload: {
+            name: 'post_documents',
+            params: data,
           },
-          body: {
-            type: "cmd",
-            payload: {
-              name: "post_documents",
-              params: data
-            }
-          }
-        })
-      }
-    ).then(res => res.json());
-    if(result.status === 200) {
-      Alert.alert(
-        'Успех!',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => {}
-          },
-        ]
-      )
+        },
+      }),
+    }).then((res) => res.json());
+    if (result.status === 200) {
+      Alert.alert('Успех!', '', [
+        {
+          text: 'OK',
+          onPress: () => {},
+        },
+      ]);
     } else {
-      Alert.alert(
-        'Запрос не был отправлен',
-        '',
-        [
-          {
-            text: 'OK',
-            onPress: () => {}
-          },
-        ]
-      )
+      Alert.alert('Запрос не был отправлен', '', [
+        {
+          text: 'OK',
+          onPress: () => {},
+        },
+      ]);
     }
-  }
+  };
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={DocumentList}
+        data={appState.documents}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

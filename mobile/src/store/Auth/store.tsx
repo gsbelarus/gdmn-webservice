@@ -1,28 +1,28 @@
 import React from 'react';
 
-import Api from '../api/Api';
-import Sync from '../api/Sync';
-import { IAppState, IContextProps } from '../model';
-import { AppActions } from './actions';
+import Api from '../../api/Api';
+import Sync from '../../api/Sync';
+import { IAuthState, IAuthContextProps } from '../../model';
+import { useTypesafeActions } from '../utils';
+import { AuthActions } from './actions';
 import { reducer, initialState } from './reducer';
-import { useTypesafeActions } from './utils';
 
 const api = new Api();
 
 const sync = new Sync();
 
-const defaultAppState: IContextProps = {
+const defaultAppState: IAuthContextProps = {
   state: initialState,
-  actions: AppActions,
+  actions: AuthActions,
   api,
   sync,
 };
 
 const createStoreContext = () => {
-  const StoreContext = React.createContext<IContextProps>(defaultAppState);
+  const StoreContext = React.createContext<IAuthContextProps>(defaultAppState);
 
   const StoreProvider = ({ children }) => {
-    const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
+    const [state, actions] = useTypesafeActions<IAuthState, typeof AuthActions>(reducer, initialState, AuthActions);
     return <StoreContext.Provider value={{ state, actions, api, sync }}>{children}</StoreContext.Provider>;
   };
 

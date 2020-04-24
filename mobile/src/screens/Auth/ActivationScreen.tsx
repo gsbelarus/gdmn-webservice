@@ -1,4 +1,3 @@
-import config from '../../config';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
@@ -7,13 +6,14 @@ import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper'
 import VirtualKeyboard from 'react-native-virtual-keyboard';
 
 import SubTitle from '../../components/SubTitle';
+import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { IServerResponse, IDataFetch } from '../../model';
-import { useStore } from '../../store';
+import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
 
 const ActivationScreen = () => {
-  const { actions, api } = useStore();
+  const { actions, api } = useAuthStore();
   const { colors } = useTheme();
 
   const [serverReq, setServerReq] = useState<IDataFetch>({
