@@ -5,8 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Picker } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
-import documents from '../../../mockData/otves/Document.json';
-import references from '../../../mockData/otves/References.json';
+import documents from '../../../mockData/Otves/Document.json';
+import references from '../../../mockData/Otves/References.json';
 import styles from '../../../styles/global';
 import { IContact, IDocumentType } from '../../../model/sell';
 const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;

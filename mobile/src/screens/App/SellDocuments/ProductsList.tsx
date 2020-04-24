@@ -6,7 +6,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Button, TextInput } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import references from '../../../mockData/otves/References.json';
+import references from '../../../mockData/Otves/References.json';
 import { IGood } from '../../../model/sell';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import styles from '../../../styles/global';

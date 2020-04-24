@@ -5,9 +5,9 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/otves/Document.json';
-import statuses from '../../../mockData/otves/documentStatuses.json';
-import references from '../../../mockData/otves/References.json';
+import documents from '../../../mockData/Otves/Document.json';
+import statuses from '../../../mockData/Otves/documentStatuses.json';
+import references from '../../../mockData/Otves/References.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/sell';
 import styles from '../../../styles/global';
 

@@ -6,9 +6,9 @@ import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData/otves/Document.json';
-import references from '../../../mockData/otves/References.json';
-import statuses from '../../../mockData/otves/documentStatuses.json';
+import documents from '../../../mockData//Otves/Document.json';
+import references from '../../../mockData/Otves/References.json';
+import statuses from '../../../mockData/Otves/documentStatuses.json';
 import { IDocument, IDocumentType, IContact } from '../../../model/sell';
 import styles from '../../../styles/global';
 
