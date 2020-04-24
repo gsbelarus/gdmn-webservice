@@ -29,10 +29,10 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id),
+          ...state.documents.slice(0, action.payload.id - 1),
           {
             ...state.documents.find((document) => document.id === action.payload.id),
-            ...action.payload.head,
+            head: action.payload.head,
           },
           ...state.documents.slice(action.payload.id),
         ],

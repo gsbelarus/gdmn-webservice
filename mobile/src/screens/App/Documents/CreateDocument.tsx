@@ -157,22 +157,36 @@ const CreateDocumentScreen = ({ route }) => {
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
           onPress={() => {
-            const id =
-              state.documents.reduce((document, currDocument) => {
-                return document.id > currDocument.id ? document : currDocument;
-              }).id + 1;
-            actions.newDocument({
-              id,
-              head: {
-                doctype: selectedDocType,
-                fromcontactId: selectedContact,
-                tocontactId: selectedContact,
-                date: date.toString(),
-                status: 0,
-              },
-              lines: [],
-            });
-            navigation.navigate('ViewDocument', { docId: id });
+            if (route.params?.docId) {
+              actions.editDocument({
+                id: route.params.docId,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+              });
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            } else {
+              const id =
+                state.documents.reduce((document, currDocument) => {
+                  return document.id > currDocument.id ? document : currDocument;
+                }).id + 1;
+              actions.newDocument({
+                id,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+                lines: [],
+              });
+              navigation.navigate('ViewDocument', { docId: id });
+            }
           }}
         >
           ОК
