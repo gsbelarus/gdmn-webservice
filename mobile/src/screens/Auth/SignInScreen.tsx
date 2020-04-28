@@ -55,10 +55,10 @@ const SignInScreen = () => {
     if (!lognState.isLoading) {
       return;
     }
-
-    timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
-      .then((data: IServerResponse<boolean | string>) => setServerResp(data))
-      .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
+    actions.setUserStatus(true);
+    // timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
+    //   .then((data: IServerResponse<boolean | string>) => setServerResp(data))
+    //   .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
   }, [api.auth, credential.userName, lognState.isLoading, state.deviceId]);
 
   useEffect(() => {
