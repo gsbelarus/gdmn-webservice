@@ -10,7 +10,7 @@ import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const { state } = useAppStore();
+  const { state, actions } = useAppStore();
 
   const product = state.goods.find((item) => item.id === route.params.prodId);
   const remain = state.remains.find((item) => item.goodId === route.params.prodId);
@@ -64,7 +64,10 @@ const ProductDetailScreen = ({ route, navigation }) => {
         />
       </View>
       <Button
-        onPress={() => navigation.navigate('ViewDocument', { docId: route.params.docId })}
+        onPress={() => {
+          actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+          navigation.navigate('ViewDocument', { docId: route.params.docId });
+        }}
         mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >
