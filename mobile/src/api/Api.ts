@@ -9,6 +9,7 @@ import {
   IMessage,
   INewDevice,
 } from '../model';
+import { IDocument } from '../model/inventory';
 import { get, post } from './http.service';
 
 export default class Api {
@@ -46,8 +47,16 @@ export default class Api {
   data = {
     getData: async (): Promise<IServerResponse<any>> => get(this.getUrl(), '/test/all'),
 
-    sendMessages: async (companyId: string, consumer: string, body: string): Promise<IServerResponse<IMessageInfo>> =>
-      post(this.getUrl(), '/messages/', JSON.stringify({ companyId, consumer, body })),
+    sendMessages: async (
+      companyId: string,
+      consumer: string,
+      documents: IDocument[],
+    ): Promise<IServerResponse<IMessageInfo>> =>
+      post(
+        this.getUrl(),
+        '/messages/',
+        JSON.stringify({ head: { companyId, consumer }, body: { document: documents } }),
+      ),
 
     getMessages: async (companyId: string): Promise<IServerResponse<IMessage[]>> =>
       get(this.getUrl(), `/messages/${companyId}`),

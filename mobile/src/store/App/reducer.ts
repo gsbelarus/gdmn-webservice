@@ -37,6 +37,23 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
           ...state.documents.slice(action.payload.id),
         ],
       };
+    case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
+      const document = state.documents.find((item) => item.id === action.payload.id);
+      return {
+        ...state,
+        documents: [
+          ...state.documents.slice(0, action.payload.id - 1),
+          {
+            ...document,
+            head: {
+              ...document.head,
+              status: action.payload.status,
+            },
+          },
+          ...state.documents.slice(action.payload.id),
+        ],
+      };
+    }
     case ActionAppTypes.DELETE_DOCUMENT:
       return {
         ...state,

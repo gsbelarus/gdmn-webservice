@@ -52,42 +52,29 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
-  const { state } = useAuthStore();
-  const { state: appState } = useAppStore();
-  const [data, setData] = useState([]);
+  const { state, api } = useAuthStore();
+  const { state: appState, actions } = useAppStore();
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const result = await fetch(`${state.baseUrl}messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        head: {
-          companyId: state.companyID,
-        },
-        body: {
-          type: 'cmd',
-          payload: {
-            name: 'post_documents',
-            params: data,
-          },
-        },
-      }),
-    }).then((res) => res.json());
-    if (result.status === 200) {
+    const data = appState.documents.filter((document) => document.head.status === 1);
+    const respons = await api.data.sendMessages(state.companyID, 'gdmn', data);
+    if (respons.result) {
       Alert.alert('Успех!', '', [
         {
           text: 'OK',
-          onPress: () => {},
+          onPress: async () => {
+            data.forEach((item) => {
+              actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+            });
+          },
         },
       ]);
     } else {
       Alert.alert('Запрос не был отправлен', '', [
         {
           text: 'OK',
-          onPress: () => {},
         },
       ]);
     }

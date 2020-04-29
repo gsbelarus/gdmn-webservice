@@ -24,8 +24,9 @@ export interface IDataFetch {
 }
 
 export interface IServerResponse<T> {
-  status: number;
-  result: T;
+  result: boolean;
+  error?: string;
+  data?: T;
 }
 
 export interface IBaseUrl {

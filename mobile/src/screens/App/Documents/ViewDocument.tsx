@@ -191,7 +191,9 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status + 1 });
+            }}
           >
             <MaterialIcons size={30} color={colors.card} name="check" />
           </TouchableOpacity>
@@ -206,7 +208,9 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status - 1 });
+            }}
           >
             <Foundation size={30} color={colors.card} name="clipboard-pencil" />
           </TouchableOpacity>
