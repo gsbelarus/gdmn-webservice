@@ -76,7 +76,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, action.payload.docId - 1),
           {
             ...document,
             lines: [
@@ -85,7 +85,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
                 ...document.lines.find((line) => line.id === action.payload.lineId),
                 quantity: action.payload.value,
               },
-              ...document.lines.slice(Number(action.payload.lineId)),
+              ...document.lines.slice(Number(action.payload.lineId) + 1),
             ],
           },
           ...state.documents.slice(action.payload.docId),
