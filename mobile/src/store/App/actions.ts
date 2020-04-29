@@ -5,6 +5,7 @@ export enum ActionAppTypes {
   DISCONNECT = 'DISCONNECT',
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',
+  DELETE_DOCUMENT = 'DELETE_DOCUMENT',
   DOCUMENT_ADD_LINE = 'DOCUMENT_ADD_LINE',
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
@@ -16,6 +17,7 @@ export const AppActions = {
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
   ),
+  deleteDocument: createActionPayload<ActionAppTypes.DELETE_DOCUMENT, number>(ActionAppTypes.DELETE_DOCUMENT),
   addLine: createActionPayload<ActionAppTypes.DOCUMENT_ADD_LINE, { docId: number; line: ILine }>(
     ActionAppTypes.DOCUMENT_ADD_LINE,
   ),
