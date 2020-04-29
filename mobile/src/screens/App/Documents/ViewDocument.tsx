@@ -1,17 +1,19 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewDocument'>>().params?.docId;
   const { colors } = useTheme();
-  const { state } = useAppStore();
+  const { state, actions } = useAppStore();
   const good: IGood = state.goods.find((i) => i.id === item.goodId);
 
   return (
@@ -45,6 +47,9 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
                   text: 'OK',
+                  onPress: () => {
+                    actions.deleteLine({ docId, lineId: item.id });
+                  },
                 },
                 {
                   text: 'Отмена',

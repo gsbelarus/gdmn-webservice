@@ -62,7 +62,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, action.payload.docId - 1),
           {
             ...document,
             lines: document.lines.filter((line) => line.id !== action.payload.lineId),
