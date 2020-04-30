@@ -21,14 +21,16 @@ const ActivationScreen = () => {
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
+  const [serverResp, setServerResp] = useState<IServerResponse<string>>(undefined);
 
   const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     if (serverReq?.isLoading) {
       timeout(5000, api.auth.verifyActivationCode(activationCode))
-        .then((data: IServerResponse<string>) => setServerResp({ result: data.result, status: data.status }))
+        .then((response: IServerResponse<{ userId: string }>) =>
+          setServerResp({ result: response.result, data: response.data.userId }),
+        )
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
   }, [activationCode, api.auth, serverReq]);
@@ -38,7 +40,7 @@ const ActivationScreen = () => {
       return;
     }
 
-    if (serverResp.status === 404) {
+    if (!serverResp.result) {
       setServerReq({ isLoading: false, isError: true, status: 'Неверный код' });
       return;
     }
@@ -47,15 +49,15 @@ const ActivationScreen = () => {
       5000,
       api.auth.addDevice({
         uid: config.debug.deviceId,
-        user: serverResp.result as string,
+        user: serverResp.data as string,
       }),
     )
-      .then((data: IServerResponse<string>) => {
-        if (data.status === 404) {
+      .then((response: IServerResponse<string>) => {
+        if (!response.result) {
           setServerReq({
             isLoading: false,
             isError: true,
-            status: data.result as string,
+            status: response.error,
           });
           setActivationCode('');
           return;

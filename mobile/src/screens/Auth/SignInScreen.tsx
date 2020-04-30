@@ -20,14 +20,14 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { state, actions, api } = useAuthStore();
+  const { actions, api } = useAuthStore();
   const { colors } = useTheme();
   const [lognState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
+  const [serverResp, setServerResp] = useState<IServerResponse<string>>(undefined);
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
     password: '',
@@ -51,27 +51,22 @@ const SignInScreen = () => {
     setLoginState({ isError: false, isLoading: true, status: undefined });
   }, []);
 
-  useEffect(
-    () => {
-      if (!lognState.isLoading) {
-        return;
-      }
-      actions.setUserStatus(true);
-      // timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
-      //   .then((data: IServerResponse<boolean | string>) => setServerResp(data))
-      //   .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
-    },
-    [
-      /*api.auth, credential.userName, lognState.isLoading, state.deviceId*/
-    ],
-  );
+  useEffect(() => {
+    if (!lognState.isLoading) {
+      return;
+    }
+    actions.setUserStatus(true);
+    // timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
+    //   .then((data: IServerResponse<boolean | string>) => setServerResp(data))
+    //   .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
+  }, [/*api.auth, credential.userName,*/ lognState.isLoading /*, state.deviceId*/]);
 
   useEffect(() => {
     if (!serverResp) {
       return;
     }
 
-    if (serverResp.status === 200 && !serverResp.result) {
+    if (!serverResp.result) {
       setLoginState({
         isLoading: false,
         status: 'Пользователь заблокирован',
@@ -80,14 +75,14 @@ const SignInScreen = () => {
       return;
     }
 
-    if (serverResp.status === 200 && serverResp.result) {
+    if (serverResp.result) {
       timeout(5000, api.auth.login(credential))
-        .then((data: IServerResponse<string>) => {
-          data.status === 200
+        .then((data: IServerResponse<undefined>) => {
+          data.result
             ? actions.setUserStatus(true)
             : setLoginState({
                 isLoading: false,
-                status: data.result,
+                status: data.error,
                 isError: true,
               });
         })
@@ -103,7 +98,7 @@ const SignInScreen = () => {
     // Иной вариант ответа
     setLoginState({
       isLoading: false,
-      status: serverResp.result as string,
+      status: serverResp.error,
       isError: true,
     });
   }, [actions, api.auth, credential, serverResp]);

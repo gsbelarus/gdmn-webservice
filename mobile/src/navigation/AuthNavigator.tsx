@@ -22,7 +22,7 @@ type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 interface ILoadingState {
-  serverResp?: IServerResponse<boolean | IUser | string | IDevice>;
+  serverResp?: IServerResponse<IDevice>;
   serverReq: IDataFetch;
   showSettings: boolean;
 }
@@ -32,7 +32,7 @@ type Action =
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
   | { type: 'SETTINGS_FORM'; showSettings: boolean }
-  | { type: 'SET_RESPONSE'; status: number; result: boolean | string | IUser | IDevice };
+  | { type: 'SET_RESPONSE'; result: boolean; data?: IDevice };
 
 function reducer(state: ILoadingState, action: Action): ILoadingState {
   switch (action.type) {
@@ -46,7 +46,7 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
         serverReq: { isError: false, status: undefined, isLoading: false },
       };
     case 'SET_RESPONSE':
-      return { ...state, serverResp: { result: action.result, status: action.status } };
+      return { ...state, serverResp: { result: action.result, data: action.data } };
     case 'SET_ERROR':
       return { ...state, serverReq: { isError: true, status: action.text, isLoading: false } };
     case 'SET_CONNECTION':
@@ -92,8 +92,8 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       timeoutWithСancellation(signal, 5000, api.auth.getDevice())
-        .then((data: IServerResponse<IDevice | string>) =>
-          setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
+        .then((response: IServerResponse<IDevice>) =>
+          setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
@@ -112,7 +112,7 @@ const AuthNavigator = () => {
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
+          .then((data: IServerResponse<IUser>) => actions.setUserStatus(isUser(data.result)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [actions, api.auth, deviceRegistered, signal]);

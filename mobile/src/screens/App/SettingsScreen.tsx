@@ -14,7 +14,7 @@ const SettingsScreen = () => {
 
   const logOut = async () => {
     const res = await api.auth.logout();
-    if (res.status === 200) {
+    if (res.result) {
       actions.logOut();
     }
   };
