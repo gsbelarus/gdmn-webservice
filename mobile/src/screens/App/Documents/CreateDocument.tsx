@@ -27,7 +27,7 @@ const CreateDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    if (route.params?.docId) {
+    if (route.params?.docId !== undefined) {
       const documet = state.documents.find((item) => item.id === route.params.docId);
       setSelectedDocType(documet.head.doctype);
       setSelectedContact(documet.head.fromcontactId);
@@ -171,9 +171,11 @@ const CreateDocumentScreen = ({ route }) => {
               navigation.navigate('ViewDocument', { docId: route.params.docId });
             } else {
               const id =
-                state.documents.reduce((document, currDocument) => {
-                  return document.id > currDocument.id ? document : currDocument;
-                }).id + 1;
+                state.documents
+                  .map((item) => item.id)
+                  .reduce((newId, currId) => {
+                    return newId > currId ? newId : currId;
+                  }, -1) + 1;
               actions.newDocument({
                 id,
                 head: {

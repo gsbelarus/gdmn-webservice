@@ -29,12 +29,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id - 1),
+          ...state.documents.slice(0, action.payload.id),
           {
             ...state.documents.find((document) => document.id === action.payload.id),
             head: action.payload.head,
           },
-          ...state.documents.slice(action.payload.id),
+          ...state.documents.slice(action.payload.id + 1),
         ],
       };
     case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
@@ -42,7 +42,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id - 1),
+          ...state.documents.slice(0, action.payload.id),
           {
             ...document,
             head: {
@@ -50,7 +50,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
               status: action.payload.status,
             },
           },
-          ...state.documents.slice(action.payload.id),
+          ...state.documents.slice(action.payload.id + 1),
         ],
       };
     }
@@ -62,20 +62,20 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
       const document = state.documents.find((item) => item.id === action.payload.docId);
       const id =
-        Number(
-          document.lines.reduce((line, currLine) => {
-            return line.id > currLine.id ? line : currLine;
-          }).id,
-        ) + 1;
+        document.lines
+          .map((item) => Number(item.id))
+          .reduce((lineId, currLineId) => {
+            return lineId > currLineId ? lineId : currLineId;
+          }, -1) + 1;
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId - 1),
+          ...state.documents.slice(0, action.payload.docId),
           {
             ...document,
-            lines: [...document.lines, { id: id.toString(), ...action.payload.line }],
+            lines: [...document.lines, { ...action.payload.line, id: id.toString() }],
           },
-          ...state.documents.slice(action.payload.docId),
+          ...state.documents.slice(action.payload.docId + 1),
         ],
       };
     }
@@ -84,12 +84,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId - 1),
+          ...state.documents.slice(0, action.payload.docId),
           {
             ...document,
             lines: document.lines.filter((line) => line.id !== action.payload.lineId),
           },
-          ...state.documents.slice(action.payload.docId),
+          ...state.documents.slice(action.payload.docId + 1),
         ],
       };
     }
@@ -98,7 +98,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId - 1),
+          ...state.documents.slice(0, action.payload.docId),
           {
             ...document,
             lines: [
@@ -110,7 +110,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
               ...document.lines.slice(Number(action.payload.lineId) + 1),
             ],
           },
-          ...state.documents.slice(action.payload.docId),
+          ...state.documents.slice(action.payload.docId + 1),
         ],
       };
     }
