@@ -2,19 +2,19 @@ Arguments:
   C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js
 
 PATH: 
-  D:\Work\Programs\_system\cmder\vendor\conemu-maximus5\ConEmu\Scripts;d:\Work\Programs\_system\cmder\vendor\far\;D:\Work\Programs\_system\cmder\vendor\conemu-maximus5;D:\Work\Programs\_system\cmder\vendor\conemu-maximus5\ConEmu;C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;d:\Work\Programs\_system\cmder\;d:\Work\servers\Firebird_3_0\;C:\Program Files\Avest\AvPCM_TB;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\Avest\AvPCM_MNS;C:\Program Files (x86)\Avest\AvPCM_nces;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\PuTTY\;%USERPROFILE%\AppData\Local\Microsoft\WindowsApps;C:\Users\Stas\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Stas\AppData\Roaming\npm;C:\Program Files (x86)\Avest\AvPCM;C:\Users\Stas\AppData\Local\Yarn\bin;C:\Users\Stas\AppData\Local\hyper\app-3.0.2\resources\bin
+  C:\Programs\Cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\Programs\Cmder\vendor\conemu-maximus5;C:\Programs\Cmder\vendor\conemu-maximus5\ConEmu;C:\Python27\;C:\Python27\Scripts;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Hewlett-Packard\HP ProtectTools Security Manager\Bin\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Programs\Cmder\vendor\Far\;C:\Programs\Cmder\;C:\Program Files (x86)\GnuPG\bin;C:\Program Files\TortoiseGit\bin;C:\Program Files\Firebird\Firebird-3.0.3.32900-0_x64\;C:\Windows\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\;C:\Program Files (x86)\Microsoft SQL Server\120\DTS\Binn\;C:\Users\HP\.windows-build-tools\python27\;C:\Program Files (x86)\Technobank\TB Internet Bank Agent\Avest;C:\Program Files (x86)\Meld\;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Avest\AvPCM_MNS;C:\Program Files\Git\cmd;C:\Program Files (x86)\Avest\AvPCM_nces;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Users\HP\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\cmder\Cmder.exe;C:\Program Files\Microsoft VS Code\bin;C:\Users\HP\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\heroku\bin;C:\Program Files\JetBrains\WebStorm 2018.3\bin;;C:\Users\HP\AppData\Roaming\npm;C:\Users\HP\AppData\Local\Yarn\bin
 
 Yarn version: 
   1.22.4
 
 Node version: 
-  13.5.0
+  13.8.0
 
 Platform: 
   win32 x64
 
 Trace: 
-  Error: EPERM: operation not permitted, unlink 'D:\Work\_develop\_git_projects\_golden\_gdmn\gdmn-webservice\mobile\node_modules\@expo\xdl\binaries\windows\adb\AdbWinApi.dll'
+  Error: EPERM: operation not permitted, unlink 'C:\_Work\Git\golden\_ng\gdmn-webservice\mobile\node_modules\@expo\xdl\binaries\windows\adb\AdbWinUsbApi.dll'
 
 npm manifest: 
   {
@@ -1907,13 +1907,12 @@ Lockfile:
       mv "~2"
       safe-json-stringify "~1"
   
-  "@expo/config@3.0.6":
-    version "3.0.6"
-    resolved "https://registry.yarnpkg.com/@expo/config/-/config-3.0.6.tgz#71ee041ffce45d09b3d5b503f2f71be542afc15e"
-    integrity sha512-gRzur6/GNTTE5qr1gqw2mjXf8QsHgy9xMXbmejqZKEtCGwQjv69CYgxu+SxHdQyyDy34YXVQ6rBbX43c1tZxMw==
+  "@expo/config@3.0.8":
+    version "3.0.8"
+    resolved "https://registry.yarnpkg.com/@expo/config/-/config-3.0.8.tgz#1f32a5e30ab426763c0feec307263107a55f7f32"
+    integrity sha512-G7IsSpybU50pAQ5L7/uD1K4L5a08a9iBGmRocPSjlE0Vl+Cbg9111GtuM+ikwOwN1lS9AsCEiXsELsxNSoxslA==
     dependencies:
       "@babel/register" "^7.8.3"
-      "@expo/babel-preset-cli" "0.2.8"
       "@expo/json-file" "8.2.8"
       "@expo/plist" "0.0.2"
       "@types/invariant" "^2.2.30"
@@ -1923,16 +1922,17 @@ Lockfile:
       jest-message-util "^25.1.0"
       plist "^3.0.1"
       resolve-from "^5.0.0"
+      semver "^7.1.3"
       slugify "^1.3.4"
       xcode "^2.1.0"
       xml2js "^0.4.23"
   
-  "@expo/dev-tools@0.10.30":
-    version "0.10.30"
-    resolved "https://registry.yarnpkg.com/@expo/dev-tools/-/dev-tools-0.10.30.tgz#61f4af71c64ad75fa8835496945a23f706ea6009"
-    integrity sha512-/MEI/sy5WUlBp+aI7NDseVW/SW3C/4zl1SKxMCQyNSaE6BzbHyswMjKd2pccbLlUURlo0ge8BrRrgpBgkIEIXg==
+  "@expo/dev-tools@0.10.35":
+    version "0.10.35"
+    resolved "https://registry.yarnpkg.com/@expo/dev-tools/-/dev-tools-0.10.35.tgz#2fe7dece72c5791de2d6d47554e578738104a3f0"
+    integrity sha512-vZtMTHs3tJVDLc3ztL2rF6rdC47Zc7UwwAWeP8hk8Ft3vsskbeHI5o7Z3qI7PYWWcxV+1PTT78abOPAMGhCy7w==
     dependencies:
-      "@expo/config" "3.0.6"
+      "@expo/config" "3.0.8"
       base64url "3.0.1"
       express "4.16.4"
       freeport-async "2.0.0"
@@ -2136,20 +2136,20 @@ Lockfile:
     dependencies:
       lodash "^4.17.4"
   
-  "@expo/webpack-config@0.11.19":
-    version "0.11.19"
-    resolved "https://registry.yarnpkg.com/@expo/webpack-config/-/webpack-config-0.11.19.tgz#e0106ad14d4140db62aa56573e60a6ab388aec04"
-    integrity sha512-5Ohn8pRyVxxcWh+F+OjvGfoTCGYTHvxNJAuqOkqIx0nVGt7354KgyGx1eLn6Cvu7kvzpP6riZK+8qXGkNh9qDQ==
+  "@expo/webpack-config@0.11.21":
+    version "0.11.21"
+    resolved "https://registry.yarnpkg.com/@expo/webpack-config/-/webpack-config-0.11.21.tgz#27427857111e5631f67be889c0bb8327902556a4"
+    integrity sha512-BQtgH/8SPdAizuYRs9o+0gkBWhLf8XUY56sx1TvprtGtFJUJRLXHVf2YrLcTrsD08xa0PmE/JSTNZD4q87txuQ==
     dependencies:
       "@babel/core" "7.9.0"
       "@babel/runtime" "7.9.0"
-      "@expo/config" "3.0.6"
+      "@expo/config" "3.0.8"
       babel-loader "8.1.0"
       chalk "^2.4.2"
       clean-webpack-plugin "^3.0.0"
       copy-webpack-plugin "5.0.0"
       css-loader "^2.1.1"
-      expo-pwa "0.0.2"
+      expo-pwa "0.0.4"
       file-loader "4.2.0"
       getenv "^0.7.0"
       html-loader "^0.5.5"
@@ -2184,13 +2184,13 @@ Lockfile:
       pouchdb-collections "^1.0.1"
       tiny-queue "^0.2.1"
   
-  "@expo/xdl@57.8.16":
-    version "57.8.16"
-    resolved "https://registry.yarnpkg.com/@expo/xdl/-/xdl-57.8.16.tgz#b88abac24574f37b97704fda843b72db9a4c765f"
-    integrity sha512-nVoOcReJcU/AOXTLnAOmJCzQ6EonningpwMqdFclqE1EbsMFUm2c73ecF9A4jpt4tGQ7/pavicsbvVGaWMMuKA==
+  "@expo/xdl@57.8.21":
+    version "57.8.21"
+    resolved "https://registry.yarnpkg.com/@expo/xdl/-/xdl-57.8.21.tgz#4b9d68621fe53c260f4a7488a20b754b8d081b02"
+    integrity sha512-9FQd7yzewYbyN+NxHBQD4wxn16c2672JnHDAQ0Gi/kl2yhuhuwHKJya3uOygF7R5Sl4U+BqE4TFK9knFB10xdA==
     dependencies:
       "@expo/bunyan" "3.0.2"
-      "@expo/config" "3.0.6"
+      "@expo/config" "3.0.8"
       "@expo/json-file" "8.2.8"
       "@expo/ngrok" "2.4.3"
       "@expo/osascript" "2.0.13"
@@ -2198,7 +2198,7 @@ Lockfile:
       "@expo/plist" "0.0.2"
       "@expo/schemer" "1.3.8"
       "@expo/spawn-async" "1.5.0"
-      "@expo/webpack-config" "0.11.19"
+      "@expo/webpack-config" "0.11.21"
       analytics-node "3.3.0"
       axios "0.19.0"
       boxen "4.1.0"
@@ -7045,21 +7045,21 @@ Lockfile:
       lodash "^4.6.0"
       prop-types "^15.6.0"
   
-  expo-cli@^3.17.18:
-    version "3.17.18"
-    resolved "https://registry.yarnpkg.com/expo-cli/-/expo-cli-3.17.18.tgz#72f18ca7b8691ebb965de5c6ac175700d0c00532"
-    integrity sha512-Vcq9jdj8q8Q3VCmOyqOCxO/8L+qPenRgIWIfr6reIFyS89DUfTleeDASGqoFFe6VDoYmN5trBUR7w1MKWQdWpQ==
+  expo-cli@^3.17.24:
+    version "3.17.24"
+    resolved "https://registry.yarnpkg.com/expo-cli/-/expo-cli-3.17.24.tgz#56e18ca6553e2414d1658db9995eff8b417d351a"
+    integrity sha512-lfgmU6LeLtHPAJUQ/LGHaZ1HTGYFCRplN39myR6vMNthD73DbEJspshjJXWwzpixHZPMBd+J5X+skI+ci88Zbw==
     dependencies:
       "@expo/build-tools" "0.1.4"
       "@expo/bunyan" "3.0.2"
-      "@expo/config" "3.0.6"
-      "@expo/dev-tools" "0.10.30"
+      "@expo/config" "3.0.8"
+      "@expo/dev-tools" "0.10.35"
       "@expo/json-file" "8.2.8"
       "@expo/package-manager" "0.0.13"
       "@expo/plist" "0.0.2"
       "@expo/simple-spinner" "1.0.2"
       "@expo/spawn-async" "1.5.0"
-      "@expo/xdl" "57.8.16"
+      "@expo/xdl" "57.8.21"
       "@types/cli-table" "^0.3.0"
       "@types/untildify" "^3.0.0"
       ansi-regex "^4.1.0"
@@ -7077,7 +7077,7 @@ Lockfile:
       enquirer "^2.3.2"
       envinfo "7.5.0"
       es6-error "3.2.0"
-      expo-optimize "0.1.15"
+      expo-optimize "0.1.17"
       fs-extra "6.0.1"
       getenv "0.7.0"
       glob "7.1.2"
@@ -7200,10 +7200,10 @@ Lockfile:
     dependencies:
       invariant "^2.2.4"
   
-  expo-optimize@0.1.15:
-    version "0.1.15"
-    resolved "https://registry.yarnpkg.com/expo-optimize/-/expo-optimize-0.1.15.tgz#ea70dcb87a597556cd0f00beac6b4c452c6f9cbf"
-    integrity sha512-EDX4kDZ2mL0tod7+ygxYQolGWa9byk6n1zCClxcw3gatL8UB75M8tc7ZC+lftcEyYRoPmBLW0++fnVR7E1HVeg==
+  expo-optimize@0.1.17:
+    version "0.1.17"
+    resolved "https://registry.yarnpkg.com/expo-optimize/-/expo-optimize-0.1.17.tgz#ec902a7238b99a1d60ac88509dbc2fcc5a09e988"
+    integrity sha512-CV/eQYB8zm0MY1FK3smr64oZz1/mxT6IWm3LsNBILhKmPxk/GtXwZrtAlv/iiWCkIdcTZG8rXwpZ6r6ZwX8P9Q==
   
   expo-permissions@~8.0.0:
     version "8.0.0"
@@ -7215,13 +7215,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/expo-permissions/-/expo-permissions-8.1.0.tgz#a7f2ee91ba76ce3a467e7b10adaa9ca5201b226f"
     integrity sha512-QBHD+1J9+sGFnhoEGzMRchPweeEE0OJ9ehG/0l1BMRBA7qsLS9vRC1FTJ55NwjI0Kr4RTha9r6ZX1kZHT09f/w==
   
-  expo-pwa@0.0.2:
-    version "0.0.2"
-    resolved "https://registry.yarnpkg.com/expo-pwa/-/expo-pwa-0.0.2.tgz#aa53c3bbdab0093c0925cb61e1ad510605c9e4f9"
-    integrity sha512-wfeVxrV84eA9cf4pH+4P82TBktAgYvJxX23jirRrdUevLCWxwy8hefrbSrLe2R6Gk4xmTzOWo2aDkS8MNSmZFw==
+  expo-pwa@0.0.4:
+    version "0.0.4"
+    resolved "https://registry.yarnpkg.com/expo-pwa/-/expo-pwa-0.0.4.tgz#76e31e3a96efb9fa38a0901411f854a655030203"
+    integrity sha512-OeSxZe2y+sC7mm+Vgu4PUYL8EzLARmdyZw2A8GHYBG84e8hWqkizep5/NM/xX4Hj7k/Jnl/Xy4HMEl2ecsSEjw==
     dependencies:
       "@expo/babel-preset-cli" "0.2.8"
-      "@expo/config" "3.0.6"
+      "@expo/config" "3.0.8"
       "@expo/image-utils" "0.2.18"
       "@expo/json-file" "8.2.8"
       chalk "2.4.2"

@@ -1,3 +1,13 @@
+export interface IMakeUser {
+  id?: string;
+  userName: string;
+  companies?: string[];
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  creatorId: string;
+}
+
 export interface IUser {
   id?: string;
   userName: string;

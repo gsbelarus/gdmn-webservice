@@ -30,27 +30,27 @@ const saveActivationCode = async (userId: string) => {
   return code;
 };
 
-/* Непонятно что делает функция */
-const editCompanies = async (userId: string, companies: string[]) => {
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const user = allUsers?.filter(item => item.id === userId)[0];
+// /* Непонятно что делает функция */
+// const editCompanies = async (userId: string, companies: string[]) => {
+//   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+//   const user = allUsers?.filter(item => item.id === userId)[0];
 
-  if (!(user && allUsers)) return;
+//   if (!(user && allUsers)) return;
 
-  const idx = allUsers.findIndex(item => item.userName === user.userName);
+//   const idx = allUsers.findIndex(item => item.userName === user.userName);
 
-  if (!allUsers || idx === undefined || idx < 0) return 1;
+//   if (!allUsers || idx === undefined || idx < 0) return 1;
 
-  await writeFile(
-    PATH_LOCAL_DB_USERS,
-    JSON.stringify([
-      ...allUsers.slice(0, idx),
-      { ...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies },
-      ...allUsers.slice(idx + 1),
-    ]),
-  );
-  return 1;
-};
+//   await writeFile(
+//     PATH_LOCAL_DB_USERS,
+//     JSON.stringify([
+//       ...allUsers.slice(0, idx),
+//       { ...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies },
+//       ...allUsers.slice(idx + 1),
+//     ]),
+//   );
+//   return 1;
+// };
 
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await findByUserName(userName);
@@ -63,4 +63,4 @@ const validateAuthCreds: VerifyFunction = async (userName: string, password: str
   }
 };
 
-export { validateAuthCreds, editCompanies, saveActivationCode, findById, findByUserName };
+export { validateAuthCreds, saveActivationCode, findById, findByUserName };
