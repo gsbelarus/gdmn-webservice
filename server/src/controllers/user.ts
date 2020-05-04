@@ -1,9 +1,8 @@
-import { IUser, IDevice, IActivationCode, IMakeUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IResponse } from '../models/requests';
+import { IResponse, IDevice, IActivationCode, IUser, IMakeUser } from '../../../common';
 
 export const makeUser = (user: IUser) => ({
   id: user.id,

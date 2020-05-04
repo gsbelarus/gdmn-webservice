@@ -1,11 +1,10 @@
 import { readFile, writeFile, removeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_MESSAGES } from '../server';
 import { v1 as uuidv1 } from 'uuid';
-import { IMessage } from '../models/models';
 import { promises } from 'fs';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IResponse } from '../models/requests';
+import { IResponse, IMessage } from '../../../common';
 
 const remove = async (company: string, uid: string) => removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`);
 

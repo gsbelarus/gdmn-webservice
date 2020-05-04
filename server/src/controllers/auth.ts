@@ -1,11 +1,10 @@
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
-import { IUser, IActivationCode } from '../models/models';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { findByUserName, saveActivationCode } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
-import { IResponse } from '../models/requests';
+import { IResponse, IActivationCode, IUser } from '../../../common';
 import log from '../utils/logger';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {

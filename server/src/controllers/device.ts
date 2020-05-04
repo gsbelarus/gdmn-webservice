@@ -1,9 +1,8 @@
 import { ParameterizedContext } from 'koa';
-import { IDevice, IUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_USERS } from '../server';
 import log from '../utils/logger';
-import { IResponse } from '../models/requests';
+import { IDevice, IResponse, IUser } from '../../../common';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const uid: string = ctx.params.id;
