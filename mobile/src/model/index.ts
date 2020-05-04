@@ -1,7 +1,7 @@
 import Api from '../api/Api';
 import Sync from '../api/Sync';
 import { AppActions, AuthActions } from '../store';
-import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference } from './inventory';
+import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl } from '../../../common';
 
 export interface IAuthContextProps {
   state: IAuthState;
@@ -21,24 +21,6 @@ export interface IDataFetch {
   isLoading: boolean;
   isError: boolean;
   status?: string;
-}
-
-export interface IServerResponse<T> {
-  result: boolean;
-  error?: string;
-  data?: T;
-}
-
-export interface IBaseUrl {
-  protocol: string;
-  server: string;
-  port: number;
-  apiPath: string;
-}
-
-export interface IUserCredentials {
-  userName: string;
-  password: string;
 }
 
 export interface IDevice {
@@ -69,36 +51,4 @@ export interface IAppState {
   documentTypes?: IDocumentType[];
   contacts?: IContact[];
   references?: IReference[];
-}
-
-// перенести в общую папку common
-export interface IUser {
-  id: string;
-  userName: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-}
-
-export interface IMessageInfo {
-  uid: string;
-  date: Date;
-}
-
-export interface IMessage {
-  head: {
-    id: string;
-    producer: string;
-    consumer: string;
-    companyId: string;
-    dateTime: string;
-  };
-  body: {
-    type: string;
-    payload: {
-      name: string;
-      params: string[];
-    };
-  };
 }

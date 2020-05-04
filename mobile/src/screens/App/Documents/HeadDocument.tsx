@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 

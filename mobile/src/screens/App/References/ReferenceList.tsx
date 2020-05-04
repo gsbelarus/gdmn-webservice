@@ -5,7 +5,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import { IReference } from '../../../model/inventory';
+import { IReference } from '../../../../../common';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 

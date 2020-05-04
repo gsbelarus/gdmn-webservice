@@ -6,7 +6,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Button, TextInput } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import { IGood } from '../../../model/inventory';
+import { IGood } from '../../../../../common';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';

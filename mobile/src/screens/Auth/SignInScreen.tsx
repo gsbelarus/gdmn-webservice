@@ -5,9 +5,10 @@ import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper'
 
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
-import { IUserCredentials, IDataFetch, IServerResponse } from '../../model';
+import { IDataFetch } from '../../model';
 import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
+import { IResponse, IUserCredentials } from '../../../../common';
 
 /*
   Порядок работы:
@@ -27,7 +28,7 @@ const SignInScreen = () => {
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IServerResponse<string>>(undefined);
+  const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
     password: '',
@@ -77,7 +78,7 @@ const SignInScreen = () => {
 
     if (serverResp.result) {
       timeout(5000, api.auth.login(credential))
-        .then((data: IServerResponse<undefined>) => {
+        .then((data: IResponse<undefined>) => {
           data.result
             ? actions.setUserStatus(true)
             : setLoginState({
