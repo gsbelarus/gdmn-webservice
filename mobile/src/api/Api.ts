@@ -46,7 +46,8 @@ export default class Api {
         JSON.stringify({ uid: newDevice.uid, user: newDevice.user }),
       ),
 
-    getCurrentUser: async (): Promise<IServerResponse<IUser>> => get(this.getUrl(), '/auth/user'),
+    getCurrentUser: async (): Promise<IServerResponse<IUser>> =>
+      get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
   };
 
   data = {
