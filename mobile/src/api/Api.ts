@@ -1,5 +1,15 @@
 import config from '../config';
-import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
+import {
+  IServerResponse,
+  IUser,
+  IUserCredentials,
+  IDevice,
+  IBaseUrl,
+  IMessageInfo,
+  IMessage,
+  INewDevice,
+} from '../model';
+import { IDocument, IReference, IRemain, IGood } from '../model/inventory';
 import { get, post } from './http.service';
 
 export default class Api {
@@ -12,26 +22,50 @@ export default class Api {
   getUrl = () => `${this.baseUrl.protocol}${this.baseUrl.server}:${this.baseUrl.port}/${this.baseUrl.apiPath}`;
 
   auth = {
-    login: async (userCredentials: IUserCredentials): Promise<IServerResponse<string>> =>
+    login: async (userCredentials: IUserCredentials): Promise<IServerResponse<undefined>> =>
       post(
         this.getUrl(),
         `/auth/login?deviceId=${config.debug.deviceId}`,
         JSON.stringify({ userName: userCredentials.userName, password: userCredentials.password }),
       ),
-    logout: async (): Promise<IServerResponse<string>> => get(this.getUrl(), `/auth/logout?deviceId=${config.debug.deviceId}`),
+    logout: async (): Promise<IServerResponse<undefined>> =>
+      get(this.getUrl(), `/auth/logout?deviceId=${config.debug.deviceId}`),
 
-    getUserStatus: async (): Promise<IServerResponse<IUser | string>> => get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
+    getUserStatus: async (): Promise<IServerResponse<IUser>> =>
+      get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
 
-    getDeviceStatus: async (): Promise<IServerResponse<boolean | string>> =>
-      get(this.getUrl(), `/devices/${config.debug.deviceId}`),
+    getDevice: async (): Promise<IServerResponse<IDevice[]>> => get(this.getUrl(), `/devices/${config.debug.deviceId}`),
 
-    getDeviceStatusByUser: async (userName: string): Promise<IServerResponse<boolean>> =>
-      get(this.getUrl(), `/devices/${config.debug.deviceId}?userName=${userName}`),
+    verifyActivationCode: async (code: string): Promise<IServerResponse<{ userId: string }>> =>
+      post(this.getUrl(), `/auth/device/code?deviceId=${config.debug.deviceId}`, JSON.stringify({ code })),
 
-    verifyActivationCode: async (code: string): Promise<IServerResponse<string>> =>
-      get(this.getUrl(), `/auth/device/code=${code}?deviceId=${config.debug.deviceId}`),
+    addDevice: async (newDevice: INewDevice): Promise<IServerResponse<IDevice>> =>
+      post(
+        this.getUrl(),
+        `/devices/?deviceId=${config.debug.deviceId}`,
+        JSON.stringify({ uid: newDevice.uid, user: newDevice.user }),
+      ),
 
-    addDevice: async (newDevice: INewDevice): Promise<IServerResponse<string>> =>
-      post(this.getUrl(), '/devices/new', JSON.stringify({ uid: newDevice.uid, userId: newDevice.userId })),
+    getCurrentUser: async (): Promise<IServerResponse<IUser>> =>
+      get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
+  };
+
+  data = {
+    getData: async (): Promise<IServerResponse<(IDocument | IReference | IRemain | IGood)[]>> =>
+      get(this.getUrl(), '/test/all'),
+
+    sendMessages: async (
+      companyId: string,
+      consumer: string,
+      documents: IDocument[],
+    ): Promise<IServerResponse<IMessageInfo>> =>
+      post(
+        this.getUrl(),
+        '/messages/?deviceId=${config.debug.deviceId}',
+        JSON.stringify({ head: { companyId, consumer }, body: { document: documents } }),
+      ),
+
+    getMessages: async (companyId: string): Promise<IServerResponse<IMessage[]>> =>
+      get(this.getUrl(), `/messages/${companyId}?deviceId=${config.debug.deviceId}`),
   };
 }

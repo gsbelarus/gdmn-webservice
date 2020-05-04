@@ -1,6 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
+import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
 
 type RootStackParamList = {
@@ -11,17 +12,19 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        key="BottomTabs"
-        name="BottomTabs"
-        component={TabsNavigator}
-        options={{
-          headerShown: false,
-          // title: 'Mobile inventory',
-        }}
-      />
-    </Stack.Navigator>
+    <AppStoreProvider>
+      <Stack.Navigator>
+        <Stack.Screen
+          key="BottomTabs"
+          name="BottomTabs"
+          component={TabsNavigator}
+          options={{
+            headerShown: false,
+            // title: 'Mobile inventory',
+          }}
+        />
+      </Stack.Navigator>
+    </AppStoreProvider>
   );
 };
 

@@ -5,10 +5,10 @@ import { ActivityIndicator } from 'react-native-paper';
 import config from '../../config';
 import { IBaseUrl } from '../../model';
 import AuthNavigator from '../../navigation/AuthNavigator';
-import { useStore } from '../../store';
+import { useAuthStore } from '../../store';
 
 const ConnectionScreen = () => {
-  const { state, actions, api } = useStore();
+  const { state, actions, api } = useAuthStore();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {

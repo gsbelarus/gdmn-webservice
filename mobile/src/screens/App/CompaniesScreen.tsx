@@ -4,20 +4,20 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
-import { useStore } from '../../store';
+import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
 
   const { colors } = useTheme();
-  const { actions, api } = useStore();
+  const { actions, api } = useAuthStore();
 
   const companies = ['company1', 'company2', 'company3'];
 
   const logOut = async () => {
     const res = await api.auth.logout();
-    if (res.status === 200) {
+    if (res.result) {
       actions.logOut();
     }
   };

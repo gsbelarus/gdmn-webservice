@@ -6,9 +6,9 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Button, TextInput } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import products from '../../../mockData/Goods.json';
 import { IGood } from '../../../model/inventory';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
@@ -42,6 +42,7 @@ const ProductsListScreen = () => {
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
+  const { state } = useAppStore();
 
   const ref = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(ref);
@@ -115,7 +116,7 @@ const ProductsListScreen = () => {
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
             </TouchableOpacity>
           </View>
-          {!products.find(
+          {!state.goods.find(
             (item) =>
               item.barcode.toLowerCase().includes(text.toLowerCase()) ||
               item.name.toLowerCase().includes(text.toLowerCase()),
@@ -124,7 +125,7 @@ const ProductsListScreen = () => {
           ) : (
             <FlatList
               ref={ref}
-              data={products.filter(
+              data={state.goods.filter(
                 (item) =>
                   item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                   item.name.toLowerCase().includes(text.toLowerCase()),

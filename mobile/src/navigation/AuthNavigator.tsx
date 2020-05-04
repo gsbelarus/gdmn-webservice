@@ -4,10 +4,10 @@ import { AsyncStorage } from 'react-native';
 
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
-import { IDataFetch, IServerResponse, IUser, IBaseUrl } from '../model';
+import { IDataFetch, IServerResponse, IUser, IBaseUrl, IDevice } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
-import { useStore } from '../store';
+import { useAuthStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
 
 type AuthStackParamList = {
@@ -22,7 +22,7 @@ type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 interface ILoadingState {
-  serverResp?: IServerResponse<boolean | IUser | string>;
+  serverResp?: IServerResponse<IDevice>;
   serverReq: IDataFetch;
   showSettings: boolean;
 }
@@ -32,7 +32,7 @@ type Action =
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
   | { type: 'SETTINGS_FORM'; showSettings: boolean }
-  | { type: 'SET_RESPONSE'; status: number; result: boolean | string | IUser };
+  | { type: 'SET_RESPONSE'; result: boolean; data?: IDevice };
 
 function reducer(state: ILoadingState, action: Action): ILoadingState {
   switch (action.type) {
@@ -46,7 +46,7 @@ function reducer(state: ILoadingState, action: Action): ILoadingState {
         serverReq: { isError: false, status: undefined, isLoading: false },
       };
     case 'SET_RESPONSE':
-      return { ...state, serverResp: { result: action.result, status: action.status } };
+      return { ...state, serverResp: { result: action.result, data: action.data } };
     case 'SET_ERROR':
       return { ...state, serverReq: { isError: true, status: action.text, isLoading: false } };
     case 'SET_CONNECTION':
@@ -73,7 +73,7 @@ const AuthNavigator = () => {
     state: { deviceRegistered, loggedIn, baseUrl, companyID },
     actions,
     api,
-  } = useStore();
+  } = useAuthStore();
 
   const [state, setState] = useReducer(reducer, initialState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,9 +91,9 @@ const AuthNavigator = () => {
   */
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
-      timeoutWithСancellation(signal, 5000, api.auth.getDeviceStatus())
-        .then((data: IServerResponse<boolean>) =>
-          setState({ type: 'SET_RESPONSE', result: data.result, status: data.status }),
+      timeoutWithСancellation(signal, 5000, api.auth.getDevice())
+        .then((response: IServerResponse<IDevice>) =>
+          setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     }
@@ -112,7 +112,7 @@ const AuthNavigator = () => {
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IServerResponse<IUser | string>) => actions.setUserStatus(isUser(data.result)))
+          .then((data: IServerResponse<IUser>) => actions.setUserStatus(isUser(data.result)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [actions, api.auth, deviceRegistered, signal]);

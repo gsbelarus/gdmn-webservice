@@ -5,9 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
-import documents from '../../../mockData/Document.json';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const CreateDocumentScreen = ({ route }) => {
@@ -16,6 +14,7 @@ const CreateDocumentScreen = ({ route }) => {
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [selectedContact, setSelectedContact] = useState<number>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const { state, actions } = useAppStore();
 
   const today = new Date();
   const { colors } = useTheme();
@@ -28,8 +27,8 @@ const CreateDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    if (route.params?.docId) {
-      const documet = documents.find((item) => item.id === route.params.docId);
+    if (route.params?.docId !== undefined) {
+      const documet = state.documents.find((item) => item.id === route.params.docId);
       setSelectedDocType(documet.head.doctype);
       setSelectedContact(documet.head.fromcontactId);
       setDate(new Date(documet.head.date));
@@ -55,8 +54,8 @@ const CreateDocumentScreen = ({ route }) => {
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
           <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
           <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {documentTypes && documentTypes.length !== 0 ? (
-              documentTypes.map((item, idx) => (
+            {state.documentTypes && state.documentTypes.length !== 0 ? (
+              state.documentTypes.map((item, idx) => (
                 <Chip
                   key={idx}
                   mode="outlined"
@@ -76,8 +75,8 @@ const CreateDocumentScreen = ({ route }) => {
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
           <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {contacts && contacts.length !== 0 ? (
-              contacts.map((item, idx) => (
+            {state.contacts && state.contacts.length !== 0 ? (
+              state.contacts.map((item, idx) => (
                 <Chip
                   key={idx}
                   mode="outlined"
@@ -158,7 +157,38 @@ const CreateDocumentScreen = ({ route }) => {
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
           onPress={() => {
-            navigation.navigate('ViewDocument', { docId: 1 });
+            if (route.params?.docId) {
+              actions.editDocument({
+                id: route.params.docId,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+              });
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            } else {
+              const id =
+                state.documents
+                  .map((item) => item.id)
+                  .reduce((newId, currId) => {
+                    return newId > currId ? newId : currId;
+                  }, -1) + 1;
+              actions.newDocument({
+                id,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+                lines: [],
+              });
+              navigation.navigate('ViewDocument', { docId: id });
+            }
           }}
         >
           ОК
