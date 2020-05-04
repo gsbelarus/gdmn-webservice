@@ -4,11 +4,12 @@ import { AsyncStorage } from 'react-native';
 
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
-import { IDataFetch, IServerResponse, IUser, IBaseUrl, IDevice } from '../model';
+import { IResponse, IUser, IBaseUrl, IDevice } from '../../../common';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useAuthStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
+import { IDataFetch } from '../model';
 
 type AuthStackParamList = {
   Splash: undefined;
@@ -22,7 +23,7 @@ type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 interface ILoadingState {
-  serverResp?: IServerResponse<IDevice>;
+  serverResp?: IResponse<IDevice>;
   serverReq: IDataFetch;
   showSettings: boolean;
 }
@@ -92,7 +93,7 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       timeoutWithСancellation(signal, 5000, api.auth.getDevice())
-        .then((response: IServerResponse<IDevice>) =>
+        .then((response: IResponse<IDevice>) =>
           setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
         )
         .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
@@ -112,7 +113,7 @@ const AuthNavigator = () => {
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IServerResponse<IUser>) => actions.setUserStatus(isUser(data.result)))
+          .then((data: IResponse<IUser>) => actions.setUserStatus(isUser(data.result)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [actions, api.auth, deviceRegistered, signal]);

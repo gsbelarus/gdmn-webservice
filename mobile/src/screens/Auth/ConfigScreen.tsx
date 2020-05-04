@@ -5,8 +5,8 @@ import { Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 import config from '../../config';
-import { IBaseUrl } from '../../model';
 import styles from '../../styles/global';
+import { IBaseUrl } from '../../../../common';
 
 type Props = {
   serverName?: string;

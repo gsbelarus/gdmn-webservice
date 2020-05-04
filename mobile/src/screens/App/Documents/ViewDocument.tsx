@@ -5,7 +5,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
+import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../../../common';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';

@@ -1,6 +1,6 @@
-import { IUser, IActivationCode, ICompany, IDevice, IMessage } from '../models/models';
 import dev from '../../config/dev';
 import { readFile } from './workWithFile';
+import { IUser, IActivationCode, ICompany, IDevice, IMessage } from '../../../common';
 
 const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
 const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;

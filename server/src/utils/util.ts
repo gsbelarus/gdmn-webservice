@@ -1,7 +1,7 @@
-import { IActivationCode, IUser } from '../models/models';
 import { readFile, writeFile } from './workWithFile';
 import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS } from '../server';
 import { VerifyFunction } from 'passport-local';
+import { IActivationCode, IUser } from '../../../common';
 
 const findById = async (id: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);

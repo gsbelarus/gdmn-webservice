@@ -18,15 +18,6 @@ export interface ILine {
   quantity: number;
 }
 
-export interface IUser {
-  id: string;
-  userName: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-}
-
 export interface IRemain {
   goodId: number;
   quantity: number;

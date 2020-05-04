@@ -8,9 +8,10 @@ import VirtualKeyboard from 'react-native-virtual-keyboard';
 import SubTitle from '../../components/SubTitle';
 import config from '../../config';
 import { timeout } from '../../helpers/utils';
-import { IServerResponse, IDataFetch } from '../../model';
+import { IDataFetch } from '../../model';
 import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
+import { IResponse } from '../../../../common';
 
 const ActivationScreen = () => {
   const { actions, api } = useAuthStore();
@@ -21,14 +22,14 @@ const ActivationScreen = () => {
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IServerResponse<string>>(undefined);
+  const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
 
   const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     if (serverReq?.isLoading) {
       timeout(5000, api.auth.verifyActivationCode(activationCode))
-        .then((response: IServerResponse<{ userId: string }>) =>
+        .then((response: IResponse<{ userId: string }>) =>
           setServerResp({ result: response.result, data: response.data.userId }),
         )
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
@@ -52,7 +53,7 @@ const ActivationScreen = () => {
         user: serverResp.data as string,
       }),
     )
-      .then((response: IServerResponse<string>) => {
+      .then((response: IResponse<string>) => {
         if (!response.result) {
           setServerReq({
             isLoading: false,
