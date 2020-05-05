@@ -1,6 +1,6 @@
 import { Context } from 'koa';
-import { IResponse } from '../models/requests';
 import log from '../utils/logger';
+import { IResponse } from '../../../common';
 
 export const authMiddleware = async (ctx: Context, next: Function) => {
   if (!ctx.state.user) {

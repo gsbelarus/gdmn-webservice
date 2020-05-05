@@ -1,26 +1,22 @@
 import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/Document.json';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { IDocument, IDocumentType } from '../../../../../common';
+import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const DocumentList: IDocument[] = documents;
-const DocumentTypes: IDocumentType[] = documentTypes;
-const Contacts: IContact[] = contacts;
 const Statuses: IDocumentType[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
+  const { state } = useAppStore();
 
   return (
     <TouchableOpacity
@@ -35,14 +31,14 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {DocumentTypes.find((type) => type.id === item.head.doctype).name}
+              {state.documentTypes.find((type) => type.id === item.head.doctype).name}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            {Contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
+            {state.contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
             {new Date(item.head.date).toLocaleDateString()}
           </Text>
         </View>
@@ -56,13 +52,39 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
+  const { state, api } = useAuthStore();
+  const { state: appState, actions } = useAppStore();
+
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
+
+  const sendUpdateRequest = async () => {
+    const data = appState.documents.filter((document) => document.head.status === 1);
+    const respons = await api.data.sendMessages(state.companyID, 'gdmn', data);
+    if (respons.result) {
+      Alert.alert('Успех!', '', [
+        {
+          text: 'OK',
+          onPress: async () => {
+            data.forEach((item) => {
+              actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+            });
+          },
+        },
+      ]);
+    } else {
+      Alert.alert('Запрос не был отправлен', '', [
+        {
+          text: 'OK',
+        },
+      ]);
+    }
+  };
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={DocumentList}
+        data={appState.documents}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -77,7 +99,7 @@ const DocumentsListScreen = ({ navigation }) => {
               borderColor: colors.primary,
             },
           ]}
-          onPress={() => ({})}
+          onPress={sendUpdateRequest}
         >
           <AntDesign size={30} color={colors.card} name="sync" />
         </TouchableOpacity>

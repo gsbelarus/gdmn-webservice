@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/interface-name-prefix */
 import { Reducer, useReducer, useMemo } from 'react';
 
-import { TActions } from './actions';
+import { TAppActions } from './App/actions';
+import { TAuthActions } from './Auth/actions';
 
 /**
  * Create an action that has a strongly typed string literal name with a strongly typed payload
@@ -68,7 +69,7 @@ interface IAction {
 }
 
 export function useTypesafeActions<S, Actions extends IAction>(
-  reducer: Reducer<S, TActions>,
+  reducer: Reducer<S, TAuthActions | TAppActions>,
   initialState: S,
   actions: Actions,
 ): [S, Actions] {

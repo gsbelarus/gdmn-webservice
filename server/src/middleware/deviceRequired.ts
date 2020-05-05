@@ -1,9 +1,8 @@
 import { Context } from 'koa';
-import { IResponse } from '../models/requests';
 import log from '../utils/logger';
 import { readFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_DEVICES } from '../server';
-import { IDevice } from '../models/models';
+import { IResponse, IDevice } from '../../../common';
 
 export const deviceMiddleware = async (ctx: Context, next: Function) => {
   if (!ctx.query.deviceId) {

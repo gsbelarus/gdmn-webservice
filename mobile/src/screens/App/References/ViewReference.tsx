@@ -6,7 +6,7 @@ import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { IReference } from '../../../model/inventory';
+import { IReference } from '../../../../../common';
 // import styles from '../../../styles/global';
 
 interface IField {

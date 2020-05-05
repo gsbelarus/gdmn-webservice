@@ -1,10 +1,9 @@
-import { ICompany, IUser, IMakeUser } from '../models/models';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../server';
 import { ParameterizedContext } from 'koa';
-import { IResponse } from '../models/requests';
 import { makeUser, addCompanyToUser } from './user';
 import log from '../utils/logger';
+import { ICompany, IResponse, IUser, IMakeUser } from '../../../common';
 
 /**
  * Добавление новой организации

@@ -4,17 +4,17 @@ import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
 import SettingsItem from '../../components/SettingsItem';
-import { useStore } from '../../store';
+import { useAuthStore } from '../../store';
 
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions, api } = useStore();
+  const { actions, api } = useAuthStore();
 
   const logOut = async () => {
     const res = await api.auth.logout();
-    if (res.status === 200) {
+    if (res.result) {
       actions.logOut();
     }
   };

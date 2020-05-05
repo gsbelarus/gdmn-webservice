@@ -1,5 +1,4 @@
 import { useTheme } from '@react-navigation/native';
-import Constants from 'expo-constants';
 import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
@@ -7,13 +6,15 @@ import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper'
 import VirtualKeyboard from 'react-native-virtual-keyboard';
 
 import SubTitle from '../../components/SubTitle';
+import config from '../../config';
 import { timeout } from '../../helpers/utils';
-import { IServerResponse, IDataFetch } from '../../model';
-import { useStore } from '../../store';
+import { IDataFetch } from '../../model';
+import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
+import { IResponse } from '../../../../common';
 
 const ActivationScreen = () => {
-  const { actions, api } = useStore();
+  const { actions, api } = useAuthStore();
   const { colors } = useTheme();
 
   const [serverReq, setServerReq] = useState<IDataFetch>({
@@ -21,14 +22,16 @@ const ActivationScreen = () => {
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IServerResponse<boolean | string>>(undefined);
+  const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
 
   const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     if (serverReq?.isLoading) {
       timeout(5000, api.auth.verifyActivationCode(activationCode))
-        .then((data: IServerResponse<string>) => setServerResp({ result: data.result, status: data.status }))
+        .then((response: IResponse<{ userId: string }>) =>
+          setServerResp({ result: response.result, data: response.data.userId }),
+        )
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
   }, [activationCode, api.auth, serverReq]);
@@ -38,7 +41,7 @@ const ActivationScreen = () => {
       return;
     }
 
-    if (serverResp.status === 404) {
+    if (!serverResp.result) {
       setServerReq({ isLoading: false, isError: true, status: 'Неверный код' });
       return;
     }
@@ -46,16 +49,16 @@ const ActivationScreen = () => {
     timeout(
       5000,
       api.auth.addDevice({
-        uid: Constants.deviceId,
-        userId: serverResp.result as string,
+        uid: config.debug.deviceId,
+        user: serverResp.data as string,
       }),
     )
-      .then((data: IServerResponse<string>) => {
-        if (data.status === 404) {
+      .then((response: IResponse<string>) => {
+        if (!response.result) {
           setServerReq({
             isLoading: false,
             isError: true,
-            status: data.result as string,
+            status: response.error,
           });
           setActivationCode('');
           return;
