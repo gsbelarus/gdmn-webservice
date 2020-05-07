@@ -28,34 +28,32 @@ export interface IRemain {
 export interface IContact {
   id: number;
   name: string;
-  type: number;
+  type?: number;
+  [fieldName: string]: unknown;
 }
 
 export interface IDocumentType {
   id: number;
   name: string;
+  [fieldName: string]: unknown;
 }
 
 export interface IGood {
   id: number;
   name: string;
-  barcode: string;
-  alias: string;
+  barcode?: string;
+  alias?: string;
+  itemWeight?: number;
+  [fieldName: string]: unknown;
 }
-
-/* export interface IReference {
-  id: number;
-  name: string;
-  type: string;
-} */
 
 export interface IReference {
   id: number;
   name: string;
   type: string;
   data: {
-    id: string;
-    name: string;
+    id: number;
+    name?: string;
     [fieldName: string]: unknown;
   }[];
 }

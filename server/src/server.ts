@@ -6,13 +6,13 @@ import router from './routes';
 import session from 'koa-session';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { IUser } from './models/models';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 import log from './utils/logger';
 
 import { findById, validateAuthCreds } from './utils/util';
 import dev from '../config/dev';
+import { IUser } from '../../common';
 
 // import log4js from 'log4js';
 // const logger = log4js.getLogger('SERVER');
