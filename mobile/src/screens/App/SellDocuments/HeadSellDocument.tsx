@@ -6,13 +6,11 @@ import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData//Otves/Document.json';
-import references from '../../../mockData/Otves/References.json';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../model/sell';
 import styles from '../../../styles/global';
-
-const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
+import { IDocument, IDocumentType, IContact } from '../../../../../common';
+import { ISellDocument, ISellHead } from '../../../model';
+import { useAppStore } from '../../../store';
 
 type TField = {
   title: string;
@@ -37,16 +35,17 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
 
 const HeadSellDocumentScreen = ({ route }) => {
   const ref = React.useRef<FlatList<TField>>(null);
-  const document: IDocument = documents.find((item) => item.id === route.params.docId);
-  const contactTo: IContact = contacts.find((item) => item.id === document.head.tocontactId);
-  const contactFrom: IContact = contacts.find((item) => item.id === document.head.fromcontactId);
-  const expeditor: IContact = contacts.find((item) => item.id === document.head.expeditorId);
+  const { state } = useAppStore();
+  const document: ISellDocument | IDocument = state.documents.find((item) => item.id === route.params.docId);
+  const contactTo: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
+  const contactFrom: IContact = state.contacts.find((item) => item.id === document.head.fromcontactId);
+  const expeditor: IContact = state.contacts.find((item) => item.id === (document.head as ISellHead).expeditorId);
   const status: string = statuses.find((item) => item.id === document.head.status).name;
   const { colors } = useTheme();
 
   const field: TField[] = [
     { title: 'Идентификатор', value: document.id },
-    { title: 'Номер', value: document.head.docnumber },
+    { title: 'Номер', value: (document.head as ISellHead).docnumber },
     { title: 'Дата', value: new Date(document.head.date).toLocaleDateString() },
     { title: 'Экспедитор', value: expeditor.name },
     { title: 'Подразделение', value: contactFrom.name },

@@ -9,7 +9,7 @@ import statuses from '../../../mockData/Otves/documentStatuses.json';
 /*import documents from '../../../mockData/Otves/Document.json';
 import references from '../../../mockData/Otves/References.json';*/
 import { IDocument, IDocumentType, IContact } from '../../../../../common';
-import { ISellDocument } from '../../../model/sell';
+import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -19,7 +19,7 @@ const Contacts: IContact[] = references.find((ref) => ref.type === "contacts").d
 
 const Statuses: IDocumentType[] = statuses;
 
-const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
+const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
@@ -38,17 +38,17 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {item.head.docnumber} от{' '}  {new Date(item.head.date).toLocaleDateString()}
+              {(item.head as ISellHead).docnumber} от{' '}  {new Date(item.head.date).toLocaleDateString()}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение: {state.contacts.find((contact) => contact.id === item.head.fromcontactId).name} 
+            Подразделение: {state.contacts.find((contact) => contact.id === (item.head as ISellHead).fromcontactId).name} 
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {state.contacts.find((contact) => contact.id === item.head.expeditorId).name}
+            Экспедитор: {state.contacts.find((contact) => contact.id === (item.head as ISellHead).expeditorId).name}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
             {state.contacts.find((contact) => contact.id === item.head.tocontactId).name} 
@@ -67,7 +67,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { state, api } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
-  const renderItem = ({ item }: { item: ISellDocument }) => <DocumentItem item={item} />;
+  const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
   
   const sendUpdateRequest = async () => {
     const data = appState.documents.filter((document) => document.head.status === 1);

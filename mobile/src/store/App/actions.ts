@@ -1,5 +1,6 @@
 import { createActionPayload, ActionsUnion } from '../utils';
 import { IHead, ILine, IDocument } from '../../../../common';
+import { ISellHead, ISellDocument, ISellLine } from '../../model';
 
 export enum ActionAppTypes {
   DISCONNECT = 'DISCONNECT',
@@ -14,15 +15,15 @@ export enum ActionAppTypes {
 
 export const AppActions = {
   disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
-  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
-  editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
+  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument | ISellDocument >(ActionAppTypes.NEW_DOCUMENT),
+  editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead | ISellHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
   ),
   editStatusDocument: createActionPayload<ActionAppTypes.EDIT_STATUS_DOCUMENT, { id: number; status: number }>(
     ActionAppTypes.EDIT_STATUS_DOCUMENT,
   ),
   deleteDocument: createActionPayload<ActionAppTypes.DELETE_DOCUMENT, number>(ActionAppTypes.DELETE_DOCUMENT),
-  addLine: createActionPayload<ActionAppTypes.DOCUMENT_ADD_LINE, { docId: number; line: ILine }>(
+  addLine: createActionPayload<ActionAppTypes.DOCUMENT_ADD_LINE, { docId: number; line: ILine | ISellLine }>(
     ActionAppTypes.DOCUMENT_ADD_LINE,
   ),
   deleteLine: createActionPayload<ActionAppTypes.DOCUMENT_DELETE_LINE, { docId: number; lineId: string }>(

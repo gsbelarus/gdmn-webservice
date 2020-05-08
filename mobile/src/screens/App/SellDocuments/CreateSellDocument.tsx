@@ -8,12 +8,14 @@ import { Text, Button, Modal, Portal, TextInput } from 'react-native-paper';
 import documents from '../../../mockData/Otves/Document.json';
 import references from '../../../mockData/Otves/References.json';
 import styles from '../../../styles/global';
-import { IContact, IDocumentType } from '../../../model/sell';
+import { useAppStore } from '../../../store';
+import { IContact } from '../../../../../common';
+/*import { IContact, IDocumentType } from '../../../model/sell';
 const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
 const people: IContact[] = contacts.filter((item) => item.type === 2);
 const companies: IContact[] = contacts.filter((item) => item.type === 3);
 const departments: IContact[] = contacts.filter((item) => item.type === 4);
-const documentTypes: IDocumentType[] = references.find((ref) => ref.type === "documentTypes").data;
+const documentTypes: IDocumentType[] = references.find((ref) => ref.type === "documentTypes").data; */
 
 const CreateSellDocumentScreen = ({ route }) => {
   const [date, setDate] = useState(new Date());
@@ -26,6 +28,10 @@ const CreateSellDocumentScreen = ({ route }) => {
   const [peopleText, setPeopleText] = useState('');
   const [companyText, setCompanyText] = useState('');
   const [numberText, setNumberText] = useState('')
+  const { state, actions } = useAppStore();
+  const people: IContact[] = state.contacts.filter((item) => item.type === 2);
+  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
+  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
 
   const today = new Date();
   const { colors } = useTheme();
@@ -263,9 +269,42 @@ const CreateSellDocumentScreen = ({ route }) => {
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
           onPress={() => {
-            const documentItem = documents.find((item) => item.id === route.params.docId);
-            documentItem.head.expeditorId = selectedExpeditor;
-            navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+            if (route.params?.docId) {
+              actions.editDocument({
+                id: route.params.docId,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedFromContact,
+                  tocontactId: selectedToContact,
+                  date: date.toString(),
+                  status: 0,
+                  docnumber: numberText,
+                  expeditorId: selectedExpeditor,
+                },
+              });
+              navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+            } else {
+              const id =
+                state.documents
+                  .map((item) => item.id)
+                  .reduce((newId, currId) => {
+                    return newId > currId ? newId : currId;
+                  }, -1) + 1;
+              actions.newDocument({
+                id,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedFromContact,
+                  tocontactId: selectedToContact,
+                  date: date.toString(),
+                  status: 0,
+                  docnumber: numberText,
+                  expeditorId: selectedExpeditor,
+                },
+                lines: [],
+              });
+              navigation.navigate('ViewSellDocument', { docId: id });
+            }
           }}
         >
           ОК

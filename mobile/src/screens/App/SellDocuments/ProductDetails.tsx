@@ -5,19 +5,21 @@ import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData/Otves/Document.json';
-import references from '../../../mockData/Otves/References.json';
 import styles from '../../../styles/global';
-import { IGood } from '../../../model/sell';
-
-const products: IGood[] = references.find((ref) => ref.type === 'goods').data; 
+import { IGood, IDocument } from '../../../../../common';
+import { ISellLine, ISellDocument } from '../../../model';
+import { useAppStore } from '../../../store';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const { state, actions } = useAppStore();
 
-  const product = products.find((item) => item.id === route.params.prodId);
-  const document = documents.find((item) => item.id === route.params.docId);
-  const lineDocument = document.lines.find((line) => line.id === route.params.lineID);
+  const product = state.goods.find((item) => item.id === route.params.prodId);
+  const document = state.documents.find((item) => item.id === route.params.docId);
+  const lineDocuments =  (document instanceof Object && (document as IDocument)) ? 
+    (document as IDocument).lines : (document as ISellDocument).lines;
+  const lineDocument = lineDocuments.find((line) => line.id === route.params.lineID);
+  const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState(1); 
 
   useEffect(() => {
@@ -25,6 +27,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
       if (lineDocument) {
         setValue(lineDocument.quantity);
       }
+      setLine(lineDocument);
     }
   }, [document.lines, route.params.modeCor, route.params.lineID]);
 
@@ -41,7 +44,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
       <View style={localeStyles.productPriceView}>
         <Text style={localeStyles.fontSize16}>Кол-во по заявке:</Text>
-        <Text style={localeStyles.productPrice}>{lineDocument?.orderQuantity?? 0}</Text>
+        <Text style={localeStyles.productPrice}>{(lineDocument as ISellLine)?.orderQuantity?? 0}</Text>
       </View>
       <View style={localeStyles.productQuantityView}>
         <Text style={localeStyles.fontSize16}>Количество:</Text>
@@ -63,7 +66,18 @@ const ProductDetailScreen = ({ route, navigation }) => {
         />
       </View>
       <Button
-        onPress={() => navigation.navigate('ViewSellDocument', { docId: route.params.docId })}
+        onPress={() => {
+          if (line !== undefined) {
+            actions.editLine({
+              docId: route.params.docId,
+              lineId: line.id,
+              value: route.params.modeCor ? value : value + line.quantity,
+            });
+          } else {
+            actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+          }
+        }
+        }
         mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >

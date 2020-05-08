@@ -5,17 +5,15 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/Otves/Document.json';
-import references from '../../../mockData/Otves/References.json';
-import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/sell';
 import styles from '../../../styles/global';
+import { IDocument, IDocumentType, IContact, IGood } from '../../../../../common';
+import { ISellDocument, ISellLine, ISellHead } from '../../../model';
+import { useAppStore } from '../../../store';
 
-const goods: IGood[] = references.find((ref) => ref.type === "goods").data;
-const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
-
-const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
+const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
   const { colors } = useTheme();
-  const good: IGood = goods.find((i) => i.id === item.goodId);
+  const { state, actions } = useAppStore();
+  const good: IGood = state.goods.find((i) => i.id === item.goodId);
 
   return (
     <>
@@ -62,7 +60,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
   );
 });
 
-const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
+const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status: number; docId: number }) => {
   const navigation = useNavigation();
 
   return status === 0 ? (
@@ -81,13 +79,14 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
 
 const ViewSellDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const document: IDocument = documents.find((item) => item.id === route.params.docId);
-  const contact: IContact = contacts.find((item) => item.id === document.head.tocontactId);
-  const ref = React.useRef<FlatList<ILine>>(null);
+  const { state, actions } = useAppStore();
+  const document: IDocument | ISellDocument = state.documents.find((item) => item.id === route.params.docId);
+  const contact: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
+  const ref = React.useRef<FlatList<ISellLine>>(null);
 
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: ILine }) => (
+  const renderItem = ({ item }: { item: ISellLine }) => (
     <LineItem item={item} status={document.head.status} docId={document.id} />
   );
 
@@ -96,7 +95,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
         <View style={localStyles.header}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {document.head.docnumber} от {' '}  {new Date(document.head.date).toLocaleDateString()}
+            {(document.head as ISellHead).docnumber} от {' '}  {new Date(document.head.date).toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}

@@ -12,8 +12,9 @@ const documentTypes = references.find((ref) => ref.type === "documentTypes").dat
 const contacts = references.find((ref) => ref.type === "contacts").data;
 const goods = references.find((ref) => ref.type === 'goods').data; 
 
-import { IAppState } from '../../model';
+import { IAppState, ISellDocument } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
+import { IDocument } from '../../../../common';
 
 export const initialState: IAppState = {
   documents,
@@ -67,10 +68,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
       const document = state.documents.find((item) => item.id === action.payload.docId);
+      const docLine =  (document instanceof Object && (document as IDocument)) ? 
+        (document as IDocument).lines : (document as ISellDocument).lines;
       const id =
-        document.lines
-          .map((item) => Number(item.id))
-          .reduce((lineId, currLineId) => {
+          docLine
+          .map((item: { id: any; }) => Number(item.id))
+          .reduce((lineId: number, currLineId: number) => {
             return lineId > currLineId ? lineId : currLineId;
           }, -1) + 1;
       return {

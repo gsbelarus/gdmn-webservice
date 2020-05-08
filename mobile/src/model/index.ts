@@ -2,6 +2,8 @@ import Api from '../api/Api';
 import Sync from '../api/Sync';
 import { AppActions, AuthActions } from '../store';
 import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl } from '../../../common';
+import { ISellDocument } from './sell';
+export { ISellDocument, ISellHead, ISellLine } from './sell';
 
 export interface IAuthContextProps {
   state: IAuthState;
@@ -45,7 +47,7 @@ export interface IAuthState {
 }
 
 export interface IAppState {
-  documents?: IDocument[];
+  documents?: (IDocument | ISellDocument)[];
   remains?: IRemain[];
   goods?: IGood[];
   documentTypes?: IDocumentType[];
