@@ -3,12 +3,12 @@
 		"id": 12345,
 		"head": {
 			"doctype": 0,
-			"docnumber": "4567",
 			"fromcontactId": 147007412,
 			"tocontactId": 147056318,
-      "expeditorId": 859147249,
 			"date": "2020-03-10T14:37:53.674Z",
-			"status": 0
+			"status": 0,
+			"docnumber": "4567",
+			"expeditorId": 859147249
 		},
 		"lines": [
 			{  
@@ -35,12 +35,12 @@
 		"id": 200678,
 		"head": {
 			"doctype": 1,
-			"docnumber": "4569",
 			"fromcontactId": 147005477,
 			"tocontactId": 1115495249,
-      "expeditorId": 1100281675,
 			"date": "2020-02-10T10:14:53.674Z",
-			"status": 1
+			"status": 1,
+			"docnumber": "4569",
+			"expeditorId": 1100281675
 		},
 		"lines": [
 			{  

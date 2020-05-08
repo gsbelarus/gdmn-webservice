@@ -1,27 +1,21 @@
-export interface IDocument {
+import { IHead, ILine, IDocument } from '../../../common';
+
+export interface ISellDocument extends IDocument{
   id: number;
-  head: IHead;
-  lines: ILine[];
+  head: ISellHead;
+  lines: ISellLine[];
 }
 
-export interface IHead {
-  doctype: number;
+export interface ISellHead extends IHead{
   docnumber: string;
-  fromcontactId: number;
-  tocontactId: number;
   expeditorId: number;
-  date: string;
-  status: number;
 }
 
-export interface ILine {
-  id: string;
-  goodId: number;
-  quantity: number;
+export interface ISellLine extends ILine{
   orderQuantity?: number;
 }
 
-export interface IUser {
+/*export interface IUser {
   id: string;
   userName: string;
   companies?: string[];
@@ -64,3 +58,4 @@ export interface IReference {
     [fieldName: string]: unknown;
   }[];
 }
+*/

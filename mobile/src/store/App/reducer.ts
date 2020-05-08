@@ -1,21 +1,27 @@
 import { Reducer } from 'react';
 
-import contacts from '../../mockData//GD_Contact.json';
-import documents from '../../mockData/Document.json';
-import documentTypes from '../../mockData/GD_DocumentType.json';
-import goods from '../../mockData/Goods.json';
-import references from '../../mockData/References.json';
+/*import contacts from '../../mockData//GD_Contact.json';
+import documents from '../../mockData/Document.json';*/
+import documents from '../../mockData/Otves/Document.json';
+import references from '../../mockData/Otves/References.json';
+/*import documentTypes from '../../mockData/GD_DocumentType.json';*/
+/*import goods from '../../mockData/Goods.json';
+import references from '../../mockData/References.json';*/
 import remains from '../../mockData/Remains.json';
+const documentTypes = references.find((ref) => ref.type === "documentTypes").data;
+const contacts = references.find((ref) => ref.type === "contacts").data;
+const goods = references.find((ref) => ref.type === 'goods').data; 
+
 import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
   documents,
-  remains,
-  references,
-  goods,
-  contacts,
+  remains, 
+  goods, 
   documentTypes,
+  contacts,
+  references
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
