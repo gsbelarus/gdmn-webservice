@@ -5,13 +5,13 @@ import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper'
 // eslint-disable-next-line import/default
 import VirtualKeyboard from 'react-native-virtual-keyboard';
 
+import { IResponse } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
 import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
-import { IResponse } from '../../../../common';
 
 const ActivationScreen = () => {
   const { actions, api } = useAuthStore();

@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import ItemSeparator from '../../../components/ItemSeparator';
 import { IReference } from '../../../../../common';
+import ItemSeparator from '../../../components/ItemSeparator';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -36,6 +36,7 @@ const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
   const { state: AppState } = useAppStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [resUpd, setResUpd] = useState();
 
   const ref = React.useRef<FlatList<IReference>>(null);
@@ -66,14 +67,14 @@ const ReferenceListScreen = () => {
       Alert.alert('Успех!', '', [
         {
           text: 'OK',
-          onPress: () => {},
+          onPress: () => ({}),
         },
       ]);
     } else {
       Alert.alert('Запрос не был отправлен', '', [
         {
           text: 'OK',
-          onPress: () => {},
+          onPress: () => ({}),
         },
       ]);
     }
@@ -88,7 +89,7 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={{ alignItems: 'flex-end' }}>
+      <View style={localStyles.syncButton}>
         <TouchableOpacity
           style={[
             styles.circularButton,
@@ -142,5 +143,8 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  syncButton: {
+    alignItems: 'flex-end',
   },
 });

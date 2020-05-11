@@ -3,12 +3,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
+import { IResponse, IUserCredentials } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
 import { useAuthStore } from '../../store';
 import styles from '../../styles/global';
-import { IResponse, IUserCredentials } from '../../../../common';
 
 /*
   Порядок работы:
@@ -28,6 +28,7 @@ const SignInScreen = () => {
     isError: false,
     status: undefined,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
@@ -60,7 +61,7 @@ const SignInScreen = () => {
     // timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
     //   .then((data: IServerResponse<boolean | string>) => setServerResp(data))
     //   .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
-  }, [/*api.auth, credential.userName,*/ lognState.isLoading /*, state.deviceId*/]);
+  }, [/*api.auth, credential.userName,*/ actions, lognState.isLoading /*, state.deviceId*/]);
 
   useEffect(() => {
     if (!serverResp) {

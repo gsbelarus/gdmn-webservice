@@ -4,8 +4,8 @@ import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
-import SubTitle from '../../../components/SubTitle';
 import { ILine } from '../../../../../common';
+import SubTitle from '../../../components/SubTitle';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 

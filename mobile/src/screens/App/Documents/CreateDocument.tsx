@@ -33,7 +33,7 @@ const CreateDocumentScreen = ({ route }) => {
       setSelectedContact(documet.head.fromcontactId);
       setDate(new Date(documet.head.date));
     }
-  }, [route.params]);
+  }, [route.params, state.documents]);
 
   return (
     <>

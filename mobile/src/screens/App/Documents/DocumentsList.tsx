@@ -4,9 +4,9 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IDocument, IDocumentType } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType } from '../../../../../common';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 

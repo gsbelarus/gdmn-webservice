@@ -1,5 +1,5 @@
-import { createActionPayload, ActionsUnion } from '../utils';
 import { IHead, ILine, IDocument } from '../../../../common';
+import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
   DISCONNECT = 'DISCONNECT',
