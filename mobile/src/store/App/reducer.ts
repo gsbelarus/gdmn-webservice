@@ -25,24 +25,27 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.NEW_DOCUMENT: {
       return { ...state, documents: [...state.documents, action.payload] };
     }
-    case ActionAppTypes.EDIT_DOCUMENT:
+    case ActionAppTypes.EDIT_DOCUMENT: {
+      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id),
+          ...state.documents.slice(0, idx),
           {
             ...state.documents.find((document) => document.id === action.payload.id),
             head: action.payload.head,
           },
-          ...state.documents.slice(action.payload.id + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
+    }
     case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
-      const document = state.documents.find((item) => item.id === action.payload.id);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
+      const document = state.documents[idx];
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             head: {
@@ -50,7 +53,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
               status: action.payload.status,
             },
           },
-          ...state.documents.slice(action.payload.id + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
@@ -60,7 +63,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         documents: state.documents.filter((document) => document.id !== action.payload),
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
-      const document = state.documents.find((item) => item.id === action.payload.docId);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
+      const document = state.documents[idx];
       const id =
         document.lines
           .map((item) => Number(item.id))
@@ -70,12 +74,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             lines: [...document.lines, { ...action.payload.line, id: id.toString() }],
           },
-          ...state.documents.slice(action.payload.docId + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
@@ -94,11 +98,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       };
     }
     case ActionAppTypes.DOCUMENT_EDIT_LINE: {
-      const document = state.documents.find((item) => item.id === action.payload.docId);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
+      const document = state.documents[idx];
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             lines: [
@@ -110,7 +115,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
               ...document.lines.slice(Number(action.payload.lineId) + 1),
             ],
           },
-          ...state.documents.slice(action.payload.docId + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
