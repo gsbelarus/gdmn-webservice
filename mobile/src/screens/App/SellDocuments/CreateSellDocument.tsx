@@ -4,12 +4,10 @@ import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Picker } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput } from 'react-native-paper';
-
-import documents from '../../../mockData/Otves/Document.json';
-import references from '../../../mockData/Otves/References.json';
 import styles from '../../../styles/global';
 import { useAppStore } from '../../../store';
 import { IContact } from '../../../../../common';
+import { ISellHead } from '../../../model';
 /*import { IContact, IDocumentType } from '../../../model/sell';
 const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
 const people: IContact[] = contacts.filter((item) => item.type === 2);
@@ -44,13 +42,13 @@ const CreateSellDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    if (route.params?.docId) {
-      const documentItem = documents.find((item) => item.id === route.params.docId);
-      setSelectedExpeditor(documentItem.head.expeditorId);
+    if (route.params?.docId !== undefined) {
+      const documentItem = state.documents.find((item) => item.id === route.params.docId);
+      setSelectedExpeditor((documentItem.head as ISellHead).expeditorId);
       setSelectedToContact(documentItem.head.tocontactId);
       setSelectedFromContact(documentItem.head.fromcontactId);
       setDate(new Date(documentItem.head.date));
-      setNumberText(documentItem.head.docnumber);
+      setNumberText((documentItem.head as ISellHead).docnumber);
     }
   }, [route.params]);
 
@@ -128,10 +126,10 @@ const CreateSellDocumentScreen = ({ route }) => {
                 mode='dropdown'
                 onValueChange={(itemValue, itemIndex) => setSelectedExpeditor(itemValue)}
               >
-              {people.filter((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())).map((item, idx) => (
-                <Picker.Item label={item.name} value={item.id} key={idx} />
-                ) 
-              )}  
+                {people.filter((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())).map((item, idx) => (
+                  <Picker.Item label={item.name} value={item.id} key={idx} />
+                  ) 
+                )}  
               </Picker>
             ) : (
               <Text>Не найдено</Text>

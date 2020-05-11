@@ -76,8 +76,8 @@ const ProductDetailScreen = ({ route, navigation }) => {
           } else {
             actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
           }
-        }
-        }
+          navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+        }}
         mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >

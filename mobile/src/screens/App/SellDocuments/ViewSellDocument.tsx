@@ -1,5 +1,5 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp  } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -8,9 +8,11 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import styles from '../../../styles/global';
 import { IDocument, IDocumentType, IContact, IGood } from '../../../../../common';
 import { ISellDocument, ISellLine, ISellHead } from '../../../model';
+import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   const good: IGood = state.goods.find((i) => i.id === item.goodId);
@@ -45,6 +47,9 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
                   text: 'OK',
+                  onPress: () => {
+                    actions.deleteLine({ docId, lineId: item.id });
+                  },
                 },
                 {
                   text: 'Отмена',
@@ -160,6 +165,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
                 {
                   text: 'OK',
                   onPress: async () => {
+                    actions.deleteDocument(document?.id);
                     navigation.navigate('SellDocumentsListScreen');
                   },
                 },
@@ -201,7 +207,9 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status + 1 });
+            }}
           >
             <MaterialIcons size={30} color={colors.card} name="check" />
           </TouchableOpacity>
@@ -216,7 +224,9 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status - 1 });
+            }}
           >
             <Foundation size={30} color={colors.card} name="clipboard-pencil" />
           </TouchableOpacity>

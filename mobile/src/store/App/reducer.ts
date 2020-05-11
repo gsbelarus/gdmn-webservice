@@ -33,23 +33,25 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, documents: [...state.documents, action.payload] };
     }
     case ActionAppTypes.EDIT_DOCUMENT:
+      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id),
+          ...state.documents.slice(0, idx),
           {
             ...state.documents.find((document) => document.id === action.payload.id),
             head: action.payload.head,
           },
-          ...state.documents.slice(action.payload.id + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
-      const document = state.documents.find((item) => item.id === action.payload.id);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
+      const document = state.documents[idx];
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.id),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             head: {
@@ -57,7 +59,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
               status: action.payload.status,
             },
           },
-          ...state.documents.slice(action.payload.id + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
@@ -67,7 +69,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         documents: state.documents.filter((document) => document.id !== action.payload),
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
-      const document = state.documents.find((item) => item.id === action.payload.docId);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
+      const document = state.documents[idx];
       const docLine =  (document instanceof Object && (document as IDocument)) ? 
         (document as IDocument).lines : (document as ISellDocument).lines;
       const id =
@@ -79,47 +82,50 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             lines: [...document.lines, { ...action.payload.line, id: id.toString() }],
           },
-          ...state.documents.slice(action.payload.docId + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
     case ActionAppTypes.DOCUMENT_DELETE_LINE: {
-      const document = state.documents.find((item) => item.id === action.payload.docId);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
+      const document = state.documents[idx];
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             lines: document.lines.filter((line) => line.id !== action.payload.lineId),
           },
-          ...state.documents.slice(action.payload.docId + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
     case ActionAppTypes.DOCUMENT_EDIT_LINE: {
-      const document = state.documents.find((item) => item.id === action.payload.docId);
+      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
+      const document = state.documents[idx];
+      const idxl = document.lines.findIndex((line) => line.id === action.payload.lineId);
       return {
         ...state,
         documents: [
-          ...state.documents.slice(0, action.payload.docId),
+          ...state.documents.slice(0, idx),
           {
             ...document,
             lines: [
-              ...document.lines.slice(0, Number(action.payload.lineId)),
+              ...document.lines.slice(0, idxl),
               {
                 ...document.lines.find((line) => line.id === action.payload.lineId),
                 quantity: action.payload.value,
               },
-              ...document.lines.slice(Number(action.payload.lineId) + 1),
+              ...document.lines.slice(idxl + 1),
             ],
           },
-          ...state.documents.slice(action.payload.docId + 1),
+          ...state.documents.slice(idx + 1),
         ],
       };
     }
