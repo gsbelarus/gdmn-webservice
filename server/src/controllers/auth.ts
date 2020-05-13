@@ -58,7 +58,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     newUser = {
       id: newUser.userName,
       ...newUser,
-      companies: [],
+      companies: newUser.companies?? [],
       creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
     };
     await writeFile(

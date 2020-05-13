@@ -16,6 +16,7 @@ export interface ISignUpCommand extends IQueryCommand {
   command: 'SIGNUP';
   userName: string;
   password: string;
+  companyId?: string;
   creatorId?: string;
 };
 

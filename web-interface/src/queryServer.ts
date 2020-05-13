@@ -74,6 +74,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       body = JSON.stringify({
         userName: param.userName,
         password: param.password,
+        companies: param.companyId ? [param.companyId] : undefined,
         creatorId: param.creatorId?? param.userName
       });
       resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
@@ -122,7 +123,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: убедиться в необходимости данного метода
+//TODO: удалить
     case 'GET_USER_BY_NAME':
       body = JSON.stringify({
         userName: param.userName,
@@ -243,7 +244,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: убедиться в необходимости. уже есть такой же запрос
+//TODO: удалить
     case 'CREATE_USER':
       body = JSON.stringify({
         ...param.user,

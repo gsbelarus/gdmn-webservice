@@ -329,12 +329,12 @@ const App: React.FC = () => {
 
   const handleCreateUser = (new_user: IUser) => {
     if (company?.companyId && user?.id) {
-      queryServer({ command: 'CREATE_USER', user: new_user, companyId: company.companyId, creatorId: user.id })
+      queryServer({ command: 'SIGNUP', userName: new_user.userName, password: new_user.password?? '', companyId: company.companyId, creatorId: user.id })
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
-          else if (data.type === 'NEW_USER') {
+          else if (data.type === 'SIGNUP') {
             dispatch({ type: 'SET_CURRENT_USER', user: data.user });
             dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, data.user] : [data.user]});
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: [] });
