@@ -29,6 +29,7 @@ export interface IGetUserData extends IQueryCommand {
 
 export interface IGetCompaniesData extends IQueryCommand {
   command: 'GET_COMPANIES';
+  companyId: string;
   userId: string;
 };
 
@@ -147,7 +148,7 @@ export interface IUserNotAuthResponse extends IQueryResponse {
 
 export interface ICompaniesResponse extends IQueryResponse {
   type: 'USER_COMPANIES';
-  companies: IUserCompany[];
+  company: IUserCompany;
 };
 
 export interface ISignUpResponse extends IQueryResponse {

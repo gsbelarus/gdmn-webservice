@@ -89,15 +89,18 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: либо удалить, либо переделать (получить организации типа IUserCompany)
     case 'GET_COMPANIES':
-      resFetch = await fetch(`${url}/company/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.result) {
         return {
           type: 'USER_COMPANIES',
-          companies: res.data
+          company: {
+            companyId: res.data.id,
+            companyName: res.data.title,
+            userRole: res.data.admin === param.userId ? 'Admin' : undefined
+          }
         } as ICompaniesResponse;
       }
       return {

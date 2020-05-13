@@ -380,18 +380,21 @@ const App: React.FC = () => {
       .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
   };
 
-  const handleGetCompanies = (userId: string, type: 'SET_COMPANIES' | 'SET_CURRENT_COMPANIES') => {
-//TODO: исправить получение списка организаций
-    /*queryServer({ command: 'GET_COMPANIES', userId })
-    .then( data => {
-      if (data.type === 'ERROR') {
-        dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-      }
-      else if (data.type === 'USER_COMPANIES') {*/
-        dispatch({ type: type, companies: [{companyId: '1', companyName: 'gdmn', userRole: 'Admin'}]/*data.companies*/ });
-    /*  }
-    })
-    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );*/
+  const handleGetCompanies = (companies: string[], userId: string, type: 'SET_COMPANIES' | 'SET_CURRENT_COMPANIES') => {
+    const getCompanies: IUserCompany[] = [];
+    companies.forEach(company => {
+      queryServer({ command: 'GET_COMPANIES', userId, companyId: company })
+      .then( data => {
+        if (data.type === 'ERROR') {
+          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+        }
+        else if (data.type === 'USER_COMPANIES') {
+          getCompanies.push(data.company);
+        }
+      })
+      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      });
+    dispatch({ type: type, companies: getCompanies });
   };
 
   const handleGetUserDevices = (userId: string, type: 'SET_DEVICES' | 'SET_CURRENT_DEVICES') => {
@@ -497,7 +500,7 @@ const App: React.FC = () => {
   useEffect( () => {
     if (needReReadCompanies && user?.id) {
       console.log('useEffect: needReReadCompanies');
-      handleGetCompanies(user.id, 'SET_COMPANIES');
+      handleGetCompanies(user.companies?? [], user.id, 'SET_COMPANIES');
       handleGetUserDevices(user.id, 'SET_DEVICES');
     }
   }, [needReReadCompanies, user]);
@@ -505,9 +508,7 @@ const App: React.FC = () => {
   useEffect( () => {
     if (currentUser?.id) {
       console.log('useEffect: currentUser');
-//TODO: исправить получение списка организаций
-      dispatch({ type: 'SET_CURRENT_COMPANIES', companies: [{companyId: '1', companyName: 'gdmn', userRole: 'Admin'}]/*currentUser?.companies?? []*/ })
-      //handleGetCompanies(currentUser.id, 'SET_CURRENT_COMPANIES');
+      handleGetCompanies(currentUser.companies?? [], currentUser.id, 'SET_CURRENT_COMPANIES');
       handleGetUserDevices(currentUser.id, 'SET_CURRENT_DEVICES');
     }
   }, [currentUser]);
