@@ -7,91 +7,109 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
   // уже сервер внутри смотрит какая команда пришла
   // и что-то делает
   // http://localhost/execute_command
+  const url: string = 'http://localhost:3649/api';
+  const deviceId = "123";
   let resFetch;
   let res;
   let body;
   console.log(param.command);
   switch (param.command) {
 
-    case 'GET_USER_DATA':
-      resFetch = await fetch(`http://localhost:3649/api/auth/user`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+    case 'GET_USER_DATA': {
+      try {
+        resFetch = await fetch(`${url}/auth/user?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+        res = await resFetch.json();
 
-      if (res.status === 200) {
+        if (res.result) {
+          return {
+            type: 'USER',
+            user: res.data
+          } as IUserResponse;
+        }
+        if (!res.result) {
+          return {
+            type: 'USER_NOT_AUTHENTICATED'
+          } as IUserNotAuthResponse;
+        }
         return {
-          type: 'USER',
-          user: res.result
-        } as IUserResponse;
+          type: 'ERROR',
+          message: res.error
+        } as INetworkError;
       }
-      if (res.status === 403) {
-        return {
-          type: 'USER_NOT_AUTHENTICATED'
-        } as IUserNotAuthResponse;
+      catch (err) {
+        if (err.response) {
+          throw new Error(err.response.data.message);
+        }
+        throw new Error(err.message);
       }
-      return {
-        type: 'ERROR',
-        message: `${res.status} - ${res.result}`
-      } as INetworkError;
-
-    case 'LOGIN':
+    }
+    case 'LOGIN': {
       body = JSON.stringify({
         userName: param.userName,
         password: param.password
       });
-      resFetch = await fetch(`http://localhost:3649/api/auth/login`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      try {
+        resFetch = await fetch(`${url}/auth/login?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+        res = await resFetch.json();
 
-      if (res.status === 200) {
+        if (res.result) {
+          return {
+            type: 'LOGIN',
+            userId: param.userName
+          } as ILoginResponse;
+        }
         return {
-          type: 'LOGIN',
-          userId: res.result
-        } as ILoginResponse;
+          type: 'ERROR',
+          message: res.error
+        } as INetworkError;
       }
-      return {
-        type: 'ERROR',
-        message: `${res.status} - ${res.result}`
-      } as INetworkError;
-
+      catch (err) {
+        if (err.response) {
+          throw new Error(err.response.data.message);
+        }
+        throw new Error(err.message);
+      }
+    }
     case 'SIGNUP':
       body = JSON.stringify({
         userName: param.userName,
         password: param.password,
-        creatorId: param.userName
+        creatorId: param.creatorId?? param.userName
       });
-      resFetch = await fetch(`http://localhost:3649/api/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'SIGNUP',
-          user: res.result
+          user: res.data
         } as ISignUpResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
-
+//TODO: либо удалить, либо переделать (получить организации типа IUserCompany)
     case 'GET_COMPANIES':
-      resFetch = await fetch(`http://localhost:3649/api/company/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/company/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'USER_COMPANIES',
-          companies: res.result
+          companies: res.data
         } as ICompaniesResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'GET_ALL_USERS':
-      resFetch = await fetch(`http://localhost:3649/api/user/all`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/users/?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'ALL_USERS',
           users: res.result //.map((r: any) => ({userId: r.id, userName: r.userName}))
@@ -99,242 +117,246 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
-
+//TODO: убедиться в необходимости данного метода
     case 'GET_USER_BY_NAME':
       body = JSON.stringify({
         userName: param.userName,
         password: param.password
       });
-      resFetch = await fetch(`http://localhost:3649/api/user/byName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/users/byName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'USER_BY_NAME',
-          user: res.result
+          user: res.data
         } as IUserByNameResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'GET_COMPANY':
-      resFetch = await fetch(`http://localhost:3649/api/company/profile?companyId=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'USER_COMPANY',
-          company: {companyId: res.result.id, companyName: res.result.title}
+          company: {companyId: res.data.id, companyName: res.data.title}
         } as IGetCompanyResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'CREATE_COMPANY':
-      resFetch = await fetch(`http://localhost:3649/api/company/new?title=${param.companyName}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      body = JSON.stringify({
+        title: param.companyName
+      });
+      resFetch = await fetch(`${url}/companies/?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'NEW_COMPANY',
-          companyId: res.result
+          companyId: res.data
         } as ICreateCompanyResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'UPDATE_COMPANY':
       body = JSON.stringify({
         title: param.companyName
       });
-      resFetch = await fetch(`http://localhost:3649/api/company/profile?companyId=${param.companyId}`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'UPDATE_COMPANY'
         } as IUpdateCompanyResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'UPDATE_USER':
 
       body = JSON.stringify(param.user);
 
-      resFetch = await fetch(`http://localhost:3649/api/user/profile`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/users/${param.user.id}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'UPDATE_USER'
         } as IUpdateUserResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
-
+//TODO: заменить этот метод на изменения пользователя
     case 'ADD_USER':
       body = JSON.stringify({
         companyId: param.companyId,
         userId: param.userId
       });
-      resFetch = await fetch(`http://localhost:3649/api/user/addCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/user/addCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'ADD_USER'
         } as IAddUserResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'CREATE_CODE':
-      resFetch = await fetch(`http://localhost:3649/api/device/getActivationCode?user=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      body = JSON.stringify({
+        userId: param.userId
+      })
+      resFetch = await fetch(`${url}/device/code`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'USER_CODE',
-          code: res.result
+          code: res.data
         } as ICreateCodeResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
-
+//TODO: убедиться в необходимости. уже есть такой же запрос
     case 'CREATE_USER':
       body = JSON.stringify({
         ...param.user,
         companies: [param.companyId],
         creatorId: param.creatorId
       });
-      resFetch = await fetch(`http://localhost:3649/api/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'NEW_USER',
-          user: res.result
+          user: res.data
         } as ICreateUserResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'LOGOUT':
-      resFetch = await fetch(`http://localhost:3649/api/signout`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/auth/logout`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'LOGOUT',
         } as ILogOutResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'GET_USER_DEVICES':
-      resFetch = await fetch(`http://localhost:3649/api/device/byUser?userId=${param.userId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/users/${param.userId}/devices?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'USER_DEVICES',
-          devices: res.result
+          devices: res.data
         } as IGetUserDevicesResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'GET_COMPANY_USERS':
-      resFetch = await fetch(`http://localhost:3649/api/user/byCompany?companyId=${param.companyId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/companies/${param.companyId}/users?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'COMPANY_USERS',
-          users: res.result
+          users: res.data
         } as IGetCompanyUsersResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
-
+//TODO: изменить нужно этот метод в месте вызова. Удаление по одному. И теперь это вызов изменения пользователя
     case 'REMOVE_COMPANY_USERS':
       body = JSON.stringify({
         users: param.userIds,
         companyId: param.companyId
       });
-      resFetch = await fetch(`http://localhost:3649/api/user/removeUsersFromCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/user/removeUsersFromCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'REMOVE_COMPANY_USERS'
         } as IRemoveCompanyUsersResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'REMOVE_DEVICES':
       body = JSON.stringify({
-        uIds: param.uIds,
-        userId: param.userId
+        userName: param.userId
       });
 
-      resFetch = await fetch(`http://localhost:3649/api/device/remove`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/devices/${param.uIds}?deviceId=${deviceId}`, {method: 'DELETE', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'REMOVE_DEVICES'
         } as IRemoveDevicesResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'BLOCK_DEVICES':
       body = JSON.stringify({
-        uIds: param.uIds,
-        userId: param.userId
+        isBlock: param.isBlock
       });
 
-      resFetch = await fetch(`http://localhost:3649/api/device/lock`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/devices/${param.uIds}/user/${param.userId}?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'BLOCK_DEVICES'
         } as IBlockDevicesResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
   };

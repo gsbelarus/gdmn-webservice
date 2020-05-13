@@ -16,6 +16,7 @@ export interface ISignUpCommand extends IQueryCommand {
   command: 'SIGNUP';
   userName: string;
   password: string;
+  creatorId?: string;
 };
 
 export interface ILogOutCommand extends IQueryCommand {
@@ -106,7 +107,8 @@ export interface IRemoveDevices extends IQueryCommand {
 export interface IBlockDevices extends IQueryCommand {
   command: 'BLOCK_DEVICES';
   uIds: string[],
-  userId: string
+  userId: string,
+  isBlock: boolean
 };
 
 export type QueryCommand = ILoginCommand | IGetUserData | IGetCompaniesData | ISignUpCommand | ILogOutCommand

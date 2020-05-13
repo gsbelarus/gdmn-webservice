@@ -287,7 +287,8 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'USER_CODE') {
-            dispatch({ type: 'SET_CURRENT_USER', user: {...currentUser, code: data.code} });
+            //TODO: code в объекте пользователя нет
+            //dispatch({ type: 'SET_CURRENT_USER', user: {...currentUser, code: data.code} });
             dispatch({ type: 'SET_STATE', appState: 'CREATE_CODE' })
           }
         })
@@ -380,16 +381,17 @@ const App: React.FC = () => {
   };
 
   const handleGetCompanies = (userId: string, type: 'SET_COMPANIES' | 'SET_CURRENT_COMPANIES') => {
-    queryServer({ command: 'GET_COMPANIES', userId })
+//TODO: исправить получение списка организаций
+    /*queryServer({ command: 'GET_COMPANIES', userId })
     .then( data => {
       if (data.type === 'ERROR') {
         dispatch({ type: 'SET_ERROR', errorMessage: data.message });
       }
-      else if (data.type === 'USER_COMPANIES') {
-        dispatch({ type: type, companies: data.companies });
-      }
+      else if (data.type === 'USER_COMPANIES') {*/
+        dispatch({ type: type, companies: [{companyId: '1', companyName: 'gdmn', userRole: 'Admin'}]/*data.companies*/ });
+    /*  }
     })
-    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );*/
   };
 
   const handleGetUserDevices = (userId: string, type: 'SET_DEVICES' | 'SET_CURRENT_DEVICES') => {
@@ -473,7 +475,7 @@ const App: React.FC = () => {
 
   const handleBlockDevices = (uIds: string[], isUnBlock?: boolean) => {
     if (currentUser?.id) {
-      queryServer({ command: 'BLOCK_DEVICES', uIds, userId: currentUser?.id })
+      queryServer({ command: 'BLOCK_DEVICES', uIds, userId: currentUser?.id, isBlock: isUnBlock?? true })
       .then( data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
@@ -503,7 +505,9 @@ const App: React.FC = () => {
   useEffect( () => {
     if (currentUser?.id) {
       console.log('useEffect: currentUser');
-      handleGetCompanies(currentUser.id, 'SET_CURRENT_COMPANIES');
+//TODO: исправить получение списка организаций
+      dispatch({ type: 'SET_CURRENT_COMPANIES', companies: [{companyId: '1', companyName: 'gdmn', userRole: 'Admin'}]/*currentUser?.companies?? []*/ })
+      //handleGetCompanies(currentUser.id, 'SET_CURRENT_COMPANIES');
       handleGetUserDevices(currentUser.id, 'SET_CURRENT_DEVICES');
     }
   }, [currentUser]);
@@ -577,11 +581,12 @@ const App: React.FC = () => {
           onSignUp={handleSignUp}
           onClearError={handleSetError}
         />
-      :  user?.code && appState === 'SIGNUP_CODE'
+      :  appState === 'SIGNUP_CODE'
+      //TODO: Исправить код активации
         ?
           <ModalBox
             title={'Код для активации устройства'}
-            text={user.code}
+            text={'123456'}
             onClose={() => handleSetAppState('LOGIN')}
           />
       : user
@@ -656,11 +661,12 @@ const App: React.FC = () => {
                         onRemoveDevices={handleRemoveDevices}
                         onBlockDevices={handleBlockDevices}
                       />
-                      : appState === 'CREATE_CODE' && currentUser?.code
+                      : appState === 'CREATE_CODE'
                       ?
+                      //TODO: Исправить с кодом активации
                         <ModalBox
                           title={'Код для активации устройства'}
-                          text={currentUser.code}
+                          text={'12345'}
                           onClose={() => handleSetAppState('UPDATE_COMPANY')}
                         />
                       :
