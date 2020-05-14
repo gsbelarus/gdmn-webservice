@@ -347,13 +347,14 @@ const App: React.FC = () => {
   };
 
   const handleAddSystemUser = (userId: string) => {
-    if (company?.companyId) {
-      queryServer({ command: 'ADD_USER', userId, companyId: company?.companyId })
+    const user = allUsers?.find(item => item.id === userId);
+    if (company?.companyId && user) {
+      queryServer({ command: 'UPDATE_USER', user: { ...user, companies: user.companies ? [...user.companies, company?.companyId] : [company?.companyId] } })
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
-          else if (data.type === 'ADD_USER') {
+          else if (data.type === 'UPDATE_USER') {
             const addedUser = allUsers?.find(u => u.id === userId);
             if (addedUser) {
               dispatch({ type: 'SET_CURRENT_USER', user: {...addedUser} });

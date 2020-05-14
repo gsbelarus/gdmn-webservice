@@ -208,7 +208,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: заменить этот метод на изменения пользователя
+//TODO: удалить
     case 'ADD_USER':
       body = JSON.stringify({
         companyId: param.companyId,
