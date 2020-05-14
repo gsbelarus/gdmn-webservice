@@ -1,4 +1,4 @@
-import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, ICreateUserResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IAddUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveCompanyUsersResponse, IUserByNameResponse, IRemoveDevicesResponse, IBlockDevicesResponse } from "./queryTypes";
+import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, ICreateUserResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IAddUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveCompanyUsersResponse, IUserByNameResponse, IRemoveDevicesResponse, IBlockDevicesResponse, IGetUserResponse } from "./queryTypes";
 
 export const queryServer = async (param: QueryCommand): Promise<QueryResponse> => {
   // посылаем на сервер переданную нам команду
@@ -118,6 +118,21 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
           type: 'ALL_USERS',
           users: res.result //.map((r: any) => ({userId: r.id, userName: r.userName}))
         } as IAllUsersResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: res.error
+      } as INetworkError;
+
+      case 'GET_USER':
+      resFetch = await fetch(`${url}/users/${param.userId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      res = await resFetch.json();
+
+      if (res.result) {
+        return {
+          type: 'GET_USER',
+          user: res.data
+        } as IGetUserResponse;
       }
       return {
         type: 'ERROR',
@@ -308,10 +323,10 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: изменить нужно этот метод в месте вызова. Удаление по одному. И теперь это вызов изменения пользователя
+//TODO: удалить
     case 'REMOVE_COMPANY_USERS':
       body = JSON.stringify({
-        users: param.userIds,
+        user: param.userId,
         companyId: param.companyId
       });
       resFetch = await fetch(`${url}/user/removeUsersFromCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});

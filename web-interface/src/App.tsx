@@ -242,7 +242,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'SIGNUP') {
-          dispatch({ type: 'SET_USER', user: {...data.user, creatorId: userName} });
+          dispatch({ type: 'SET_USER', user: data.user });
           dispatch({ type: 'SET_STATE', appState: 'LOGIN' });
         }
       })
@@ -347,9 +347,9 @@ const App: React.FC = () => {
   };
 
   const handleAddSystemUser = (userId: string) => {
-    const user = allUsers?.find(item => item.id === userId);
-    if (company?.companyId && user) {
-      queryServer({ command: 'UPDATE_USER', user: { ...user, companies: user.companies ? [...user.companies, company?.companyId] : [company?.companyId] } })
+    const systemUuser = allUsers?.find(item => item.id === userId);
+    if (company?.companyId && systemUuser) {
+      queryServer({ command: 'UPDATE_USER', user: { ...systemUuser, companies: systemUuser.companies ? [...systemUuser.companies, company?.companyId] : [company?.companyId] } })
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
@@ -429,14 +429,14 @@ const App: React.FC = () => {
   //   .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
   // };
 
-  const handleUpdateUser = (user: IUser, type: 'SET_USER' | 'SET_CURRENT_USER') => {
-    queryServer({ command: 'UPDATE_USER', user })
+  const handleUpdateUser = (updateUser: IUser, type: 'SET_USER' | 'SET_CURRENT_USER') => {
+    queryServer({ command: 'UPDATE_USER', user: updateUser })
     .then( data => {
       if (data.type === 'ERROR') {
         dispatch({ type: 'SET_ERROR', errorMessage: data.message });
       }
       else if (data.type === 'UPDATE_USER') {
-        dispatch({ type, user});
+        dispatch({ type, user: updateUser});
         dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
       }
     })
@@ -447,17 +447,33 @@ const App: React.FC = () => {
   const handleRemoveCompanyUsers = (userIds: string[]) => {
     if (company?.companyId) {
       const uIds = userIds.filter(u => u !== user?.id);
-      queryServer({ command: 'REMOVE_COMPANY_USERS', userIds: uIds, companyId: company?.companyId })
-      .then( data => {
-        if (data.type === 'ERROR') {
-          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-        }
-        else if (data.type === 'REMOVE_COMPANY_USERS') {
-          dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers?.filter(c => !!uIds.findIndex(u => u === c.id))});
-          dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
-        }
-      })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      uIds.forEach(uId => {
+        queryServer({ command: 'GET_USER', userId: uId })
+          .then( data => {
+            if (data.type === 'ERROR') {
+              dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+            }
+            else if (data.type === 'GET_USER') {
+              if(data.user && data.user.companies) {
+                queryServer({
+                  command: 'UPDATE_USER',
+                  user: {...data.user,  companies: data.user.companies.filter((item) => item !== company?.companyId)}
+                })
+                .then( data => {
+                  if (data.type === 'ERROR') {
+                    dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+                  }
+                  else if (data.type === 'UPDATE_USER') {
+                    dispatch({ type: 'SET_USER', user});
+                    dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
+                  }
+                })
+                .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+              }
+            }
+          })
+          .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      });
     }
   };
 
