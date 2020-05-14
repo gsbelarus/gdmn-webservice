@@ -243,10 +243,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'CREATE_CODE':
-      body = JSON.stringify({
-        userId: param.userId
-      })
-      resFetch = await fetch(`${url}/device/code`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/auth/user/${param.userId}/device/code`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.result) {

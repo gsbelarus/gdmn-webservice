@@ -28,6 +28,7 @@ interface IState {
    */
   user?: IUser;
 
+  activationCode?: string;
   company?: IUserCompany;
   companies?: IUserCompany[];
   devices?: IDevice[];
@@ -45,6 +46,7 @@ interface IState {
 
 type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_USER', user?: IUser, needReReadCompanies?: boolean, needReReadUserData?: boolean }
+  | { type: 'SET_ACTIVATION_CODE', code?: string }
   | { type: 'SET_COMPANY_USERS', companyUsers?: IUser[] }
   | { type: 'SET_ALL_USERS', allUsers?: IUser[] }
   | { type: 'CREATE_COMPANY', company: IUserCompany }
@@ -107,7 +109,12 @@ const reducer = (state: IState, action: Action): IState => {
         currentUser: undefined
       }
     }
-
+    case 'SET_ACTIVATION_CODE': {
+      return {
+        ...state,
+        activationCode: action.code
+      }
+    }
     case 'SET_COMPANY_USERS': {
       const { companyUsers } = action;
       return {
@@ -205,7 +212,7 @@ const reducer = (state: IState, action: Action): IState => {
 };
 
 const App: React.FC = () => {
-  const [{ appState, user, companies, currentCompanies, company, companyUsers, allUsers, errorMessage, isAdmin, currentUser, devices, currentDevices, needReReadCompanies, needReReadUsers, needReReadUserData }, dispatch] = useReducer(reducer, {
+  const [{ appState, user, activationCode, companies, currentCompanies, company, companyUsers, allUsers, errorMessage, isAdmin, currentUser, devices, currentDevices, needReReadCompanies, needReReadUsers, needReReadUserData }, dispatch] = useReducer(reducer, {
     appState: 'LOGIN',
     needReReadUserData: true
 
@@ -288,7 +295,7 @@ const App: React.FC = () => {
           }
           else if (data.type === 'USER_CODE') {
             //TODO: code в объекте пользователя нет
-            //dispatch({ type: 'SET_CURRENT_USER', user: {...currentUser, code: data.code} });
+            dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
             dispatch({ type: 'SET_STATE', appState: 'CREATE_CODE' })
           }
         })
@@ -599,13 +606,16 @@ const App: React.FC = () => {
           onSignUp={handleSignUp}
           onClearError={handleSetError}
         />
-      :  appState === 'SIGNUP_CODE'
+      :  appState === 'SIGNUP_CODE' && activationCode
       //TODO: Исправить код активации
         ?
           <ModalBox
             title={'Код для активации устройства'}
-            text={'123456'}
-            onClose={() => handleSetAppState('LOGIN')}
+            text={activationCode}
+            onClose={() => {
+              dispatch({ type: 'SET_ACTIVATION_CODE' });
+              handleSetAppState('LOGIN');
+            }}
           />
       : user
         ?
@@ -679,13 +689,16 @@ const App: React.FC = () => {
                         onRemoveDevices={handleRemoveDevices}
                         onBlockDevices={handleBlockDevices}
                       />
-                      : appState === 'CREATE_CODE'
+                      : appState === 'CREATE_CODE' && activationCode
                       ?
                       //TODO: Исправить с кодом активации
                         <ModalBox
                           title={'Код для активации устройства'}
-                          text={'12345'}
-                          onClose={() => handleSetAppState('UPDATE_COMPANY')}
+                          text={activationCode}
+                          onClose={() => {
+                            dispatch({ type: 'SET_ACTIVATION_CODE' });
+                            handleSetAppState('UPDATE_COMPANY');
+                          }}
                         />
                       :
                         <Profile
