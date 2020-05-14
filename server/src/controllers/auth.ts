@@ -123,7 +123,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId } = ctx.request.body;
+  const userId: string = ctx.params.userId;
   const code = await saveActivationCode(userId);
   ctx.status = 200;
   const result: IResponse<string> = { result: true, data: code };
