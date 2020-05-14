@@ -294,7 +294,6 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'USER_CODE') {
-            //TODO: code в объекте пользователя нет
             dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
             dispatch({ type: 'SET_STATE', appState: 'CREATE_CODE' })
           }
@@ -607,7 +606,6 @@ const App: React.FC = () => {
           onClearError={handleSetError}
         />
       :  appState === 'SIGNUP_CODE' && activationCode
-      //TODO: Исправить код активации
         ?
           <ModalBox
             title={'Код для активации устройства'}
@@ -691,7 +689,6 @@ const App: React.FC = () => {
                       />
                       : appState === 'CREATE_CODE' && activationCode
                       ?
-                      //TODO: Исправить с кодом активации
                         <ModalBox
                           title={'Код для активации устройства'}
                           text={activationCode}

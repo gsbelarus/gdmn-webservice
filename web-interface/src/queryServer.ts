@@ -1,4 +1,4 @@
-import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, ICreateUserResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IAddUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveCompanyUsersResponse, IUserByNameResponse, IRemoveDevicesResponse, IBlockDevicesResponse, IGetUserResponse } from "./queryTypes";
+import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveDevicesResponse, IBlockDevicesResponse, IGetUserResponse } from "./queryTypes";
 
 export const queryServer = async (param: QueryCommand): Promise<QueryResponse> => {
   // посылаем на сервер переданную нам команду
@@ -138,24 +138,6 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: удалить
-    case 'GET_USER_BY_NAME':
-      body = JSON.stringify({
-        userName: param.userName,
-        password: param.password
-      });
-      resFetch = await fetch(`${url}/users/byName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
-      if (res.result) {
-        return {
-          type: 'USER_BY_NAME',
-          user: res.data
-        } as IUserByNameResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: res.error
-      } as INetworkError;
 
     case 'GET_COMPANY':
       resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
@@ -223,24 +205,6 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-//TODO: удалить
-    case 'ADD_USER':
-      body = JSON.stringify({
-        companyId: param.companyId,
-        userId: param.userId
-      });
-      resFetch = await fetch(`${url}/user/addCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
-
-      if (res.result) {
-        return {
-          type: 'ADD_USER'
-        } as IAddUserResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: res.error
-      } as INetworkError;
 
     case 'CREATE_CODE':
       resFetch = await fetch(`${url}/auth/user/${param.userId}/device/code`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
@@ -251,26 +215,6 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
           type: 'USER_CODE',
           code: res.data
         } as ICreateCodeResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: res.error
-      } as INetworkError;
-//TODO: удалить
-    case 'CREATE_USER':
-      body = JSON.stringify({
-        ...param.user,
-        companies: [param.companyId],
-        creatorId: param.creatorId
-      });
-      resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
-
-      if (res.result) {
-        return {
-          type: 'NEW_USER',
-          user: res.data
-        } as ICreateUserResponse;
       }
       return {
         type: 'ERROR',
@@ -315,24 +259,6 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
           type: 'COMPANY_USERS',
           users: res.data
         } as IGetCompanyUsersResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: res.error
-      } as INetworkError;
-//TODO: удалить
-    case 'REMOVE_COMPANY_USERS':
-      body = JSON.stringify({
-        user: param.userId,
-        companyId: param.companyId
-      });
-      resFetch = await fetch(`${url}/user/removeUsersFromCompany`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
-
-      if (res.result) {
-        return {
-          type: 'REMOVE_COMPANY_USERS'
-        } as IRemoveCompanyUsersResponse;
       }
       return {
         type: 'ERROR',
