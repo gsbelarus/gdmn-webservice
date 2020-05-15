@@ -112,7 +112,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       if (res.result) {
         return {
           type: 'ALL_USERS',
-          users: res.result //.map((r: any) => ({userId: r.id, userName: r.userName}))
+          users: res.data //.map((r: any) => ({userId: r.id, userName: r.userName}))
         } as IAllUsersResponse;
       }
       return {
