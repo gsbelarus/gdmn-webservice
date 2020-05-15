@@ -91,17 +91,13 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         message: res.error
       } as INetworkError;
     case 'GET_COMPANIES':
-      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+      resFetch = await fetch(`${url}/companies/?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
       res = await resFetch.json();
 
       if (res.result) {
         return {
           type: 'USER_COMPANIES',
-          company: {
-            companyId: res.data.id,
-            companyName: res.data.title,
-            userRole: res.data.admin === param.userId ? 'Admin' : undefined
-          }
+          companies: res.data
         } as ICompaniesResponse;
       }
       return {

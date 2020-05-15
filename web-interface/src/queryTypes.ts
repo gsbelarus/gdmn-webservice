@@ -1,4 +1,5 @@
 import { IUser, IUserCompany, IDevice } from "./types";
+import { ICompany } from '../../common';
 
 export interface IQueryCommand {
   command: 'LOGIN' | 'GET_USER_DATA' | 'GET_COMPANIES' | 'SIGNUP' | 'LOGOUT' | 'GET_ALL_USERS' | 'GET_USER' | 'CREATE_CODE'
@@ -30,8 +31,6 @@ export interface IGetUserData extends IQueryCommand {
 
 export interface IGetCompaniesData extends IQueryCommand {
   command: 'GET_COMPANIES';
-  companyId: string;
-  userId: string;
 };
 
 export interface IGetAllUsersData extends IQueryCommand {
@@ -128,7 +127,7 @@ export interface IUserNotAuthResponse extends IQueryResponse {
 
 export interface ICompaniesResponse extends IQueryResponse {
   type: 'USER_COMPANIES';
-  company: IUserCompany;
+  companies: ICompany[];
 };
 
 export interface ISignUpResponse extends IQueryResponse {

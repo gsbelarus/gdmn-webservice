@@ -236,7 +236,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'LOGIN') {
-          dispatch({ type: 'SET_USER', user: {userName, password, id: data.userId}, needReReadCompanies: true, needReReadUserData: true });
+          dispatch({ type: 'SET_USER', needReReadUserData: true });
         }
       })
       .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
@@ -388,20 +388,19 @@ const App: React.FC = () => {
   };
 
   const handleGetCompanies = (companies: string[], userId: string, type: 'SET_COMPANIES' | 'SET_CURRENT_COMPANIES') => {
-    const getCompanies: IUserCompany[] = [];
-    companies.forEach(company => {
-      queryServer({ command: 'GET_COMPANIES', userId, companyId: company })
-      .then( data => {
-        if (data.type === 'ERROR') {
-          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+    queryServer({ command: 'GET_COMPANIES' })
+    .then( data => {
+      if (data.type === 'ERROR') {
+        dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+      }
+      else if (data.type === 'USER_COMPANIES') {
+        const getCompanies = data.companies
+          .filter(item => companies.some(company => company === item.id ))
+          .map(item => {return {companyId: item.id, companyName: item.title, userRole: item.admin === userId ? 'Admin' : undefined} as IUserCompany});
+          dispatch({ type: type, companies: getCompanies });
         }
-        else if (data.type === 'USER_COMPANIES') {
-          getCompanies.push(data.company);
-        }
-      })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
-      });
-    dispatch({ type: type, companies: getCompanies });
+    })
+    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
   };
 
   const handleGetUserDevices = (userId: string, type: 'SET_DEVICES' | 'SET_CURRENT_DEVICES') => {
