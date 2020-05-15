@@ -284,12 +284,13 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         isBlock: param.isBlock
       });
 
-      resFetch = await fetch(`${url}/devices/${param.uIds}/user/${param.userId}?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/devices/${param.uId}/user/${param.userId}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.result) {
         return {
-          type: 'BLOCK_DEVICES'
+          type: 'BLOCK_DEVICES',
+          device: { ...res.data, state: res.data.isBlock ? 'blocked' : 'active' }
         } as IBlockDevicesResponse;
       }
       return {

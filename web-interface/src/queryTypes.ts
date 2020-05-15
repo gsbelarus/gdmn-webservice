@@ -86,7 +86,7 @@ export interface IRemoveDevices extends IQueryCommand {
 
 export interface IBlockDevices extends IQueryCommand {
   command: 'BLOCK_DEVICES';
-  uIds: string[],
+  uId: string,
   userId: string,
   isBlock: boolean
 };
@@ -194,6 +194,7 @@ export interface IRemoveDevicesResponse extends IQueryResponse {
 
 export interface IBlockDevicesResponse extends IQueryResponse {
   type: 'BLOCK_DEVICES';
+  device: IDevice;
 };
 
 export type QueryResponse = INetworkError | ILoginResponse | IUserResponse | ICompaniesResponse | ISignUpResponse
