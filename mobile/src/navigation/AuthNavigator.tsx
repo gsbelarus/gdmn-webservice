@@ -2,14 +2,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 import { AsyncStorage } from 'react-native';
 
+import { IResponse, IUser, IBaseUrl, IDevice } from '../../../common';
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
-import { IResponse, IUser, IBaseUrl, IDevice } from '../../../common';
+import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useAuthStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
-import { IDataFetch } from '../model';
 
 type AuthStackParamList = {
   Splash: undefined;

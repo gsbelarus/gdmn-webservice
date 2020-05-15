@@ -1,4 +1,3 @@
-import config from '../config';
 import {
   IResponse,
   IUser,
@@ -10,9 +9,11 @@ import {
   IReference,
   IRemain,
   IGood,
-  IUserCredentials} from '../../../common';
-import { get, post } from './http.service';
+  IUserCredentials,
+} from '../../../common';
+import config from '../config';
 import { INewDevice } from '../model';
+import { get, post } from './http.service';
 
 export default class Api {
   baseUrl: IBaseUrl;

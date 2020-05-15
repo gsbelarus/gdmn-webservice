@@ -3,10 +3,10 @@ import React, { useState, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
+import { IBaseUrl } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import config from '../../config';
 import styles from '../../styles/global';
-import { IBaseUrl } from '../../../../common';
 
 type Props = {
   serverName?: string;

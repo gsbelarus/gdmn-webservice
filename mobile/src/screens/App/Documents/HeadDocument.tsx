@@ -4,10 +4,10 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 

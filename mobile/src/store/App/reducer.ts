@@ -32,7 +32,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.NEW_DOCUMENT: {
       return { ...state, documents: [...state.documents, action.payload] };
     }
-    case ActionAppTypes.EDIT_DOCUMENT:
+    case ActionAppTypes.EDIT_DOCUMENT: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       return {
         ...state,
@@ -45,6 +45,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
           ...state.documents.slice(idx + 1),
         ],
       };
+    }
     case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       const document = state.documents[idx];
