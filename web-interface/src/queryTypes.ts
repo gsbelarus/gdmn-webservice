@@ -80,7 +80,7 @@ export interface IGetCompanyUsers extends IQueryCommand {
 
 export interface IRemoveDevices extends IQueryCommand {
   command: 'REMOVE_DEVICES';
-  uIds: string[],
+  uId: string,
   userId: string
 };
 

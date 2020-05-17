@@ -261,24 +261,24 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         message: res.error
       } as INetworkError;
 
-    case 'REMOVE_DEVICES':
+    case 'REMOVE_DEVICES': {
       body = JSON.stringify({
-        userName: param.userId
+        userId: param.userId
       });
 
-      resFetch = await fetch(`${url}/devices/${param.uIds}?deviceId=${deviceId}`, {method: 'DELETE', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      resFetch = await fetch(`${url}/devices/${param.uId}?deviceId=${deviceId}`, {method: 'DELETE', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
 
-      if (res.result) {
+      if (resFetch.ok) {
         return {
           type: 'REMOVE_DEVICES'
         } as IRemoveDevicesResponse;
       }
+      res = await resFetch.json();
       return {
         type: 'ERROR',
         message: res.error
       } as INetworkError;
-
+    }
     case 'BLOCK_DEVICES':
       body = JSON.stringify({
         isBlock: param.isBlock

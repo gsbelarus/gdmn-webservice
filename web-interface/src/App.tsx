@@ -59,6 +59,7 @@ type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_DEVICES', devices?: IDevice[] }
   | { type: 'SET_CURRENT_DEVICES', devices?: IDevice[] }
   | { type: 'UPDATE_CURRENT_DEVICE', device: IDevice }
+  | { type: 'DELETE_CURRENT_DEVICE', uId: string }
   | { type: 'SET_ERROR', errorMessage?: string };
 
 /*
@@ -210,11 +211,24 @@ const reducer = (state: IState, action: Action): IState => {
     case 'UPDATE_CURRENT_DEVICE': {
       const { device } = action;
       const { currentDevices } = state;
-      const idx = state.currentDevices?.findIndex(item => item.uid === device.uid);
+      const idx = currentDevices?.findIndex(item => item.uid === device.uid);
       if(currentDevices && idx && idx > -1) {
         return {
           ...state,
           currentDevices: [...currentDevices?.slice(0, idx), device, ...currentDevices?.slice(idx + 1)]
+        }
+      } else {
+        return state;
+      }
+    }
+
+    case 'DELETE_CURRENT_DEVICE': {
+      const { uId } = action;
+      const { currentDevices } = state;
+      if(currentDevices) {
+        return {
+          ...state,
+          currentDevices: currentDevices.filter(item => item.uid !== uId)
         }
       } else {
         return state;
@@ -497,20 +511,22 @@ const App: React.FC = () => {
     }
   };
 
-  const handleRemoveDevices = (uIds: string[]) => {
-    if (currentUser?.id) {
-      queryServer({ command: 'REMOVE_DEVICES', uIds, userId: currentUser?.id })
-      .then( data => {
-        if (data.type === 'ERROR') {
-          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-        }
-        else if (data.type === 'REMOVE_DEVICES') {
-          dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.filter(c => uIds.findIndex(u => u === c.uid) === -1)});
-          dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
-        }
-      })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
-    }
+  const handleRemoveDevices = async (uIds: string[]) => {
+    uIds.forEach(uId => {
+      if (currentUser?.id) {
+        queryServer({ command: 'REMOVE_DEVICES', uId, userId: currentUser?.id })
+        .then( data => {
+          if (data.type === 'ERROR') {
+            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+          }
+          else if (data.type === 'REMOVE_DEVICES') {
+            dispatch({ type: 'DELETE_CURRENT_DEVICE', uId});
+            dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+          }
+        })
+        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      }
+    });
   };
 
   const handleBlockDevices = (uIds: string[], isUnBlock: boolean) => {
