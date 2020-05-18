@@ -1,5 +1,5 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp  } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -31,7 +31,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.orderQuantity?? 0}
+          {item.orderQuantity ?? 0}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
@@ -71,7 +71,9 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   return status === 0 ? (
     <TouchableOpacity
       style={localStyles.listContainer}
-      onPress={() => navigation.navigate('ProductDetail', { lineID: item.id, prodId: item.goodId, docId, modeCor: true })}
+      onPress={() =>
+        navigation.navigate('ProductDetail', { lineID: item.id, prodId: item.goodId, docId, modeCor: true })
+      }
     >
       <ContentItem item={item} status={status} />
     </TouchableOpacity>
@@ -100,7 +102,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
         <View style={localStyles.header}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {(document.head as ISellHead).docnumber} от {' '}  {new Date(document.head.date).toLocaleDateString()}
+            {(document.head as ISellHead).docnumber} от {new Date(document.head.date).toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}
@@ -118,21 +120,15 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={localStyles.listContainer}>
-      <View style={localStyles.headProductTitle}>
-        <Text style={localStyles.productBarcodeView}>
-          Наименование ТМЦ
-        </Text>
-      </View>
-      <View style={localStyles.remainsInfoTitle}>
-        <Text style={localStyles.productBarcodeView}>
-          Заявка
-        </Text>
-      </View>
-      <View style={localStyles.remainsInfoTitle}>
-        <Text style={localStyles.productBarcodeView}>
-          Кол-во
-        </Text>
-      </View>
+        <View style={localStyles.headProductTitle}>
+          <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
+        </View>
+        <View style={localStyles.remainsInfoTitle}>
+          <Text style={localStyles.productBarcodeView}>Заявка</Text>
+        </View>
+        <View style={localStyles.remainsInfoTitle}>
+          <Text style={localStyles.productBarcodeView}>Кол-во</Text>
+        </View>
       </View>
       <FlatList
         ref={ref}
@@ -338,7 +334,7 @@ const localStyles = StyleSheet.create({
     marginLeft: 30,
   },
   remainsInfoTitle: {
-    alignItems: 'center' ,
+    alignItems: 'center',
     marginLeft: 10,
   },
 });

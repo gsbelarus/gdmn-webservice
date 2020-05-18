@@ -10,7 +10,8 @@
     "checkup": "yarn run prettier:fix",
     "prettier:check": "prettier --check \"src/**/*.ts*\"",
     "prettier:fix": "prettier --write \"src/**/*.ts*\"",
-    "eslint:run": "eslint \"src/**/*.ts*\""
+    "eslint:run": "eslint \"src/**/*.ts*\"",
+    "eslint:fix": "eslint --fix \"src/**/*.ts\""
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "^2.2.2",

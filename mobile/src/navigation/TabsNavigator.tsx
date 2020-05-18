@@ -4,8 +4,8 @@ import { StyleSheet } from 'react-native';
 
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
-import SettingsNavigator from './SettingsNavigator';
 import SellDocumentsNavigator from './SellDocumentsNavigator';
+import SettingsNavigator from './SettingsNavigator';
 
 type TabsStackParams = {
   Documents: undefined;

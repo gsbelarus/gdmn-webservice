@@ -1,17 +1,17 @@
 import { IHead, ILine, IDocument } from '../../../common';
 
-export interface ISellDocument extends IDocument{
+export interface ISellDocument extends IDocument {
   id: number;
   head: ISellHead;
   lines: ISellLine[];
 }
 
-export interface ISellHead extends IHead{
+export interface ISellHead extends IHead {
   docnumber: string;
   expeditorId: number;
 }
 
-export interface ISellLine extends ILine{
+export interface ISellLine extends ILine {
   orderQuantity?: number;
 }
 

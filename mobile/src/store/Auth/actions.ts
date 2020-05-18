@@ -1,5 +1,5 @@
-import { createActionPayload, ActionsUnion, createAction } from '../utils';
 import { IBaseUrl } from '../../../../common';
+import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 export enum ActionAuthTypes {
   DISCONNECT = 'DISCONNECT',

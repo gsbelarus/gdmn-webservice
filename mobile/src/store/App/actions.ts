@@ -1,6 +1,6 @@
-import { createActionPayload, ActionsUnion } from '../utils';
 import { IHead, ILine, IDocument } from '../../../../common';
 import { ISellHead, ISellDocument, ISellLine } from '../../model';
+import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
   DISCONNECT = 'DISCONNECT',
@@ -15,7 +15,7 @@ export enum ActionAppTypes {
 
 export const AppActions = {
   disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
-  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument | ISellDocument >(ActionAppTypes.NEW_DOCUMENT),
+  newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument | ISellDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead | ISellHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
   ),

@@ -4,11 +4,12 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
 /*import documents from '../../../mockData/Otves/Document.json';
 import references from '../../../mockData/Otves/References.json';*/
-import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -38,20 +39,21 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {(item.head as ISellHead).docnumber} от{' '}  {new Date(item.head.date).toLocaleDateString()}
+              {(item.head as ISellHead).docnumber} от {new Date(item.head.date).toLocaleDateString()}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение: {state.contacts.find((contact) => contact.id === (item.head as ISellHead).fromcontactId).name} 
+            Подразделение:{' '}
+            {state.contacts?.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)?.name}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             Экспедитор: {state.contacts.find((contact) => contact.id === (item.head as ISellHead).expeditorId).name}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {state.contacts.find((contact) => contact.id === item.head.tocontactId).name} 
+            {state.contacts.find((contact) => contact.id === item.head.tocontactId).name}
           </Text>
         </View>
       </View>
@@ -68,7 +70,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { state: appState, actions } = useAppStore();
 
   const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
-  
+
   const sendUpdateRequest = async () => {
     const data = appState.documents.filter((document) => document.head.status === 1);
     const respons = await api.data.sendMessages(state.companyID, 'gdmn', data);
@@ -156,6 +158,10 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  company: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   details: {
     margin: 8,
     marginRight: 0,
@@ -182,9 +188,5 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
-  },
-  company: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
 });

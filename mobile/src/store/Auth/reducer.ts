@@ -1,8 +1,8 @@
 import { Reducer } from 'react';
 
+import { IDocument } from '../../../../common';
 import { IAuthState } from '../../model';
 import { TAuthActions, ActionAuthTypes } from './actions';
-import { IDocument } from '../../../../common';
 
 export const initialState: IAuthState = {
   baseUrl: undefined,
