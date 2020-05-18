@@ -587,6 +587,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_USER', user: data.user, needReReadCompanies: true});
         } else if (data.type === 'USER_NOT_AUTHENTICATED') {
           dispatch({ type: 'SET_STATE', appState: 'LOGIN'});
+          dispatch({ type: 'SET_USER'});
         }
       })
       .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
