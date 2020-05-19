@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { AsyncStorage, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
+import { IBaseUrl } from '../../../../common';
 import config from '../../config';
 import AuthNavigator from '../../navigation/AuthNavigator';
 import { useAuthStore } from '../../store';
-import { IBaseUrl } from '../../../../common';
 
 const ConnectionScreen = () => {
   const { state, actions, api } = useAuthStore();

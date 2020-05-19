@@ -5,8 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
 
-import ItemSeparator from '../../../components/ItemSeparator';
 import { IGood } from '../../../../../common';
+import ItemSeparator from '../../../components/ItemSeparator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
