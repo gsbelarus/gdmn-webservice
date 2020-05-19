@@ -1,13 +1,28 @@
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
+import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../server';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { findByUserName, saveActivationCode } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
-import { IResponse, IActivationCode, IUser } from '../../../common';
+import { IResponse, IActivationCode, IUser, IDevice } from '../../../common';
 import log from '../utils/logger';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+  const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const currDevice = devices?.find(device => device.uid === ctx.query.deviceId && device.user === ctx.request.body?.userName);
+
+  if (!currDevice) {
+    log.info(`not such device(${ctx.query.deviceId})`);
+    const res: IResponse<string> = { result: false, error: 'not device or user' };
+    ctx.throw(404, JSON.stringify(res));
+  }
+
+  if (currDevice.isBlock) {
+    log.info(`device(${ctx.query.deviceId}) does not have access`);
+    const res: IResponse<string> = { result: false, error: 'does not have access' };
+    ctx.throw(401, JSON.stringify(res));
+  }
+
   const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
