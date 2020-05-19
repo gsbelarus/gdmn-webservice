@@ -1,59 +1,16 @@
-export interface IDocument {
+import { IDocument, IHead, ILine, IDocumentType } from './base';
+
+export interface IInventoryDocument extends IDocument {
   id: number;
-  head: IHead;
-  lines: ILine[];
+  head: IInventoryHead;
+  lines: IInventoryLine[];
 }
 
-export interface IHead {
-  doctype: number;
-  fromcontactId: number;
-  tocontactId: number;
-  date: string;
-  status: number;
+export interface IInventoryHead extends IHead {
 }
 
-export interface ILine {
-  id: string;
-  goodId: number;
-  quantity: number;
+export interface IInventoryLine extends ILine {
 }
 
-export interface IRemain {
-  goodId: number;
-  quantity: number;
-  price: number;
-  contactId: number;
-}
-
-export interface IContact {
-  id: number;
-  name: string;
-  type?: number;
-  [fieldName: string]: unknown;
-}
-
-export interface IDocumentType {
-  id: number;
-  name: string;
-  [fieldName: string]: unknown;
-}
-
-export interface IGood {
-  id: number;
-  name: string;
-  barcode?: string;
-  alias?: string;
-  itemWeight?: number;
-  [fieldName: string]: unknown;
-}
-
-export interface IReference {
-  id: number;
-  name: string;
-  type: string;
-  data: {
-    id: number;
-    name?: string;
-    [fieldName: string]: unknown;
-  }[];
+export interface IInventoryDocumentType extends IDocumentType {
 }

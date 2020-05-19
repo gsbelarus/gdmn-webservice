@@ -1,20 +1,20 @@
 import { Reducer } from 'react';
 
-/*import contacts from '../../mockData//GD_Contact.json';
-import documents from '../../mockData/Document.json';*/
-import { IDocument } from '../../../../common';
-import documents from '../../mockData/Otves/Document.json';
-import references from '../../mockData/Otves/References.json';
+/*import contacts from '../../mockData//GD_Contact.json';*/
+import documents from '../../mockData/Document.json';
+import { IDocument, IContact, IDocumentType, IInventoryDocumentType, IGood, IReference } from '../../../../common';
+//import documents from '../../mockData/Otves/Document.json';
+//import references from '../../mockData/Otves/References.json';
 /*import documentTypes from '../../mockData/GD_DocumentType.json';*/
-/*import goods from '../../mockData/Goods.json';
-import references from '../../mockData/References.json';*/
+/*import goods from '../../mockData/Goods.json';*/
+import references from '../../mockData/References.json';
 import remains from '../../mockData/Remains.json';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { IAppState, ISellDocument } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
-const documentTypes = references.find((ref) => ref.type === 'documentTypes').data;
-const contacts = references.find((ref) => ref.type === 'contacts').data;
-const goods = references.find((ref) => ref.type === 'goods').data;
+const documentTypes = references.find((ref) => ref.type === 'documentTypes').data as IInventoryDocumentType[] | IDocumentType[];
+const contacts = references.find((ref) => ref.type === 'contacts').data as IContact[];
+const goods = references.find((ref) => ref.type === 'goods').data as IGood[];
 
 export const initialState: IAppState = {
   documents,
@@ -22,7 +22,7 @@ export const initialState: IAppState = {
   goods,
   documentTypes,
   contacts,
-  references,
+  references: references as IReference[],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {

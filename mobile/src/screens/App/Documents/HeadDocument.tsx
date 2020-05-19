@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../../../common';
+import { IInventoryDocument, IInventoryDocumentType, IContact } from '../../../../../common';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -35,8 +35,8 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
 const HeadDocumentScreen = ({ route }) => {
   const ref = React.useRef<FlatList<TField>>(null);
   const { state } = useAppStore();
-  const document: IDocument = state.documents.find((item) => item.id === route.params.docId);
-  const type: IDocumentType = state.documentTypes.find((item) => item.id === document.head.doctype);
+  const document: IInventoryDocument = state.documents.find((item) => item.id === route.params.docId);
+  const type: IInventoryDocumentType = state.documentTypes.find((item) => item.id === document.head.doctype);
   const contactTo: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
   const contactFrom: IContact = state.contacts.find((item) => item.id === document.head.fromcontactId);
   const status: string = statuses.find((item) => item.id === document.head.status).name;
