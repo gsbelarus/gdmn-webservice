@@ -3,8 +3,8 @@ import { View, Modal, FlatList, Dimensions, KeyboardAvoidingView, TouchableOpaci
 import { Text, TextInput, Button, Checkbox } from 'react-native-paper';
 
 interface IPropsItem {
-  selected?: boolean;
   item?: IItem;
+  selected?: boolean;
   onPressItem: (item: IItem) => void;
 }
 
@@ -18,7 +18,7 @@ interface IPropsDropdown {
   getSingleSelectedItem: (selected: IItem) => void;
 }
 
-const myListItem = React.memo(({ selected, item, onPressItem }: IPropsItem) => {
+const MyListItem = React.memo(({ item, selected, onPressItem }: IPropsItem) => {
   const onPress = () => onPressItem (item); 
   const textColor = selected ? 'red' : 'black';
   const checked = selected ? 'checked' : 'unchecked';
@@ -112,10 +112,16 @@ const Dropdown =  React.memo(({list,  getSingleSelectedItem}: IPropsDropdown) =>
     setState({...state, selected: item}); 
   }
 
+  const renderItem = ({ item }: { item: IItem }) => (
+    <MyListItem item={item} selected={state.selected === item} onPressItem={onPressItem} />
+  );
+
+
   return (
    <div></div>
   )
-}) 
+})
+export { Dropdown } 
 
 export default StyleSheet.create({
   container: {
