@@ -42,6 +42,10 @@ const CreateSellDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
+    setSelectedDocType(334644058);
+  }, [])
+
+  useEffect(() => {
     if (route.params?.docId !== undefined) {
       const documentItem = state.documents.find((item) => item.id === route.params.docId);
       setSelectedExpeditor((documentItem.head as ISellHead).expeditorId);
