@@ -6,7 +6,7 @@ import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import styles from '../../../styles/global';
-import { IDocument, IDocumentType, IContact, IGood } from '../../../../../common';
+import { IDocument, IContact, IGood } from '../../../../../common';
 import { ISellDocument, ISellLine, ISellHead } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -87,14 +87,15 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
 const ViewSellDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-  const document: IDocument | ISellDocument = state.documents.find((item) => item.id === route.params.docId);
-  const contact: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
+  const notFound = { id: -1, name: ''};
+  const document: IDocument | ISellDocument | undefined = state.documents.find((item) => item.id === route.params.docId);
+  const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const ref = React.useRef<FlatList<ISellLine>>(null);
 
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: ISellLine }) => (
-    <LineItem item={item} status={document.head.status} docId={document.id} />
+    <LineItem item={item} status={document?.head.status} docId={document?.id} />
   );
 
   return (
@@ -102,7 +103,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
         <View style={localStyles.header}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {(document.head as ISellHead).docnumber} от {new Date(document.head.date).toLocaleDateString()}
+            {(document?.head as ISellHead)?.docnumber} от {new Date(document?.head.date)?.toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
             {contact.name}
@@ -114,7 +115,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
             color={colors.card}
             name="chevron-right"
             onPress={() => {
-              navigation.navigate('HeadSellDocument', { docId: document.id });
+              navigation.navigate('HeadSellDocument', { docId: document?.id });
             }}
           />
         </TouchableOpacity>
@@ -132,7 +133,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       </View>
       <FlatList
         ref={ref}
-        data={document.lines}
+        data={document?.lines ?? []}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -142,11 +143,11 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
           localStyles.flexDirectionRow,
           // eslint-disable-next-line react-native/no-inline-styles
           {
-            justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
+            justifyContent: document?.head.status !== 0 ? 'flex-start' : 'space-evenly',
           },
         ]}
       >
-        {document.head.status === 0 || document.head.status === 3 ? (
+        {document?.head.status === 0 || document?.head.status === 3 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -174,7 +175,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
             <MaterialIcons size={30} color={colors.card} name="delete" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -193,7 +194,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
             <MaterialIcons size={30} color={colors.card} name="edit" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -210,7 +211,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
             <MaterialIcons size={30} color={colors.card} name="check" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 1 ? (
+        {document?.head.status === 1 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -221,13 +222,13 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
               },
             ]}
             onPress={() => {
-              actions.editStatusDocument({ id: document.id, status: document?.head.status - 1 });
+              actions.editStatusDocument({ id: document?.id, status: document?.head.status - 1 });
             }}
           >
             <Foundation size={30} color={colors.card} name="clipboard-pencil" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -237,7 +238,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => navigation.navigate('ProductsList', { docId: document.id })}
+            onPress={() => navigation.navigate('ProductsList', { docId: document?.id })}
           >
             <MaterialIcons size={30} color={colors.card} name="add" />
           </TouchableOpacity>
