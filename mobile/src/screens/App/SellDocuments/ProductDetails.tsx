@@ -16,11 +16,13 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
   const product = state.goods.find((item) => item.id === route.params.prodId);
   const document = state.documents.find((item) => item.id === route.params.docId);
-  const lineDocuments =  (document instanceof Object && (document as IDocument)) ? 
-    (document as IDocument).lines : (document as ISellDocument).lines;
+  const lineDocuments =
+    document instanceof Object && (document as IDocument)
+      ? (document as IDocument).lines
+      : (document as ISellDocument).lines;
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineID);
   const [line, setLine] = useState<ISellLine>(undefined);
-  const [value, setValue] = useState(1); 
+  const [value, setValue] = useState(1);
 
   useEffect(() => {
     if (route.params.modeCor) {
@@ -44,11 +46,11 @@ const ProductDetailScreen = ({ route, navigation }) => {
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
       <View style={localeStyles.productPriceView}>
         <Text style={localeStyles.fontSize16}>Кол-во по заявке:</Text>
-        <Text style={localeStyles.productPrice}>{(lineDocument as ISellLine)?.orderQuantity?? 0}</Text>
+        <Text style={localeStyles.productPrice}>{(lineDocument as ISellLine)?.orderQuantity ?? 0}</Text>
       </View>
       <View style={localeStyles.productQuantityView}>
         <Text style={localeStyles.fontSize16}>Количество:</Text>
-        <Text style={localeStyles.productQuantity}>{lineDocument?.quantity?? 0}</Text>
+        <Text style={localeStyles.productQuantity}>{lineDocument?.quantity ?? 0}</Text>
       </View>
       <View style={localeStyles.editQuantityView}>
         <Text style={localeStyles.fontSize16}>Изменить количество:</Text>

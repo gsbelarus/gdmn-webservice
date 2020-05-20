@@ -37,7 +37,12 @@ const SellDocumentsNavigator = () => {
         initialParams={{ docId: 0 }}
         options={{ title: '' }}
       />
-      <Stack.Screen key="HeadSellDocument" name="HeadSellDocument" component={HeadSellDocumentScreen} options={{ title: '' }} />
+      <Stack.Screen
+        key="HeadSellDocument"
+        name="HeadSellDocument"
+        component={HeadSellDocumentScreen}
+        options={{ title: '' }}
+      />
       <Stack.Screen
         key="CreateSellDocument"
         name="CreateSellDocument"

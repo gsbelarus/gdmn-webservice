@@ -1,28 +1,28 @@
 import { Reducer } from 'react';
 
-/*import contacts from '../../mockData//GD_Contact.json';
-import documents from '../../mockData/Document.json';*/
-import documents from '../../mockData/Otves/Document.json';
-import references from '../../mockData/Otves/References.json';
+/*import contacts from '../../mockData//GD_Contact.json';*/
+import documents from '../../mockData/Document.json';
+import { IDocument, IContact, IDocumentType, IInventoryDocumentType, IGood, IReference } from '../../../../common';
+//import documents from '../../mockData/Otves/Document.json';
+//import references from '../../mockData/Otves/References.json';
 /*import documentTypes from '../../mockData/GD_DocumentType.json';*/
-/*import goods from '../../mockData/Goods.json';
-import references from '../../mockData/References.json';*/
+/*import goods from '../../mockData/Goods.json';*/
+import references from '../../mockData/References.json';
 import remains from '../../mockData/Remains.json';
-const documentTypes = references.find((ref) => ref.type === "documentTypes").data;
-const contacts = references.find((ref) => ref.type === "contacts").data;
-const goods = references.find((ref) => ref.type === 'goods').data; 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { IAppState, ISellDocument } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
-import { IDocument } from '../../../../common';
+const documentTypes = references.find((ref) => ref.type === 'documentTypes').data as IInventoryDocumentType[] | IDocumentType[];
+const contacts = references.find((ref) => ref.type === 'contacts').data as IContact[];
+const goods = references.find((ref) => ref.type === 'goods').data as IGood[];
 
 export const initialState: IAppState = {
   documents,
-  remains, 
-  goods, 
+  remains,
+  goods,
   documentTypes,
   contacts,
-  references
+  references: references as IReference[],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -72,11 +72,13 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
       const document = state.documents[idx];
-      const docLine =  (document instanceof Object && (document as IDocument)) ? 
-        (document as IDocument).lines : (document as ISellDocument).lines;
+      const docLine = (document as IDocument).lines;
+      // document instanceof Object && (document as IDocument)
+      //   ? (document as IDocument).lines
+      //   : (document as ISellDocument).lines;
       const id =
-          docLine
-          .map((item: { id: any; }) => Number(item.id))
+        docLine
+          .map((item: { id: unknown }) => Number(item.id))
           .reduce((lineId: number, currLineId: number) => {
             return lineId > currLineId ? lineId : currLineId;
           }, -1) + 1;

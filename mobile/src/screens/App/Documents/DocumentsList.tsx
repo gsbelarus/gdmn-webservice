@@ -4,15 +4,15 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { IDocument, IDocumentType } from '../../../../../common';
+import { IInventoryDocument, IInventoryDocumentType } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/documentStatuses.json';
 import { useAuthStore, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const Statuses: IDocumentType[] = statuses;
+const Statuses: IInventoryDocumentType[] = statuses;
 
-const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
+const DocumentItem = React.memo(({ item }: { item: IInventoryDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
@@ -31,7 +31,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {state.documentTypes.find((type) => type.id === item.head.doctype).name}
+              {state.documentTypes.find((type) => type.id === item.head.doctype)
+                ? state.documentTypes.find((type) => type.id === item.head.doctype).name
+                : 'Неизвестный тип'
+              }
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
@@ -49,13 +52,13 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
 const DocumentsListScreen = ({ navigation }) => {
   const { colors } = useTheme();
-  const ref = React.useRef<FlatList<IDocument>>(null);
+  const ref = React.useRef<FlatList<IInventoryDocument>>(null);
   useScrollToTop(ref);
 
   const { state, api } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
-  const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
+  const renderItem = ({ item }: { item: IInventoryDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
     const data = appState.documents.filter((document) => document.head.status === 1);
@@ -84,7 +87,7 @@ const DocumentsListScreen = ({ navigation }) => {
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={appState.documents}
+        data={appState.documents.filter(item => item.head.doctype !== 334644058)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

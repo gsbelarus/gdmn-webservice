@@ -5,12 +5,24 @@
     "type": "documentTypes",
     "data": [
       {
-        "id": "147023466",
+        "id": 147023466,
         "name": "Накладная на получение товара"
       },
       {
-        "id": "147032148",
+        "id": 147032148,
         "name": "Инвентаризация"
+      },
+      {
+        "id": 334644058,
+        "name": "04.Отвес-накладная"
+      },
+      {
+        "id": 0,
+        "name": "Инвентаризация"
+      },
+      {
+        "id": 1,
+        "name": "Приход"
       }
     ]
 	},
@@ -35,24 +47,139 @@
     "type": "contacts",
     "data": [
       {
-        "contacttype": "2",
-        "id": "650002",
+        "type": 2,
+        "id": 650002,
         "name": "Инна Петровна"
       },
       {
-        "contacttype": "4",
-        "id": "147004107",
+        "type": 4,
+        "id": 147004107,
         "name": "Склад продуктов"
       },
       {
-        "contacttype": "4",
-        "id": "147004108",
+        "type": 4,
+        "id": 147004108,
         "name": "Корбан Александра"
       },
       {
-        "contacttype": "2",
-        "id": "147032705",
+        "type": 2,
+        "id": 147032705,
         "name": "Склад овощей"
+      },
+      {
+        "id": 884524537,
+        "name": "РАХМАТУЛЛИН Эрик Рифатович",
+        "type": 2
+      },
+      {
+        "id": 392043678,
+        "name": "ПЛАВСЮК Андрей Вячеславович",
+        "type": 2
+      },
+      {
+        "id": 1100281675,
+        "name": "ЛОМЕЙКО Дмитрий Викторович",
+        "type": 2
+      },
+      {
+        "id": 925835807,
+        "name": "ЕФИМЧИК Анатолий Анатольевич",
+        "type": 2
+      },
+      {
+        "id": 859147249,
+        "name": "ШВЕД Александр Сергеевич",
+        "type": 2
+      },
+      {
+        "id": 720633710,
+        "name": "КУЛИК Валерий Николаевич",
+        "type": 2
+      },
+      {
+        "id": 147007412,
+        "name": "Экспедиция ККС",
+        "type": 4
+      },
+      {
+        "id": 147005477,
+        "name": "Экспедиция холодильника",
+        "type": 4
+      },
+      {
+        "id": 379025416,
+        "name": "ХОЛОДИЛЬНИК ЭКСПЕДИЦИЯ БАРАНОВИЧИ",
+        "type": 4
+      },
+      {
+        "id": 147056318,
+        "name": "ООО 'Евроторг' г.Минск,+",
+        "type": 3
+      },
+      {
+        "id": 332103073,
+        "name": "ООО 'Евроторг' магазин №7 'Евроопт', г.Минск",
+        "type": 3
+      },
+      {
+        "id": 147058183,
+        "name": "ОДО 'Виталюр' г.Минск",
+        "type": 3
+      },
+      {
+        "id": 1115495249,
+        "name": "ОДО 'Виталюр', г. Минск, ул.Казинца,49",
+        "type": 3
+      },
+      {
+        "id": 0,
+        "name": "Buraya Alena",
+        "type": 2
+      },
+      {
+        "id": 1,
+        "name": "Shiralieva Samira",
+        "type": 2
+      },
+      {
+        "id": 2,
+        "name": "Kireev Anrey",
+        "type": 2
+      },
+      {
+        "id": 3,
+        "name": "Volkov Denis",
+        "type": 2
+      },
+      {
+        "id": 4,
+        "name": "Dubrova Mariya",
+        "type": 2
+      },
+      {
+        "id": 5,
+        "name": "Petrov Evgeniy",
+        "type": 2
+      },
+      {
+        "id": 6,
+        "name": "Sklad",
+        "type": 4
+      },
+      {
+        "id": 7,
+        "name": "Vitrina 1",
+        "type": 4
+      },
+      {
+        "id": 8,
+        "name": "Vitrina 2",
+        "type": 4
+      },
+      {
+        "id": 9,
+        "name": "Vitrina 3",
+        "type": 4
       }
     ]
 	},
@@ -62,25 +189,258 @@
     "type": "goods",
     "data": [
       {
-        "id": "147032297",
+        "id": 147032297,
         "name": "Товар1",
         "alias": "1",
         "barcode": "11111111",
         "value": "кв.м."
       },
       {
-        "id": "147032305",
+        "id": 147032305,
         "name": "Товар2",
         "alias": "2",
         "barcode": "2222222",
         "value": "кг"
       },
       {
-        "id": "147032757",
+        "id": 147032757,
         "name": "Авокадо",
         "alias": "3",
         "barcode": "11111111",
         "value": "кг"
+      },
+      {
+        "id": 961841853,
+        "name": "Вар.колб.изд.мяс.К-са 'Голландская' в/с",
+        "barcode": "4810315048514",
+        "alias": "86184",
+        "itemWeight": 1
+      },
+      {
+        "id": 961841848,
+        "name": "Вар.колб.изд.мяс.К-са 'Докторская с маслом' в/с",
+        "barcode": "4810315048507",
+        "alias": "86179",
+        "itemWeight": 1
+      },
+      {
+        "id": 1065106641,
+        "name": "Вар.колб.изд.мяс.К-са 'Докторская с маслом' в/с (400 г)",
+        "barcode": "4810315049993",
+        "alias": "93198",
+        "itemWeight": 0.4
+      },
+      {
+        "id": 973476000,
+        "name": "Вар.колб.изд.мяс.С-ки 'Венские' в/с(амилюкс, газ)",
+        "barcode": "4810315028929",
+        "alias": "87047",
+        "itemWeight": 1
+      },
+      {
+        "id": 618001485,
+        "name": "Вар.к.из'Сливочные Классические' 1с(газ)",
+        "barcode": "4810315048569",
+        "alias": "52159",
+        "itemWeight": 1
+      },
+      {
+        "id": 583610470,
+        "name": "К-са ливер. мясн.'Любительская'",
+        "barcode": "4810315031318",
+        "alias": "47932",
+        "itemWeight": 1
+      },
+      {
+        "id": 309863298,
+        "name": "П/ф Шашлык 'КоролевскиЙ'2 кг зам.",
+        "barcode": "4810315012478",
+        "alias": "3685",
+        "itemWeight": 2
+      },
+      {
+        "id": 757950448,
+        "name": "П/ф из свин. 'Для жаркого Фирменный' (котл. мясо) охл.3кг",
+        "barcode": "4810315040600",
+        "alias": "71195",
+        "itemWeight": 3
+      },
+      {
+        "id": 753392425,
+        "name": "П/ф к/к б/к 'Длинннейшая мышца свин. 'Фирменная' зам.10кг",
+        "barcode": "4810315040037",
+        "alias": "70659",
+        "itemWeight": 10
+      },
+      {
+        "id": 917812184,
+        "name": "П/ф рубл. мясн. 'Фарш 'Котлетный' зам. фас. 0,5 кг",
+        "barcode": "4810315041560",
+        "alias": "83160",
+        "itemWeight": 0.5
+      },
+      {
+        "id": 892113333,
+        "name": "Мяс. п/ф в тес.зам.Пельм.'Сябруки со вк.грибов'кат.В фас.0,5",
+        "barcode": "4810315046879",
+        "alias": "81334",
+        "itemWeight": 0.5
+      },
+      {
+        "id": 0,
+        "alias": "9006",
+        "barcode": "4605246004346",
+        "name": "Black tea Greenfield 'Christmas mystery'"
+      },
+      {
+        "id": 1,
+        "alias": "5204",
+        "barcode": "4810272003304",
+        "name": "Sucar rafinad 'Gorodeyskiy sahar'"
+      },
+      {
+        "id": 2,
+        "alias": "5859",
+        "barcode": "4607078206639",
+        "name": "Comp mous Gembird MUSW-350"
+      },
+      {
+        "id": 3,
+        "alias": "5121",
+        "barcode": "4810387000137",
+        "name": "Shoe brush Damavik moder care 019"
+      },
+      {
+        "id": 4,
+        "alias": "5105",
+        "barcode": "4820023749115",
+        "name": "Paper handkerchiefs Ruta"
+      },
+      {
+        "id": 5,
+        "alias": "142",
+        "barcode": "4690419012259",
+        "name": "Antibacterial hand gel Dr. Hand"
+      },
+      {
+        "id": 6,
+        "alias": "1160",
+        "barcode": "9900010480834",
+        "name": "NotePad OZ"
+      },
+      {
+        "id": 7,
+        "alias": "3755",
+        "barcode": "4811329022781",
+        "name": "Lipstick PinUp Ultra math"
+      },
+      {
+        "id": 8,
+        "alias": "297",
+        "barcode": "4812152000267",
+        "name": "Paper handkerchiefs Smart"
+      },
+      {
+        "id": 9,
+        "alias": "8256",
+        "barcode": "4811329021234",
+        "name": "Lipstick PinUp Ultra math Luxvisage"
+      },
+      {
+        "id": 10,
+        "alias": "364",
+        "barcode": "5000204021288",
+        "name": "Enterfent salz-und wasserrander Salamander"
+      },
+      {
+        "id": 11,
+        "alias": "594",
+        "barcode": "5606428601505",
+        "name": "Women's scarf black Parfios"
+      },
+      {
+        "id": 12,
+        "alias": "6464",
+        "barcode": "2110022000587",
+        "name": "Natural tea green Night Cleopatr"
+      },
+      {
+        "id": 13,
+        "alias": "6120",
+        "barcode": "4601834005047",
+        "name": "Antibacterial hand gel Claenberry"
+      },
+      {
+        "id": 14,
+        "alias": "6936",
+        "barcode": "46031117161457",
+        "name": "Lip balm Lemon"
+      },
+      {
+        "id": 15,
+        "alias": "310",
+        "barcode": "4690219139682",
+        "name": "Pen ball Screiber S-806 0.8 mm"
+      },
+      {
+        "id": 16,
+        "alias": "3554",
+        "barcode": "859042230294",
+        "name": "Paper handkerchiefs BigSoft"
+      },
+      {
+        "id": 17,
+        "alias": "9596",
+        "barcode": "9112400020304497",
+        "name": "Card tickets MinskTrans"
+      },
+      {
+        "id": 18,
+        "alias": "9596",
+        "barcode": "9112400017913409",
+        "name": "Card tickets MinskTrans"
+      },
+      {
+        "id": 19,
+        "alias": "1389",
+        "barcode": "9100100201428",
+        "name": "Discont Card DNK"
+      },
+      {
+        "id": 20,
+        "alias": "2417",
+        "barcode": "2303012307531",
+        "name": "Discont Card Kari"
+      },
+      {
+        "id": 21,
+        "alias": "2278",
+        "barcode": "2610010008774",
+        "name": "Discont Card Vygoda"
+      },
+      {
+        "id": 22,
+        "alias": "7573",
+        "barcode": "4000012720701",
+        "name": "Discont Card Mila"
+      },
+      {
+        "id": 23,
+        "alias": "7181",
+        "barcode": "23000004057631397",
+        "name": "Discont Card Evroopt"
+      },
+      {
+        "id": 24,
+        "alias": "1017",
+        "barcode": "9800007978859",
+        "name": "Discont Card Vitalur"
+      },
+      {
+        "id": 25,
+        "alias": "8198",
+        "barcode": "-3731194",
+        "name": "Discont Card OstrovChistoty"
       }
     ]
 	}

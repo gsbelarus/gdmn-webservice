@@ -40,50 +40,56 @@ const ProductDetailScreen = ({ route, navigation }) => {
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
-      <View style={localeStyles.productPriceView}>
-        <Text style={localeStyles.fontSize16}>Цена:</Text>
-        <Text style={localeStyles.productPrice}>{remain.price}</Text>
-      </View>
-      <View style={localeStyles.productQuantityView}>
-        <Text style={localeStyles.fontSize16}>Количество:</Text>
-        <Text style={localeStyles.productQuantity}>{remain.quantity}</Text>
-      </View>
-      <View style={localeStyles.editQuantityView}>
-        <Text style={localeStyles.fontSize16}>Добавить количество:</Text>
-        <InputSpinner
-          returnKeyType="done"
-          style={localeStyles.inputSpinner}
-          inputStyle={localeStyles.fontSize20}
-          value={value}
-          max={1000}
-          min={0}
-          step={1}
-          colorLeft={colors.primary}
-          colorRight={colors.primary}
-          onChange={setValue}
-          // onMin={() => {
-          //   Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
-          // }}
-        />
-      </View>
-      <Button
-        onPress={() => {
-          if (line !== undefined) {
-            actions.editLine({
-              docId: route.params.docId,
-              lineId: line.id,
-              value: route.params.modeCor ? value : value + line.quantity,
-            });
-          } else {
-            actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
-          }
-          navigation.navigate('ViewDocument', { docId: route.params.docId });
-        }}
-        mode="contained"
-        style={[styles.rectangularButton, localeStyles.button]}
-      >
-        Добавить
-      </Button>
+      {
+        remain
+        ? <>
+          <View style={localeStyles.productPriceView}>
+            <Text style={localeStyles.fontSize16}>Цена:</Text>
+            <Text style={localeStyles.productPrice}>{remain.price}</Text>
+          </View>
+          <View style={localeStyles.productQuantityView}>
+            <Text style={localeStyles.fontSize16}>Количество:</Text>
+            <Text style={localeStyles.productQuantity}>{remain.quantity}</Text>
+          </View>
+          <View style={localeStyles.editQuantityView}>
+            <Text style={localeStyles.fontSize16}>Добавить количество:</Text>
+            <InputSpinner
+              returnKeyType="done"
+              style={localeStyles.inputSpinner}
+              inputStyle={localeStyles.fontSize20}
+              value={value}
+              max={1000}
+              min={0}
+              step={1}
+              colorLeft={colors.primary}
+              colorRight={colors.primary}
+              onChange={setValue}
+              // onMin={() => {
+              //   Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
+              // }}
+            />
+          </View>
+          <Button
+            onPress={() => {
+              if (line !== undefined) {
+                actions.editLine({
+                  docId: route.params.docId,
+                  lineId: line.id,
+                  value: route.params.modeCor ? value : value + line.quantity,
+                });
+              } else {
+                actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+              }
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            }}
+            mode="contained"
+            style={[styles.rectangularButton, localeStyles.button]}
+          >
+            Добавить
+          </Button>
+        </>
+        : <Text style={[styles.title, localeStyles.fontSize16]}>Не найдено</Text>
+      }
     </View>
   );
 };

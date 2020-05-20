@@ -1,29 +1,29 @@
-import { IHead, ILine, IDocument } from '../../../common';
-
-export interface ISellDocument extends IDocument {
+export interface IDocument {
   id: number;
-  head: ISellHead;
-  lines: ISellLine[];
+  head: IHead;
+  lines: ILine[];
 }
 
-export interface ISellHead extends IHead {
-  docnumber: string;
-  expeditorId: number;
+export interface IHead {
+  doctype: number;
+  fromcontactId: number;
+  tocontactId: number;
+  date: string;
+  status: number;
 }
 
-export interface ISellLine extends ILine {
-  orderQuantity?: number;
-}
-
-/*export interface IUser {
+export interface ILine {
   id: string;
-  userName: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  goodId: number;
+  quantity: number;
 }
 
+export interface IRemain {
+  goodId: number;
+  quantity: number;
+  price: number;
+  contactId: number;
+}
 
 export interface IContact {
   id: number;
@@ -47,7 +47,6 @@ export interface IGood {
   [fieldName: string]: unknown;
 }
 
-
 export interface IReference {
   id: number;
   name: string;
@@ -58,4 +57,3 @@ export interface IReference {
     [fieldName: string]: unknown;
   }[];
 }
-*/

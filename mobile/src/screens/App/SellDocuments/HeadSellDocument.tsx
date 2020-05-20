@@ -4,13 +4,13 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IDocument, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
-import styles from '../../../styles/global';
-import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAppStore } from '../../../store';
+import styles from '../../../styles/global';
 
 type TField = {
   title: string;
@@ -50,7 +50,7 @@ const HeadSellDocumentScreen = ({ route }) => {
     { title: 'Экспедитор', value: expeditor.name },
     { title: 'Подразделение', value: contactFrom.name },
     { title: 'Организация', value: contactTo.name },
-    { title: 'Статус', value: status }
+    { title: 'Статус', value: status },
   ];
 
   useScrollToTop(ref);

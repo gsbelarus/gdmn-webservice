@@ -25,7 +25,7 @@ const CreateSellDocumentScreen = ({ route }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [peopleText, setPeopleText] = useState('');
   const [companyText, setCompanyText] = useState('');
-  const [numberText, setNumberText] = useState('')
+  const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
   const people: IContact[] = state.contacts.filter((item) => item.type === 2);
   const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
@@ -42,6 +42,10 @@ const CreateSellDocumentScreen = ({ route }) => {
   };
 
   useEffect(() => {
+    setSelectedDocType(334644058);
+  }, [])
+
+  useEffect(() => {
     if (route.params?.docId !== undefined) {
       const documentItem = state.documents.find((item) => item.id === route.params.docId);
       setSelectedExpeditor((documentItem.head as ISellHead).expeditorId);
@@ -55,24 +59,23 @@ const CreateSellDocumentScreen = ({ route }) => {
   return (
     <>
       <ScrollView>
-      <View style={localeStyles.container}>
-       
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-          <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
-          <TouchableOpacity
-            style={localeStyles.containerDate}
-            onPress={() => {
-              setOldDate(date);
-              setDatePickerVisibility(true);
-            }}
-          >
-            <Text style={[localeStyles.textDate, { color: colors.text }]}>{date.toLocaleDateString()}</Text>
-            <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-          </TouchableOpacity>
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
-          <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
-          <TextInput
+        <View style={localeStyles.container}>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
+            <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
+            <TouchableOpacity
+              style={localeStyles.containerDate}
+              onPress={() => {
+                setOldDate(date);
+                setDatePickerVisibility(true);
+              }}
+            >
+              <Text style={[localeStyles.textDate, { color: colors.text }]}>{date.toLocaleDateString()}</Text>
+              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+            </TouchableOpacity>
+          </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
+            <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
+            <TextInput
               style={[
                 styles.input,
                 localeStyles.textNumberInput,
@@ -92,231 +95,231 @@ const CreateSellDocumentScreen = ({ route }) => {
               returnKeyType="done"
               autoCorrect={false}
             />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <View style={localeStyles.filter}>
-            <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-            <TextInput
-              style={[
-                styles.input,
-                localeStyles.textInput,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
-              ]}
-              onChangeText={setPeopleText}
-              value={peopleText}
-              placeholder="Введите строку поиска"
-              placeholderTextColor={colors.border}
-              multiline={false}
-              autoCapitalize="sentences"
-              underlineColorAndroid="transparent"
-              selectionColor={'black'}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
           </View>
-          <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={11}>
-            {people.find((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())) && people.length !== 0 ? (
-              <Picker
-                selectedValue={selectedExpeditor}
-                style={localeStyles.pickerView}
-                itemStyle={localeStyles.pickerView}
-                mode='dropdown'
-                onValueChange={(itemValue, itemIndex) => setSelectedExpeditor(itemValue)}
-              >
-                {people.filter((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())).map((item, idx) => (
-                  <Picker.Item label={item.name} value={item.id} key={idx} />
-                  ) 
-                )}  
-              </Picker>
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </View> 
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-          <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={12}>
-            {departments && departments.length !== 0 ? (
-              <Picker
-                selectedValue={selectedFromContact}
-                style={localeStyles.pickerView}
-                itemStyle={localeStyles.pickerView}
-                mode='dropdown'
-                onValueChange={(itemValue, itemIndex) => setSelectedFromContact(itemValue)}
-              >
-              {departments.map((item, idx) => (
-                <Picker.Item label={item.name} value={item.id} key={idx} />
-                ) 
-              )}  
-              </Picker>
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </View> 
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-          
-          <View style={localeStyles.filter}>
-            <Text style={localeStyles.subdivisionText}>Организация: </Text>
-            <TextInput
-              style={[
-                styles.input,
-                localeStyles.textInput,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
-              ]}
-              onChangeText={setCompanyText}
-              value={companyText}
-              placeholder="Введите строку поиска"
-              placeholderTextColor={colors.border}
-              multiline={false}
-              autoCapitalize="sentences"
-              underlineColorAndroid="transparent"
-              selectionColor={'black'}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={13}>
-            {companies && companies.length !== 0 ? (
-              <Picker
-                selectedValue={selectedToContact}
-                style={localeStyles.pickerView}
-                itemStyle={localeStyles.pickerView}
-                mode='dropdown'
-                onValueChange={(itemValue, itemIndex) => setSelectedToContact(itemValue)}
-              >
-              {companies.filter((item) => item.name.toLowerCase().includes(companyText.toLowerCase())).map((item, idx) => (
-                <Picker.Item label={item.name} value={item.id} key={idx} />
-                ) 
-              )}  
-              </Picker>
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </View> 
-        </View>
-        
-        {isDatePickerVisible &&
-          (Platform.OS !== 'ios' ? (
-            <DateTimePicker
-              testID="dateTimePicker"
-              timeZoneOffsetInMinutes={0}
-              value={date}
-              is24Hour={true}
-              display="default"
-              onChange={onChange}
-              mode="date"
-              locale="en_GB"
-              maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-              minimumDate={new Date(1990, 0, 1)}
-            />
-          ) : (
-            <Portal>
-              <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
-                <View
-                  style={[
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                    localeStyles.containerModalDatePicker,
-                  ]}
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+            <View style={localeStyles.filter}>
+              <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  localeStyles.textInput,
+                  {
+                    backgroundColor: colors.card,
+                    color: colors.text,
+                  },
+                ]}
+                onChangeText={setPeopleText}
+                value={peopleText}
+                placeholder="Введите строку поиска"
+                placeholderTextColor={colors.border}
+                multiline={false}
+                autoCapitalize="sentences"
+                underlineColorAndroid="transparent"
+                selectionColor={'black'}
+                returnKeyType="done"
+                autoCorrect={false}
+              />
+            </View>
+            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={11}>
+              {people.find((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())) &&
+              people.length !== 0 ? (
+                <Picker
+                  selectedValue={selectedExpeditor}
+                  style={localeStyles.pickerView}
+                  itemStyle={localeStyles.pickerView}
+                  mode="dropdown"
+                  onValueChange={(itemValue, itemIndex) => setSelectedExpeditor(itemValue)}
                 >
+                  {people
+                    .filter((item) => item.name.toLowerCase().includes(peopleText.toLowerCase()))
+                    .map((item, idx) => (
+                      <Picker.Item label={item.name} value={item.id} key={idx} />
+                    ))}
+                </Picker>
+              ) : (
+                <Text>Не найдено</Text>
+              )}
+            </View>
+          </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
+            <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
+            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={12}>
+              {departments && departments.length !== 0 ? (
+                <Picker
+                  selectedValue={selectedFromContact}
+                  style={localeStyles.pickerView}
+                  itemStyle={localeStyles.pickerView}
+                  mode="dropdown"
+                  onValueChange={(itemValue, itemIndex) => setSelectedFromContact(itemValue)}
+                >
+                  {departments.map((item, idx) => (
+                    <Picker.Item label={item.name} value={item.id} key={idx} />
+                  ))}
+                </Picker>
+              ) : (
+                <Text>Не найдено</Text>
+              )}
+            </View>
+          </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
+            <View style={localeStyles.filter}>
+              <Text style={localeStyles.subdivisionText}>Организация: </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  localeStyles.textInput,
+                  {
+                    backgroundColor: colors.card,
+                    color: colors.text,
+                  },
+                ]}
+                onChangeText={setCompanyText}
+                value={companyText}
+                placeholder="Введите строку поиска"
+                placeholderTextColor={colors.border}
+                multiline={false}
+                autoCapitalize="sentences"
+                underlineColorAndroid="transparent"
+                selectionColor={'black'}
+                returnKeyType="done"
+                autoCorrect={false}
+              />
+            </View>
+            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={13}>
+              {companies && companies.length !== 0 ? (
+                <Picker
+                  selectedValue={selectedToContact}
+                  style={localeStyles.pickerView}
+                  itemStyle={localeStyles.pickerView}
+                  mode="dropdown"
+                  onValueChange={(itemValue, itemIndex) => setSelectedToContact(itemValue)}
+                >
+                  {companies
+                    .filter((item) => item.name.toLowerCase().includes(companyText.toLowerCase()))
+                    .map((item, idx) => (
+                      <Picker.Item label={item.name} value={item.id} key={idx} />
+                    ))}
+                </Picker>
+              ) : (
+                <Text>Не найдено</Text>
+              )}
+            </View>
+          </View>
+
+          {isDatePickerVisible &&
+            (Platform.OS !== 'ios' ? (
+              <DateTimePicker
+                testID="dateTimePicker"
+                timeZoneOffsetInMinutes={0}
+                value={date}
+                is24Hour={true}
+                display="default"
+                onChange={onChange}
+                mode="date"
+                locale="en_GB"
+                maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
+                minimumDate={new Date(1990, 0, 1)}
+              />
+            ) : (
+              <Portal>
+                <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
                   <View
                     style={[
-                      localeStyles.buttonDatePicker,
                       {
-                        borderBottomColor: colors.border,
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
                       },
+                      localeStyles.containerModalDatePicker,
                     ]}
                   >
-                    <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
-                    <Button
-                      onPress={() => {
-                        setDatePickerVisibility(false);
-                        setDate(oldDate);
-                      }}
+                    <View
+                      style={[
+                        localeStyles.buttonDatePicker,
+                        {
+                          borderBottomColor: colors.border,
+                        },
+                      ]}
                     >
-                      Отмена
-                    </Button>
+                      <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
+                      <Button
+                        onPress={() => {
+                          setDatePickerVisibility(false);
+                          setDate(oldDate);
+                        }}
+                      >
+                        Отмена
+                      </Button>
+                    </View>
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      timeZoneOffsetInMinutes={0}
+                      value={date}
+                      is24Hour={true}
+                      display="default"
+                      onChange={onChange}
+                      mode="date"
+                      locale="en_GB"
+                    />
                   </View>
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    timeZoneOffsetInMinutes={0}
-                    value={date}
-                    is24Hour={true}
-                    display="default"
-                    onChange={onChange}
-                    mode="date"
-                    locale="en_GB"
-                  />
-                </View>
-              </Modal>
-            </Portal>
-          ))}
-       
-      </View>
-      <View style={localeStyles.buttonView}>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, localeStyles.button]}
-          onPress={() => {
-            if (route.params?.docId) {
-              actions.editDocument({
-                id: route.params.docId,
-                head: {
-                  doctype: selectedDocType,
-                  fromcontactId: selectedFromContact,
-                  tocontactId: selectedToContact,
-                  date: date.toString(),
-                  status: 0,
-                  docnumber: numberText,
-                  expeditorId: selectedExpeditor,
-                },
-              });
-              navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-            } else {
-              const id =
-                state.documents
-                  .map((item) => item.id)
-                  .reduce((newId, currId) => {
-                    return newId > currId ? newId : currId;
-                  }, -1) + 1;
-              actions.newDocument({
-                id,
-                head: {
-                  doctype: selectedDocType,
-                  fromcontactId: selectedFromContact,
-                  tocontactId: selectedToContact,
-                  date: date.toString(),
-                  status: 0,
-                  docnumber: numberText,
-                  expeditorId: selectedExpeditor,
-                },
-                lines: [],
-              });
-              navigation.navigate('ViewSellDocument', { docId: id });
-            }
-          }}
-        >
-          ОК
-        </Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-          onPress={() => {
-            navigation.navigate('SellDocumentsListScreen');
-          }}
-        >
-          Отмена
-        </Button>
-      </View>
+                </Modal>
+              </Portal>
+            ))}
+        </View>
+        <View style={localeStyles.buttonView}>
+          <Button
+            mode="contained"
+            style={[styles.rectangularButton, localeStyles.button]}
+            onPress={() => {
+              if (route.params?.docId) {
+                actions.editDocument({
+                  id: route.params.docId,
+                  head: {
+                    doctype: selectedDocType,
+                    fromcontactId: selectedFromContact,
+                    tocontactId: selectedToContact,
+                    date: date.toString(),
+                    status: 0,
+                    docnumber: numberText,
+                    expeditorId: selectedExpeditor,
+                  },
+                });
+                navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+              } else {
+                const id =
+                  state.documents
+                    .map((item) => item.id)
+                    .reduce((newId, currId) => {
+                      return newId > currId ? newId : currId;
+                    }, -1) + 1;
+                actions.newDocument({
+                  id,
+                  head: {
+                    doctype: selectedDocType,
+                    fromcontactId: selectedFromContact,
+                    tocontactId: selectedToContact,
+                    date: date.toString(),
+                    status: 0,
+                    docnumber: numberText,
+                    expeditorId: selectedExpeditor,
+                  },
+                  lines: [],
+                });
+                navigation.navigate('ViewSellDocument', { docId: id });
+              }
+            }}
+          >
+            ОК
+          </Button>
+          <Button
+            mode="contained"
+            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
+            onPress={() => {
+              navigation.navigate('SellDocumentsListScreen');
+            }}
+          >
+            Отмена
+          </Button>
+        </View>
       </ScrollView>
     </>
   );
