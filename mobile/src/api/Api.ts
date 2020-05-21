@@ -48,9 +48,6 @@ export default class Api {
         `/devices/?deviceId=${config.debug.deviceId}`,
         JSON.stringify({ uid: newDevice.uid, user: newDevice.user }),
       ),
-
-    getCurrentUser: async (): Promise<IResponse<IUser>> =>
-      get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
   };
 
   data = {

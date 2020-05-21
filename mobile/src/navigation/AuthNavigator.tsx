@@ -113,7 +113,7 @@ const AuthNavigator = () => {
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IResponse<IUser>) => actions.setUserStatus(isUser(data.result)))
+          .then((data: IResponse<IUser>) => actions.setUserStatus(isUser(data.data)))
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
       : actions.setUserStatus(false);
   }, [actions, api.auth, deviceRegistered, signal]);

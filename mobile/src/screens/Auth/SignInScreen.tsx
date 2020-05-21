@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials } from '../../../../common';
+import { IResponse, IUserCredentials, IUser, IDevice } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
@@ -28,8 +28,7 @@ const SignInScreen = () => {
     isError: false,
     status: undefined,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
+
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
     password: '',
@@ -57,28 +56,7 @@ const SignInScreen = () => {
     if (!lognState.isLoading) {
       return;
     }
-    actions.setUserStatus(true);
-    // timeout(5000, api.auth.getDeviceStatusByUser(credential.userName))
-    //   .then((data: IServerResponse<boolean | string>) => setServerResp(data))
-    //   .catch((err: Error) => setLoginState({ isLoading: false, status: err.message, isError: true }));
-  }, [/*api.auth, credential.userName,*/ actions, lognState.isLoading /*, state.deviceId*/]);
-
-  useEffect(() => {
-    if (!serverResp) {
-      return;
-    }
-
-    if (!serverResp.result) {
-      setLoginState({
-        isLoading: false,
-        status: 'Пользователь заблокирован',
-        isError: true,
-      });
-      return;
-    }
-
-    if (serverResp.result) {
-      timeout(5000, api.auth.login(credential))
+       timeout(5000, api.auth.login(credential))
         .then((data: IResponse<undefined>) => {
           data.result
             ? actions.setUserStatus(true)
@@ -95,15 +73,7 @@ const SignInScreen = () => {
             isError: true,
           }),
         );
-      return;
-    }
-    // Иной вариант ответа
-    setLoginState({
-      isLoading: false,
-      status: serverResp.error,
-      isError: true,
-    });
-  }, [actions, api.auth, credential, serverResp]);
+  }, [api.auth, credential.userName, lognState.isLoading /*, state.deviceId*/]);
 
   return (
     <>
