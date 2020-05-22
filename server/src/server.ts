@@ -24,7 +24,7 @@ export const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
 export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
 export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
 
-export async function init(): Promise<void> {
+export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
@@ -70,4 +70,5 @@ export async function init(): Promise<void> {
   await new Promise(resolve => app.listen(dev.PORT, () => resolve()));
   // log.info('Started');
   log.info(`Server is running on http://localhost:${dev.PORT}`);
+  return app;
 }
