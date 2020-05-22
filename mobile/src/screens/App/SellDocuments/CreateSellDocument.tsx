@@ -8,6 +8,12 @@ import styles from '../../../styles/global';
 import { useAppStore } from '../../../store';
 import { IContact } from '../../../../../common';
 import { ISellHead } from '../../../model';
+import { DropdownList } from '../../../components/DropDown';
+
+interface IItem {
+  id?: number;
+  value?: string;
+}
 /*import { IContact, IDocumentType } from '../../../model/sell';
 const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
 const people: IContact[] = contacts.filter((item) => item.type === 2);
@@ -23,13 +29,22 @@ const CreateSellDocumentScreen = ({ route }) => {
   const [selectedFromContact, setSelectedFromContact] = useState<number>();
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [peopleText, setPeopleText] = useState('');
   const [companyText, setCompanyText] = useState('');
   const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
   const people: IContact[] = state.contacts.filter((item) => item.type === 2);
+  const listPeople = people.map((item) => { return {id: item.id, value: item.name} as IItem}) 
   const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
   const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
+  
+  const list = [
+    {id: 0, value: 'Петриченко Александр Вениаминович'},
+    {id: 1, value: 'item1'},
+    {id: 2, value: 'item2'},
+    {id: 3, value: 'item3'},
+    {id: 4, value: 'item4'},
+    {id: 5, value: 'item5'},
+  ]
 
   const today = new Date();
   const { colors } = useTheme();
@@ -60,6 +75,9 @@ const CreateSellDocumentScreen = ({ route }) => {
     <>
       <ScrollView>
         <View style={localeStyles.container}>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={230}>
+            <DropdownList list={list} value={{id: 2, value: 'item2'}} onValueChange={(item) => {console.log(item.value)}}/>
+          </View>  
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
             <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
             <TouchableOpacity
@@ -99,46 +117,9 @@ const CreateSellDocumentScreen = ({ route }) => {
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
             <View style={localeStyles.filter}>
               <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  localeStyles.textInput,
-                  {
-                    backgroundColor: colors.card,
-                    color: colors.text,
-                  },
-                ]}
-                onChangeText={setPeopleText}
-                value={peopleText}
-                placeholder="Введите строку поиска"
-                placeholderTextColor={colors.border}
-                multiline={false}
-                autoCapitalize="sentences"
-                underlineColorAndroid="transparent"
-                selectionColor={'black'}
-                returnKeyType="done"
-                autoCorrect={false}
-              />
             </View>
-            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={11}>
-              {people.find((item) => item.name.toLowerCase().includes(peopleText.toLowerCase())) &&
-              people.length !== 0 ? (
-                <Picker
-                  selectedValue={selectedExpeditor}
-                  style={localeStyles.pickerView}
-                  itemStyle={localeStyles.pickerView}
-                  mode="dropdown"
-                  onValueChange={(itemValue, itemIndex) => setSelectedExpeditor(itemValue)}
-                >
-                  {people
-                    .filter((item) => item.name.toLowerCase().includes(peopleText.toLowerCase()))
-                    .map((item, idx) => (
-                      <Picker.Item label={item.name} value={item.id} key={idx} />
-                    ))}
-                </Picker>
-              ) : (
-                <Text>Не найдено</Text>
-              )}
+            <View key={11}>
+              <DropdownList list={listPeople} value={{}} onValueChange={(item) => {setSelectedExpeditor(item.id)}}/>
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
