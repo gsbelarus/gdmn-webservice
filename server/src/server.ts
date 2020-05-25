@@ -11,18 +11,18 @@ import morganlogger from 'koa-morgan';
 import log from './utils/logger';
 
 import { findById, validateAuthCreds } from './utils/util';
-import dev from '../config/dev';
+import config from '../config';
 import { IUser } from '../../common';
 
 // import log4js from 'log4js';
 // const logger = log4js.getLogger('SERVER');
 // logger.level = 'trace';
 
-export const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
-export const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
-export const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
-export const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
-export const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
+export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
+export const PATH_LOCAL_DB_ACTIVATION_CODES = `${config.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
+export const PATH_LOCAL_DB_COMPANIES = `${config.FILES_PATH}\\DB_COMPANIES.json`;
+export const PATH_LOCAL_DB_DEVICES = `${config.FILES_PATH}\\DB_DEVICES.json`;
+export const PATH_LOCAL_DB_MESSAGES = `${config.FILES_PATH}\\DB_MESSAGES\\`;
 
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
@@ -67,8 +67,8 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(router.allowedMethods());
 
   log.info('Starting listener ...');
-  await new Promise(resolve => app.listen(dev.PORT, () => resolve()));
+  await new Promise(resolve => app.listen(config.PORT, () => resolve()));
   // log.info('Started');
-  log.info(`Server is running on http://localhost:${dev.PORT}`);
+  log.info(`Server is running on http://localhost:${config.PORT}`);
   return app;
 }
