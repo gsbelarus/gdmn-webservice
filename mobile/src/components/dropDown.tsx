@@ -190,8 +190,9 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
   const { colors } = useTheme();
   const [stateList, setStateList] = useState({ selectedItem: {} as IItem, modalVisible: false})
 
-  useEffect(() => { setStateList( {...stateList,  
-    selectedItem: value})
+  useEffect(() => { value === undefined ? 
+    setStateList( {...stateList, selectedItem: {}}) : 
+    setStateList( {...stateList, selectedItem: value})
   }, [value]);
 
   /**This function open the dropdown modal */
