@@ -32,19 +32,26 @@ const CreateSellDocumentScreen = ({ route }) => {
   const [companyText, setCompanyText] = useState('');
   const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
+  const selectedItem = (listItems: IItem[], id: Number) => (listItems.find((item) => item.id === id));
+  const getListItems = (contacts: IContact[]) => contacts.map((item) => { return {id: item.id, value: item.name} as IItem});
   const people: IContact[] = state.contacts.filter((item) => item.type === 2);
-  const listPeople = people.map((item) => { return {id: item.id, value: item.name} as IItem}) 
+  const listPeople = getListItems(people);
   const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
+  const listCompanies = getListItems(companies);
   const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
-  
-  const list = [
+  const listDepartments = getListItems(departments);
+
+  /*const list = [
     {id: 0, value: 'Петриченко Александр Вениаминович'},
     {id: 1, value: 'item1'},
     {id: 2, value: 'item2'},
     {id: 3, value: 'item3'},
     {id: 4, value: 'item4'},
     {id: 5, value: 'item5'},
-  ]
+  ] 
+   <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={230}>
+    <DropdownList list={list} value={{id: 2, value: 'item2'}} onValueChange={(item) => {console.log(item.value)}}/>
+  </View> */
 
   const today = new Date();
   const { colors } = useTheme();
@@ -74,10 +81,7 @@ const CreateSellDocumentScreen = ({ route }) => {
   return (
     <>
       <ScrollView>
-        <View style={localeStyles.container}>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={230}>
-            <DropdownList list={list} value={{id: 2, value: 'item2'}} onValueChange={(item) => {console.log(item.value)}}/>
-          </View>  
+        <View style={localeStyles.container}> 
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
             <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
             <TouchableOpacity
@@ -115,72 +119,26 @@ const CreateSellDocumentScreen = ({ route }) => {
             />
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-            <View style={localeStyles.filter}>
-              <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-            </View>
+            <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
             <View key={11}>
-              <DropdownList list={listPeople} value={{}} onValueChange={(item) => {setSelectedExpeditor(item.id)}}/>
+              <DropdownList list={listPeople} value = {selectedItem(listPeople, selectedExpeditor)} onValueChange={(item) => {setSelectedExpeditor(item.id)}}/>
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={12}>
+            <View  key={12}>
               {departments && departments.length !== 0 ? (
-                <Picker
-                  selectedValue={selectedFromContact}
-                  style={localeStyles.pickerView}
-                  itemStyle={localeStyles.pickerView}
-                  mode="dropdown"
-                  onValueChange={(itemValue, itemIndex) => setSelectedFromContact(itemValue)}
-                >
-                  {departments.map((item, idx) => (
-                    <Picker.Item label={item.name} value={item.id} key={idx} />
-                  ))}
-                </Picker>
+                <DropdownList list={listDepartments} value = {selectedItem(listDepartments, selectedFromContact)} onValueChange={(item) => {setSelectedFromContact(item.id)}}/>
               ) : (
                 <Text>Не найдено</Text>
               )}
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-            <View style={localeStyles.filter}>
-              <Text style={localeStyles.subdivisionText}>Организация: </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  localeStyles.textInput,
-                  {
-                    backgroundColor: colors.card,
-                    color: colors.text,
-                  },
-                ]}
-                onChangeText={setCompanyText}
-                value={companyText}
-                placeholder="Введите строку поиска"
-                placeholderTextColor={colors.border}
-                multiline={false}
-                autoCapitalize="sentences"
-                underlineColorAndroid="transparent"
-                selectionColor={'black'}
-                returnKeyType="done"
-                autoCorrect={false}
-              />
-            </View>
-            <View style={[localeStyles.areaPicker, { borderColor: colors.border }]} key={13}>
+            <Text style={localeStyles.subdivisionText}>Организация: </Text>
+            <View key={13}>
               {companies && companies.length !== 0 ? (
-                <Picker
-                  selectedValue={selectedToContact}
-                  style={localeStyles.pickerView}
-                  itemStyle={localeStyles.pickerView}
-                  mode="dropdown"
-                  onValueChange={(itemValue, itemIndex) => setSelectedToContact(itemValue)}
-                >
-                  {companies
-                    .filter((item) => item.name.toLowerCase().includes(companyText.toLowerCase()))
-                    .map((item, idx) => (
-                      <Picker.Item label={item.name} value={item.id} key={idx} />
-                    ))}
-                </Picker>
+                 <DropdownList list={listCompanies} value = {selectedItem(listCompanies, selectedToContact)} onValueChange={(item) => {setSelectedToContact(item.id)}}/>
               ) : (
                 <Text>Не найдено</Text>
               )}

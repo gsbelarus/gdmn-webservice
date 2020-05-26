@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Modal, FlatList, Dimensions, KeyboardAvoidingView, TouchableOpacity, StyleSheet} from 'react-native';
 import { Text, TextInput, Checkbox } from 'react-native-paper';
 import { useTheme,  useScrollToTop } from '@react-navigation/native';
-import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
 interface IPropsItem {
   item?: IItem;
@@ -204,28 +204,28 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
     setStateList({...stateList, modalVisible: !stateList.modalVisible, selectedItem: item});
     onValueChange(item);
   }
-
-  const label = Object.keys(stateList.selectedItem).length === 0 ? 'Select item' : stateList.selectedItem.value;
+  const label = stateList.selectedItem == undefined ? 'Select item' :
+    Object.keys(stateList.selectedItem).length === 0 ? 'Select item' : stateList.selectedItem.value;
 
   return (
     <View style={{flex:1}}> 
-      <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+      <View style={[localeStyles.picker, { borderColor: colors.border}]}>
         <TouchableOpacity
             onPress={openDropdown}>
             <View style={{flexDirection: 'row', alignItems:'center'}}>
-                <View style={{flex:0.90}}>
+                <View style={{flex:0.93}}>
                   <Text style={localeStyles.text}> {label} </Text> 
                 </View>
-                <View style={{flex:0.10}}>
-                  <MaterialIcons
-                    size={20}
+                <View style={{flex:0.07}}>
+                  <AntDesign
+                    size={15}
                     color={'#000'}
-                    name="chevron-right"
+                    name={"down"}
                   />
                 </View>
             </View>
         </TouchableOpacity>
-      </View>
+      </View> 
       <Dropdown
         visible={stateList.modalVisible}
         selectedValue={stateList.selectedItem}
