@@ -9,18 +9,22 @@ beforeAll(async (done) => {
   done();
 })
 
-describe('POST /auth/login?deviceId=123', () => {
+describe('POST /api/auth/login?deviceId', () => {
 
-  test('responds correct', async() => {
+  test('SUCCESS: first login', async() => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
+      .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
       .send({
         userName: 'admin',
         password: 'admin'
       })
     expect(response.status).toEqual(200);
-    expect(response.body.result).toEqual(true)
+    expect(response.type).toEqual('application/json');
+    expect(response.body).toBeDefined();
+    expect(response.body.result).toBeTruthy();
   });
+
 });
