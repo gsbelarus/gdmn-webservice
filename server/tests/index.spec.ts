@@ -44,10 +44,10 @@ describe('POST /api/auth/login?deviceId', () => {
         userName: 'admin1',
         password: 'admin'
       })
-      expect(response.status).toEqual(404);
-      expect(response.type).toEqual('application/json');
-      expect(response.body.result).toBeFalsy();
-      expect(response.body.error).toBe('not device or user');
+    expect(response.status).toEqual(404);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not device or user');
   });
 
   test('ERROR: does not have access', async() => {
@@ -110,4 +110,31 @@ describe('POST /api/auth/login?deviceId', () => {
     expect(response.status).toEqual(200);
     expect(response.body.result).toBeTruthy();
   });
+});
+
+describe('GET /api/auth/logout?deviceId', () => {
+
+  test('SUCCESS: authenticated', async() => {
+    const response = await request(app.callback())
+      .get('/api/auth/logout')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+    expect(response.status).toEqual(200);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+  });
+
+  test('ERROR: not authenticated', async() => {
+    const response = await request(app.callback())
+      .get('/api/auth/logout')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+    expect(response.status).toEqual(401);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not authenticated');
+  });
+
 });
