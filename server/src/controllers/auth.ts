@@ -56,6 +56,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   const res: IResponse<IUser> = { result: true, data: user };
   ctx.status = 200;
+  ctx.type = 'application/json';
   ctx.body = JSON.stringify(res);
 };
 

@@ -9,7 +9,6 @@ beforeAll(async (done) => {
   done();
 })
 
-
 describe('POST /api/auth/login?deviceId', () => {
 
   test('ERROR: not device or user', async() => {
@@ -156,6 +155,77 @@ describe('GET /api/auth/logout?deviceId', () => {
     expect(response.type).toEqual('application/json');
     expect(response.body.result).toBeFalsy();
     expect(response.body.error).toBe('not authenticated');
+  });
+
+});
+
+describe('GET /api/auth/user?deviceId', () => {
+  const userName = 'admin';
+  const password = 'admin';
+  let response: request.Response;
+
+  beforeAll(async() => {
+    const resLogin = await request(app.callback())
+      .post('/api/auth/login')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .send({
+        userName,
+        password
+      })
+
+    response = await request(app.callback())
+      .get('/api/auth/user')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .set('Cookie', resLogin.header['set-cookie'])
+  })
+
+  test('SUCCESS', async() => {
+    expect(response.status).toEqual(200);
+  });
+
+  test('correct format', async() => {
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+    expect(response.body.data).toBeDefined();
+  });
+
+  test('not fields (password)', async() => {
+    expect(Object.keys(response.body.data)).not.toContain('password');
+  });
+
+  test('correct data', async() => {
+    expect(Object.keys(response.body.data)).toEqual(
+      expect.arrayContaining(['id', 'userName', 'creatorId']));
+    expect(typeof response.body.data['id']).toBe('string');
+    expect(typeof response.body.data['userName']).toBe('string');
+    expect(typeof response.body.data['creatorId']).toBe('string');
+  });
+
+  test('correct optional fields', async() => {
+    let count = 0;
+    const keys = Object.keys(response.body.data);
+    if(keys.some(key => key === 'companies' && response.body.data['companies'])) {
+      expect(Array.isArray(response.body.data['companies'])).toBe(true);
+      expect(typeof response.body.data['companies'][0]).toBe('string');
+      count++;
+    }
+    if(keys.some(key => key === 'firstName' && response.body.data['firstName'])) {
+      expect(typeof response.body.data['firstName']).toBe('string');
+      count++;
+    }
+    if(keys.some(key => key === 'lastName' && response.body.data['lastName'])) {
+      expect(typeof response.body.data['lastName']).toBe('string');
+      count++;
+    }
+    if(keys.some(key => key === 'phoneNumber' && response.body.data['phoneNumber'])) {
+      expect(typeof response.body.data['phoneNumber']).toBe('string');
+      count++;
+    }
+    expect(keys.length).toBeLessThanOrEqual(count + 3);
   });
 
 });
