@@ -118,3 +118,44 @@ describe('POST /api/auth/login?deviceId', () => {
     expect(response.body.result).toBeTruthy();
   });
 });
+
+describe('GET /api/auth/logout?deviceId', () => {
+  let setCookies: string[];
+  beforeAll(async() => {
+    const response = await request(app.callback())
+      .post('/api/auth/login')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .send({
+        userName: 'admin',
+        password: 'admin'
+      })
+      setCookies = response.header['set-cookie'];
+  })
+
+  test('SUCCESS: authenticated', async() => {
+    const response = await request(app.callback())
+      .get('/api/auth/logout')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .set('Cookie', setCookies)
+    expect(response.status).toEqual(200);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+  });
+
+  test('ERROR: not authenticated', async() => {
+    const response = await request(app.callback())
+      .get('/api/auth/logout')
+      .query('deviceId=123')
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+    expect(response.status).toEqual(401);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not authenticated');
+  });
+
+});
