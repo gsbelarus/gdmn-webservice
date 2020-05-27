@@ -119,27 +119,24 @@ describe('POST /api/auth/login?deviceId', () => {
 });
 
 describe('GET /api/auth/logout?deviceId', () => {
-  let setCookies: string[];
-  beforeAll(async() => {
-    const response = await request(app.callback())
-      .post('/api/auth/login')
-      .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
-      .send({
-        userName: 'admin',
-        password: 'admin'
-      })
-      setCookies = response.header['set-cookie'];
-  })
 
   test('SUCCESS: authenticated', async() => {
+    const resLogin = await request(app.callback())
+    .post('/api/auth/login')
+    .query('deviceId=123')
+    .set('Content-Type', 'application/json')
+    .set('Accept', 'application/json')
+    .send({
+      userName: 'admin',
+      password: 'admin'
+    })
+
     const response = await request(app.callback())
       .get('/api/auth/logout')
       .query('deviceId=123')
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
-      .set('Cookie', setCookies)
+      .set('Cookie', resLogin.header['set-cookie'])
     expect(response.status).toEqual(200);
     expect(response.type).toEqual('application/json');
     expect(response.body.result).toBeTruthy();
