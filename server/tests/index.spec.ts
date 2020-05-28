@@ -15,8 +15,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=1234')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName: 'admin',
         password: 'admin'
@@ -31,8 +29,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName: 'admin1',
         password: 'admin'
@@ -47,8 +43,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=456')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName: '1',
         password: '1'
@@ -63,8 +57,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName: 'admin',
         password: '1'
@@ -79,8 +71,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName: 'admin',
         password: 'admin'
@@ -96,8 +86,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const reqLogin = await request(app.callback())
     .post('/api/auth/login')
     .query('deviceId=123')
-    .set('Content-Type', 'application/json')
-    .set('Accept', 'application/json')
     .send({
       userName: 'admin',
       password: 'admin'
@@ -107,7 +95,6 @@ describe('POST /api/auth/login?deviceId', () => {
     const response = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
-      .set('Accept', 'application/json')
       .set('Cookie', setCookies)
       .send({
         userName: '1',
@@ -124,8 +111,6 @@ describe('GET /api/auth/logout?deviceId', () => {
     const resLogin = await request(app.callback())
     .post('/api/auth/login')
     .query('deviceId=123')
-    .set('Content-Type', 'application/json')
-    .set('Accept', 'application/json')
     .send({
       userName: 'admin',
       password: 'admin'
@@ -134,8 +119,6 @@ describe('GET /api/auth/logout?deviceId', () => {
     const response = await request(app.callback())
       .get('/api/auth/logout')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .set('Cookie', resLogin.header['set-cookie'])
     expect(response.status).toEqual(200);
     expect(response.type).toEqual('application/json');
@@ -146,8 +129,6 @@ describe('GET /api/auth/logout?deviceId', () => {
     const response = await request(app.callback())
       .get('/api/auth/logout')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
     expect(response.status).toEqual(401);
     expect(response.type).toEqual('application/json');
     expect(response.body.result).toBeFalsy();
@@ -165,8 +146,6 @@ describe('GET /api/auth/user?deviceId', () => {
     const resLogin = await request(app.callback())
       .post('/api/auth/login')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .send({
         userName,
         password
@@ -175,8 +154,6 @@ describe('GET /api/auth/user?deviceId', () => {
     response = await request(app.callback())
       .get('/api/auth/user')
       .query('deviceId=123')
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
       .set('Cookie', resLogin.header['set-cookie'])
   })
 
