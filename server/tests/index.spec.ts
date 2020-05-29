@@ -292,3 +292,85 @@ describe('GET /api/auth/user?deviceId', () => {
   });
 
 });
+
+describe('POST /api/auth/signup', () => {
+
+  test('SUCCESS: authenticated user create new user', async() => {
+    const loginUserName = 'admin';
+    const resLogin = await request(app.callback())
+    .post('/api/auth/login')
+    .query('deviceId=123')
+    .send({
+      userName: loginUserName,
+      password: 'admin'
+    })
+
+    const userName = '2';
+
+    const response = await request(app.callback())
+      .post('/api/auth/signup')
+      .query('deviceId=123')
+      .set('Cookie', resLogin.header['set-cookie'])
+      .send({
+        userName,
+        password: '2'
+      })
+    const keys = Object.keys(response.body.data);
+    expect(response.status).toEqual(201);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+    expect(keys).toEqual(
+      expect.arrayContaining(['id', 'userName', 'creatorId']));
+    expect(typeof response.body.data['id']).toBe('string');
+    expect(typeof response.body.data['userName']).toBe('string');
+    expect(Array.isArray(response.body.data['companies'])).toBe(true);
+    if(response.body.data['companies'][0]) {
+      expect(typeof response.body.data['companies'][0]).toBe('string');
+    }
+    expect(typeof response.body.data['creatorId']).toBe('string');
+    expect(keys).not.toContain('password');
+    expect(response.body.data.userName).toEqual(userName)
+    expect(response.body.data.creatorId).toEqual(loginUserName)
+  });
+
+  test('SUCCESS: signup', async() => {
+    const userName = '3';
+    const response = await request(app.callback())
+      .post('/api/auth/signup')
+      .send({
+        userName,
+        password: '3'
+      })
+    const keys = Object.keys(response.body.data);
+    expect(response.status).toEqual(201);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+    expect(keys).toEqual(
+      expect.arrayContaining(['id', 'userName', 'creatorId']));
+    expect(typeof response.body.data['id']).toBe('string');
+    expect(typeof response.body.data['userName']).toBe('string');
+    expect(Array.isArray(response.body.data['companies'])).toBe(true);
+    if(response.body.data['companies'][0]) {
+      expect(typeof response.body.data['companies'][0]).toBe('string');
+    }
+    expect(typeof response.body.data['creatorId']).toBe('string');
+    expect(keys).not.toContain('password');
+    expect(response.body.data.userName).toEqual(userName)
+    expect(response.body.data.creatorId).toEqual(userName)
+  });
+
+  test('ERROR: a user already exists', async() => {
+
+    const response = await request(app.callback())
+      .post('/api/auth/signup')
+      .send({
+        userName: 'admin',
+        password: 'admin'
+      })
+    expect(response.status).toEqual(400);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('a user already exists');
+  });
+
+});
