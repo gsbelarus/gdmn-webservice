@@ -374,3 +374,17 @@ describe('POST /api/auth/signup', () => {
   });
 
 });
+
+describe('GET /api/auth/user/:userId/device/code', () => {
+
+  test('SUCCESS: create actiovation code', async() => {
+    const response = await request(app.callback())
+      .get('/api/auth/user/admin/device/code')
+    expect(response.status).toEqual(200);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+    expect(typeof response.body.data).toBe('string');
+    expect(response.body.data.length).toBe(4);
+  });
+
+});
