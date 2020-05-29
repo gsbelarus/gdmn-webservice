@@ -6,11 +6,12 @@ import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_COMP
 import { IActivationCode } from '../../common';
 
 let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+const today = new Date();
 
 const users = [{id:"admin",userName:"admin",password:"admin",creatorId:"admin",companies:["com"]},{id:"1",userName:"1",password:"1",creatorId:"admin",companies:["com"]}];
 const devices = [{uid:"123",user:"admin",isBlock:false},{uid:"123",user:"1",isBlock:false},{uid:"qwe",user:"admin",isBlock:true}];
 const companies = [{id:"com",title:"com",admin:"admin"}];
-const activationCodes: IActivationCode[] = [];
+const activationCodes: IActivationCode[] = [{code: "123qwe", user: "admin", date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString()}, {code: "asd456", user: "admin", date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString()}];
 
 beforeAll(async (done) => {
   app = await run();
@@ -385,6 +386,40 @@ describe('GET /api/auth/user/:userId/device/code', () => {
     expect(response.body.result).toBeTruthy();
     expect(typeof response.body.data).toBe('string');
     expect(response.body.data.length).toBe(4);
+  });
+
+});
+
+describe('POST /api/auth/device/code', () => {
+
+  test('SUCCESS: device has been successfully activated', async() => {
+    const response = await request(app.callback())
+      .post('/api/auth/device/code')
+      .send({code: '123qwe'})
+    expect(response.status).toEqual(200);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeTruthy();
+    expect(response.body.data).toBe('admin');
+  });
+
+  test('ERROR: not found activation code', async() => {
+    const response = await request(app.callback())
+      .post('/api/auth/device/code')
+      .send({code: '124qwa'})
+    expect(response.status).toEqual(404);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('invalid activation code');
+  });
+
+  test('ERROR: activation code expired', async() => {
+    const response = await request(app.callback())
+      .post('/api/auth/device/code')
+      .send({code: 'asd456'})
+    expect(response.status).toEqual(404);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('invalid activation code');
   });
 
 });
