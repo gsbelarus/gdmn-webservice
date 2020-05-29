@@ -271,7 +271,9 @@ describe('GET /api/auth/user?deviceId', () => {
     const keys = Object.keys(response.body.data);
     if(keys.some(key => key === 'companies' && response.body.data['companies'])) {
       expect(Array.isArray(response.body.data['companies'])).toBe(true);
-      expect(typeof response.body.data['companies'][0]).toBe('string');
+      if(response.body.data['companies'][0]) {
+        expect(typeof response.body.data['companies'][0]).toBe('string');
+      }
       count++;
     }
     if(keys.some(key => key === 'firstName' && response.body.data['firstName'])) {
