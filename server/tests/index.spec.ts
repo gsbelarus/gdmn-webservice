@@ -1,11 +1,23 @@
 import Koa from 'koa';
 import request from 'supertest';
 import run from '../src/index';
+import { writeFile } from '../src/utils/workWithFile';
+import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_DEVICES } from '../src/server';
+import { IActivationCode } from '../../common';
 
 let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
 
+const users = [{id:"admin",userName:"admin",password:"admin",creatorId:"admin",companies:["com"]},{id:"1",userName:"1",password:"1",creatorId:"admin",companies:["com"]}];
+const devices = [{uid:"123",user:"admin",isBlock:false},{uid:"123",user:"1",isBlock:false},{uid:"qwe",user:"admin",isBlock:true}];
+const companies = [{id:"com",title:"com",admin:"admin"}];
+const activationCodes: IActivationCode[] = [];
+
 beforeAll(async (done) => {
   app = await run();
+  await writeFile( PATH_LOCAL_DB_USERS, JSON.stringify(users));
+  await writeFile( PATH_LOCAL_DB_DEVICES, JSON.stringify(devices));
+  await writeFile( PATH_LOCAL_DB_COMPANIES, JSON.stringify(companies));
+  await writeFile( PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(activationCodes));
   done();
 })
 
@@ -105,6 +117,91 @@ describe('POST /api/auth/login?deviceId', () => {
   });
 });
 
+describe('Check working middleware: auth', () => {
+
+  test('SUCCESS: authenticated', async() => {
+    const resLogin = await request(app.callback())
+    .post('/api/auth/login')
+    .query('deviceId=123')
+    .send({
+      userName: 'admin',
+      password: 'admin'
+    })
+
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .query('deviceId=123')
+      .set('Cookie', resLogin.header['set-cookie'])
+    expect(response.status).toEqual(200);
+  });
+
+  test('ERROR: not authenticated', async() => {
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .query('deviceId=123')
+    expect(response.status).toEqual(401);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not authenticated');
+  });
+
+});
+
+describe('Check working middleware: device', () => {
+  let resLogin: request.Response;
+
+  test('SUCCESS: authenticated', async() => {
+    resLogin = await request(app.callback())
+    .post('/api/auth/login')
+    .query('deviceId=123')
+    .send({
+      userName: '1',
+      password: '1'
+    })
+
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .query('deviceId=123')
+      .set('Cookie', resLogin.header['set-cookie'])
+    expect(response.status).toEqual(200);
+  });
+
+  test('ERROR: not such all parameters', async() => {
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .set('Cookie', resLogin.header['set-cookie'])
+    expect(response.status).toEqual(422);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not such all parameters');
+  });
+
+  test('ERROR: not such device', async() => {
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .query('deviceId=123qwe')
+      .set('Cookie', resLogin.header['set-cookie'])
+    expect(response.status).toEqual(404);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('not such device');
+  });
+
+  test('ERROR: does not have access', async() => {
+    //тест не доделан
+    //нужно блокировать устройство после входа
+    const response = await request(app.callback())
+      .get('/api/users/')
+      .query('deviceId=123')
+      .set('Cookie', resLogin.header['set-cookie'])
+    expect(response.status).toEqual(401);
+    expect(response.type).toEqual('application/json');
+    expect(response.body.result).toBeFalsy();
+    expect(response.body.error).toBe('does not have access');
+  });
+
+});
+
 describe('GET /api/auth/logout?deviceId', () => {
 
   test('SUCCESS: authenticated', async() => {
@@ -123,16 +220,6 @@ describe('GET /api/auth/logout?deviceId', () => {
     expect(response.status).toEqual(200);
     expect(response.type).toEqual('application/json');
     expect(response.body.result).toBeTruthy();
-  });
-
-  test('ERROR: not authenticated', async() => {
-    const response = await request(app.callback())
-      .get('/api/auth/logout')
-      .query('deviceId=123')
-    expect(response.status).toEqual(401);
-    expect(response.type).toEqual('application/json');
-    expect(response.body.result).toBeFalsy();
-    expect(response.body.error).toBe('not authenticated');
   });
 
 });
