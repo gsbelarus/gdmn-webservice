@@ -101,6 +101,8 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       ),
     );
 
+    delete newUser.password;
+
     const res = { result: true, data: newUser };
     ctx.status = 201;
     ctx.body = JSON.stringify(res);
