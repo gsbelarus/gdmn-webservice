@@ -8,6 +8,7 @@
 #config
 /config/dev.ts
 /config/prod.ts
+/config/test.ts
 
 # testing
 /coverage
