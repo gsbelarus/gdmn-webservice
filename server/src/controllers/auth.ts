@@ -16,7 +16,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   if (!currDevice) {
     log.info(`not such device(${ctx.query.deviceId})`);
-    const res: IResponse<undefined> = { result: false, error: 'not device or user' };
+    const res: IResponse<string> = { result: false, error: 'not device or user' };
     ctx.status = 404;
     ctx.body = JSON.stringify(res);
     return;
