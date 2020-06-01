@@ -65,9 +65,9 @@ describe('POST /api/auth/login?deviceId', () => {
   });
 
   test('ERROR: does not have access', async () => {
-    const response = await request(app.callback()).post('/api/auth/login').query('deviceId=456').send({
-      userName: '1',
-      password: '1',
+    const response = await request(app.callback()).post('/api/auth/login').query('deviceId=qwe').send({
+      userName: 'admin',
+      password: 'admin',
     });
     expect(response.status).toEqual(401);
     expect(response.type).toEqual('application/json');
