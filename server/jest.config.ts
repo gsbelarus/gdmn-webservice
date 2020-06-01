@@ -1,6 +1,6 @@
-module.exports = {
+export default {
     "roots": [
-        "<rootDir>/tests"
+        "<rootDir>/test"
     ],
     "transform": {
         "^.+\\.tsx?$": "ts-jest"
