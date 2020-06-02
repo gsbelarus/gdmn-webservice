@@ -8,7 +8,7 @@ import styles from '../../../styles/global';
 import { useAppStore } from '../../../store';
 import { IContact } from '../../../../../common';
 import { ISellHead } from '../../../model';
-import { DropdownList } from '../../../components/DropDown';
+import DropdownList from '../../../components/dropDown';
 
 interface IItem {
   id?: number;
@@ -29,7 +29,6 @@ const CreateSellDocumentScreen = ({ route }) => {
   const [selectedFromContact, setSelectedFromContact] = useState<number>();
   const [selectedDocType, setSelectedDocType] = useState<number>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [companyText, setCompanyText] = useState('');
   const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
   const selectedItem = (listItems: IItem[], id: Number) => (listItems.find((item) => item.id === id));

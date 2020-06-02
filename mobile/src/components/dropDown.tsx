@@ -16,10 +16,10 @@ interface IItem {
 }
 
 interface IPropsDropdown {
-  list: IItem[];
+  list: IItem [];
   selectedValue: IItem; 
-  getSelectedItem: (selected: IItem) => void;
   visible: boolean;
+  getSelectedItem: (selected: IItem) => void;
 }
 
 const MyListItem = React.memo(({ item, isSelected, onPressItem }: IPropsItem) => {
@@ -205,11 +205,11 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
     setStateList({...stateList, modalVisible: !stateList.modalVisible, selectedItem: item});
     onValueChange(item);
   }
-  const label = stateList.selectedItem == undefined ? 'Select item' :
-    Object.keys(stateList.selectedItem).length === 0 ? 'Select item' : stateList.selectedItem.value;
+  const label = (stateList === undefined) || Object.keys(stateList.selectedItem).length === 0 ? 
+    'Select item' : stateList.selectedItem.value;
 
   return (
-    <View style={{flex:1}}> 
+    <View style={{flex: 1}}> 
       <View style={[localeStyles.picker, { borderColor: colors.border}]}>
         <TouchableOpacity
             onPress={openDropdown}>
@@ -236,7 +236,8 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
     </View>
   )
 })
-export { DropdownList } 
+
+export default DropdownList; 
 
 const localeStyles = StyleSheet.create({
   containerHome: {
