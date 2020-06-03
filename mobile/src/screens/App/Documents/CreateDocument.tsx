@@ -156,6 +156,7 @@ const CreateDocumentScreen = ({ route }) => {
         <Button
           mode="contained"
           style={[styles.rectangularButton, localeStyles.button]}
+          disabled={selectedDocType === undefined || selectedContact === undefined}
           onPress={() => {
             if (route.params?.docId) {
               actions.editDocument({
