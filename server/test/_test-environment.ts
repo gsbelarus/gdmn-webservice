@@ -25,6 +25,7 @@ export async function initEnvironment(): Promise<void> {
   const devices = [
     { uid: '123', user: 'admin', isBlock: false },
     { uid: '123', user: '1', isBlock: false },
+    { uid: 'asd', user: '1', isBlock: false },
     { uid: 'qwe', user: 'admin', isBlock: true },
   ];
   const companies = [{ id: 'com', title: 'com', admin: 'admin' }];
