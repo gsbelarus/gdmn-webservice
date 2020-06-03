@@ -64,7 +64,7 @@ const CompaniesScreen = () => {
           <Button
             mode="contained"
             style={[styles.rectangularButton, localeStyles.button]}
-            disabled={companies === undefined || companies.length === 0}
+            disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={() => {
               actions.setCompanyID(selectedCompany);
             }}
