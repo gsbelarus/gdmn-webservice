@@ -207,6 +207,8 @@ const CreateSellDocumentScreen = ({ route }) => {
           <Button
             mode="contained"
             style={[styles.rectangularButton, localeStyles.button]}
+            disabled={selectedExpeditor === undefined || selectedToContact === undefined || 
+              selectedFromContact === undefined || numberText === undefined}
             onPress={() => {
               if (route.params?.docId) {
                 actions.editDocument({

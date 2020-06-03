@@ -26,11 +26,10 @@ const MyListItem = React.memo(({ item, isSelected, onPressItem }: IPropsItem) =>
   const onPress = () => onPressItem (item); 
   const textColor = isSelected ? 'red' : 'black';
   const checked = isSelected ? 'checked' : 'unchecked';
-  const width = Dimensions.get('window').width;
   return (
     <TouchableOpacity onPress = {onPress} >
-      <View style = {{ width: width * 0.8, backgroundColor: 'white' }}>
-        <View style = {{ flexDirection: 'row', alignItems: 'center',  flex: 1 }}>
+      <View style = {localeStyles.containerItem}>
+        <View style = {localeStyles.subContainerItem}>
           <View style = {{ flex: 0.13 }}>
             <Checkbox 
               status = {checked} 
@@ -39,11 +38,7 @@ const MyListItem = React.memo(({ item, isSelected, onPressItem }: IPropsItem) =>
             />
           </View>
           <View style = {{ flex: 0.87 }}>
-            <Text style = {{
-              color:'#000',
-              padding: 10,
-              fontStyle: 'normal'
-              }}>
+            <Text style = {localeStyles.textItem}>
               {item.value}
             </Text>
           </View>
@@ -87,11 +82,7 @@ const Dropdown =  React.memo(({list, selectedValue, getSelectedItem, visible}: I
   const listViewItemSeparator = () => {
     return(
       <View 
-        style={{
-            height: 0.5,
-            width: Dimensions.get('window').width,
-            backgroundColor: '#000'
-        }}>
+        style={localeStyles.itemSeparator}>
       </View>
     )
   }
@@ -153,8 +144,8 @@ const Dropdown =  React.memo(({list, selectedValue, getSelectedItem, visible}: I
               />
             </View>
             { state.dataSource.length == 0 ?
-              <View style={{backgroundColor:'#fff',  width:'100%', height:60,  alignItems:'center', padding:20 }}>
-                <Text style={{textAlign:'center',  color:'red'}}>
+              <View style={localeStyles.notFoundContaner}>
+                <Text style={localeStyles.notFoundText}>
                   Не найдено
                 </Text>
               </View>
@@ -172,11 +163,7 @@ const Dropdown =  React.memo(({list, selectedValue, getSelectedItem, visible}: I
             }
             <TouchableOpacity  onPress= {() => {submitSelectItems()}}>
               <View style={[localeStyles.button, { backgroundColor: colors.primary}]}>
-                <Text style={{
-                  color:'#FFFFFF',
-                  fontSize: 14,
-                  fontStyle:'normal',
-                  fontWeight:'bold'}}> SUBMIT </Text>
+                <Text style={localeStyles.submitButton}> ПРИНЯТЬ </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -206,14 +193,14 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
     onValueChange(item);
   }
   const label = (stateList === undefined) || Object.keys(stateList.selectedItem).length === 0 ? 
-    'Select item' : stateList.selectedItem.value;
+    'Выберите из списка' : stateList.selectedItem.value;
 
   return (
     <View style={{flex: 1}}> 
       <View style={[localeStyles.picker, { borderColor: colors.border}]}>
         <TouchableOpacity
             onPress={openDropdown}>
-            <View style={{flexDirection: 'row', alignItems:'center'}}>
+            <View style={localeStyles.containerMain}>
                 <View style={{flex:0.93}}>
                   <Text style={localeStyles.text}> {label} </Text> 
                 </View>
@@ -243,24 +230,43 @@ const localeStyles = StyleSheet.create({
   containerHome: {
       flex: 1
   },
-  text: {
-      fontSize: 14,
-      color: '#000',
-      fontStyle: 'normal'
+  containerMain: {
+    flexDirection: 'row', 
+    alignItems:'center',  
+    height: '100%',
   },
+  containerItem: {
+    width:  Dimensions.get('window').width * 0.8, 
+    backgroundColor: 'white',
+  },
+  subContainerItem: {
+    flexDirection: 'row', 
+    alignItems: 'center',  
+    flex: 1, 
+  },
+  text: {
+    fontSize: 14,
+    color: '#000',
+    fontStyle: 'normal',
+  },
+  textItem: {
+    color:'#000',
+    padding: 10,
+    fontStyle: 'normal',
+    },
   picker: {
-      width: Dimensions.get('window').width * 0.9,
-      height: 40,
-      borderRadius: 4,
-      borderWidth: 1,
-      padding: 10,
-      marginTop: 5,
-      alignSelf:'center',
-      backgroundColor: '#FFFFFF',
+    width: Dimensions.get('window').width * 0.9,
+    height: 40,
+    borderRadius: 4,
+    borderWidth: 1,
+    padding: 10,
+    marginTop: 5,
+    alignSelf:'center',
+    backgroundColor: '#FFFFFF',
   },
   icon: {
-      fontSize: 15,
-      color: '#000'
+    fontSize: 15,
+    color: '#000'
   },
   container: {
     flex: 1,
@@ -270,26 +276,32 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'column',
   },
   modalView:{
-      backgroundColor: '#FFFFFF',
-      width: Dimensions.get('window').width * 0.9,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-around',
+    backgroundColor: '#FFFFFF',
+    width: Dimensions.get('window').width * 0.9,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
   header:{
-      backgroundColor:'#1F618D',
-      width: "100%",
+    backgroundColor:'#1F618D',
+    width: "100%",
   },
   textInput:{
-      textAlign: 'center',
-      borderWidth: 0,
-      fontSize: 14,
+    textAlign: 'center',
+    borderWidth: 0,
+    fontSize: 14,
   },
   button:{
-      width: Dimensions.get('window').width * 0.9,
-      height: 50,
-      alignItems: 'center',
-      justifyContent: 'center'
+    width: Dimensions.get('window').width * 0.9,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  submitButton: {
+    color:'#FFFFFF',
+    fontSize: 14,
+    fontStyle:'normal',
+    fontWeight:'bold',
   },
   filter: {
     alignItems: 'center',
@@ -305,4 +317,20 @@ const localeStyles = StyleSheet.create({
     padding: 0,
     width: "95%",
   },
+  itemSeparator: {
+    height: 0.5,
+    width: Dimensions.get('window').width * 0.9,
+    backgroundColor: '#000',
+  },
+  notFoundContaner: {
+    backgroundColor:'#fff',  
+    width: '100%', 
+    height: 60,  
+    alignItems: 'center', 
+    padding: 20, 
+  },
+  notFoundText: {
+    textAlign:'center',  
+    color:'red',
+  }
 });

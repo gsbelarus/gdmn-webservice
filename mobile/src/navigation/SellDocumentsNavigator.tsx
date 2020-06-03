@@ -1,5 +1,7 @@
+import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import {
   SellDocumentsListScreen,
@@ -35,7 +37,19 @@ const SellDocumentsNavigator = () => {
         name="ViewSellDocument"
         component={ViewSellDocumentScreen}
         initialParams={{ docId: 0 }}
-        options={{ title: '' }}
+        options={({ navigation }) => ({
+          title: '',
+          headerLeft: () => (
+            <TouchableOpacity
+              style={localeStyles.marginLeft}
+              onPress={() => {
+                navigation.navigate('SellDocumentsListScreen');
+              }}
+            >
+              <Feather name="arrow-left" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <Stack.Screen
         key="HeadSellDocument"
@@ -67,3 +81,9 @@ const SellDocumentsNavigator = () => {
 };
 
 export default SellDocumentsNavigator;
+
+const localeStyles = StyleSheet.create({
+  marginLeft: {
+    marginLeft: 15,
+  },
+});
