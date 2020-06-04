@@ -19,8 +19,18 @@ export async function initEnvironment(): Promise<void> {
   const today = new Date();
 
   const users = [
-    { id: 'admin', userName: 'admin', password: 'admin', creatorId: 'admin', companies: ['com'] },
-    { id: '1', userName: '1', password: '1', creatorId: 'admin', companies: ['com'] },
+    { id: 'admin', userName: 'admin', password: 'admin', firstName: 'admin', creatorId: 'admin', companies: ['com'] },
+    {
+      id: '1',
+      userName: '1',
+      password: '1',
+      firstName: '1',
+      lastName: '1',
+      phoneNumber: '1',
+      creatorId: 'admin',
+      companies: ['com'],
+    },
+    { id: '2', userName: '2', password: '2', creatorId: 'admin', companies: ['com'] },
   ];
   const devices = [
     { uid: '123', user: 'admin', isBlock: false },
