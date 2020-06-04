@@ -170,7 +170,7 @@ describe('testing /api/auth/', () => {
         password: 'admin',
       });
 
-      const userName = '2';
+      const userName = '3';
 
       const response = await request(getApp().callback())
         .post('/api/auth/signup')
@@ -178,12 +178,12 @@ describe('testing /api/auth/', () => {
         .set('Cookie', resLogin.header['set-cookie'])
         .send({
           userName,
-          password: '2',
+          password: '3',
         });
-      const keys = Object.keys(response.body.data);
       expect(response.status).toEqual(201);
       expect(response.type).toEqual('application/json');
       expect(response.body.result).toBeTruthy();
+      const keys = Object.keys(response.body.data);
       expect(keys).toEqual(expect.arrayContaining(['id', 'userName', 'creatorId']));
       expect(typeof response.body.data['id']).toBe('string');
       expect(typeof response.body.data['userName']).toBe('string');
@@ -198,10 +198,10 @@ describe('testing /api/auth/', () => {
     });
 
     test('SUCCESS: signup', async () => {
-      const userName = '3';
+      const userName = '4';
       const response = await request(getApp().callback()).post('/api/auth/signup').send({
         userName,
-        password: '3',
+        password: '4',
       });
       const keys = Object.keys(response.body.data);
       expect(response.status).toEqual(201);
