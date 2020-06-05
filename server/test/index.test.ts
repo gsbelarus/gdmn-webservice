@@ -8,3 +8,4 @@ require('./middleware.spec');
 require('./auth.test');
 require('./devices.test');
 require('./users.test');
+require('./companies.test');

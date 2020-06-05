@@ -38,7 +38,10 @@ export async function initEnvironment(): Promise<void> {
     { uid: 'asd', user: '1', isBlock: false },
     { uid: 'qwe', user: 'admin', isBlock: true },
   ];
-  const companies = [{ id: 'com', title: 'com', admin: 'admin' }];
+  const companies = [
+    { id: 'com', title: 'com', admin: 'admin' },
+    { id: 'org', title: 'org', admin: 'admin' },
+  ];
   const activationCodes: IActivationCode[] = [
     { code: '123qwe', user: 'admin', date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString() },
     { code: 'asd456', user: 'admin', date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString() },
