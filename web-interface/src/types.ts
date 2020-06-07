@@ -5,8 +5,8 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  companies?: string[];
   isAdmin?: boolean;
-  code?: string;
   creatorId?: string;
 };
 export interface IUserCompany {

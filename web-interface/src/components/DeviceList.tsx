@@ -5,7 +5,7 @@ import { IItem, IDevice } from '../types';
 export interface IDeviceListProps {
   devices: IDevice[];
   onRemoveDevices?: (uIds: string[]) => void;
-  onBlockDevices?:  (uIds: string[], isUnBlock?: boolean) => void;
+  onBlockDevices?:  (uIds: string[], isUnBlock: boolean) => void;
   onClearError?: () => void;
 }
 
@@ -63,7 +63,7 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
             style={{marginLeft: '10px', float: 'right'}}
             onClick={() => {
               onClearError();
-              onBlockDevices(selectedItems);
+              onBlockDevices(selectedItems, true);
               selection.current.setAllSelected(false);
             }}
           />
@@ -74,7 +74,7 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
             style={{float: 'right'}}
             onClick={() => {
               onClearError();
-              onBlockDevices(selectedItems, true);
+              onBlockDevices(selectedItems, false);
               selection.current.setAllSelected(false);
             }}
           />

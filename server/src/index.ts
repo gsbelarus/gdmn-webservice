@@ -1,17 +1,15 @@
-import { init } from './rest';
+import { init } from './server';
 
-export default async function run() {
+const run = async (): Promise<void> => {
   await init();
-}
+};
 
 if (!module.parent) {
-  run()
-    .then(() => {
-      console.log('Server started successful');
-    })
-    .catch(err => {
-      console.error('!!! SERVER DROPPED BY ERROR !!!');
-      console.error(err instanceof Error || typeof err !== 'object' ? err : '!!! undefined error !!!');
-      process.exit(1);
-    });
+  run().catch(err => {
+    console.error('!!! SERVER DROPPED BY ERROR !!!');
+    console.error(err instanceof Error || typeof err !== 'object' ? err : '!!! undefined error !!!');
+    process.exit(1);
+  });
 }
+
+export default run;

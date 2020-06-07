@@ -4,26 +4,28 @@ import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
+import { ILine } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData/Document.json';
-import products from '../../../mockData/Goods.json';
-import remains from '../../../mockData/Remains.json';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const { state, actions } = useAppStore();
 
-  const product = products.find((item) => item.id === route.params.prodId);
-  const remain = remains.find((item) => item.goodId === route.params.prodId);
-  const document = documents.find((item) => item.id === route.params.docId);
+  const product = state.goods.find((item) => item.id === route.params.prodId);
+  const remain = state.remains.find((item) => item.goodId === route.params.prodId);
+  const document = state.documents.find((item) => item.id === route.params.docId);
+  const [line, setLine] = useState<ILine>(undefined);
   const [value, setValue] = useState(1);
 
   useEffect(() => {
-    if (route.params.modeCor) {
-      const lineDocument = document.lines.find((line) => line.goodId === route.params.prodId);
-      if (lineDocument) {
+    const lineDocument = document.lines.find((item) => item.goodId === route.params.prodId);
+    if (lineDocument) {
+      if (route.params.modeCor) {
         setValue(lineDocument.quantity);
       }
+      setLine(lineDocument);
     }
   }, [document.lines, route.params.modeCor, route.params.prodId]);
 
@@ -65,7 +67,18 @@ const ProductDetailScreen = ({ route, navigation }) => {
         />
       </View>
       <Button
-        onPress={() => navigation.navigate('ViewDocument', { docId: route.params.docId })}
+        onPress={() => {
+          if (line !== undefined) {
+            actions.editLine({
+              docId: route.params.docId,
+              lineId: line.id,
+              value: route.params.modeCor ? value : value + line.quantity,
+            });
+          } else {
+            actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+          }
+          navigation.navigate('ViewDocument', { docId: route.params.docId });
+        }}
         mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >

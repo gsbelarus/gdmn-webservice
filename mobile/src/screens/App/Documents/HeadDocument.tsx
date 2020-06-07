@@ -4,13 +4,11 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IDocument, IDocumentType, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import documents from '../../../mockData/Document.json';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
 import statuses from '../../../mockData/documentStatuses.json';
-import { IDocument, IDocumentType, IContact } from '../../../model/inventory';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 type TField = {
@@ -36,10 +34,11 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
 
 const HeadDocumentScreen = ({ route }) => {
   const ref = React.useRef<FlatList<TField>>(null);
-  const document: IDocument = documents.find((item) => item.id === route.params.docId);
-  const type: IDocumentType = documentTypes.find((item) => item.id === document.head.doctype);
-  const contactTo: IContact = contacts.find((item) => item.id === document.head.tocontactId);
-  const contactFrom: IContact = contacts.find((item) => item.id === document.head.fromcontactId);
+  const { state } = useAppStore();
+  const document: IDocument = state.documents.find((item) => item.id === route.params.docId);
+  const type: IDocumentType = state.documentTypes.find((item) => item.id === document.head.doctype);
+  const contactTo: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
+  const contactFrom: IContact = state.contacts.find((item) => item.id === document.head.fromcontactId);
   const status: string = statuses.find((item) => item.id === document.head.status).name;
   const { colors } = useTheme();
 

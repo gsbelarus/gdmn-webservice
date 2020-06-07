@@ -1,21 +1,20 @@
 import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import documents from '../../../mockData/Document.json';
-import contacts from '../../../mockData/GD_Contact.json';
-import documentTypes from '../../../mockData/GD_DocumentType.json';
-import goods from '../../../mockData/Goods.json';
-import remains from '../../../mockData/Remains.json';
-import { IDocument, IContact, IDocumentType, ILine, IGood } from '../../../model/inventory';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewDocument'>>().params?.docId;
   const { colors } = useTheme();
-  const good: IGood = goods.find((i) => i.id === item.goodId);
+  const { state, actions } = useAppStore();
+  const good: IGood = state.goods.find((i) => i.id === item.goodId);
 
   return (
     <>
@@ -34,7 +33,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
-          {remains?.find((remain) => remain.goodId === good.id).price}
+          {state.remains?.find((remain) => remain.goodId === good.id).price}
         </Text>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {item.quantity}
@@ -48,6 +47,9 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
                   text: 'OK',
+                  onPress: () => {
+                    actions.deleteLine({ docId, lineId: item.id });
+                  },
                 },
                 {
                   text: 'Отмена',
@@ -82,15 +84,16 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
 
 const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const document: IDocument = documents.find((item) => item.id === route.params.docId);
-  const type: IDocumentType = documentTypes.find((item) => item.id === document.head.doctype);
-  const contact: IContact = contacts.find((item) => item.id === document.head.tocontactId);
+  const { state, actions } = useAppStore();
+  const document: IDocument | undefined = state.documents.find((item) => item.id === route.params.docId);
+  const type: IDocumentType | undefined = state.documentTypes.find((item) => item.id === document?.head.doctype);
+  const contact: IContact | undefined = state.contacts.find((item) => item.id === document?.head.tocontactId);
   const ref = React.useRef<FlatList<ILine>>(null);
 
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: ILine }) => (
-    <LineItem item={item} status={document.head.status} docId={document.id} />
+    <LineItem item={item} status={document?.head.status} docId={document?.id} />
   );
 
   return (
@@ -98,10 +101,10 @@ const ViewDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
         <View style={localStyles.header}>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {type.name} от {new Date(document.head.date).toLocaleDateString()}
+            {type?.name} от {new Date(document?.head.date).toLocaleDateString()}
           </Text>
           <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {contact.name}
+            {contact?.name}
           </Text>
         </View>
         <TouchableOpacity style={localStyles.goDetailsHeader}>
@@ -117,7 +120,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
       </View>
       <FlatList
         ref={ref}
-        data={document.lines}
+        data={document ? document.lines : []}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -127,11 +130,11 @@ const ViewDocumentScreen = ({ route, navigation }) => {
           localStyles.flexDirectionRow,
           // eslint-disable-next-line react-native/no-inline-styles
           {
-            justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
+            justifyContent: document?.head.status !== 0 ? 'flex-start' : 'space-evenly',
           },
         ]}
       >
-        {document.head.status === 0 || document.head.status === 3 ? (
+        {document?.head.status === 0 || document?.head.status === 3 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -145,7 +148,8 @@ const ViewDocumentScreen = ({ route, navigation }) => {
               Alert.alert('Вы уверены, что хотите удалить?', '', [
                 {
                   text: 'OK',
-                  onPress: async () => {
+                  onPress: () => {
+                    actions.deleteDocument(document?.id);
                     navigation.navigate('DocumentsListScreen');
                   },
                 },
@@ -158,7 +162,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
             <MaterialIcons size={30} color={colors.card} name="delete" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -177,7 +181,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
             <MaterialIcons size={30} color={colors.card} name="edit" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -187,12 +191,14 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status + 1 });
+            }}
           >
             <MaterialIcons size={30} color={colors.card} name="check" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 1 ? (
+        {document?.head.status === 1 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -202,12 +208,14 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => ({})}
+            onPress={() => {
+              actions.editStatusDocument({ id: document.id, status: document?.head.status - 1 });
+            }}
           >
             <Foundation size={30} color={colors.card} name="clipboard-pencil" />
           </TouchableOpacity>
         ) : undefined}
-        {document.head.status === 0 ? (
+        {document?.head.status === 0 ? (
           <TouchableOpacity
             style={[
               styles.circularButton,
@@ -217,7 +225,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => navigation.navigate('ProductsList', { docId: document.id })}
+            onPress={() => navigation.navigate('ProductsList', { docId: document?.id })}
           >
             <MaterialIcons size={30} color={colors.card} name="add" />
           </TouchableOpacity>

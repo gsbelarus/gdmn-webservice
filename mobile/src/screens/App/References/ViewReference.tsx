@@ -4,9 +4,9 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { IReference } from '../../../model/inventory';
 // import styles from '../../../styles/global';
 
 interface IField {
