@@ -61,11 +61,14 @@ describe('Middleware: device', () => {
   });
 
   test('ERROR: does not have access', async () => {
-    //тест не доделан
-    //нужно блокировать устройство после входа
+    resLogin = await request(getApp().callback()).post('/api/auth/login').query('deviceId=123').send({
+      userName: 'admin',
+      password: 'admin',
+    });
+
     const response = await request(getApp().callback())
       .get('/api/users/')
-      .query('deviceId=123')
+      .query('deviceId=qwe')
       .set('Cookie', resLogin.header['set-cookie']);
     expect(response.status).toEqual(401);
     expect(response.type).toEqual('application/json');
