@@ -10,6 +10,7 @@ const remove = async (company: string, uid: string) => removeFile(`${PATH_LOCAL_
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { head, body } = ctx.request.body;
+  ctx.type = 'application/json';
 
   if (!ctx.state.user.companies) {
     log.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${head.companyId})`);
@@ -17,7 +18,9 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
       result: false,
       error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     };
-    ctx.throw(403, JSON.stringify(result));
+    ctx.status = 403;
+    ctx.body = JSON.stringify(result);
+    return;
   }
 
   if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === head.companyId)) {
@@ -26,11 +29,26 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
       result: false,
       error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
     };
-    ctx.throw(403, JSON.stringify(result));
+    ctx.status = 403;
+    ctx.body = JSON.stringify(result);
+    return;
   }
 
+  if (!body || !body.type || !body.payload) {
+    log.warn('incorrect format message');
+    const result: IResponse<string> = {
+      result: false,
+      error: `incorrect format message`,
+    };
+    ctx.status = 400;
+    ctx.body = JSON.stringify(result);
+    return;
+  }
+
+  console.log(body);
+
   const uuid = uuidv1();
-  const msgObject = {
+  const msgObject: IMessage = {
     head: {
       id: uuid,
       consumer: head.consumer || 'gdmn',
@@ -40,28 +58,20 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     body,
   };
 
-  if (msgObject instanceof Object && (msgObject as IMessage)) {
-    await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
-    log.info(`new message in queue: ${uuid}`);
-    const result: IResponse<{ uid: string; date: Date }> = {
-      result: true,
-      data: { uid: uuid, date: new Date() },
-    };
-    ctx.status = 201;
-    ctx.body = JSON.stringify(result);
-  } else {
-    log.warn('incorrect format message');
-    const result: IResponse<string> = {
-      result: false,
-      error: `incorrect format message`,
-    };
-    ctx.throw(400, JSON.stringify(result));
-  }
+  await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
+  log.info(`new message in queue: ${uuid}`);
+  const result: IResponse<{ uid: string; date: Date }> = {
+    result: true,
+    data: { uid: uuid, date: new Date() },
+  };
+  ctx.status = 201;
+  ctx.body = JSON.stringify(result);
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId } = ctx.request.body;
   const result: IMessage[] = [];
+  ctx.type = 'application/json';
 
   try {
     const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
@@ -83,13 +93,15 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
       result: false,
       error: `file or directory not found`,
     };
-    ctx.throw(404, JSON.stringify(result));
+    ctx.status = 404;
+    ctx.body = JSON.stringify(result);
   }
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, id: uid } = ctx.params;
   const result = await remove(companyId, uid);
+  ctx.type = 'application/json';
 
   if (result === 'OK') {
     ctx.status = 204;
@@ -99,7 +111,8 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
       result: false,
       error: `could not delete file`,
     };
-    ctx.throw(422, JSON.stringify(result));
+    ctx.status = 422;
+    ctx.body = JSON.stringify(result);
   }
 };
 

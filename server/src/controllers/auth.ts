@@ -12,35 +12,42 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const currDevice = devices?.find(
     device => device.uid === ctx.query.deviceId && device.user === ctx.request.body?.userName,
   );
+  ctx.type = 'application/json';
 
   if (!currDevice) {
-    log.info(`no such device (${ctx.query.deviceId})`);
-    const res: IResponse<string> = { result: false, error: 'no device or user' };
-    ctx.throw(404, JSON.stringify(res));
+    log.info(`not such device(${ctx.query.deviceId})`);
+    const res: IResponse<string> = { result: false, error: 'not device or user' };
+    ctx.status = 404;
+    ctx.body = JSON.stringify(res);
+    return;
   }
 
   if (currDevice.isBlock) {
-    log.info(`device (${ctx.query.deviceId}) does not have access`);
-    const res: IResponse<string> = { result: false, error: 'does not have access' };
-    ctx.throw(401, JSON.stringify(res));
+    log.info(`device(${ctx.query.deviceId}) does not have access`);
+    const res: IResponse<undefined> = { result: false, error: 'does not have access' };
+    ctx.status = 401;
+    ctx.response.body = JSON.stringify(res);
+    return;
   }
-
   const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
     log.info('failed login attempt');
-    const res: IResponse<string> = { result: false, error: 'не верный пользователь и\\или пароль ' };
-    ctx.throw(404, JSON.stringify(res));
+    const res: IResponse<undefined> = { result: false, error: 'не верный пользователь и\\или пароль' };
+    ctx.status = 404;
+    ctx.response.body = JSON.stringify(res);
+    return;
   }
 
   ctx.login(user);
 
   delete user.password;
 
-  log.info(`user ${user} successfully logged in`);
+  log.info(`user ${user.id} successfully logged in`);
 
   const res: IResponse<IUser> = { result: true, data: user };
   ctx.status = 200;
+  ctx.type = 'application/json';
   ctx.body = JSON.stringify(res);
 };
 
@@ -54,6 +61,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   const res: IResponse<IUser> = { result: true, data: user };
   ctx.status = 200;
+  ctx.type = 'application/json';
   ctx.body = JSON.stringify(res);
 };
 
@@ -65,11 +73,13 @@ const logOut = (ctx: ParameterizedContext): void => {
 
   const res: IResponse<undefined> = { result: true };
   ctx.status = 200;
+  ctx.type = 'application/json';
   ctx.body = JSON.stringify(res);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   let newUser = ctx.request.body as IUser;
+  ctx.type = 'application/json';
   if (!(await findByUserName(newUser.userName))) {
     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
     newUser = {
@@ -96,6 +106,8 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       ),
     );
 
+    delete newUser.password;
+
     const res = { result: true, data: newUser };
     ctx.status = 201;
     ctx.body = JSON.stringify(res);
@@ -103,7 +115,8 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   } else {
     log.info('a user already exists');
     const res: IResponse<string> = { result: false, error: 'a user already exists' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.status = 400;
+    ctx.response.body = JSON.stringify(res);
   }
 };
 
@@ -112,6 +125,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const code = data && data.find(el => el.code === ctx.request.body.code);
   let result: IResponse<string>;
   let status: number;
+  ctx.type = 'application/json';
 
   if (code) {
     const date = new Date(code.date);
@@ -143,6 +157,7 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const userId: string = ctx.params.userId;
   const code = await saveActivationCode(userId);
   ctx.status = 200;
+  ctx.type = 'application/json';
   const result: IResponse<string> = { result: true, data: code };
   ctx.body = JSON.stringify(result);
   log.info('activation code generated successfully');
