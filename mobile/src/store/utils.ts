@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/interface-name-prefix */
 import { Reducer, useReducer, useMemo } from 'react';
 
 import { TAppActions } from './App/actions';

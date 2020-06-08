@@ -67,23 +67,23 @@ const SignInScreen = () => {
     if (!lognState.isLoading) {
       return;
     }
-       timeout(5000, api.auth.login(credential))
-        .then((data: IResponse<undefined>) => {
-          data.result
-            ? actions.setUserStatus(true)
-            : setLoginState({
-                isLoading: false,
-                status: data.error,
-                isError: true,
-              });
-        })
-        .catch((err: Error) =>
-          setLoginState({
-            isLoading: false,
-            status: err.message,
-            isError: true,
-          }),
-        );
+    timeout(5000, api.auth.login(credential))
+      .then((data: IResponse<undefined>) => {
+        data.result
+          ? actions.setUserStatus(true)
+          : setLoginState({
+              isLoading: false,
+              status: data.error,
+              isError: true,
+            });
+      })
+      .catch((err: Error) =>
+        setLoginState({
+          isLoading: false,
+          status: err.message,
+          isError: true,
+        }),
+      );
   }, [api.auth, credential.userName, lognState.isLoading /*, state.deviceId*/]);
 
   return (

@@ -22,7 +22,7 @@ const CompaniesScreen = () => {
       }
     };
     request();
-  }, []);
+  }, [api.auth]);
 
   const logOut = async () => {
     const res = await api.auth.logout();
