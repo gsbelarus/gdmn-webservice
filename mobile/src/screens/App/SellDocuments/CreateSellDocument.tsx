@@ -41,7 +41,7 @@ const CreateSellDocumentScreen = ({ route }) => {
   const listDepartments = getListItems(departments);
 
   /*const list = [
-    {id: 0, value: 'Петриченко Александр Вениаминович'},
+    {id: 0, value: 'item0'},
     {id: 1, value: 'item1'},
     {id: 2, value: 'item2'},
     {id: 3, value: 'item3'},

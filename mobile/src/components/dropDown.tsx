@@ -4,6 +4,24 @@ import { Text, TextInput, Checkbox } from 'react-native-paper';
 import { useTheme,  useScrollToTop } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
 
+/* 
+Basic Usage
+ 
+export const dropdownList = () => {
+    return (
+        <DropdownList 
+          list={[
+              { id: 1, value: 'football' },
+              { id: 2, value: 'baseball' },
+              { id: 3, value: 'hockey' },
+          ]}
+          value={id: 2, value: 'baseball'}
+          onValueChange={(item) => console.log(item.value)}
+        />
+    );
+};
+*/
+
 interface IPropsItem {
   item?: IItem;
   isSelected?: boolean;
