@@ -11,7 +11,8 @@
     "prettier:check": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",
     "eslint:run": "eslint \"src/**/*.ts\"",
-    "eslint:fix": "eslint --fix \"src/**/*.ts\""
+    "eslint:fix": "eslint --fix \"src/**/*.ts\"",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -19,6 +20,8 @@
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/eslint-plugin-tslint": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
+    "@types/jest": "^25.2.3",
+    "@types/supertest": "^2.0.9",
     "cross-env": "^7.0",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "^18.1.0",
@@ -34,6 +37,7 @@
     "jest": "^26.0.1",
     "nodemon": "^2.0",
     "prettier": "^2.0.5",
+    "ts-jest": "^26.0.0",
     "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.9",
     "tslint": "^6.1.2",
@@ -41,6 +45,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "~3.9",
+    "supertest": "^4.0.2",
     "winston": "^3.2.1"
   },
   "dependencies": {

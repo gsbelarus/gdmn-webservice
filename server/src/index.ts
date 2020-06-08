@@ -1,7 +1,8 @@
+import Koa from 'koa';
 import { init } from './server';
 
-const run = async (): Promise<void> => {
-  await init();
+const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
+  return await init();
 };
 
 if (!module.parent) {
