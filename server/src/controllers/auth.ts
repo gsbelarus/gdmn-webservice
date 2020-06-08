@@ -9,16 +9,18 @@ import log from '../utils/logger';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const currDevice = devices?.find(device => device.uid === ctx.query.deviceId && device.user === ctx.request.body?.userName);
+  const currDevice = devices?.find(
+    device => device.uid === ctx.query.deviceId && device.user === ctx.request.body?.userName,
+  );
 
   if (!currDevice) {
-    log.info(`not such device(${ctx.query.deviceId})`);
-    const res: IResponse<string> = { result: false, error: 'not device or user' };
+    log.info(`no such device (${ctx.query.deviceId})`);
+    const res: IResponse<string> = { result: false, error: 'no device or user' };
     ctx.throw(404, JSON.stringify(res));
   }
 
   if (currDevice.isBlock) {
-    log.info(`device(${ctx.query.deviceId}) does not have access`);
+    log.info(`device (${ctx.query.deviceId}) does not have access`);
     const res: IResponse<string> = { result: false, error: 'does not have access' };
     ctx.throw(401, JSON.stringify(res));
   }
@@ -73,7 +75,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     newUser = {
       id: newUser.userName,
       ...newUser,
-      companies: newUser.companies?? [],
+      companies: newUser.companies ?? [],
       creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
     };
     await writeFile(
