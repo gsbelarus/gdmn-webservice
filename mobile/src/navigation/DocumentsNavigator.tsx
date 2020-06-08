@@ -1,5 +1,7 @@
+import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import {
   DocumentsListScreen,
@@ -35,7 +37,19 @@ const DocumentsNavigator = () => {
         name="ViewDocument"
         component={ViewDocumentScreen}
         initialParams={{ docId: 0 }}
-        options={{ title: '' }}
+        options={({ navigation }) => ({
+          title: '',
+          headerLeft: () => (
+            <TouchableOpacity
+              style={localeStyles.marginLeft}
+              onPress={() => {
+                navigation.navigate('DocumentsListScreen');
+              }}
+            >
+              <Feather name="arrow-left" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocumentScreen} options={{ title: '' }} />
       <Stack.Screen
@@ -62,3 +76,9 @@ const DocumentsNavigator = () => {
 };
 
 export default DocumentsNavigator;
+
+const localeStyles = StyleSheet.create({
+  marginLeft: {
+    marginLeft: 15,
+  },
+});

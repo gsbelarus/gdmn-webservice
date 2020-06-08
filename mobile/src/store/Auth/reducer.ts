@@ -16,7 +16,7 @@ export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState,
     case ActionAuthTypes.DISCONNECT:
       return { ...{ baseUrl: state.baseUrl, initialState, documents: [] as IDocument[] } };
     case ActionAuthTypes.LOG_OUT:
-      return { ...state, userID: undefined, loggedIn: false };
+      return { ...state, userID: undefined, loggedIn: false, companyID: undefined };
     case ActionAuthTypes.SET_BASEURL:
       return { ...state, baseUrl: action.payload };
     case ActionAuthTypes.SET_DEVICE_STATUS:
