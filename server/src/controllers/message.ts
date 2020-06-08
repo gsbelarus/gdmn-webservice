@@ -34,6 +34,19 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     return;
   }
 
+  if (!body || !body.type || !body.payload) {
+    log.warn('incorrect format message');
+    const result: IResponse<string> = {
+      result: false,
+      error: `incorrect format message`,
+    };
+    ctx.status = 400;
+    ctx.body = JSON.stringify(result);
+    return;
+  }
+
+  console.log(body);
+
   const uuid = uuidv1();
   const msgObject: IMessage = {
     head: {
@@ -45,24 +58,14 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     body,
   };
 
-  if (msgObject instanceof Object && (msgObject as IMessage)) {
-    await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
-    log.info(`new message in queue: ${uuid}`);
-    const result: IResponse<{ uid: string; date: Date }> = {
-      result: true,
-      data: { uid: uuid, date: new Date() },
-    };
-    ctx.status = 201;
-    ctx.body = JSON.stringify(result);
-  } else {
-    log.warn('incorrect format message');
-    const result: IResponse<string> = {
-      result: false,
-      error: `incorrect format message`,
-    };
-    ctx.status = 400;
-    ctx.body = JSON.stringify(result);
-  }
+  await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
+  log.info(`new message in queue: ${uuid}`);
+  const result: IResponse<{ uid: string; date: Date }> = {
+    result: true,
+    data: { uid: uuid, date: new Date() },
+  };
+  ctx.status = 201;
+  ctx.body = JSON.stringify(result);
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
