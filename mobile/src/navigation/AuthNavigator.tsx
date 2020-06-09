@@ -154,7 +154,18 @@ const AuthNavigator = () => {
         serverName={`${baseUrl?.server}:${baseUrl?.port}`}
       />
     ),
-    [baseUrl, breakConnection, connection, deviceRegistered, loggedIn, showSettings, state],
+    [
+      baseUrl?.port,
+      baseUrl?.server,
+      breakConnection,
+      connection,
+      deviceRegistered,
+      loggedIn,
+      showSettings,
+      state?.serverReq?.isError,
+      state?.serverReq?.isLoading,
+      state?.serverReq?.status,
+    ],
   );
 
   const CongfigWithParams = useCallback(
@@ -165,7 +176,7 @@ const AuthNavigator = () => {
         serverPort={baseUrl?.port}
       />
     ),
-    [baseUrl, hideSettings, changeSettings],
+    [hideSettings, changeSettings, baseUrl?.protocol, baseUrl?.server, baseUrl?.port],
   );
 
   const ConfigComponent = useMemo(

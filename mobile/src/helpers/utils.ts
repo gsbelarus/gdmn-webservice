@@ -36,16 +36,23 @@ export function createCancellableSignal<T>() {
   return p;
 }
 
-export const saveToStorage = async (value: string, key: string) => {
-  await AsyncStorage.setItem(key, value);
-};
+export const appStorage = {
+  setItem: async <T>(key: string, data: T) => {
+    AsyncStorage.setItem(key, JSON.stringify(data));
+  },
 
-export const getValueFromStorage = async (keys: string[]) => {
-  try {
+  getItem: async (key: string) => {
+    const result = await AsyncStorage.getItem(key);
+
+    return result ? JSON.parse(result) : null;
+  },
+
+  getItems: async (keys: string[]) => {
     const result = await AsyncStorage.multiGet(keys);
-    //const result: boolean = JSON.parse(await AsyncStorage.getItem(key)).value as boolean;
-    return result;
-  } catch {
-    return false;
-  }
+    return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
+  },
+
+  removeItem: async (key: string) => {
+    await AsyncStorage.removeItem(key);
+  },
 };

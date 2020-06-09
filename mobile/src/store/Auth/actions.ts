@@ -9,6 +9,8 @@ export enum ActionAuthTypes {
   SET_COMPANY_ID = 'SET_COMPANY_ID',
   SET_USER_ID = 'SET_USER_ID',
   SET_BASEURL = 'SET_BASEURL',
+  SET_SYNCHRONIZATION = 'SET_SYNCHRONIZATION',
+  SET_AUTODELETING_DOCUMENT = 'SET_AUTODELETING_DOCUMENT',
 }
 
 export const AuthActions = {
@@ -23,6 +25,12 @@ export const AuthActions = {
   ),
   setCompanyID: createActionPayload<ActionAuthTypes.SET_COMPANY_ID, string>(ActionAuthTypes.SET_COMPANY_ID),
   setUserID: createActionPayload<ActionAuthTypes.SET_USER_ID, string>(ActionAuthTypes.SET_USER_ID),
+  setSynchonization: createActionPayload<ActionAuthTypes.SET_SYNCHRONIZATION, boolean>(
+    ActionAuthTypes.SET_SYNCHRONIZATION,
+  ),
+  setAutodeletingDocument: createActionPayload<ActionAuthTypes.SET_AUTODELETING_DOCUMENT, boolean>(
+    ActionAuthTypes.SET_AUTODELETING_DOCUMENT,
+  ),
 };
 
 export type TAuthActions = ActionsUnion<typeof AuthActions>;

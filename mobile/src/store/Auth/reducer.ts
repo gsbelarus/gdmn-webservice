@@ -27,6 +27,10 @@ export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState,
       return { ...state, companyID: action.payload };
     case ActionAuthTypes.SET_USER_ID:
       return { ...state, userID: action.payload };
+    case ActionAuthTypes.SET_SYNCHRONIZATION:
+      return { ...state, synchronization: action.payload };
+    case ActionAuthTypes.SET_AUTODELETING_DOCUMENT:
+      return { ...state, autodeletingDocument: action.payload };
     default:
       return state;
   }
