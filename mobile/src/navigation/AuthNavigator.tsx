@@ -72,7 +72,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 const AuthNavigator = () => {
   const {
     state: { deviceRegistered, loggedIn, baseUrl, companyID },
-    actions,
+    actions: authActions,
     api,
   } = useAuthStore();
 
@@ -91,6 +91,7 @@ const AuthNavigator = () => {
         - осуществлён ли вход текущего пользователя, если нет то перевод на вход пользователя
   */
   useEffect(() => {
+    /* 1. Запрос к серверу*/
     if (deviceRegistered ?? state.serverReq?.isLoading) {
       timeoutWithСancellation(signal, 5000, api.auth.getDevice())
         .then((response: IResponse<IDevice>) =>
@@ -103,6 +104,7 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (state.serverResp) {
       // TODO вызов 3 раза
+      console.log('state.serverResp', state.serverResp);
       actions.setDeviceStatus(state.serverResp.result as boolean);
     }
   }, [actions, state.serverResp]);
@@ -113,10 +115,16 @@ const AuthNavigator = () => {
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IResponse<IUser>) => actions.setUserStatus(isUser(data.data)))
+          .then((data: IResponse<IUser>) => {
+            const userStatus = isUser(data.data)
+              ? { logged: true, userID: data.data.id }
+              : { logged: false, userID: undefined };
+            actions.setUserStatus(userStatus);
+          })
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
-      : actions.setUserStatus(false);
+      : actions.setUserStatus({ logged: false, userID: undefined });
   }, [actions, api.auth, deviceRegistered, signal]);
+  // Вынести всё в store  - deviceRegistered
 
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
 

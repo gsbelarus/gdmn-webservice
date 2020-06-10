@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials } from '../../../../common';
+import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
@@ -21,7 +21,7 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { actions, api, state } = useAuthStore();
+  const { actions, api } = useAuthStore();
   const { colors } = useTheme();
   const [loginState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
@@ -58,13 +58,13 @@ const SignInScreen = () => {
   //   actions.setUserStatus(true);
   // };
 
-  useEffect(() => {
-    if (state.loggedIn) {
-      // TODO: Не всегда заходит почему-то
-      // TODO: setUserStatus совсемстить с setUserID
-      actions.setUserID(credential.userName);
-    }
-  }, [actions, credential.userName, state.loggedIn]);
+  // useEffect(() => {
+  //   if (state.loggedIn) {
+  //     // TODO: Не всегда заходит почему-то
+  //     // TODO: setUserStatus совсемстить с setUserID
+  //     actions.setUserID(credential.userName);
+  //   }
+  // }, [actions, credential.userName, state.loggedIn]);
 
   const logIn = useCallback(() => {
     Keyboard.dismiss();
@@ -76,9 +76,12 @@ const SignInScreen = () => {
       return;
     }
     timeout(5000, api.auth.login(credential))
-      .then((data: IResponse<undefined>) => {
+      .then((data: IResponse<IUser>) => {
         data.result
-          ? actions.setUserStatus(true)
+          ? actions.setUserStatus({
+              logged: true,
+              userID: data.data.id,
+            }) /* Сделать как в AuthNav а лучше 1 вариант на 2 запроса*/
           : setLoginState({
               isLoading: false,
               status: data.error,

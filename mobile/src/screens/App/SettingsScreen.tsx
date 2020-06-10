@@ -4,18 +4,20 @@ import { ScrollView, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
 import SettingsItem from '../../components/SettingsItem';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useAppStore } from '../../store';
+// AppStore
 
 // const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions, state, api } = useAuthStore();
+  const { actions: appActions, state: { settings }, api } = useAppStore();
+  const { actions: authActions, state: { settings }, api } = useAuthStore();
 
   const logOut = async () => {
     const res = await api.auth.logout();
     if (res.result) {
-      actions.logOut();
+      authActions.logOut();
     }
   };
 
@@ -23,7 +25,7 @@ const SettingsScreen = () => {
     <ScrollView style={{ backgroundColor: colors.background }}>
       <View style={localStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
-        <Button mode="contained" onPress={() => actions.setCompanyID(undefined)}>
+        <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
           Сменить орг.
         </Button>
         <Button icon="logout" mode="contained" onPress={logOut}>
@@ -33,14 +35,14 @@ const SettingsScreen = () => {
       <Divider />
       <SettingsItem
         label="Синхронизировать"
-        value={state.synchronization}
-        onValueChange={() => actions.setSynchonization(!state.synchronization)}
+        value={setting.synchronization}
+        onValueChange={() => appActions.setSettings({...setting, synchronization: !setting.synchronization)}
       />
       <Divider />
       <SettingsItem
         label="Удалять документы после обработки на сервере"
-        value={state.autodeletingDocument}
-        onValueChange={() => actions.setAutodeletingDocument(!state.autodeletingDocument)}
+        value={setting.autodeletingDocument}
+        onValueChange={() => appActions.setSettings({...setting, autodeletingDocument: !setting.autodeletingDocument} )}
       />
       <Divider />
       <SettingsItem

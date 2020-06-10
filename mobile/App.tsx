@@ -30,6 +30,7 @@ const App = () => {
   }, [theme.colors, theme.dark]);
 
   return (
+    // <ApiStoreProvider>
     <AuthStoreProvider>
       <PaperProvider theme={paperTheme}>
         {Platform.OS === 'ios' && <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />}

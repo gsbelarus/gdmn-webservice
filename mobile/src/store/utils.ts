@@ -1,7 +1,6 @@
 import { Reducer, useReducer, useMemo } from 'react';
 
-import { TAppActions } from './App/actions';
-import { TAuthActions } from './Auth/actions';
+import { TActions } from './';
 
 /**
  * Create an action that has a strongly typed string literal name with a strongly typed payload
@@ -68,7 +67,7 @@ interface IAction {
 }
 
 export function useTypesafeActions<S, Actions extends IAction>(
-  reducer: Reducer<S, TAuthActions | TAppActions>,
+  reducer: Reducer<S, TActions>,
   initialState: S,
   actions: Actions,
 ): [S, Actions] {

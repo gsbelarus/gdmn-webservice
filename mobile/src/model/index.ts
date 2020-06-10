@@ -1,20 +1,23 @@
 import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl } from '../../../common';
 import Api from '../api/Api';
 import Sync from '../api/Sync';
-import { AppActions, AuthActions } from '../store';
+import { AppActions, AuthActions, ApiActions } from '../store';
+
+export interface IApiContextProps {
+  state: IApiState;
+  actions: typeof ApiActions;
+  api: Api;
+  sync: Sync;
+}
 
 export interface IAuthContextProps {
   state: IAuthState;
   actions: typeof AuthActions;
-  api: Api;
-  sync: Sync;
 }
 
 export interface IAppContextProps {
   state: IAppState;
   actions: typeof AppActions;
-  api: Api;
-  sync: Sync;
 }
 
 export interface IDataFetch {
@@ -34,19 +37,27 @@ export interface INewDevice {
   user: string;
 }
 
+export interface IApiState {
+  serverUrl?: IBaseUrl;
+  storagePath?: string;
+}
+
 export interface IAuthState {
-  baseUrl?: IBaseUrl;
   companyID?: string;
   userID?: string;
   deviceRegistered?: boolean;
   deviceActive?: boolean;
   loggedIn?: boolean;
   deviceId?: string;
+}
+
+export interface IAppSettings {
   synchronization?: boolean;
   autodeletingDocument?: boolean;
 }
 
 export interface IAppState {
+  settings: IAppSettings;
   documents?: IDocument[];
   remains?: IRemain[];
   goods?: IGood[];

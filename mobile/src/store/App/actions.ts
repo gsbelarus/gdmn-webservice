@@ -1,4 +1,5 @@
 import { IHead, ILine, IDocument } from '../../../../common';
+import { IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
@@ -10,10 +11,11 @@ export enum ActionAppTypes {
   DOCUMENT_ADD_LINE = 'DOCUMENT_ADD_LINE',
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
+  SET_SETTINGS = 'SET_SETTINGS',
 }
 
 export const AppActions = {
-  disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
+  // disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
   newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
@@ -31,6 +33,7 @@ export const AppActions = {
   editLine: createActionPayload<ActionAppTypes.DOCUMENT_EDIT_LINE, { docId: number; lineId: string; value: number }>(
     ActionAppTypes.DOCUMENT_EDIT_LINE,
   ),
+  setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;
