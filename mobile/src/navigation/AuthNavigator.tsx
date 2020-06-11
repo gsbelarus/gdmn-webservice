@@ -234,7 +234,7 @@ const AuthNavigator = () => {
           options={{ animationTypeForReplace: 'pop' }}
         />
       ),
-    [RegisterComponent, SplashWithParams, deviceRegistered, /*userID*/],
+    [RegisterComponent, SplashWithParams, deviceRegistered /*, userID*/],
   );
 
   return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;

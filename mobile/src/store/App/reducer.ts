@@ -10,6 +10,7 @@ import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
+  settings: undefined,
   documents,
   remains,
   references,

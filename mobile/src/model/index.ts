@@ -56,7 +56,7 @@ export interface IAppSettings {
 }
 
 export interface IAppState {
-  settings: IAppSettings;
+  settings?: IAppSettings;
   documents?: IDocument[];
   remains?: IRemain[];
   goods?: IGood[];

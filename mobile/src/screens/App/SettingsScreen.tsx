@@ -12,7 +12,10 @@ import { useAuthStore, useAppStore, useApiStore } from '../../store';
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
   const { api } = useApiStore();
-  const { actions: appActions, state } = useAppStore();
+  const {
+    actions: appActions,
+    state: { settings },
+  } = useAppStore();
   const { actions: authActions } = useAuthStore();
 
   const logOut = async () => {
@@ -36,14 +39,16 @@ const SettingsScreen = () => {
       <Divider />
       <SettingsItem
         label="Синхронизировать"
-        value={false} //setting.synchronization}
-        onValueChange={() => { }} //appActions.setSettings({...setting, synchronization: !setting.synchronization)}
+        value={settings?.synchronization}
+        onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
       />
       <Divider />
       <SettingsItem
         label="Удалять документы после обработки на сервере"
-        value={false} //setting.autodeletingDocument}
-        onValueChange={() => { }} //appActions.setSettings({...setting, autodeletingDocument: !setting.autodeletingDocument} )}
+        value={settings?.autodeletingDocument}
+        onValueChange={() =>
+          appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
+        }
       />
       <Divider />
       <SettingsItem

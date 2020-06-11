@@ -52,7 +52,7 @@ export interface IReference {
   name: string;
   type: string;
   data: {
-    id: number;
+    id: number | string;
     name?: string;
     [fieldName: string]: unknown;
   }[];
