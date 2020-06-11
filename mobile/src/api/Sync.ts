@@ -1,10 +1,31 @@
-// import Constants from 'expo-constants';
-// import { IServerResponse, IUser, IUserCredentials, INewDevice, IBaseUrl } from '../model';
+import { IBaseUrl } from '../../../common';
+import config from '../config';
+import { appStorage } from '../helpers/utils';
 
 export default class Sync {
-  path: string;
+  private path: string;
 
   setPath = (path: string) => {
     this.path = path;
+  };
+
+  setServer = async (serverUrl: IBaseUrl) => {
+    await appStorage.setItem('pathServer', serverUrl);
+  };
+
+  getServer = async () => {
+    let pathSrv: IBaseUrl = await appStorage.getItem('pathServer');
+
+    if (!(pathSrv instanceof Object && 'protocol' in pathSrv)) {
+      pathSrv = {
+        protocol: config.server.protocol,
+        server: config.server.name,
+        port: config.server.port,
+        apiPath: config.apiPath,
+      };
+      await this.setServer(pathSrv);
+    }
+
+    return pathSrv;
   };
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Api from '../../api/Api';
 import Sync from '../../api/Sync';
@@ -23,6 +23,19 @@ const createStoreContext = () => {
 
   const StoreProvider = ({ children }) => {
     const [state, actions] = useTypesafeActions<IApiState, typeof ApiActions>(reducer, initialState, ApiActions);
+
+    useEffect(() => {
+      const getUrl = async () => {
+        actions.setServerUrl(await sync.getServer());
+      };
+
+      if (state.serverUrl !== undefined) {
+        api.setUrl(state.serverUrl);
+      } else {
+        getUrl();
+      }
+    }, [actions, state.serverUrl]);
+
     return <StoreContext.Provider value={{ state, actions, api, sync }}>{children}</StoreContext.Provider>;
   };
 
