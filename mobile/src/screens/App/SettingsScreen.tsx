@@ -4,15 +4,16 @@ import { ScrollView, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
 import SettingsItem from '../../components/SettingsItem';
-import { useAuthStore, useAppStore } from '../../store';
+import { useAuthStore, useAppStore, useApiStore } from '../../store';
 // AppStore
 
 // const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions: appActions, state: { settings }, api } = useAppStore();
-  const { actions: authActions, state: { settings }, api } = useAuthStore();
+  const { api } = useApiStore();
+  const { actions: appActions, state: { settings } } = useAppStore();
+  const { actions: authActions, state: { settings } } = useAuthStore();
 
   const logOut = async () => {
     const res = await api.auth.logout();

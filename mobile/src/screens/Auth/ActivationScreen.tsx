@@ -10,11 +10,12 @@ import SubTitle from '../../components/SubTitle';
 import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useApiStore } from '../../store';
 import styles from '../../styles/global';
 
 const ActivationScreen = () => {
-  const { actions, api } = useAuthStore();
+  const { api } = useApiStore();
+  const { actions } = useAuthStore();
   const { colors } = useTheme();
 
   const [serverReq, setServerReq] = useState<IDataFetch>({

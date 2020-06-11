@@ -2,13 +2,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 import { AsyncStorage } from 'react-native';
 
-import { IResponse, IUser, IBaseUrl, IDevice } from '../../../common';
+import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
 import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
-import { useAuthStore } from '../store';
+import { useAuthStore, useApiStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
 
 type AuthStackParamList = {
@@ -71,10 +71,15 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, loggedIn, baseUrl, companyID },
+    state: { deviceRegistered, loggedIn, companyID },
     actions: authActions,
-    api,
   } = useAuthStore();
+
+  const {
+    state: { serverUrl },
+    actions,
+    api,
+  } = useApiStore();
 
   const [state, setState] = useReducer(reducer, initialState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,9 +110,9 @@ const AuthNavigator = () => {
     if (state.serverResp) {
       // TODO вызов 3 раза
       console.log('state.serverResp', state.serverResp);
-      actions.setDeviceStatus(state.serverResp.result as boolean);
+      authActions.setDeviceStatus(state.serverResp.result as boolean);
     }
-  }, [actions, state.serverResp]);
+  }, [authActions, state.serverResp]);
 
   useEffect(() => {
     if (deviceRegistered === undefined) {
@@ -119,11 +124,11 @@ const AuthNavigator = () => {
             const userStatus = isUser(data.data)
               ? { logged: true, userID: data.data.id }
               : { logged: false, userID: undefined };
-            actions.setUserStatus(userStatus);
+            authActions.setUserStatus(userStatus);
           })
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
-      : actions.setUserStatus({ logged: false, userID: undefined });
-  }, [actions, api.auth, deviceRegistered, signal]);
+      : authActions.setUserStatus({ logged: false, userID: undefined });
+  }, [authActions, api.auth, deviceRegistered, signal]);
   // Вынести всё в store  - deviceRegistered
 
   useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
@@ -137,20 +142,20 @@ const AuthNavigator = () => {
   const hideSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: false }), []);
 
   const changeSettings = useCallback(
-    (newBaseUrl: IBaseUrl) => {
-      AsyncStorage.setItem('pathServer', JSON.stringify(newBaseUrl))
-        .then(() => actions.setBaseUrl(newBaseUrl))
+    (newserverUrl: IBaseUrl) => {
+      AsyncStorage.setItem('pathServer', JSON.stringify(newserverUrl))
+        .then(() => actions.setServerUrl(newserverUrl))
         .catch(() => setState({ type: 'SETTINGS_FORM', showSettings: false }));
     },
     [actions],
   );
 
   useEffect(() => {
-    if (baseUrl !== undefined) {
+    if (serverUrl !== undefined) {
       setState({ type: 'SETTINGS_FORM', showSettings: false });
-      api.setUrl(baseUrl);
+      api.setUrl(serverUrl);
     }
-  }, [api, baseUrl]);
+  }, [api, serverUrl]);
 
   const SplashWithParams = useCallback(
     () => (
@@ -159,16 +164,15 @@ const AuthNavigator = () => {
         isLoading={state?.serverReq.isLoading}
         isError={state?.serverReq?.isError}
         status={state?.serverReq?.status}
-        serverName={`${baseUrl?.server}:${baseUrl?.port}`}
+        serverName={`${serverUrl?.server}:${serverUrl?.port}`}
       />
     ),
     [
-      baseUrl?.port,
-      baseUrl?.server,
+      serverUrl?.port,
+      serverUrl?.server,
       breakConnection,
       connection,
       deviceRegistered,
-      loggedIn,
       showSettings,
       state?.serverReq?.isError,
       state?.serverReq?.isLoading,
@@ -180,11 +184,11 @@ const AuthNavigator = () => {
     () => (
       <ConfigScreen
         {...{ hideSettings, changeSettings }}
-        serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
-        serverPort={baseUrl?.port}
+        serverName={`${serverUrl?.protocol}${serverUrl?.server}`}
+        serverPort={serverUrl?.port}
       />
     ),
-    [hideSettings, changeSettings, baseUrl?.protocol, baseUrl?.server, baseUrl?.port],
+    [hideSettings, changeSettings, serverUrl?.protocol, serverUrl?.server, serverUrl?.port],
   );
 
   const ConfigComponent = useMemo(

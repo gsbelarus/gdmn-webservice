@@ -7,7 +7,7 @@ import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useApiStore } from '../../store';
 import styles from '../../styles/global';
 
 /*
@@ -21,7 +21,8 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { actions, api } = useAuthStore();
+  const { api } = useApiStore();
+  const { actions } = useAuthStore();
   const { colors } = useTheme();
   const [loginState, setLoginState] = useState<IDataFetch>({
     isLoading: false,

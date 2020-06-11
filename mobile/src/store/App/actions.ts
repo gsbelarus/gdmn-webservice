@@ -3,7 +3,6 @@ import { IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
-  DISCONNECT = 'DISCONNECT',
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',
   EDIT_STATUS_DOCUMENT = 'EDIT_STATUS_DOCUMENT',
@@ -15,7 +14,6 @@ export enum ActionAppTypes {
 }
 
 export const AppActions = {
-  // disconnect: createActionPayload<ActionAppTypes.DISCONNECT, void>(ActionAppTypes.DISCONNECT),
   newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,

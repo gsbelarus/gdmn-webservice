@@ -5,14 +5,18 @@ import { ActivityIndicator } from 'react-native-paper';
 import { IBaseUrl } from '../../../../common';
 import config from '../../config';
 import AuthNavigator from '../../navigation/AuthNavigator';
-import { useAuthStore } from '../../store';
+import { useApiStore } from '../../store';
 
 const ConnectionScreen = () => {
-  const { state, actions, api } = useAuthStore();
+  const {
+    state: { serverUrl },
+    actions,
+    api,
+  } = useApiStore();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (state.baseUrl !== undefined) {
+    if (serverUrl !== undefined) {
       return;
     }
 
@@ -22,7 +26,7 @@ const ConnectionScreen = () => {
         pathSrv = undefined;
       }
 
-      const url: IBaseUrl = state.baseUrl ||
+      const url: IBaseUrl = serverUrl ||
         pathSrv || {
           protocol: config.server.protocol,
           server: config.server.name,
@@ -32,20 +36,20 @@ const ConnectionScreen = () => {
 
       AsyncStorage.setItem('pathServer', JSON.stringify(url))
         .then(() => {
-          actions.setBaseUrl(url);
+          actions.setServerUrl(url);
         })
         .catch(() => setLoading(false));
     };
 
     setBaseURL();
-  }, [actions, api, state.baseUrl]);
+  }, [actions, api, serverUrl]);
 
   useEffect(() => {
-    if (state.baseUrl !== undefined) {
-      api.setUrl(state.baseUrl);
+    if (serverUrl !== undefined) {
+      api.setUrl(serverUrl);
       setLoading(false);
     }
-  }, [api, state.baseUrl]);
+  }, [api, serverUrl]);
 
   if (isLoading) {
     return <ActivityIndicator style={localStyles.container} size="large" color="#70667D" />;
