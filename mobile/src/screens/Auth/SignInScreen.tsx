@@ -7,7 +7,7 @@ import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
-import { useAuthStore, useApiStore } from '../../store';
+import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 /*
@@ -21,7 +21,7 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { api } = useApiStore();
+  const { apiService } = useServiceStore();
   const { actions } = useAuthStore();
   const { colors } = useTheme();
   const [loginState, setLoginState] = useState<IDataFetch>({
@@ -76,7 +76,7 @@ const SignInScreen = () => {
     if (!loginState.isLoading) {
       return;
     }
-    timeout(5000, api.auth.login(credential))
+    timeout(5000, apiService.auth.login(credential))
       .then((data: IResponse<IUser>) => {
         data.result
           ? actions.setUserStatus({
@@ -95,7 +95,7 @@ const SignInScreen = () => {
           isError: true,
         }),
       );
-  }, [actions, api.auth, credential, credential.userName, loginState.isLoading]);
+  }, [actions, apiService.auth, credential, credential.userName, loginState.isLoading]);
 
   return (
     <>

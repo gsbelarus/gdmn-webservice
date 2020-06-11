@@ -8,7 +8,7 @@ import {
 } from 'react-native-paper';
 
 import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
-import { AuthStoreProvider, ApiStoreProvider } from './src/store';
+import { AuthStoreProvider, ServiceStoreProvider } from './src/store';
 
 const App = () => {
   const containerRef = React.useRef<NavigationContainerRef>();
@@ -30,7 +30,7 @@ const App = () => {
   }, [theme.colors, theme.dark]);
 
   return (
-    <ApiStoreProvider>
+    <ServiceStoreProvider>
       <AuthStoreProvider>
         <PaperProvider theme={paperTheme}>
           {Platform.OS === 'ios' && <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />}
@@ -44,7 +44,7 @@ const App = () => {
           </NavigationContainer>
         </PaperProvider>
       </AuthStoreProvider>
-    </ApiStoreProvider>
+    </ServiceStoreProvider>
   );
 };
 

@@ -3,12 +3,15 @@ import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
 import AuthNavigator from '../../navigation/AuthNavigator';
-import { useApiStore } from '../../store';
+import { useServiceStore } from '../../store';
 
+/**
+ * Компонент для загрузки ресурсов приложения
+ */
 const ConnectionScreen = () => {
   const {
     state: { serverUrl },
-  } = useApiStore();
+  } = useServiceStore();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,13 +1,13 @@
 import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl } from '../../../common';
-import Api from '../api/Api';
-import Sync from '../api/Sync';
-import { AppActions, AuthActions, ApiActions } from '../store';
+import Api from '../service/Api';
+import Sync from '../service/Storage';
+import { AppActions, AuthActions, ServiceActions } from '../store';
 
-export interface IApiContextProps {
-  state: IApiState;
-  actions: typeof ApiActions;
-  api: Api;
-  sync: Sync;
+export interface IServiceContextProps {
+  state: IServiceState;
+  actions: typeof ServiceActions;
+  apiService: Api;
+  storageService: Sync;
 }
 
 export interface IAuthContextProps {
@@ -37,14 +37,14 @@ export interface INewDevice {
   user: string;
 }
 
-export interface IApiState {
+export interface IServiceState {
   serverUrl?: IBaseUrl;
   storagePath?: string;
 }
 
 export interface IAuthState {
-  companyID?: string;
-  userID?: string;
+  companyID?: string | null;
+  userID?: string | null;
   deviceRegistered?: boolean;
   deviceActive?: boolean;
   deviceId?: string;

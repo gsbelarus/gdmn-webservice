@@ -11,7 +11,7 @@ export const timeout = <T>(ms: number, promise: Promise<T>) => {
   });
 };
 
-export const timeoutWithСancellation = <T>(signal: Promise<T>, ms: number, promise: Promise<T>) => {
+export const timeoutWithСancellation = <T>(signal: Promise<void>, ms: number, promise: Promise<T>) => {
   return new Promise((resolve, reject) => {
     const tmOut = setTimeout(() => reject(new Error('время вышло')), ms);
 
@@ -24,14 +24,14 @@ export const timeoutWithСancellation = <T>(signal: Promise<T>, ms: number, prom
   });
 };
 
-interface ICancellablePromise<T> extends Promise<T> {
-  signal: Promise<T>;
+interface ICancellablePromise extends Promise<never> {
+  signal: Promise<never>;
   cancel: () => void;
 }
 
-export function createCancellableSignal<T>() {
-  const p: Partial<ICancellablePromise<T>> = {};
-  p.signal = new Promise<T>((resolve, reject) => (p.cancel = () => reject(new Error('прервано пользователем'))));
+export function createCancellableSignal() {
+  const p: Partial<ICancellablePromise> = {};
+  p.signal = new Promise((resolve, reject) => (p.cancel = () => reject(new Error('прервано пользователем'))));
 
   return p;
 }

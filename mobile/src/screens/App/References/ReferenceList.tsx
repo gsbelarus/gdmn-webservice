@@ -6,7 +6,7 @@ import { Text } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { useAuthStore, useAppStore, useApiStore } from '../../../store';
+import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -36,7 +36,7 @@ const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
   const { state: AppState } = useAppStore();
-  const { state: ApiState } = useApiStore();
+  const { state: ServiceState } = useServiceStore();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [resUpd, setResUpd] = useState();
 
@@ -46,7 +46,7 @@ const ReferenceListScreen = () => {
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const result = await fetch(`${ApiState.serverUrl}messages`, {
+    const result = await fetch(`${ServiceState.serverUrl}messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

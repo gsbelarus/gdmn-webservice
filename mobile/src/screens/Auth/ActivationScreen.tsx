@@ -10,11 +10,11 @@ import SubTitle from '../../components/SubTitle';
 import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
-import { useAuthStore, useApiStore } from '../../store';
+import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 const ActivationScreen = () => {
-  const { api } = useApiStore();
+  const { apiService } = useServiceStore();
   const { actions } = useAuthStore();
   const { colors } = useTheme();
 
@@ -29,13 +29,13 @@ const ActivationScreen = () => {
 
   useEffect(() => {
     if (serverReq?.isLoading) {
-      timeout(5000, api.auth.verifyActivationCode(activationCode))
+      timeout(5000, apiService.auth.verifyActivationCode(activationCode))
         .then((response: IResponse<{ userId: string }>) =>
           setServerResp({ result: response.result, data: response.data.userId }),
         )
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
-  }, [activationCode, api.auth, serverReq]);
+  }, [activationCode, apiService.auth, serverReq]);
 
   useEffect(() => {
     if (serverResp === undefined) {
@@ -49,7 +49,7 @@ const ActivationScreen = () => {
 
     timeout(
       5000,
-      api.auth.addDevice({
+      apiService.auth.addDevice({
         uid: config.debug.deviceId,
         user: serverResp.data as string,
       }),
@@ -70,7 +70,7 @@ const ActivationScreen = () => {
         console.log(JSON.stringify(err.message));
         setServerReq({ isLoading: false, isError: true, status: err.message });
       });
-  }, [actions, api.auth, serverResp]);
+  }, [actions, apiService.auth, serverResp]);
 
   return (
     <>

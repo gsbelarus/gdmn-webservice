@@ -37,7 +37,7 @@ export default class Api {
     getUserStatus: async (): Promise<IResponse<IUser>> =>
       get(this.getUrl(), `/auth/user?deviceId=${config.debug.deviceId}`),
 
-    getDevice: async (): Promise<IResponse<IDevice[]>> => get(this.getUrl(), `/devices/${config.debug.deviceId}`),
+    getDevice: async (): Promise<IResponse<IDevice>> => get(this.getUrl(), `/devices/${config.debug.deviceId}`),
 
     verifyActivationCode: async (code: string): Promise<IResponse<{ userId: string }>> =>
       post(this.getUrl(), `/auth/device/code?deviceId=${config.debug.deviceId}`, JSON.stringify({ code })),

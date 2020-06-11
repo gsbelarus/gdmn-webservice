@@ -15,7 +15,7 @@ export const AuthActions = {
   setDeviceStatus: createActionPayload<ActionAuthTypes.SET_DEVICE_STATUS, boolean | undefined>(
     ActionAuthTypes.SET_DEVICE_STATUS,
   ),
-  setUserStatus: createActionPayload<ActionAuthTypes.SET_USER_STATUS, { userID: string } | undefined>(
+  setUserStatus: createActionPayload<ActionAuthTypes.SET_USER_STATUS, { userID: string | undefined | null }>(
     ActionAuthTypes.SET_USER_STATUS,
   ),
   setCompanyID: createActionPayload<ActionAuthTypes.SET_COMPANY_ID, string>(ActionAuthTypes.SET_COMPANY_ID),
