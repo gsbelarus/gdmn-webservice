@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import { IDocument, IDocumentType } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/documentStatuses.json';
-import { useAuthStore, useAppStore } from '../../../store';
+import { useAuthStore, useAppStore, useApiStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const Statuses: IDocumentType[] = statuses;
@@ -52,7 +52,8 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
-  const { state, api } = useAuthStore();
+  const { api } = useApiStore();
+  const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;

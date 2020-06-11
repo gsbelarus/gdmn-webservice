@@ -80,7 +80,6 @@ const SignInScreen = () => {
       .then((data: IResponse<IUser>) => {
         data.result
           ? actions.setUserStatus({
-              logged: true,
               userID: data.data.id,
             }) /* Сделать как в AuthNav а лучше 1 вариант на 2 запроса*/
           : setLoginState({

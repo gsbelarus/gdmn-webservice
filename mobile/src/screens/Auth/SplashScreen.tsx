@@ -8,7 +8,6 @@ import styles from '../../styles/global';
 
 type Props = {
   deviceRegistered?: boolean;
-  loggedIn?: boolean;
   serverName?: string;
   isLoading?: boolean;
   isError?: boolean;

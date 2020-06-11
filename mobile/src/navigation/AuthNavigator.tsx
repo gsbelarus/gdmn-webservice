@@ -71,7 +71,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, loggedIn, companyID },
+    state: { deviceRegistered, userID, companyID },
     actions: authActions,
   } = useAuthStore();
 
@@ -96,8 +96,10 @@ const AuthNavigator = () => {
         - осуществлён ли вход текущего пользователя, если нет то перевод на вход пользователя
   */
   useEffect(() => {
+    console.log('useEffect: api.auth, deviceRegistered, signal, state.serverReq');
     /* 1. Запрос к серверу*/
     if (deviceRegistered ?? state.serverReq?.isLoading) {
+      console.log('breack request');
       timeoutWithСancellation(signal, 5000, api.auth.getDevice())
         .then((response: IResponse<IDevice>) =>
           setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
@@ -107,6 +109,7 @@ const AuthNavigator = () => {
   }, [api.auth, deviceRegistered, signal, state.serverReq]);
 
   useEffect(() => {
+    console.log('useEffect: authActions, state.serverResp');
     if (state.serverResp) {
       // TODO вызов 3 раза
       console.log('state.serverResp', state.serverResp);
@@ -115,23 +118,25 @@ const AuthNavigator = () => {
   }, [authActions, state.serverResp]);
 
   useEffect(() => {
+    console.log('useEffect: authActions, api.auth, deviceRegistered, signal');
     if (deviceRegistered === undefined) {
       return;
     }
     deviceRegistered
       ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
           .then((data: IResponse<IUser>) => {
-            const userStatus = isUser(data.data)
-              ? { logged: true, userID: data.data.id }
-              : { logged: false, userID: undefined };
+            const userStatus = isUser(data.data) ? { userID: data.data.id } : undefined;
             authActions.setUserStatus(userStatus);
           })
           .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
-      : authActions.setUserStatus({ logged: false, userID: undefined });
+      : authActions.setUserStatus({ userID: undefined });
   }, [authActions, api.auth, deviceRegistered, signal]);
   // Вынести всё в store  - deviceRegistered
 
-  useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
+  useEffect(() => {
+    console.log('useEffect: userID');
+    setState({ type: 'INIT' });
+  }, [userID]);
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
@@ -151,6 +156,7 @@ const AuthNavigator = () => {
   );
 
   useEffect(() => {
+    console.log('useEffect: api, serverUrl');
     if (serverUrl !== undefined) {
       setState({ type: 'SETTINGS_FORM', showSettings: false });
       api.setUrl(serverUrl);
@@ -160,24 +166,14 @@ const AuthNavigator = () => {
   const SplashWithParams = useCallback(
     () => (
       <SplashScreen
-        {...{ breakConnection, connection, deviceRegistered, loggedIn, showSettings }}
+        {...{ breakConnection, connection, deviceRegistered, userID, showSettings }}
         isLoading={state?.serverReq.isLoading}
         isError={state?.serverReq?.isError}
         status={state?.serverReq?.status}
         serverName={`${serverUrl?.server}:${serverUrl?.port}`}
       />
     ),
-    [
-      serverUrl?.port,
-      serverUrl?.server,
-      breakConnection,
-      connection,
-      deviceRegistered,
-      showSettings,
-      state?.serverReq?.isError,
-      state?.serverReq?.isLoading,
-      state?.serverReq?.status,
-    ],
+    [breakConnection, connection, deviceRegistered, serverUrl, showSettings, state, userID],
   );
 
   const CongfigWithParams = useCallback(
@@ -188,7 +184,7 @@ const AuthNavigator = () => {
         serverPort={serverUrl?.port}
       />
     ),
-    [hideSettings, changeSettings, serverUrl?.protocol, serverUrl?.server, serverUrl?.port],
+    [hideSettings, changeSettings, serverUrl],
   );
 
   const ConfigComponent = useMemo(
@@ -203,19 +199,18 @@ const AuthNavigator = () => {
     [CongfigWithParams],
   );
 
-  const LoginComponent = useMemo(
-    () =>
-      loggedIn ? (
-        companyID !== undefined ? (
-          <Stack.Screen key="App" name="App" component={AppNavigator} />
-        ) : (
-          <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
-        )
+  const LoginComponent = useMemo(() => {
+    console.log('useMemo: LoginComp');
+    return userID ? (
+      companyID !== undefined ? (
+        <Stack.Screen key="App" name="App" component={AppNavigator} />
       ) : (
-        <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
-      ),
-    [loggedIn, companyID],
-  );
+        <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
+      )
+    ) : (
+      <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
+    );
+  }, [userID, companyID]);
 
   const RegisterComponent = useMemo(
     () =>
@@ -229,7 +224,7 @@ const AuthNavigator = () => {
 
   const AuthConfig = useMemo(
     () =>
-      deviceRegistered !== undefined && loggedIn !== undefined ? (
+      deviceRegistered !== undefined /* && userID !== undefined*/ ? (
         RegisterComponent
       ) : (
         <Stack.Screen
@@ -239,7 +234,7 @@ const AuthNavigator = () => {
           options={{ animationTypeForReplace: 'pop' }}
         />
       ),
-    [RegisterComponent, SplashWithParams, deviceRegistered, loggedIn],
+    [RegisterComponent, SplashWithParams, deviceRegistered, /*userID*/],
   );
 
   return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;

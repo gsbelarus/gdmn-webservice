@@ -47,7 +47,6 @@ export interface IAuthState {
   userID?: string;
   deviceRegistered?: boolean;
   deviceActive?: boolean;
-  loggedIn?: boolean;
   deviceId?: string;
 }
 

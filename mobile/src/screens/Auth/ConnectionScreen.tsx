@@ -20,6 +20,7 @@ const ConnectionScreen = () => {
       return;
     }
 
+    /* TODO Перенести в Sync */
     const setBaseURL = async () => {
       let pathSrv: IBaseUrl = JSON.parse(await AsyncStorage.getItem('pathServer'));
       if (!(pathSrv instanceof Object && 'protocol' in pathSrv)) {

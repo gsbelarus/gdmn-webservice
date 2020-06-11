@@ -4,7 +4,7 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useApiStore } from '../../store';
 import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
@@ -12,7 +12,8 @@ const CompaniesScreen = () => {
   const [companies, setCompanies] = useState<string[]>([]);
 
   const { colors } = useTheme();
-  const { actions, api } = useAuthStore();
+  const { api } = useApiStore();
+  const { actions } = useAuthStore();
 
   useEffect(() => {
     const request = async () => {
