@@ -40,7 +40,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         </Text>
       </View>
       {status === 0 ? (
-        <View style={localStyles.marginRight}>
+        <View style={localStyles.remainsInfo}>
           <TouchableOpacity
             style={localStyles.buttonDelete}
             onPress={async () => {
@@ -121,14 +121,19 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={localStyles.listContainer}>
-        <View style={localStyles.headProductTitle}>
+        <View style={localStyles.avatarRow}>
+        </View>
+        <View style={localStyles.goodInfo}>
           <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
         </View>
-        <View style={localStyles.remainsInfoTitle}>
+        <View style={localStyles.remainsInfo}>
           <Text style={localStyles.productBarcodeView}>Заявка</Text>
         </View>
-        <View style={localStyles.remainsInfoTitle}>
+        <View style={localStyles.remainsInfo}>
           <Text style={localStyles.productBarcodeView}>Кол-во</Text>
+        </View>
+        <View style={localStyles.remainsInfo}>
+          <Text style={localStyles.productBarcodeView}></Text>
         </View>
       </View>
       <FlatList
@@ -259,6 +264,10 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
+  avatarRow: {
+    width: 36,
+    marginLeft: 5,
+  },
   buttonDelete: {
     alignItems: 'flex-end',
     flex: 1,
@@ -273,7 +282,7 @@ const localStyles = StyleSheet.create({
   },
   documentHeader: {
     flexDirection: 'row',
-    height: 50,
+    height: 60,
   },
   documentHeaderText: {
     flex: 1,
@@ -289,10 +298,7 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 15,
   },
-  goodInfo: {
-    marginLeft: 15,
-    width: '55%',
-  },
+ 
   header: {
     alignItems: 'center',
     flexDirection: 'column',
@@ -327,15 +333,12 @@ const localStyles = StyleSheet.create({
   remainsInfo: {
     alignItems: 'flex-end',
     flexGrow: 1,
-    marginRight: 15,
+    flexBasis: 45,
+    marginRight: 5,
   },
-  headProductTitle: {
-    width: '55%',
-    alignItems: 'center',
-    marginLeft: 30,
-  },
-  remainsInfoTitle: {
-    alignItems: 'center',
-    marginLeft: 10,
+  goodInfo: {
+    marginLeft: 15,
+    flexGrow: 5,
+    flexBasis: 150,
   },
 });

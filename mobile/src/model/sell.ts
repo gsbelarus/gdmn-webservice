@@ -11,8 +11,14 @@ export interface ISellHead extends IHead {
   expeditorId: number;
 }
 
+export interface ITara {
+  tarakey: number;
+  quantity: number;
+}
+
 export interface ISellLine extends ILine {
   orderQuantity?: number;
+  tara?: ITara[];
 }
 
 /*export interface IUser {

@@ -220,7 +220,7 @@ const DropdownList =  React.memo(({list, value, onValueChange}: {list: IItem[], 
             onPress={openDropdown}>
             <View style={localeStyles.containerMain}>
                 <View style={{flex:0.93}}>
-                  <Text style={localeStyles.text}> {label} </Text> 
+                  <Text  style={localeStyles.text} > {label} </Text> 
                 </View>
                 <View style={{flex:0.07}}>
                   <AntDesign
@@ -254,7 +254,7 @@ const localeStyles = StyleSheet.create({
     height: '100%',
   },
   containerItem: {
-    width:  Dimensions.get('window').width * 0.8, 
+    width:  Dimensions.get('window').width * 0.95, 
     backgroundColor: 'white',
   },
   subContainerItem: {
@@ -273,7 +273,7 @@ const localeStyles = StyleSheet.create({
     fontStyle: 'normal',
     },
   picker: {
-    width: Dimensions.get('window').width * 0.9,
+    width: '100%',
     height: 40,
     borderRadius: 4,
     borderWidth: 1,
@@ -295,7 +295,7 @@ const localeStyles = StyleSheet.create({
   },
   modalView:{
     backgroundColor: '#FFFFFF',
-    width: Dimensions.get('window').width * 0.9,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around',
@@ -310,7 +310,7 @@ const localeStyles = StyleSheet.create({
     fontSize: 14,
   },
   button:{
-    width: Dimensions.get('window').width * 0.9,
+    width: Dimensions.get('window').width,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center'
@@ -336,8 +336,8 @@ const localeStyles = StyleSheet.create({
     width: "95%",
   },
   itemSeparator: {
-    height: 0.5,
-    width: Dimensions.get('window').width * 0.9,
+    height: 0.9,
+    width: '100%',
     backgroundColor: '#000',
   },
   notFoundContaner: {

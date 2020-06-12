@@ -361,7 +361,6 @@ const localeStyles = StyleSheet.create({
   },
   textNumberInput: {
     fontSize: 16,
-    height: 17,
-    marginTop: 5,
+    height: 20,
   },
 });
