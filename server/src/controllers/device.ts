@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ParameterizedContext } from 'koa';
 import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_USERS } from '../server';
@@ -12,6 +15,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   let device: IDevice | undefined = undefined;
   let result: IResponse<string | IDevice>;
+  ctx.type = 'application/json';
 
   if (userName) {
     // Проверяем по пользователю
@@ -20,7 +24,9 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
     if (!device) {
       log.warn(`the device (${uid}) is not assigned to the user`);
       result = { result: false, error: `the device (${uid}) is not assigned to the user` };
-      ctx.throw(422, JSON.stringify(result));
+      ctx.status = 422;
+      ctx.body = JSON.stringify(result);
+      return;
     }
 
     log.info(`device status for current user:${device.isBlock || ' not'} active`);
@@ -35,7 +41,9 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   if (!device) {
     log.warn('device does not exist');
     result = { result: false, error: 'device does not exist' };
-    ctx.throw(422, JSON.stringify(result));
+    ctx.status = 422;
+    ctx.body = JSON.stringify(result);
+    return;
   }
   result = { result: true, data: device };
   ctx.status = 200;
@@ -61,6 +69,7 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
           }),
   };
   log.info(`get devices successfully`);
+  ctx.type = 'application/json';
   ctx.status = 200;
   ctx.body = JSON.stringify(result);
 };
@@ -73,23 +82,25 @@ const getDeviceByCurrentUser = async (ctx: ParameterizedContext): Promise<void> 
   const device: IDevice | undefined = allDevices?.find(device => device.uid === uid && device.user === userId);
 
   let result: IResponse<string | IDevice>;
+  ctx.type = 'application/json';
 
   if (device) {
     log.info(`device status for current user:${device?.isBlock || ' not'} active`);
     result = { result: true, data: device };
     ctx.status = 200;
-    ctx.body = JSON.stringify(result);
   } else {
     log.warn(`the device (${uid}) is not assigned to the current user)`);
     result = { result: false, error: 'device does not exist' };
-    ctx.throw(422, JSON.stringify(result));
+    ctx.status = 422;
   }
+  ctx.body = JSON.stringify(result);
 };
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { uid, userId } = ctx.request.body;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   let result: IResponse<string | IDevice>;
+  ctx.type = 'application/json';
 
   if (!(allDevices && allDevices.find(device => device.uid === uid && device.user === userId))) {
     const newDevice: IDevice = { uid, user: userId, isBlock: false };
@@ -97,12 +108,12 @@ const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
     log.info('a new device has been added');
     result = { result: true, data: newDevice };
     ctx.status = 201;
-    ctx.body = JSON.stringify(result);
   } else {
     log.warn(`the device(${uid}) is assigned to the user(${userId})`);
     result = { result: false, error: `the device(${uid}) is assigned to the user(${userId})` };
-    ctx.throw(422, JSON.stringify(result));
+    ctx.status = 422;
   }
+  ctx.body = JSON.stringify(result);
 };
 
 interface IUserState {
@@ -127,6 +138,7 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
             }),
   };
   ctx.status = 200;
+  ctx.type = 'application/json';
   ctx.body = JSON.stringify(result);
   log.info('get users by device successfully');
 };
@@ -137,11 +149,14 @@ const editDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const editPart = ctx.request.body;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
+  ctx.type = 'application/json';
 
   if (!allDevices || idx === undefined || idx < 0) {
     log.warn('no such device');
     const res: IResponse<string> = { result: false, error: 'no such device' };
-    ctx.throw(422, JSON.stringify(res));
+    ctx.status = 422;
+    ctx.body = JSON.stringify(res);
+    return;
   }
   const device: IDevice = { uid: uid, user: userId, ...editPart };
 
@@ -160,6 +175,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { userId } = ctx.request.body;
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const idx = allDevices && allDevices.findIndex(device => device.uid === uid && device.user === userId);
+  ctx.type = 'application/json';
 
   if (!allDevices || idx === undefined || idx < 0) {
     log.warn(`the device(${uid}) is not assigned to the user(${userId})`);
@@ -167,7 +183,8 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
       result: false,
       error: `the device(${uid}) is not assigned to the user(${userId})`,
     };
-    ctx.throw(422, JSON.stringify(result));
+    ctx.status = 422;
+    ctx.body = JSON.stringify(result);
   } else {
     await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]));
     log.info('device removed successfully');

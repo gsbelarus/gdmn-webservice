@@ -5,10 +5,13 @@ import { PATH_LOCAL_DB_DEVICES } from '../server';
 import { IResponse, IDevice } from '../../../common';
 
 export const deviceMiddleware = async (ctx: Context, next: Function) => {
+  ctx.type = 'application/json';
   if (!ctx.query.deviceId) {
     log.info('not such all parameters');
-    const res: IResponse<string> = { result: false, error: 'not such all parameters' };
-    ctx.throw(422, JSON.stringify(res));
+    const res: IResponse<undefined> = { result: false, error: 'not such all parameters' };
+    ctx.status = 422;
+    ctx.body = JSON.stringify(res);
+    return;
   }
 
   const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
@@ -16,14 +19,18 @@ export const deviceMiddleware = async (ctx: Context, next: Function) => {
 
   if (!currDevice) {
     log.info(`not such device(${ctx.query.deviceId})`);
-    const res: IResponse<string> = { result: false, error: 'not such device' };
-    ctx.throw(404, JSON.stringify(res));
+    const res: IResponse<undefined> = { result: false, error: 'not such device' };
+    ctx.status = 404;
+    ctx.body = JSON.stringify(res);
+    return;
   }
 
   if (currDevice.isBlock) {
     log.info(`device(${ctx.query.deviceId}) does not have access`);
-    const res: IResponse<string> = { result: false, error: 'does not have access' };
-    ctx.throw(401, JSON.stringify(res));
+    const res: IResponse<undefined> = { result: false, error: 'does not have access' };
+    ctx.status = 401;
+    ctx.body = JSON.stringify(res);
+    return;
   }
 
   await next();

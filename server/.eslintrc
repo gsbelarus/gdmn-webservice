@@ -26,7 +26,6 @@
   },
   "rules": {
     "prettier/prettier": "error",
-    "@typescript-eslint/interface-name-prefix": [1, { "prefixWithI": "always" }],
     "linebreak-style": [
       "error",
       "unix"

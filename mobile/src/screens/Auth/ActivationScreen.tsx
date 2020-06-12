@@ -29,9 +29,13 @@ const ActivationScreen = () => {
   useEffect(() => {
     if (serverReq?.isLoading) {
       timeout(5000, api.auth.verifyActivationCode(activationCode))
-        .then((response: IResponse<{ userId: string }>) =>
-          setServerResp({ result: response.result, data: response.data.userId }),
-        )
+        .then((response: IResponse<{ userId?: string }>) => {
+          if (response.result) {
+            setServerResp({ result: response.result, data: response.data.userId });
+          } else {
+            setServerReq({ isLoading: false, isError: true, status: response.error });
+          }
+        })
         .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
     }
   }, [activationCode, api.auth, serverReq]);
