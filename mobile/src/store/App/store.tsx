@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings } from '../../model';
@@ -18,24 +18,41 @@ const createStoreContext = () => {
   const StoreProvider = ({ children }) => {
     const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
     const {
-      state: { userID },
+      state: { userID, companyID },
     } = useAuthStore();
+
+    const [isLoad, setIsLoad] = useState(false);
 
     // TODO возможно нужно отвязаться от state.userID
     /* */
     useEffect(() => {
+      console.log('useEffect: load settings');
       const loadStorageData = async () => {
-        const storageSettings: IAppSettings = await appStorage.getItem(`${userID}/SETTINGS`);
+        const storageSettings: IAppSettings = await appStorage.getItem(`${userID}/${companyID}/SETTINGS`);
 
         actions.setSettings(storageSettings);
         console.log('load settings', storageSettings);
       };
 
-      if (userID) {
+      if (userID && companyID) {
+        console.log('companyId: ', companyID);
         loadStorageData();
       }
       console.log('state.userID', userID);
-    }, [actions, userID]);
+    }, [actions, userID, companyID]);
+
+    useEffect(() => {
+      console.log('useEffect: save Settings');
+      const saveStorageData = async () => {
+        await appStorage.setItem(`${userID}/${companyID}/SETTINGS`, state.settings);
+      };
+
+      if (userID && companyID && isLoad) {
+        saveStorageData();
+      }
+      setIsLoad(true);
+    }, [state.settings, userID, companyID]);
+
     /* TODO Добавить огранизацию */
 
     /* TODO Убрать loggedIn => state.userID*/

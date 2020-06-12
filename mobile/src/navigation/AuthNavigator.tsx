@@ -95,13 +95,11 @@ const AuthNavigator = () => {
         - осуществлён ли вход текущего пользователя, если нет то перевод на вход пользователя
   */
   useEffect(() => {
-    console.log('useEffect: apiService.auth, deviceRegistered, signal, state.serverReq');
     /* Нажата кнопка подключиться (или начальное состояние 'подключение')
       deviceRegistered ещё не определно и состояние isLoading = true
        => 1. Запрос к серверу devices/:id
     */
     const getDeviceStatus = async () => {
-      console.info('REQUEST: devices/:id');
       try {
         const response = await apiService.auth.getDevice();
         // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
@@ -109,7 +107,6 @@ const AuthNavigator = () => {
         //   5000,
         //   apiService.auth.getDevice(),
         // );
-        console.log('result', response.result);
         setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });
@@ -132,7 +129,6 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (state.serverResp) {
       // TODO вызов 3 раза
-      console.info('RESPONSE: devices/:id. Result', state.serverResp.result);
       authActions.setDeviceStatus(state.serverResp.result as boolean);
     }
   }, [authActions, state.serverResp]);
@@ -142,11 +138,9 @@ const AuthNavigator = () => {
       то делаем отправляем запрос на проверку пользователя (пользователь передаётся из куки)
     */
     const getUser = async () => {
-      console.info('REQUEST: auth/user');
       try {
         const result = await apiService.auth.getUserStatus();
         const userStatus = { userID: isUser(result.data) ? result.data.id : null };
-        console.info('   user status:', userStatus);
         authActions.setUserStatus(userStatus);
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });
@@ -160,7 +154,6 @@ const AuthNavigator = () => {
   useEffect(() => {
     if (!userID) {
       /* При обнулении userID сбрасываем состояние состояния в навигаторе */
-      console.log('useEffect: [userID] init');
       setState({ type: 'INIT' });
     }
   }, [userID]);
@@ -229,7 +222,6 @@ const AuthNavigator = () => {
   );
 
   const LoginComponent = useMemo(() => {
-    console.log('useMemo: LoginComp', userID);
     return userID ? (
       companyID !== undefined ? (
         <Stack.Screen key="App" name="App" component={AppNavigator} />
@@ -252,9 +244,6 @@ const AuthNavigator = () => {
   );
 
   const AuthConfig = useMemo(() => {
-    console.log('AuthConfig: deviceRegistered ', deviceRegistered);
-    console.log('AuthConfig: userID ', userID);
-
     return deviceRegistered !== undefined && userID !== undefined ? (
       RegisterComponent
     ) : (
