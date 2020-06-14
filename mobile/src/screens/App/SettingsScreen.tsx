@@ -29,11 +29,13 @@ const SettingsScreen = () => {
     <ScrollView style={{ backgroundColor: colors.background }}>
       <View style={localStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
-        <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
-          Сменить орг.
-        </Button>
         <Button icon="logout" mode="contained" onPress={logOut}>
           Выход
+        </Button>
+      </View>
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
+          Сменить организацию
         </Button>
       </View>
       <Divider />
@@ -68,7 +70,7 @@ const localStyles = StyleSheet.create({
   content: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
