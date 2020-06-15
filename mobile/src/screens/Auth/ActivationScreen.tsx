@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
 // eslint-disable-next-line import/default
@@ -27,24 +27,20 @@ const ActivationScreen = () => {
 
   const [activationCode, setActivationCode] = useState('');
 
-  useEffect(() => {
+  const sendActivationCode = useCallback(async () => {
     /* Запрос к серверу на проверку кода активации */
-    const srvRequest = async () => {
-      try {
-        const resp = await timeout<IResponse<{ userId: string }>>(
-          5000,
-          apiService.auth.verifyActivationCode(activationCode),
-        );
-        setServerResp({ result: resp.result, data: resp.data.userId });
-      } catch (err) {
-        setServerReq({ isLoading: false, isError: true, status: err.message });
-      }
-    };
-
-    if (serverReq.isLoading) {
-      srvRequest();
+    setServerReq({ isError: false, isLoading: true, status: undefined });
+    try {
+      const resp = await timeout<IResponse<{ userId: string }>>(
+        5000,
+        apiService.auth.verifyActivationCode(activationCode),
+      );
+      setServerResp({ result: resp.result, data: resp.data.userId });
+      setServerReq({ isError: false, isLoading: false, status: undefined });
+    } catch (err) {
+      setServerReq({ isLoading: false, isError: true, status: err.message });
     }
-  }, [activationCode, apiService.auth, serverReq.isLoading]);
+  }, [activationCode, apiService.auth]);
 
   useEffect(() => {
     if (serverResp === undefined) {
@@ -115,7 +111,7 @@ const ActivationScreen = () => {
             mode="contained"
             disabled={serverReq.isLoading}
             icon={'login'}
-            onPress={() => setServerReq({ isLoading: true, isError: false, status: '' })}
+            onPress={sendActivationCode}
             style={styles.rectangularButton}
           >
             Отправить
