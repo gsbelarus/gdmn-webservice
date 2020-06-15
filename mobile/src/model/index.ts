@@ -39,6 +39,7 @@ export interface INewDevice {
 
 export interface IServiceState {
   serverUrl?: IBaseUrl;
+  deviceId?: string;
   storagePath?: string;
 }
 
