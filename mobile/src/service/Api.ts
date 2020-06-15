@@ -43,14 +43,11 @@ export default class Api {
     getDevice: async (): Promise<IResponse<IDevice>> => get(this.getUrl(), `/devices/${this.deviceId}`),
 
     verifyActivationCode: async (code: string): Promise<IResponse<{ userId: string }>> =>
-      post(this.getUrl(), `/auth/device/code?deviceId=${this.deviceId}`, JSON.stringify({ code })),
+      post(this.getUrl(), '/auth/device/code', JSON.stringify({ uid: this.deviceId, code })),
 
+    //TODO: избавиться от роута
     addDevice: async (newDevice: INewDevice): Promise<IResponse<IDevice>> =>
-      post(
-        this.getUrl(),
-        `/devices/?deviceId=${this.deviceId}`,
-        JSON.stringify({ uid: newDevice.uid, user: newDevice.user }),
-      ),
+      post(this.getUrl(), '/devices/', JSON.stringify({ uid: newDevice.uid, user: newDevice.user })),
   };
 
   data = {
