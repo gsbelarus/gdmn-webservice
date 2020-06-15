@@ -13,7 +13,7 @@ import { deviceMiddleware } from '../middleware/deviceRequired';
 
 const router = new Router({ prefix: '/companies' });
 
-router.post('/', compose([authMiddleware, deviceMiddleware]), addCompany);
+router.post('/', addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
 router.get('/:id', compose([authMiddleware, deviceMiddleware]), getCompanyProfile);
 router.patch('/:id', compose([authMiddleware, deviceMiddleware]), editCompanyProfile);
 router.get('/:id/users', compose([authMiddleware, deviceMiddleware]), getUsersByCompany);

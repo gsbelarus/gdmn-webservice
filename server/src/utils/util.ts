@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { readFile, writeFile } from './workWithFile';
-import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS } from '../server';
+import { PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES } from '../server';
 import { VerifyFunction } from 'passport-local';
-import { IActivationCode, IUser } from '../../../common';
+import { IActivationCode, IUser, IDevice } from '../../../common';
 
 const findById = async (id: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
@@ -11,6 +12,24 @@ const findById = async (id: string) => {
 const findByUserName = async (userName: string) => {
   const data: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   return data ? data.find(user => user.userName === userName) : undefined;
+};
+
+const addNewDevice = async ({
+  userId,
+  deviceId,
+}: {
+  userId: string;
+  deviceId: string;
+}): Promise<IDevice | undefined> => {
+  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+
+  if (!(allDevices && allDevices.find(device => device.uid === deviceId && device.user === userId))) {
+    const newDevice: IDevice = { uid: deviceId, user: userId, isBlock: false };
+    await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(allDevices ? [...allDevices, newDevice] : [newDevice]));
+
+    return newDevice;
+  }
+  return undefined;
 };
 
 const saveActivationCode = async (userId: string) => {
@@ -63,4 +82,4 @@ const validateAuthCreds: VerifyFunction = async (userName: string, password: str
   }
 };
 
-export { validateAuthCreds, saveActivationCode, findById, findByUserName };
+export { validateAuthCreds, saveActivationCode, findById, findByUserName, addNewDevice };

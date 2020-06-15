@@ -108,6 +108,8 @@ const AuthNavigator = () => {
         //   apiService.auth.getDevice(),
         // );
         setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
+        authActions.setUserStatus({ userID: null });
+        authActions.setDeviceStatus(response.result);
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });
       }
@@ -124,14 +126,14 @@ const AuthNavigator = () => {
     //     )
     //     .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
     // }
-  }, [apiService.auth, deviceRegistered, signal, state.serverReq]);
+  }, [apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (state.serverResp) {
       // TODO вызов 3 раза
       authActions.setDeviceStatus(state.serverResp.result as boolean);
     }
-  }, [authActions, state.serverResp]);
+  }, [authActions, state.serverResp]); */
 
   useEffect(() => {
     /* 2. Если устройства найдено (deviceRegistered = true)
@@ -147,7 +149,9 @@ const AuthNavigator = () => {
       }
     };
 
-    deviceRegistered ? getUser() : authActions.setUserStatus({ userID: undefined });
+    if (deviceRegistered !== undefined) {
+      deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null });
+    }
   }, [authActions, apiService.auth, deviceRegistered, signal]);
   // Вынести всё в store  - deviceRegistered
 
@@ -158,11 +162,11 @@ const AuthNavigator = () => {
     }
   }, [userID]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (userID && companyID) {
       actions.setStoragePath(`${userID}/${companyID}`);
     }
-  }, [userID, companyID, actions]);
+  }, [userID, companyID, actions]); */
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 

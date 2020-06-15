@@ -19,7 +19,7 @@ const CompaniesScreen = () => {
     const request = async () => {
       const response = await apiService.auth.getUserStatus();
       if (response.result) {
-        setCompanies(response.data.companies ?? []);
+        setCompanies(response.data.companies || []);
       }
     };
     request();

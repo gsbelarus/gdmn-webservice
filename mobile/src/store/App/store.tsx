@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { useServiceStore } from '..';
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings } from '../../model';
+import { useStore as useServiceStore } from '../Service/store';
 //import { useStore as useAuthStore } from '../Auth/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';

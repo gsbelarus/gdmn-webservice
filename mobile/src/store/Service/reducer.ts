@@ -10,6 +10,7 @@ export const initialState: IServiceState = {
 };
 
 export const reducer: Reducer<IServiceState, TServiceActions> = (state = initialState, action): IServiceState => {
+  console.log('Service action: ', JSON.stringify(action));
   switch (action.type) {
     case ActionServiceTypes.SET_SERVER_URL:
       return { ...state, serverUrl: action.payload };

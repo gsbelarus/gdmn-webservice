@@ -1,20 +1,17 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
-import { Text, Button, ActivityIndicator, IconButton } from 'react-native-paper';
-// eslint-disable-next-line import/default
-import VirtualKeyboard from 'react-native-virtual-keyboard';
+import { Text, Button, ActivityIndicator, IconButton, TextInput } from 'react-native-paper';
 
 import { IResponse } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
-import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
 import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 const ActivationScreen = () => {
-  const { apiService } = useServiceStore();
+  const { actions: serviceActions, apiService } = useServiceStore();
   const { actions } = useAuthStore();
   const { colors } = useTheme();
 
@@ -23,7 +20,6 @@ const ActivationScreen = () => {
     isError: false,
     status: undefined,
   });
-  const [serverResp, setServerResp] = useState<IResponse<string>>(undefined);
 
   const [activationCode, setActivationCode] = useState('');
 
@@ -31,51 +27,22 @@ const ActivationScreen = () => {
     /* Запрос к серверу на проверку кода активации */
     setServerReq({ isError: false, isLoading: true, status: undefined });
     try {
-      const resp = await timeout<IResponse<{ userId: string }>>(
+      const resp = await timeout<IResponse<{ userId: string; deviceId: string }>>(
         5000,
         apiService.auth.verifyActivationCode(activationCode),
       );
-      setServerResp({ result: resp.result, data: resp.data.userId });
-      setServerReq({ isError: false, isLoading: false, status: undefined });
+
+      if (!resp.result) {
+        setActivationCode('');
+        setServerReq({ isError: true, isLoading: false, status: resp.error });
+        return;
+      }
+      serviceActions.setDeviceId(resp.data.deviceId);
+      actions.setDeviceStatus(true); // Возможно нужно сделать перенаправление на первую страницу
     } catch (err) {
       setServerReq({ isLoading: false, isError: true, status: err.message });
     }
-  }, [activationCode, apiService.auth]);
-
-  useEffect(() => {
-    if (serverResp === undefined) {
-      return;
-    }
-
-    if (!serverResp.result) {
-      setServerReq({ isLoading: false, isError: true, status: 'Неверный код' });
-      return;
-    }
-
-    timeout(
-      5000,
-      apiService.auth.addDevice({
-        uid: config.debug.deviceId,
-        user: serverResp.data as string,
-      }),
-    )
-      .then((response: IResponse<string>) => {
-        if (!response.result) {
-          setServerReq({
-            isLoading: false,
-            isError: true,
-            status: response.error,
-          });
-          setActivationCode('');
-          return;
-        }
-        actions.setDeviceStatus(true);
-      })
-      .catch((err: Error) => {
-        console.log(JSON.stringify(err.message));
-        setServerReq({ isLoading: false, isError: true, status: err.message });
-      });
-  }, [actions, apiService.auth, serverResp]);
+  }, [actions, activationCode, apiService.auth, serviceActions]);
 
   return (
     <>
@@ -91,22 +58,15 @@ const ActivationScreen = () => {
             {serverReq.isError && <Text style={localStyles.errorText}>Ошибка: {serverReq.status}</Text>}
             {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
-          {/* <TextInput
-          value={inputValue}
-          onChangeText={setInputValue}
-          placeholder="Введите код"
-          placeholderTextColor={'#9A9FA1'}
-          autoCapitalize="sentences"
-          underlineColorAndroid="transparent"
-          selectionColor={'black'}
-          maxLength={50}
-          returnKeyType="done"
-          autoCorrect={false}
-          keyboardType="decimal-pad"
-          style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-        />} */}
-          <Text style={localStyles.codeText}>{activationCode}</Text>
-          <VirtualKeyboard color="black" pressMode="string" onPress={setActivationCode} />
+          <TextInput
+            placeholder="Введите код"
+            keyboardType="number-pad"
+            returnKeyType="done"
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
+            value={activationCode}
+            onChangeText={setActivationCode}
+          />
           <Button
             mode="contained"
             disabled={serverReq.isLoading}

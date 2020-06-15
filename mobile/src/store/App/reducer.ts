@@ -20,6 +20,7 @@ export const initialState: IAppState = {
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
+  console.log('App action: ', JSON.stringify(action));
   switch (action.type) {
     case ActionAppTypes.NEW_DOCUMENT: {
       return { ...state, documents: [...state.documents, action.payload] };

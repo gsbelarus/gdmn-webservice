@@ -29,12 +29,12 @@ export default class Sync {
     return pathSrv;
   };
 
-  setDeviceId = async (deviceId: string) => {
+  setDeviceId = async (deviceId: string): Promise<void> => {
     await appStorage.setItem('deviceId', deviceId);
   };
 
   getDeviceId = async () => {
-    const deviceId: string = (await appStorage.getItem('deviceId')) || '0';
+    const deviceId: string = await appStorage.getItem('deviceId');
     return deviceId;
   };
 }

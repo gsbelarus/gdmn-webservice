@@ -1,7 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
-import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
+import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
+import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
 import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
@@ -106,12 +106,18 @@ const SignInScreen = () => {
         <View>
           <SubTitle>Вход пользователя</SubTitle>
           <TextInput
+            returnKeyType="done"
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
             placeholder="Имя пользователя"
             value={credential.userName}
             onChangeText={(val) => setCredentials({ ...credential, userName: val })}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           <TextInput
+            returnKeyType="done"
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
             placeholder="Пароль"
             secureTextEntry
             value={credential.password}
