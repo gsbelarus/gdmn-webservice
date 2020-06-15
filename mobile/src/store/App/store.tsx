@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
+import { useServiceStore } from '..';
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings } from '../../model';
-import { useStore as useAuthStore } from '../Auth/store';
+//import { useStore as useAuthStore } from '../Auth/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
 import { reducer, initialState } from './reducer';
@@ -18,40 +19,37 @@ const createStoreContext = () => {
   const StoreProvider = ({ children }) => {
     const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
     const {
-      state: { userID, companyID },
-    } = useAuthStore();
+      state: { storagePath },
+    } = useServiceStore();
 
     const [isLoad, setIsLoad] = useState(false);
 
     // TODO возможно нужно отвязаться от state.userID
     /* */
     useEffect(() => {
-      console.log('useEffect: load settings');
       const loadStorageData = async () => {
-        const storageSettings: IAppSettings = await appStorage.getItem(`${userID}/${companyID}/SETTINGS`);
+        const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/SETTINGS`);
 
         actions.setSettings(storageSettings);
-        console.log('load settings', storageSettings);
       };
 
-      if (userID && companyID) {
-        console.log('companyId: ', companyID);
+      if (storagePath) {
         loadStorageData();
       }
-      console.log('state.userID', userID);
-    }, [actions, userID, companyID]);
+    }, [actions, storagePath]);
 
     useEffect(() => {
-      console.log('useEffect: save Settings');
-      const saveStorageData = async () => {
-        await appStorage.setItem(`${userID}/${companyID}/SETTINGS`, state.settings);
-      };
+      if (state.settings) {
+        const saveStorageData = async () => {
+          await appStorage.setItem(`${storagePath}/SETTINGS`, state.settings);
+        };
 
-      if (userID && companyID && isLoad) {
-        saveStorageData();
+        if (storagePath && isLoad) {
+          saveStorageData();
+        }
+        setIsLoad(true);
       }
-      setIsLoad(true);
-    }, [state.settings, userID, companyID]);
+    }, [isLoad, state.settings, storagePath]);
 
     /* TODO Добавить огранизацию */
 

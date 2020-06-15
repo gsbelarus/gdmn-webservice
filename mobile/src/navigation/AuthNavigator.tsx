@@ -158,6 +158,12 @@ const AuthNavigator = () => {
     }
   }, [userID]);
 
+  useEffect(() => {
+    if (userID && companyID) {
+      actions.setStoragePath(`${userID}/${companyID}`);
+    }
+  }, [userID, companyID, actions]);
+
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
   const breakConnection = useCallback(() => cancel(), [cancel]);

@@ -40,14 +40,30 @@ const createStoreContext = () => {
       }
     }, [actions, init, state.serverUrl]);
 
+    //useEffect для deviceId
     useEffect(() => {
-      const getUrl = async () => {
+      if (state.deviceId !== undefined) {
+        apiService.setDeviceId(state.deviceId); // в службе Service обновляем deviceId
+        if (!init) {
+          // Если не инициализация, а изменение
+          storageService.setDeviceId(state.deviceId); // записываем deviceId в хранилище устройства
+          // сохранение deviceId || '0'
+        }
+      } else {
+        setInit(true);
+      }
+    }, [actions, init, state.deviceId]);
+
+    useEffect(() => {
+      const getInitialState = async () => {
         actions.setServerUrl(await storageService.getServer()); // Загружаем путь к серверу из хранилища в стейт
+        // TODO загрузка deviceId из хранилища
+        actions.setDeviceId(await storageService.getDeviceId()); // Загружаем deviceId из хранилища в стейт
         setInit(false);
       };
 
       if (init) {
-        getUrl();
+        getInitialState();
       }
     }, [actions, init]);
 
