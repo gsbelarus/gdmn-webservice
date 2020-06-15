@@ -28,14 +28,23 @@ const ActivationScreen = () => {
   const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
-    if (serverReq?.isLoading) {
-      timeout(5000, apiService.auth.verifyActivationCode(activationCode))
-        .then((response: IResponse<{ userId: string }>) =>
-          setServerResp({ result: response.result, data: response.data.userId }),
-        )
-        .catch((err: Error) => setServerReq({ isLoading: false, isError: true, status: err.message }));
+    /* Запрос к серверу на проверку кода активации */
+    const srvRequest = async () => {
+      try {
+        const resp = await timeout<IResponse<{ userId: string }>>(
+          5000,
+          apiService.auth.verifyActivationCode(activationCode),
+        );
+        setServerResp({ result: resp.result, data: resp.data.userId });
+      } catch (err) {
+        setServerReq({ isLoading: false, isError: true, status: err.message });
+      }
+    };
+
+    if (serverReq.isLoading) {
+      srvRequest();
     }
-  }, [activationCode, apiService.auth, serverReq]);
+  }, [activationCode, apiService.auth, serverReq.isLoading]);
 
   useEffect(() => {
     if (serverResp === undefined) {

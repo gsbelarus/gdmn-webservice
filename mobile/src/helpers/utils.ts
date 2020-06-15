@@ -5,14 +5,14 @@ import config from '../config';
 export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     setTimeout(() => reject(new Error('время вышло')), ms);
     promise.then(resolve, reject);
   });
 };
 
 export const timeoutWithСancellation = <T>(signal: Promise<void>, ms: number, promise: Promise<T>) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const tmOut = setTimeout(() => reject(new Error('время вышло')), ms);
 
     promise.then(resolve, reject);
