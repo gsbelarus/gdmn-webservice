@@ -34,6 +34,8 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     overwrite: true /** (boolean) can overwrite or not (default true) */,
     httpOnly: true /** (boolean) httpOnly or not (default true) */,
     signed: true /** (boolean) signed or not (default true) */,
+    sameSite:
+      true /** (string) lets require that a cookie shouldn't be sent with cross-origin requests (default undefined) */,
   };
 
   passport.serializeUser((user: IUser, done) => done(null, user.id));

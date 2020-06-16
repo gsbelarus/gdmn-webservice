@@ -14,12 +14,12 @@ import { deviceMiddleware } from '../middleware/deviceRequired';
 
 const router = new Router({ prefix: '/devices' });
 
-router.post('/', compose([authMiddleware, deviceMiddleware]), addDevice);
-router.get('/', compose([authMiddleware, deviceMiddleware]), getDevices);
+router.post('/', compose([deviceMiddleware, authMiddleware]), addDevice);
+router.get('/', compose([deviceMiddleware, authMiddleware]), getDevices);
 router.get('/:id', getDevice);
-router.get('/:id/currentuser', compose([authMiddleware, deviceMiddleware]), getDeviceByCurrentUser);
-router.get('/:id/users', compose([authMiddleware, deviceMiddleware]), getUsersByDevice);
-router.patch('/:id/user/:userId', compose([authMiddleware, deviceMiddleware]), editDevice);
-router.delete('/:id', compose([authMiddleware, deviceMiddleware]), removeDevice);
+router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
+router.get('/:id/users', compose([deviceMiddleware, authMiddleware]), getUsersByDevice);
+router.patch('/:id/user/:userId', compose([deviceMiddleware, authMiddleware]), editDevice);
+router.delete('/:id', compose([deviceMiddleware, authMiddleware]), removeDevice);
 
 export default router;

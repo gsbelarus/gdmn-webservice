@@ -78,7 +78,6 @@ export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditO
                   && ((user?.phoneNumber || '') === (state.phoneNumber || ''))
                   && ((user?.password || '') === (state.password || '')))
                 || (repeatPassword || '') !== (state.password || '')
-                || ((state.password || '') === '')
               }
               onClick={() => {
                 onClearError();
