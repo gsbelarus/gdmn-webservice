@@ -6,6 +6,7 @@ import { readFile, writeFile } from '../utils/workWithFile';
 import { PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_USERS } from '../server';
 import log from '../utils/logger';
 import { IDevice, IResponse, IUser } from '../../../common';
+import { addNewDevice } from '../utils/util';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const uid: string = ctx.params.id;
@@ -98,13 +99,12 @@ const getDeviceByCurrentUser = async (ctx: ParameterizedContext): Promise<void> 
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { uid, userId } = ctx.request.body;
-  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+
   let result: IResponse<string | IDevice>;
   ctx.type = 'application/json';
 
-  if (!(allDevices && allDevices.find(device => device.uid === uid && device.user === userId))) {
-    const newDevice: IDevice = { uid, user: userId, isBlock: false };
-    await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(allDevices ? [...allDevices, newDevice] : [newDevice]));
+  const newDevice = await addNewDevice({ userId, deviceId: uid });
+  if (newDevice) {
     log.info('a new device has been added');
     result = { result: true, data: newDevice };
     ctx.status = 201;

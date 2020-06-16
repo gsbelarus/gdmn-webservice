@@ -4,11 +4,11 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Text, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
+import { useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 type Props = {
   deviceRegistered?: boolean;
-  loggedIn?: boolean;
   serverName?: string;
   isLoading?: boolean;
   isError?: boolean;
@@ -20,7 +20,7 @@ type Props = {
 
 const SplashScreen = (props: Props) => {
   const { serverName, isLoading, isError, status, connection, breakConnection, showSettings } = props;
-
+  const { state } = useServiceStore();
   const { colors } = useTheme();
 
   return (

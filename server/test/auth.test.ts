@@ -244,12 +244,31 @@ describe('testing /api/auth/', () => {
   });
 
   describe('POST /api/auth/device/code', () => {
-    test('SUCCESS: device has been successfully activated', async () => {
-      const response = await request(getApp().callback()).post('/api/auth/device/code').send({ code: '123qwe' });
-      expect(response.status).toEqual(200);
-      expect(response.type).toEqual('application/json');
-      expect(response.body.result).toBeTruthy();
-      expect(response.body.data).toBe('admin');
+    describe('SUCCESS: device has been successfully activated', () => {
+      let response: request.Response;
+      beforeAll(async () => {
+        response = await request(getApp().callback()).post('/api/auth/device/code').send({ code: '123qwe' });
+      });
+
+      test('Status 200', () => {
+        expect(response.status).toEqual(200);
+      });
+
+      test('correct structure body', () => {
+        expect(response.body.result).toBeTruthy();
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data).toHaveProperty('deviceId');
+        expect(response.body.data).toHaveProperty('userId');
+      });
+
+      test('correct type data', () => {
+        expect(typeof response.body.data.deviceId).toBe('string');
+        expect(typeof response.body.data.userId).toBe('string');
+      });
+
+      test('correct data length', () => {
+        expect(Object.keys(response.body.data).length).toEqual(2);
+      });
     });
 
     test('ERROR: not found activation code', async () => {

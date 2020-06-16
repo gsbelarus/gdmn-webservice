@@ -12,5 +12,13 @@ export interface IInventoryHead extends IHead {
 export interface IInventoryLine extends ILine {
 }
 
-export interface IInventoryDocumentType extends IDocumentType {
+export interface IReference {
+  id: number;
+  name: string;
+  type: string;
+  data: {
+    id: number | string;
+    name?: string;
+    [fieldName: string]: unknown;
+  }[];
 }

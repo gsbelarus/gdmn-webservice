@@ -1,14 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
-import { AsyncStorage } from 'react-native';
 
-import { IResponse, IUser, IBaseUrl, IDevice } from '../../../common';
+import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
-import { createCancellableSignal, timeoutWithСancellation } from '../helpers/utils';
+import { createCancellableSignal } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
-import { useAuthStore } from '../store';
+import { useAuthStore, useServiceStore } from '../store';
 import CompanyNavigator from './CompanyNavigator';
 
 type AuthStackParamList = {
@@ -71,10 +70,15 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, loggedIn, baseUrl, companyID },
-    actions,
-    api,
+    state: { deviceRegistered, userID, companyID },
+    actions: authActions,
   } = useAuthStore();
+
+  const {
+    state: { serverUrl },
+    actions,
+    apiService,
+  } = useServiceStore();
 
   const [state, setState] = useReducer(reducer, initialState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,34 +95,78 @@ const AuthNavigator = () => {
         - осуществлён ли вход текущего пользователя, если нет то перевод на вход пользователя
   */
   useEffect(() => {
-    if (deviceRegistered ?? state.serverReq?.isLoading) {
-      timeoutWithСancellation(signal, 5000, api.auth.getDevice())
-        .then((response: IResponse<IDevice>) =>
-          setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
-        )
-        .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
-    }
-  }, [api.auth, deviceRegistered, signal, state.serverReq]);
+    /* Нажата кнопка подключиться (или начальное состояние 'подключение')
+      deviceRegistered ещё не определно и состояние isLoading = true
+       => 1. Запрос к серверу devices/:id
+    */
+    const getDeviceStatus = async () => {
+      try {
+        const response = await apiService.auth.getDevice();
+        // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
+        //   signal,
+        //   5000,
+        //   apiService.auth.getDevice(),
+        // );
+        setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
+        authActions.setUserStatus({ userID: null });
+        authActions.setDeviceStatus(response.result);
+      } catch (err) {
+        setState({ type: 'SET_ERROR', text: err.message });
+      }
+    };
 
-  useEffect(() => {
+    if (deviceRegistered === undefined && state.serverReq?.isLoading) {
+      getDeviceStatus();
+    }
+    // if (deviceRegistered === undefined && state.serverReq?.isLoading) {
+    //   console.log('break request');
+    //   timeoutWithСancellation(signal, 5000, apiService.auth.getDevice())
+    //     .then((response: IResponse<IDevice>) =>
+    //       setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
+    //     )
+    //     .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
+    // }
+  }, [apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
+
+  /*   useEffect(() => {
     if (state.serverResp) {
       // TODO вызов 3 раза
-      actions.setDeviceStatus(state.serverResp.result as boolean);
+      authActions.setDeviceStatus(state.serverResp.result as boolean);
     }
-  }, [actions, state.serverResp]);
+  }, [authActions, state.serverResp]); */
 
   useEffect(() => {
-    if (deviceRegistered === undefined) {
-      return;
-    }
-    deviceRegistered
-      ? timeoutWithСancellation(signal, 5000, api.auth.getUserStatus())
-          .then((data: IResponse<IUser>) => actions.setUserStatus(isUser(data.data)))
-          .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }))
-      : actions.setUserStatus(false);
-  }, [actions, api.auth, deviceRegistered, signal]);
+    /* 2. Если устройства найдено (deviceRegistered = true)
+      то делаем отправляем запрос на проверку пользователя (пользователь передаётся из куки)
+    */
+    const getUser = async () => {
+      try {
+        const result = await apiService.auth.getUserStatus();
+        const userStatus = { userID: isUser(result.data) ? result.data.id : null };
+        authActions.setUserStatus(userStatus);
+      } catch (err) {
+        setState({ type: 'SET_ERROR', text: err.message });
+      }
+    };
 
-  useEffect(() => setState({ type: 'INIT' }), [loggedIn]);
+    if (deviceRegistered !== undefined) {
+      deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null });
+    }
+  }, [authActions, apiService.auth, deviceRegistered, signal]);
+  // Вынести всё в store  - deviceRegistered
+
+  useEffect(() => {
+    if (!userID) {
+      /* При обнулении userID сбрасываем состояние состояния в навигаторе */
+      setState({ type: 'INIT' });
+    }
+  }, [userID]);
+
+  /*   useEffect(() => {
+    if (userID && companyID) {
+      actions.setStoragePath(`${userID}/${companyID}`);
+    }
+  }, [userID, companyID, actions]); */
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
@@ -129,43 +177,46 @@ const AuthNavigator = () => {
   const hideSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: false }), []);
 
   const changeSettings = useCallback(
-    (newBaseUrl: IBaseUrl) => {
-      AsyncStorage.setItem('pathServer', JSON.stringify(newBaseUrl))
-        .then(() => actions.setBaseUrl(newBaseUrl))
-        .catch(() => setState({ type: 'SETTINGS_FORM', showSettings: false }));
+    (newServerUrl: IBaseUrl) => {
+      actions.setServerUrl(newServerUrl);
+      setState({ type: 'SETTINGS_FORM', showSettings: false });
     },
     [actions],
   );
 
-  useEffect(() => {
-    if (baseUrl !== undefined) {
-      setState({ type: 'SETTINGS_FORM', showSettings: false });
-      api.setUrl(baseUrl);
-    }
-  }, [api, baseUrl]);
-
   const SplashWithParams = useCallback(
     () => (
       <SplashScreen
-        {...{ breakConnection, connection, deviceRegistered, loggedIn, showSettings }}
+        {...{ breakConnection, connection, deviceRegistered, userID, showSettings }}
         isLoading={state?.serverReq.isLoading}
         isError={state?.serverReq?.isError}
         status={state?.serverReq?.status}
-        serverName={`${baseUrl?.server}:${baseUrl?.port}`}
+        serverName={`${serverUrl?.server}:${serverUrl?.port}`}
       />
     ),
-    [baseUrl, breakConnection, connection, deviceRegistered, loggedIn, showSettings, state],
+    [
+      breakConnection,
+      connection,
+      deviceRegistered,
+      userID,
+      showSettings,
+      state?.serverReq?.isLoading,
+      state?.serverReq?.isError,
+      state?.serverReq?.status,
+      serverUrl?.server,
+      serverUrl?.port,
+    ],
   );
 
   const CongfigWithParams = useCallback(
     () => (
       <ConfigScreen
         {...{ hideSettings, changeSettings }}
-        serverName={`${baseUrl?.protocol}${baseUrl?.server}`}
-        serverPort={baseUrl?.port}
+        serverName={`${serverUrl?.protocol}${serverUrl?.server}`}
+        serverPort={serverUrl?.port}
       />
     ),
-    [baseUrl, hideSettings, changeSettings],
+    [hideSettings, changeSettings, serverUrl?.protocol, serverUrl?.server, serverUrl?.port],
   );
 
   const ConfigComponent = useMemo(
@@ -180,19 +231,17 @@ const AuthNavigator = () => {
     [CongfigWithParams],
   );
 
-  const LoginComponent = useMemo(
-    () =>
-      loggedIn ? (
-        companyID !== undefined ? (
-          <Stack.Screen key="App" name="App" component={AppNavigator} />
-        ) : (
-          <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
-        )
+  const LoginComponent = useMemo(() => {
+    return userID ? (
+      companyID !== undefined ? (
+        <Stack.Screen key="App" name="App" component={AppNavigator} />
       ) : (
-        <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
-      ),
-    [loggedIn, companyID],
-  );
+        <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
+      )
+    ) : (
+      <Stack.Screen key="LogIn" name="LogIn" component={SignInScreen} />
+    );
+  }, [userID, companyID]);
 
   const RegisterComponent = useMemo(
     () =>
@@ -204,20 +253,18 @@ const AuthNavigator = () => {
     [deviceRegistered, LoginComponent],
   );
 
-  const AuthConfig = useMemo(
-    () =>
-      deviceRegistered !== undefined && loggedIn !== undefined ? (
-        RegisterComponent
-      ) : (
-        <Stack.Screen
-          key="Splash"
-          name="Splash"
-          component={SplashWithParams}
-          options={{ animationTypeForReplace: 'pop' }}
-        />
-      ),
-    [RegisterComponent, SplashWithParams, deviceRegistered, loggedIn],
-  );
+  const AuthConfig = useMemo(() => {
+    return deviceRegistered !== undefined && userID !== undefined ? (
+      RegisterComponent
+    ) : (
+      <Stack.Screen
+        key="Splash"
+        name="Splash"
+        component={SplashWithParams}
+        options={{ animationTypeForReplace: 'pop' }}
+      />
+    );
+  }, [RegisterComponent, SplashWithParams, deviceRegistered, userID]);
 
   return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;
 };

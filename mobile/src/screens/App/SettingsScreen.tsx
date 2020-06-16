@@ -1,21 +1,27 @@
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
-import { ScrollView, AsyncStorage, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
 import SettingsItem from '../../components/SettingsItem';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useAppStore, useServiceStore } from '../../store';
+// AppStore
 
-const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
+// const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
   const { colors, dark } = useTheme();
-  const { actions, api } = useAuthStore();
+  const { apiService } = useServiceStore();
+  const {
+    actions: appActions,
+    state: { settings },
+  } = useAppStore();
+  const { actions: authActions } = useAuthStore();
 
   const logOut = async () => {
-    const res = await api.auth.logout();
+    const res = await apiService.auth.logout();
     if (res.result) {
-      actions.logOut();
+      authActions.logOut();
     }
   };
 
@@ -23,24 +29,35 @@ const SettingsScreen = () => {
     <ScrollView style={{ backgroundColor: colors.background }}>
       <View style={localStyles.content}>
         <Avatar.Icon size={48} icon="face-outline" />
-        <Button mode="contained" onPress={() => actions.setCompanyID(undefined)}>
-          Сменить орг.
-        </Button>
         <Button icon="logout" mode="contained" onPress={logOut}>
           Выход
         </Button>
       </View>
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
+          Сменить организацию
+        </Button>
+      </View>
       <Divider />
-      <SettingsItem label="Синхронизировать" value={true} onValueChange={() => ({})} />
+      <SettingsItem
+        label="Синхронизировать"
+        value={settings?.synchronization}
+        onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
+      />
       <Divider />
-      <SettingsItem label="Удалять документы после обработки на сервере" value={true} onValueChange={() => ({})} />
+      <SettingsItem
+        label="Удалять документы после обработки на сервере"
+        value={settings?.autodeletingDocument}
+        onValueChange={() =>
+          appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
+        }
+      />
       <Divider />
       <SettingsItem
         label="Dark theme"
         value={dark}
         onValueChange={() => {
-          AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
-
+          //AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
           // Переделать в глобал стейт
           // setTheme(t => (t.dark ? DefaultTheme : DarkTheme));
         }}
@@ -53,7 +70,7 @@ const localStyles = StyleSheet.create({
   content: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
