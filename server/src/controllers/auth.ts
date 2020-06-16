@@ -13,26 +13,30 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
-  const currDevice = devices?.find(
-    device => (device.uid === deviceId || deviceId === 'WEB') && device.user === userName,
-  );
-  ctx.type = 'application/json';
 
-  if (!currDevice) {
-    log.info(`not such device (${deviceId})`);
-    const res: IResponse<string> = { result: false, error: 'not device or user' };
-    ctx.status = 404;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (deviceId !== 'WEB') {
+    const currDevice = devices?.find(
+      device => (device.uid === deviceId || deviceId === 'WEB') && device.user === userName,
+    );
+    ctx.type = 'application/json';
+
+    if (!currDevice) {
+      log.info(`not such device (${deviceId})`);
+      const res: IResponse<string> = { result: false, error: 'not device or user' };
+      ctx.status = 404;
+      ctx.body = JSON.stringify(res);
+      return;
+    }
+
+    if (currDevice.isBlock) {
+      log.info(`device(${deviceId}) does not have access`);
+      const res: IResponse<undefined> = { result: false, error: 'does not have access' };
+      ctx.status = 401;
+      ctx.response.body = JSON.stringify(res);
+      return;
+    }
   }
 
-  if (currDevice.isBlock) {
-    log.info(`device(${deviceId}) does not have access`);
-    const res: IResponse<undefined> = { result: false, error: 'does not have access' };
-    ctx.status = 401;
-    ctx.response.body = JSON.stringify(res);
-    return;
-  }
   const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
 
   if (!user) {
