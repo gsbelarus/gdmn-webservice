@@ -212,7 +212,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { device } = action;
       const { currentDevices } = state;
       const idx = currentDevices?.findIndex(item => item.uid === device.uid);
-      if(currentDevices && idx && idx > -1) {
+      if(currentDevices && idx !== undefined && idx > -1) {
         return {
           ...state,
           currentDevices: [...currentDevices?.slice(0, idx), device, ...currentDevices?.slice(idx + 1)]
