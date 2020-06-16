@@ -1,21 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import Api from '../../api/Api';
-import Sync from '../../api/Sync';
 import { IAuthState, IAuthContextProps } from '../../model';
+import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AuthActions } from './actions';
 import { reducer, initialState } from './reducer';
 
-const api = new Api();
-
-const sync = new Sync();
-
 const defaultAppState: IAuthContextProps = {
   state: initialState,
   actions: AuthActions,
-  api,
-  sync,
 };
 
 const createStoreContext = () => {
@@ -23,7 +16,15 @@ const createStoreContext = () => {
 
   const StoreProvider = ({ children }) => {
     const [state, actions] = useTypesafeActions<IAuthState, typeof AuthActions>(reducer, initialState, AuthActions);
-    return <StoreContext.Provider value={{ state, actions, api, sync }}>{children}</StoreContext.Provider>;
+    const { actions: storeActions } = useServiceStore();
+
+    useEffect(() => {
+      if (state.userID && state.companyID) {
+        storeActions.setStoragePath(`${state.userID}/${state.companyID}`);
+      }
+    }, [state.userID, state.companyID, actions, storeActions]);
+
+    return <StoreContext.Provider value={{ state, actions }}>{children}</StoreContext.Provider>;
   };
 
   const useStore = () => React.useContext(StoreContext);

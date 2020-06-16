@@ -10,6 +10,7 @@ import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
+  settings: undefined,
   documents,
   remains,
   references,
@@ -19,9 +20,8 @@ export const initialState: IAppState = {
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
+  console.log('App action: ', JSON.stringify(action));
   switch (action.type) {
-    case ActionAppTypes.DISCONNECT:
-      return { ...initialState };
     case ActionAppTypes.NEW_DOCUMENT: {
       return { ...state, documents: [...state.documents, action.payload] };
     }
@@ -119,6 +119,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         ],
       };
     }
+    case ActionAppTypes.SET_SETTINGS:
+      return { ...state, settings: action.payload };
     default:
       return state;
   }

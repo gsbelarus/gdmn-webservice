@@ -1,32 +1,27 @@
 import { Reducer } from 'react';
 
-import { IDocument } from '../../../../common';
 import { IAuthState } from '../../model';
 import { TAuthActions, ActionAuthTypes } from './actions';
 
 export const initialState: IAuthState = {
-  baseUrl: undefined,
   deviceRegistered: undefined,
-  loggedIn: undefined,
+  userID: undefined,
   companyID: undefined,
 };
 
 export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState, action): IAuthState => {
+  console.log('Auth action: ', JSON.stringify(action));
   switch (action.type) {
     case ActionAuthTypes.DISCONNECT:
-      return { ...{ baseUrl: state.baseUrl, initialState, documents: [] as IDocument[] } };
+      return initialState;
     case ActionAuthTypes.LOG_OUT:
-      return { ...state, userID: undefined, loggedIn: false, companyID: undefined };
-    case ActionAuthTypes.SET_BASEURL:
-      return { ...state, baseUrl: action.payload };
+      return { ...state, userID: null, companyID: undefined };
     case ActionAuthTypes.SET_DEVICE_STATUS:
       return { ...state, deviceRegistered: action.payload };
     case ActionAuthTypes.SET_USER_STATUS:
-      return { ...state, loggedIn: action.payload };
+      return { ...state, userID: action.payload?.userID };
     case ActionAuthTypes.SET_COMPANY_ID:
       return { ...state, companyID: action.payload };
-    case ActionAuthTypes.SET_USER_ID:
-      return { ...state, userID: action.payload };
     default:
       return state;
   }

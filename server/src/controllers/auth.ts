@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import koaPassport from 'koa-passport';
 import { promisify } from 'util';
 import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../server';
 import { readFile, writeFile } from '../utils/workWithFile';
-import { findByUserName, saveActivationCode } from '../utils/util';
+import { findByUserName, saveActivationCode, addNewDevice } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
 import { IResponse, IActivationCode, IUser, IDevice } from '../../../common';
 import log from '../utils/logger';
+import { v1 as uuidv1 } from 'uuid';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
@@ -121,24 +123,37 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const data: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const code = data && data.find(el => el.code === ctx.request.body.code);
-  let result: IResponse<string>;
+  const { code, uid = '0' } = ctx.request.body;
+  const codeList: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
+  const codeRec = codeList?.find(el => el.code === code);
+
+  let result: IResponse<{ userId: string; deviceId: string }>;
   let status: number;
   ctx.type = 'application/json';
 
-  if (code) {
-    const date = new Date(code.date);
+  if (codeRec) {
+    const date = new Date(codeRec.date);
     date.setDate(date.getDate() + 7);
 
     if (date >= new Date()) {
-      await writeFile(
-        PATH_LOCAL_DB_ACTIVATION_CODES,
-        JSON.stringify(data?.filter(el => el.code !== ctx.request.body.code)),
-      );
-      status = 200;
-      result = { result: true, data: code.user };
-      log.info('device has been successfully activated');
+      // Сохраняем список кодов без использованного
+      /* TODO
+        1) Вынести добавление устройства в utils
+        2) сделать вызов добавления устройства из метода addDevice (контроллер Device) и отсюда ниже
+        3) если uid = 0 то сгенерировать uid
+      addDevice({}) */
+      const deviceId = uid == '0' ? uuidv1() : uid;
+
+      const newDevice = await addNewDevice({ userId: codeRec.user, deviceId });
+      if (newDevice) {
+        status = 200;
+        result = { result: true, data: { userId: codeRec.user, deviceId: deviceId as string } };
+      } else {
+        status = 404;
+        result = { result: false, error: 'error' };
+        log.warn('error');
+      }
+      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(codeList?.filter(el => el.code !== code)));
     } else {
       status = 404;
       result = { result: false, error: 'invalid activation code' };
@@ -154,7 +169,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.userId;
+  const { userId }: { userId: string } = ctx.params;
   const code = await saveActivationCode(userId);
   ctx.status = 200;
   ctx.type = 'application/json';

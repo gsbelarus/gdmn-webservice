@@ -4,6 +4,13 @@
   // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+  {
+    "name": "Attach to Chrome",
+    "port": 9229,
+    "request": "attach",
+    "type": "pwa-chrome",
+    "webRoot": "${workspaceFolder}"
+  },
     {
       "type": "node",
       "request": "attach",

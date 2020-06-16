@@ -4,7 +4,7 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
@@ -12,20 +12,21 @@ const CompaniesScreen = () => {
   const [companies, setCompanies] = useState<string[]>([]);
 
   const { colors } = useTheme();
-  const { actions, api } = useAuthStore();
+  const { apiService } = useServiceStore();
+  const { actions } = useAuthStore();
 
   useEffect(() => {
     const request = async () => {
-      const response = await api.auth.getUserStatus();
+      const response = await apiService.auth.getUserStatus();
       if (response.result) {
-        setCompanies(response.data.companies ?? []);
+        setCompanies(response.data.companies || []);
       }
     };
     request();
-  }, []);
+  }, [apiService.auth]);
 
   const logOut = async () => {
-    const res = await api.auth.logout();
+    const res = await apiService.auth.logout();
     if (res.result) {
       actions.logOut();
     }

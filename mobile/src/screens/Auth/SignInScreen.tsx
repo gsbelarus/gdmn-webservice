@@ -1,13 +1,13 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TextInput, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
-import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
+import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
+import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials, IUser, IDevice } from '../../../../common';
+import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 
 /*
@@ -21,9 +21,10 @@ import styles from '../../styles/global';
 */
 
 const SignInScreen = () => {
-  const { actions, api } = useAuthStore();
+  const { apiService } = useServiceStore();
+  const { actions } = useAuthStore();
   const { colors } = useTheme();
-  const [lognState, setLoginState] = useState<IDataFetch>({
+  const [loginState, setLoginState] = useState<IDataFetch>({
     isLoading: false,
     isError: false,
     status: undefined,
@@ -47,33 +48,54 @@ const SignInScreen = () => {
     };
   }, []);
 
+  // const finishLogin = async () => {
+  //   const result = await appStorage.getItems([
+  //     `${credential.userName}/SYNCHRONIZATION`,
+  //     `${credential.userName}/AUTODELETING_DOCUMENT`,
+  //   ]);
+  //   actions.setSynchonization(result?.[0][1] && JSON.parse(result[0][1]).value);
+  //   actions.setAutodeletingDocument(result?.[1][1] && JSON.parse(result[1][1]).value);
+  //   actions.setUserID(credential.userName);
+  //   actions.setUserStatus(true);
+  // };
+
+  // useEffect(() => {
+  //   if (state.loggedIn) {
+  //     // TODO: Не всегда заходит почему-то
+  //     // TODO: setUserStatus совсемстить с setUserID
+  //     actions.setUserID(credential.userName);
+  //   }
+  // }, [actions, credential.userName, state.loggedIn]);
+
   const logIn = useCallback(() => {
     Keyboard.dismiss();
     setLoginState({ isError: false, isLoading: true, status: undefined });
   }, []);
 
   useEffect(() => {
-    if (!lognState.isLoading) {
+    if (!loginState.isLoading) {
       return;
     }
-       timeout(5000, api.auth.login(credential))
-        .then((data: IResponse<undefined>) => {
-          data.result
-            ? actions.setUserStatus(true)
-            : setLoginState({
-                isLoading: false,
-                status: data.error,
-                isError: true,
-              });
-        })
-        .catch((err: Error) =>
-          setLoginState({
-            isLoading: false,
-            status: err.message,
-            isError: true,
-          }),
-        );
-  }, [api.auth, credential.userName, lognState.isLoading /*, state.deviceId*/]);
+    timeout(5000, apiService.auth.login(credential))
+      .then((data: IResponse<IUser>) => {
+        data.result
+          ? actions.setUserStatus({
+              userID: data.data.id,
+            }) /* Сделать как в AuthNav а лучше 1 вариант на 2 запроса*/
+          : setLoginState({
+              isLoading: false,
+              status: data.error,
+              isError: true,
+            });
+      })
+      .catch((err: Error) =>
+        setLoginState({
+          isLoading: false,
+          status: err.message,
+          isError: true,
+        }),
+      );
+  }, [actions, apiService.auth, credential, credential.userName, loginState.isLoading]);
 
   return (
     <>
@@ -84,12 +106,18 @@ const SignInScreen = () => {
         <View>
           <SubTitle>Вход пользователя</SubTitle>
           <TextInput
+            returnKeyType="done"
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
             placeholder="Имя пользователя"
             value={credential.userName}
             onChangeText={(val) => setCredentials({ ...credential, userName: val })}
             style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
           />
           <TextInput
+            returnKeyType="done"
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
             placeholder="Пароль"
             secureTextEntry
             value={credential.password}
@@ -98,7 +126,7 @@ const SignInScreen = () => {
           />
           <Button
             mode="contained"
-            disabled={lognState.isLoading}
+            disabled={loginState.isLoading}
             icon={'login'}
             onPress={logIn}
             style={styles.rectangularButton}
@@ -107,8 +135,8 @@ const SignInScreen = () => {
           </Button>
         </View>
         <View style={localStyles.statusBox}>
-          {lognState.isError && <Text style={localStyles.errorText}>Ошибка: {lognState.status}</Text>}
-          {lognState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+          {loginState.isError && <Text style={localStyles.errorText}>Ошибка: {loginState.status}</Text>}
+          {loginState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
       </KeyboardAvoidingView>
       <View style={styles.bottomButtons}>

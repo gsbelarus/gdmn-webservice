@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import { IDocument, IDocumentType } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/documentStatuses.json';
-import { useAuthStore, useAppStore } from '../../../store';
+import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const Statuses: IDocumentType[] = statuses;
@@ -52,14 +52,15 @@ const DocumentsListScreen = ({ navigation }) => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
-  const { state, api } = useAuthStore();
+  const { apiService } = useServiceStore();
+  const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
     const data = appState.documents.filter((document) => document.head.status === 1);
-    const respons = await api.data.sendMessages(state.companyID, 'gdmn', data);
+    const respons = await apiService.data.sendMessages(state.companyID, 'gdmn', data);
     if (respons.result) {
       Alert.alert('Успех!', '', [
         {
