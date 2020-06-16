@@ -8,7 +8,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
   // и что-то делает
   // http://localhost/execute_command
   const url: string = 'http://localhost:3649/api';
-  const deviceId = "123";
+  const deviceId = "WEB";
   let resFetch;
   let res;
   let body;

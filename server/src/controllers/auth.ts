@@ -11,13 +11,15 @@ import { v1 as uuidv1 } from 'uuid';
 
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
+  const { deviceId } = ctx.query;
+  const { userName } = ctx.request.body;
   const currDevice = devices?.find(
-    device => device.uid === ctx.query.deviceId && device.user === ctx.request.body?.userName,
+    device => (device.uid === deviceId || deviceId === 'WEB') && device.user === userName,
   );
   ctx.type = 'application/json';
 
   if (!currDevice) {
-    log.info(`not such device(${ctx.query.deviceId})`);
+    log.info(`not such device (${deviceId})`);
     const res: IResponse<string> = { result: false, error: 'not device or user' };
     ctx.status = 404;
     ctx.body = JSON.stringify(res);
@@ -25,7 +27,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   }
 
   if (currDevice.isBlock) {
-    log.info(`device(${ctx.query.deviceId}) does not have access`);
+    log.info(`device(${deviceId}) does not have access`);
     const res: IResponse<undefined> = { result: false, error: 'does not have access' };
     ctx.status = 401;
     ctx.response.body = JSON.stringify(res);
