@@ -1,14 +1,40 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation} from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
+import ItemSeparator from '../../../components/ItemSeparator';
 import styles from '../../../styles/global';
-import { IGood, IDocument } from '../../../../../common';
-import { ISellLine, ISellDocument } from '../../../model';
+import { IGood, IDocument, IReference } from '../../../../../common';
+import { ISellLine, ISellDocument, ILineTara, ITara } from '../../../model';
 import { useAppStore } from '../../../store';
+
+const TaraItem = React.memo(({ item, line }:  { item: ITara; line: ISellLine; }) => {
+  const navigation = useNavigation();
+  const [taraStatus, setTaraStatus] = useState(false);
+  const { colors } = useTheme();
+  return (
+    <TouchableOpacity
+      style={[localeStyles.listContainer, {backgroundColor: colors.border }]}
+      onPress={() => {setTaraStatus(true);}}
+    >
+      <View style={localeStyles.taraContanerView}>
+        <Text  style={[localeStyles.fontSize16, { opacity: 0.7 }]}>
+          {item.name}
+        </Text>
+        <Text  style={[localeStyles.fontSize16, { opacity: 0.7 }]}>
+          вес ед.: {item.weight ?? 0}
+        </Text>
+        <Text  style={[localeStyles.fontSize16, { opacity: 0.7 }]}>
+          количество: {line?.tara? line.tara.find((t) => t.tarakey === item.id)?.quantity : 0}
+        </Text>
+      </View> 
+    </TouchableOpacity>
+  );
+}); 
+/**/
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
@@ -21,8 +47,16 @@ const ProductDetailScreen = ({ route, navigation }) => {
       ? (document as IDocument).lines
       : (document as ISellDocument).lines;
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineID);
+  const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
   const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState(1);
+
+  const ref = React.useRef<FlatList<ITara>>(null);
+  useScrollToTop(ref);
+
+  const renderItem = ({ item }: {item: ITara}) => (
+    <TaraItem item={item} line={line} />
+  );
 
   useEffect(() => {
     if (route.params.modeCor) {
@@ -44,14 +78,16 @@ const ProductDetailScreen = ({ route, navigation }) => {
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
+
       <View style={localeStyles.productPriceView}>
-        <Text style={localeStyles.fontSize16}>Кол-во по заявке:</Text>
-        <Text style={localeStyles.productPrice}>{(lineDocument as ISellLine)?.orderQuantity ?? 0}</Text>
+        <View style={localeStyles.productQuantity}>
+          <Text style={localeStyles.fontSize16}>Количество: {lineDocument?.quantity ?? 0}</Text>
+        </View>
+        <View  style={localeStyles.productQuantity}>
+          <Text style={localeStyles.fontSize16}>Кол-во по заявке: {(lineDocument as ISellLine)?.orderQuantity ?? 0} </Text>
+        </View>
       </View>
-      <View style={localeStyles.productQuantityView}>
-        <Text style={localeStyles.fontSize16}>Количество:</Text>
-        <Text style={localeStyles.productQuantity}>{lineDocument?.quantity ?? 0}</Text>
-      </View>
+     
       <View style={localeStyles.editQuantityView}>
         <Text style={localeStyles.fontSize16}>Изменить количество:</Text>
         <InputSpinner
@@ -65,6 +101,16 @@ const ProductDetailScreen = ({ route, navigation }) => {
           colorLeft={colors.primary}
           colorRight={colors.primary}
           onChange={setValue}
+        />
+      </View>
+      <View style={localeStyles.flatContaner}>
+        <FlatList
+          ref={ref}
+          data={taraList ?? []}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+          horizontal={true}
         />
       </View>
       <Button
@@ -83,7 +129,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         mode="contained"
         style={[styles.rectangularButton, localeStyles.button]}
       >
-        Изменить
+        Подтвердить
       </Button>
     </View>
   );
@@ -104,7 +150,7 @@ const localeStyles = StyleSheet.create({
   editQuantityView: {
     alignItems: 'center',
     flexDirection: 'column',
-    marginTop: 100,
+    marginTop: 20,
   },
   fontSize16: {
     fontSize: 16,
@@ -131,13 +177,14 @@ const localeStyles = StyleSheet.create({
   },
   productPriceView: {
     flexDirection: 'row',
-    marginLeft: 15,
-    marginTop: 45,
+    marginHorizontal: 15,
+    marginTop: 25,
+    justifyContent: 'center', 
   },
   productQuantity: {
     color: '#000000',
     fontSize: 17,
-    marginLeft: 5,
+    marginLeft: 15,
   },
   productQuantityView: {
     flexDirection: 'row',
@@ -147,4 +194,24 @@ const localeStyles = StyleSheet.create({
   title: {
     padding: 10,
   },
+  taraContanerView: {
+    flexDirection: 'column',
+    marginHorizontal: 3,
+    marginVertical: 3,
+    padding: 15,
+    flexBasis: 145,
+    minWidth: 120,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 4,
+  },
+  listContainer: {
+    flexBasis: 100,
+    marginTop: 10,
+    marginLeft: 0.5,
+    borderRadius: 6,
+  },
+  flatContaner: {
+    margin: 20,
+  }
 });

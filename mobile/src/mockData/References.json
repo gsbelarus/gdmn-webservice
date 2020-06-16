@@ -443,5 +443,42 @@
         "name": "Discont Card OstrovChistoty"
       }
     ]
-	}
+  },
+	{
+    "id": 5,
+    "name": "Тара",
+    "type": "taraTypes",
+    "data": [
+      {
+				"id": 155679483,
+				"name": "Ящик 3.3",
+				"goodkey": 45375970,
+				"weight": 3.3
+      },
+      {
+				"id": 155679484,
+				"name": "Ящик 2.7",
+				"goodkey": 45375971,
+				"weight": 2.7
+      },
+      {
+        "id": 155679485,
+				"name": "Коробка 0.6",
+				"goodkey": 45375972,
+				"weight": 0.6
+      },
+      {
+				"id": 155679486,
+				"name": "Ящик 1.7",
+				"goodkey": 45375973,
+				"weight": 1.7
+      },
+      {
+        "id": 155679487,
+				"name": "Коробка 0.4",
+				"goodkey": 45375975,
+				"weight": 0.4
+      }
+    ]
+  }
 ]

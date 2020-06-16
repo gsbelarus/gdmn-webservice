@@ -3,7 +3,7 @@ import Api from '../api/Api';
 import Sync from '../api/Sync';
 import { AppActions, AuthActions } from '../store';
 import { ISellDocument } from './sell';
-export { ISellDocument, ISellHead, ISellLine } from './sell';
+export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara} from './sell';
 
 export interface IAuthContextProps {
   state: IAuthState;
