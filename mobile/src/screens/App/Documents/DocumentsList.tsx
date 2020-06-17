@@ -67,7 +67,7 @@ const DocumentsListScreen = ({ navigation }) => {
 
     timeout(
       5000,
-      apiService.data.sendMessagesRef(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
           name: 'post_documents',
