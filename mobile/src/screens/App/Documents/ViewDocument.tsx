@@ -33,7 +33,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
-          {state.remains?.find((remain) => remain.goodId === good.id).price}
+          {state.remains?.find((remain) => remain?.goodId === good.id)?.price || 0}
         </Text>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {item.quantity}

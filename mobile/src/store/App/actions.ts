@@ -1,9 +1,8 @@
-import { IHead, ILine, IDocument, IReference } from '../../../../common';
+import { IHead, ILine, IDocument, IReference, IRemain } from '../../../../common';
 import { IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
-  LOAD_REFERENCES = 'LOAD_REFERENCES',
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',
   EDIT_STATUS_DOCUMENT = 'EDIT_STATUS_DOCUMENT',
@@ -13,10 +12,11 @@ export enum ActionAppTypes {
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
   SET_SETTINGS = 'SET_SETTINGS',
   SET_REFERENCES = 'SET_REFERENCES',
+  SET_DOCUMENTS = 'SET_DOCUMENTS',
+  SET_REMAINS = 'SET_REMAINS',
 }
 
 export const AppActions = {
-  loadreferences: createActionPayload<ActionAppTypes.LOAD_REFERENCES, IReference[]>(ActionAppTypes.LOAD_REFERENCES),
   newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
@@ -36,6 +36,8 @@ export const AppActions = {
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
   setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, IReference[]>(ActionAppTypes.SET_REFERENCES),
+  setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
+  setRemains: createActionPayload<ActionAppTypes.SET_REMAINS, IRemain[]>(ActionAppTypes.SET_REMAINS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

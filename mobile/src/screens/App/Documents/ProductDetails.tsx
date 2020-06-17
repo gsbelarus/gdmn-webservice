@@ -42,11 +42,11 @@ const ProductDetailScreen = ({ route, navigation }) => {
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
       <View style={localeStyles.productPriceView}>
         <Text style={localeStyles.fontSize16}>Цена:</Text>
-        <Text style={localeStyles.productPrice}>{remain.price}</Text>
+        <Text style={localeStyles.productPrice}>{remain?.price || 0}</Text>
       </View>
       <View style={localeStyles.productQuantityView}>
         <Text style={localeStyles.fontSize16}>Количество:</Text>
-        <Text style={localeStyles.productQuantity}>{remain.quantity}</Text>
+        <Text style={localeStyles.productQuantity}>{remain?.quantity || 0}</Text>
       </View>
       <View style={localeStyles.editQuantityView}>
         <Text style={localeStyles.fontSize16}>Добавить количество:</Text>

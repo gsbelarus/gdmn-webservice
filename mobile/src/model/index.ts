@@ -38,6 +38,7 @@ export interface INewDevice {
 }
 
 export interface IServiceState {
+  isLoading: boolean;
   serverUrl?: IBaseUrl;
   deviceId?: string;
   storagePath?: string;

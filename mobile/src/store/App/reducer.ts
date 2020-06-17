@@ -1,19 +1,19 @@
 import { Reducer } from 'react';
 
 import contacts from '../../mockData//GD_Contact.json';
-import documents from '../../mockData/Document.json';
+// import documents from '../../mockData/Document.json';
 import documentTypes from '../../mockData/GD_DocumentType.json';
 import goods from '../../mockData/Goods.json';
-import references from '../../mockData/References.json';
-import remains from '../../mockData/Remains.json';
+// import references from '../../mockData/References.json';
+// import remains from '../../mockData/Remains.json';
 import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
   settings: undefined,
-  documents,
-  remains,
-  references,
+  documents: undefined,
+  remains: undefined,
+  references: undefined,
   goods,
   contacts,
   documentTypes,
@@ -123,6 +123,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, settings: action.payload };
     case ActionAppTypes.SET_REFERENCES:
       return { ...state, references: action.payload };
+    case ActionAppTypes.SET_DOCUMENTS: {
+      return { ...state, documents: action.payload };
+    }
+    case ActionAppTypes.SET_REMAINS: {
+      return { ...state, remains: action.payload };
+    }
     default:
       return state;
   }
