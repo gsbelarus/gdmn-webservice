@@ -4,19 +4,13 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { IDocument, IDocumentType, IContact } from '../../../../../common';
+import { IDocument, IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
+import { timeout } from '../../../helpers/utils';
 import ItemSeparator from '../../../components/ItemSeparator';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
-/*import documents from '../../../mockData/Otves/Document.json';
-import references from '../../../mockData/Otves/References.json';*/
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
-
-/*const DocumentList: IDocument[] = documents;
-const DocumentTypes: IDocumentType[] = references.find((ref) => ref.type === "documentTypes").data;
-const Contacts: IContact[] = references.find((ref) => ref.type === "contacts").data; */
 
 const Statuses: IDocumentType[] = statuses;
 
@@ -65,6 +59,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const ref = React.useRef<FlatList<ISellDocument>>(null);
   useScrollToTop(ref);
+
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
@@ -72,26 +67,47 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const data = appState.documents.filter((document) => document.head.status === 1);
-    const respons = await apiService.data.sendMessages(state.companyID, 'gdmn', data);
-    if (respons.result) {
-      Alert.alert('Успех!', '', [
-        {
-          text: 'OK',
-          onPress: async () => {
-            data.forEach((item) => {
-              actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
-            });
+    const documents = appState.documents.filter((document) => document.head.status === 1);
+    
+    timeout(
+      5000,
+      apiService.data.sendMessages(state.companyID, 'gdmn', {
+        type: 'cmd',
+        payload: {
+          name: 'post_documents',
+          params: documents,
+        },
+      }),
+    )
+      .then((response: IResponse<IMessageInfo>) => {
+        if (response.result) {
+          Alert.alert('Успех!', '', [
+            {
+              text: 'OK',
+              onPress: () => {
+                documents.forEach((item) => {
+                  actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+                });
+              },
+            },
+          ]);
+        } else {
+          Alert.alert('Запрос не был отправлен', '', [
+            {
+              text: 'OK',
+              onPress: () => ({}),
+            },
+          ]);
+        }
+      })
+      .catch((err: Error) =>
+        Alert.alert('Ошибка!', err.message, [
+          {
+            text: 'OK',
+            onPress: () => ({}),
           },
-        },
-      ]);
-    } else {
-      Alert.alert('Запрос не был отправлен', '', [
-        {
-          text: 'OK',
-        },
-      ]);
-    }
+        ]),
+      );
   };
 
   return (
