@@ -1,11 +1,12 @@
 import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { IReference } from '../../../../../common';
+import { IReference, IMessageInfo, IResponse } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { timeout } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -36,50 +37,52 @@ const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
   const { state: AppState } = useAppStore();
-  const { state: ServiceState } = useServiceStore();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [resUpd, setResUpd] = useState();
+  const { actions, apiService } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
-  const sendUpdateRequest = async () => {
-    const result = await fetch(`${ServiceState.serverUrl}messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        head: {
-          companyId: state.companyID,
-        },
-        body: {
-          type: 'cmd',
-          payload: {
-            name: 'get_references',
-            params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
-          },
+  const sendUpdateRequest = useCallback(() => {
+    timeout(
+      5000,
+      apiService.data.sendMessagesRef(state.companyID, 'gdmn', {
+        type: 'cmd',
+        payload: {
+          name: 'get_references',
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
         },
       }),
-    }).then((res) => res.json());
-    if (result.status === 201) {
-      setResUpd(result.result);
-      Alert.alert('Успех!', '', [
-        {
-          text: 'OK',
-          onPress: () => ({}),
-        },
-      ]);
-    } else {
-      Alert.alert('Запрос не был отправлен', '', [
-        {
-          text: 'OK',
-          onPress: () => ({}),
-        },
-      ]);
-    }
-  };
+    )
+      .then((response: IResponse<IMessageInfo>) => {
+        if (response.result) {
+          //actions.addMessageUID(response.data.uid);
+          //actions.setSentDocuments(true);
+          Alert.alert('Успех!', '', [
+            {
+              text: 'OK',
+              onPress: () => ({}),
+            },
+          ]);
+        } else {
+          Alert.alert('Запрос не был отправлен', '', [
+            {
+              text: 'OK',
+              onPress: () => ({}),
+            },
+          ]);
+        }
+      })
+      .catch((err: Error) =>
+        Alert.alert('Ошибка!', err.message, [
+          {
+            text: 'OK',
+            onPress: () => ({}),
+          },
+        ]),
+      );
+  }, [apiService.data, state.companyID]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

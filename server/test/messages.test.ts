@@ -22,12 +22,9 @@ describe('testing /api/messages/', () => {
       let response: request.Response;
       beforeAll(async () => {
         response = await request(getApp().callback())
-          .get('/api/messages/')
+          .get('/api/messages/org')
           .query('deviceId=123')
-          .set('Cookie', setCookies)
-          .send({
-            companyId: 'org',
-          });
+          .set('Cookie', setCookies);
       });
 
       test('Status 200', () => {
@@ -116,12 +113,9 @@ describe('testing /api/messages/', () => {
 
     test('ERROR: message exists', async () => {
       const response = await request(getApp().callback())
-        .get('/api/messages/')
+        .get('/api/messages/orgCom')
         .query('deviceId=123')
-        .set('Cookie', setCookies)
-        .send({
-          companyId: 'orgCom',
-        });
+        .set('Cookie', setCookies);
       expect(response.status).toEqual(404);
       expect(response.body.result).toBeFalsy();
       expect(response.body.error).toBe('file or directory not found');
@@ -131,7 +125,6 @@ describe('testing /api/messages/', () => {
   describe('POST /api/messages/', () => {
     describe('SUCCESS: create message', () => {
       let response: request.Response;
-      const title = 'newCom';
 
       beforeAll(async () => {
         response = await request(getApp().callback())

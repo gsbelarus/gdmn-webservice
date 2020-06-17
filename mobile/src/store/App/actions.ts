@@ -12,6 +12,7 @@ export enum ActionAppTypes {
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
   SET_SETTINGS = 'SET_SETTINGS',
+  SET_REFERENCES = 'SET_REFERENCES',
 }
 
 export const AppActions = {
@@ -34,6 +35,7 @@ export const AppActions = {
     ActionAppTypes.DOCUMENT_EDIT_LINE,
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
+  setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, IReference[]>(ActionAppTypes.SET_REFERENCES),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;
