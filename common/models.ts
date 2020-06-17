@@ -68,7 +68,7 @@ export interface IMessage {
     type: string;
     payload: {
       name: string;
-      params: IDocument[];
+      params: IDocument[] | string[];
     };
   };
 }
