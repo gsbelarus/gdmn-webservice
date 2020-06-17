@@ -121,6 +121,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     }
     case ActionAppTypes.SET_SETTINGS:
       return { ...state, settings: action.payload };
+    case ActionAppTypes.SET_REFERENCES:
+      return { ...state, references: action.payload };
     default:
       return state;
   }

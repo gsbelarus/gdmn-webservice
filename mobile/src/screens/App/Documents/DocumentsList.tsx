@@ -4,8 +4,9 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { IDocument, IDocumentType } from '../../../../../common';
+import { IDocument, IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/documentStatuses.json';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -59,26 +60,47 @@ const DocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const data = appState.documents.filter((document) => document.head.status === 1);
-    const respons = await apiService.data.sendMessages(state.companyID, 'gdmn', data);
-    if (respons.result) {
-      Alert.alert('Успех!', '', [
-        {
-          text: 'OK',
-          onPress: async () => {
-            data.forEach((item) => {
-              actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
-            });
+    const documents = appState.documents.filter((document) => document.head.status === 1);
+
+    timeout(
+      5000,
+      apiService.data.sendMessagesRef(state.companyID, 'gdmn', {
+        type: 'cmd',
+        payload: {
+          name: 'post_documents',
+          params: documents,
+        },
+      }),
+    )
+      .then((response: IResponse<IMessageInfo>) => {
+        if (response.result) {
+          Alert.alert('Успех!', '', [
+            {
+              text: 'OK',
+              onPress: () => {
+                documents.forEach((item) => {
+                  actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+                });
+              },
+            },
+          ]);
+        } else {
+          Alert.alert('Запрос не был отправлен', '', [
+            {
+              text: 'OK',
+              onPress: () => ({}),
+            },
+          ]);
+        }
+      })
+      .catch((err: Error) =>
+        Alert.alert('Ошибка!', err.message, [
+          {
+            text: 'OK',
+            onPress: () => ({}),
           },
-        },
-      ]);
-    } else {
-      Alert.alert('Запрос не был отправлен', '', [
-        {
-          text: 'OK',
-        },
-      ]);
-    }
+        ]),
+      );
   };
 
   return (
