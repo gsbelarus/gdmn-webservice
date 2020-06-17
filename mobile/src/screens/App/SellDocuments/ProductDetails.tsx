@@ -13,12 +13,13 @@ import { useAppStore } from '../../../store';
 
 const TaraItem = React.memo(({ item, line }:  { item: ITara; line: ISellLine; }) => {
   const navigation = useNavigation();
-  const [taraStatus, setTaraStatus] = useState(false);
+  const [taraStatus, setTaraStatus] = useState(true);
   const { colors } = useTheme();
-  return (
+ 
+  return  taraStatus ? (
     <TouchableOpacity
       style={[localeStyles.listContainer, {backgroundColor: colors.border }]}
-      onPress={() => {setTaraStatus(true);}}
+      onPress={() => {setTaraStatus(false);}}
     >
       <View style={localeStyles.taraContanerView}>
         <Text  style={[localeStyles.fontSize16, { opacity: 0.7 }]}>
@@ -32,6 +33,16 @@ const TaraItem = React.memo(({ item, line }:  { item: ITara; line: ISellLine; })
         </Text>
       </View> 
     </TouchableOpacity>
+  ) : 
+  (
+    <View style={localeStyles.taraContanerView}>
+      <Text  style={localeStyles.fontSize16}>
+        {item.name}
+      </Text>
+      <Text  style={localeStyles.fontSize16}>
+        количество: {line?.tara? line.tara.find((t) => t.tarakey === item.id)?.quantity : 0}
+      </Text>
+    </View> 
   );
 }); 
 /**/
@@ -50,6 +61,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
   const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState(1);
+  const [tara, setTara] = useState<ILineTara[]>(undefined)
 
   const ref = React.useRef<FlatList<ITara>>(null);
   useScrollToTop(ref);
@@ -64,6 +76,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         setValue(lineDocument.quantity);
       }
       setLine(lineDocument);
+      setTara((lineDocument as ISellLine).tara ?? undefined);
     }
   }, [document.lines, route.params.modeCor, route.params.lineID]);
 
@@ -98,6 +111,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
           max={1000}
           min={0}
           step={1}
+          type={"float"}
           colorLeft={colors.primary}
           colorRight={colors.primary}
           onChange={setValue}

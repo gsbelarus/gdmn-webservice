@@ -11,7 +11,7 @@ import statuses from '../../../mockData/Otves/documentStatuses.json';
 /*import documents from '../../../mockData/Otves/Document.json';
 import references from '../../../mockData/Otves/References.json';*/
 import { ISellDocument, ISellHead } from '../../../model';
-import { useAuthStore, useAppStore } from '../../../store';
+import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 import styles from '../../../styles/global';
 
 /*const DocumentList: IDocument[] = documents;
@@ -65,15 +65,15 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const ref = React.useRef<FlatList<ISellDocument>>(null);
   useScrollToTop(ref);
-
-  const { state, api } = useAuthStore();
+  const { apiService } = useServiceStore();
+  const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
   const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
     const data = appState.documents.filter((document) => document.head.status === 1);
-    const respons = await api.data.sendMessages(state.companyID, 'gdmn', data);
+    const respons = await apiService.data.sendMessages(state.companyID, 'gdmn', data);
     if (respons.result) {
       Alert.alert('Успех!', '', [
         {
