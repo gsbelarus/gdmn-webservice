@@ -1,3 +1,5 @@
+import { IDocument } from './inventory';
+
 export interface IMakeUser {
   id?: string;
   userName: string;
@@ -66,7 +68,7 @@ export interface IMessage {
     type: string;
     payload: {
       name: string;
-      params: string[];
+      params: IDocument[] | string[];
     };
   };
 }
