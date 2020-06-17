@@ -1,8 +1,9 @@
-import { IHead, ILine, IDocument } from '../../../../common';
+import { IHead, ILine, IDocument, IReference } from '../../../../common';
 import { IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
+  LOAD_REFERENCES = 'LOAD_REFERENCES',
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',
   EDIT_STATUS_DOCUMENT = 'EDIT_STATUS_DOCUMENT',
@@ -14,6 +15,7 @@ export enum ActionAppTypes {
 }
 
 export const AppActions = {
+  loadreferences: createActionPayload<ActionAppTypes.LOAD_REFERENCES, IReference[]>(ActionAppTypes.LOAD_REFERENCES),
   newDocument: createActionPayload<ActionAppTypes.NEW_DOCUMENT, IDocument>(ActionAppTypes.NEW_DOCUMENT),
   editDocument: createActionPayload<ActionAppTypes.EDIT_DOCUMENT, { id: number; head: IHead }>(
     ActionAppTypes.EDIT_DOCUMENT,
