@@ -1,9 +1,11 @@
 import { useTheme } from '@react-navigation/native';
-import React from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
+import { IResponse, IMessage, IReference } from '../../../../common';
 import SettingsItem from '../../components/SettingsItem';
+import { timeout } from '../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 // AppStore
 
@@ -14,9 +16,12 @@ const SettingsScreen = () => {
   const { apiService } = useServiceStore();
   const {
     actions: appActions,
-    state: { settings },
+    state: { settings, documents },
   } = useAppStore();
-  const { actions: authActions } = useAuthStore();
+  const {
+    state: { companyID },
+    actions: authActions,
+  } = useAuthStore();
 
   const logOut = async () => {
     const res = await apiService.auth.logout();
@@ -24,6 +29,56 @@ const SettingsScreen = () => {
       authActions.logOut();
     }
   };
+
+  const sendGetReferencesRequest = useCallback(() => {
+    if (!documents.some((document) => document.head.status <= 1)) {
+      timeout(5000, apiService.data.getMessages(companyID))
+        .then((response: IResponse<IMessage[]>) => {
+          if (response.result) {
+            Alert.alert('Успех!', 'Справочники обновлены.', [
+              {
+                text: 'OK',
+                onPress: () => {
+                  const messages = response.data.filter((message) => message.body.type === 'data');
+                  if (messages.length !== 0) {
+                    const sortMessages = messages.sort((curr, next) =>
+                      next.head.dateTime.localeCompare(curr.head.dateTime),
+                    );
+                    appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
+                  }
+                },
+              },
+            ]);
+          } else {
+            Alert.alert('Запрос не был отправлен', '', [
+              {
+                text: 'OK',
+                onPress: () => ({}),
+              },
+            ]);
+          }
+        })
+        .catch((err: Error) =>
+          Alert.alert('Ошибка!', err.message, [
+            {
+              text: 'OK',
+              onPress: () => ({}),
+            },
+          ]),
+        );
+    } else {
+      Alert.alert(
+        'Предупреждение',
+        'Нельзя проверять обновления, если есть документы со статусами "Черновик" и "Готово".',
+        [
+          {
+            text: 'OK',
+            onPress: () => ({}),
+          },
+        ],
+      );
+    }
+  }, [apiService.data, appActions, companyID, documents]);
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
@@ -36,6 +91,11 @@ const SettingsScreen = () => {
       <View style={localStyles.content}>
         <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
           Сменить организацию
+        </Button>
+      </View>
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={sendGetReferencesRequest}>
+          Проверить обновления
         </Button>
       </View>
       <Divider />

@@ -57,12 +57,12 @@ export default class Api {
     sendMessages: async (
       companyId: string,
       consumer: string,
-      documents: IDocument[],
+      body: IMessage['body'],
     ): Promise<IResponse<IMessageInfo>> =>
       post(
         this.getUrl(),
         `/messages/?deviceId=${this.deviceId}`,
-        JSON.stringify({ head: { companyId, consumer }, body: { document: documents } }),
+        JSON.stringify({ head: { companyId, consumer }, body }),
       ),
 
     getMessages: async (companyId: string): Promise<IResponse<IMessage[]>> =>

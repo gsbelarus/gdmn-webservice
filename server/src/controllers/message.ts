@@ -69,7 +69,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId } = ctx.request.body;
+  const { companyId } = ctx.params;
   const result: IMessage[] = [];
   ctx.type = 'application/json';
 
