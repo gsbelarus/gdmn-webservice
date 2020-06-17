@@ -9,7 +9,6 @@ import {
   HeadDocumentScreen,
   CreateDocumentScreen,
   ProductsListScreen,
-  ProductDetailScreen,
 } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
@@ -18,7 +17,6 @@ export type DocumentStackParamList = {
   HeadDocument: { docId: number };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
-  ProductDetail: { prodId: number; docId: number; modeCor: boolean };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -63,13 +61,6 @@ const DocumentsNavigator = () => {
         name="ProductsList"
         component={ProductsListScreen}
         options={{ title: 'Товары' }}
-      />
-      <Stack.Screen
-        key="ProductDetail"
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        initialParams={{ prodId: 0 }}
-        options={{ title: '' }}
       />
     </Stack.Navigator>
   );

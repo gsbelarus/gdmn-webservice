@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
@@ -9,7 +9,18 @@ import SubTitle from '../../../components/SubTitle';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const ProductDetailScreen = ({ route, navigation }) => {
+export interface IProductDetailsRef {
+  done(): void;
+}
+
+interface MyInputProps {
+  route: any;
+  navigation: any;
+}
+
+//export type Handle<T> = T extends ForwardRefExoticComponent<RefAttributes<infer T2>> ? T2 : never;
+
+const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -28,6 +39,21 @@ const ProductDetailScreen = ({ route, navigation }) => {
       setLine(lineDocument);
     }
   }, [document.lines, route.params.modeCor, route.params.prodId]);
+
+  useImperativeHandle(ref, () => ({
+    done: () => {
+      if (line !== undefined) {
+        actions.editLine({
+          docId: route.params.docId,
+          lineId: line.id,
+          value: route.params.modeCor ? value : value + line.quantity,
+        });
+      } else {
+        actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+      }
+      navigation.navigate('ViewDocument', { docId: route.params.docId });
+    },
+  }));
 
   return (
     <View
@@ -86,7 +112,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
       </Button>
     </View>
   );
-};
+});
 
 export { ProductDetailScreen };
 
