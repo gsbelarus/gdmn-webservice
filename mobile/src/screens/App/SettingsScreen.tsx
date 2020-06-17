@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
-import { IResponse, IMessage, IReference } from '../../../../common';
+import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemain } from '../../../../common';
 import SettingsItem from '../../components/SettingsItem';
 import { timeout } from '../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
@@ -31,53 +31,45 @@ const SettingsScreen = () => {
   };
 
   const sendGetReferencesRequest = useCallback(() => {
-    if (!documents.some((document) => document.head.status <= 1)) {
-      timeout(5000, apiService.data.getMessages(companyID))
-        .then((response: IResponse<IMessage[]>) => {
-          if (response.result) {
-            Alert.alert('Успех!', 'Справочники обновлены.', [
-              {
-                text: 'OK',
-                onPress: () => {
-                  const messages = response.data.filter((message) => message.body.type === 'data');
-                  if (messages.length !== 0) {
-                    const sortMessages = messages.sort((curr, next) =>
-                      next.head.dateTime.localeCompare(curr.head.dateTime),
-                    );
-                    appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
-                  }
-                },
-              },
-            ]);
-          } else {
-            Alert.alert('Запрос не был отправлен', '', [
-              {
-                text: 'OK',
-                onPress: () => ({}),
-              },
-            ]);
-          }
-        })
-        .catch((err: Error) =>
-          Alert.alert('Ошибка!', err.message, [
-            {
-              text: 'OK',
-              onPress: () => ({}),
-            },
-          ]),
-        );
-    } else {
-      Alert.alert(
-        'Предупреждение',
-        'Нельзя проверять обновления, если есть документы со статусами "Черновик" и "Готово".',
-        [
-          {
-            text: 'OK',
-            onPress: () => ({}),
-          },
-        ],
-      );
+    if (documents.some((document) => document.head?.status <= 1)) {
+      Alert.alert('Внимание!', 'Нельзя обновить справочники, если есть документы со статусами "Черновик" и "Готово".', [
+        {
+          text: 'OK',
+          onPress: () => ({}),
+        },
+      ]);
+      return;
     }
+
+    const getMessages = async () => {
+      try {
+        const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
+        if (!response.result) {
+          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          return;
+        }
+        const messages = response.data.filter((message) => message.body.type === 'data');
+        if (messages.length !== 0) {
+          const sortMessages = messages.sort((curr, next) => next.head.dateTime.localeCompare(curr.head.dateTime));
+          /* Обработка данных по справочникам */
+          const ref = (sortMessages[0].body.payload as unknown) as IReference[];
+          const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
+          appActions.setContacts(contacts);
+          const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
+          appActions.setDocumentTypes(documentTypes);
+          const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
+          appActions.setGoods(goods);
+          const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
+          appActions.setRemains(remains);
+          // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
+        }
+        Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+      } catch (err) {
+        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+      }
+    };
+
+    getMessages();
   }, [apiService.data, appActions, companyID, documents]);
 
   return (

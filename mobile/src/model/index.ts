@@ -1,4 +1,4 @@
-import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl } from '../../../common';
+import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '../../../common';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
@@ -64,5 +64,4 @@ export interface IAppState {
   goods?: IGood[];
   documentTypes?: IDocumentType[];
   contacts?: IContact[];
-  references?: IReference[];
 }
