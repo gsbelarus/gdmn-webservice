@@ -1,14 +1,22 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
-const CreateDocumentScreen = ({ route }) => {
+export interface ICreateDocumentRef {
+  done(): void;
+}
+
+interface MyInputProps {
+  route: any;
+  navigation: any;
+}
+
+const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ route }, ref) => {
   const [date, setDate] = useState(new Date());
   const [oldDate, setOldDate] = useState(new Date());
   const [selectedDocType, setSelectedDocType] = useState<number>();
@@ -25,6 +33,52 @@ const CreateDocumentScreen = ({ route }) => {
     setDatePickerVisibility(Platform.OS === 'ios');
     setDate(currentDate);
   };
+
+  useImperativeHandle(ref, () => ({
+    done: () => {
+      if (selectedDocType === undefined || selectedContact === undefined) {
+        Alert.alert('Ошибка!', 'Не все поля заполнены.', [
+          {
+            text: 'OK',
+            onPress: () => ({}),
+          },
+        ]);
+        return;
+      }
+      if (route.params?.docId !== undefined) {
+        actions.editDocument({
+          id: route.params.docId,
+          head: {
+            doctype: selectedDocType,
+            fromcontactId: selectedContact,
+            tocontactId: selectedContact,
+            date: date.toString(),
+            status: 0,
+          },
+        });
+        navigation.navigate('ViewDocument', { docId: route.params.docId });
+      } else {
+        const id =
+          state.documents
+            .map((item) => item.id)
+            .reduce((newId, currId) => {
+              return newId > currId ? newId : currId;
+            }, -1) + 1;
+        actions.newDocument({
+          id,
+          head: {
+            doctype: selectedDocType,
+            fromcontactId: selectedContact,
+            tocontactId: selectedContact,
+            date: date.toString(),
+            status: 0,
+          },
+          lines: [],
+        });
+        navigation.navigate('ViewDocument', { docId: id });
+      }
+    },
+  }));
 
   useEffect(() => {
     if (route.params?.docId !== undefined) {
@@ -152,61 +206,9 @@ const CreateDocumentScreen = ({ route }) => {
             </Portal>
           ))}
       </View>
-      <View style={localeStyles.buttonView}>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, localeStyles.button]}
-          disabled={selectedDocType === undefined || selectedContact === undefined}
-          onPress={() => {
-            if (route.params?.docId) {
-              actions.editDocument({
-                id: route.params.docId,
-                head: {
-                  doctype: selectedDocType,
-                  fromcontactId: selectedContact,
-                  tocontactId: selectedContact,
-                  date: date.toString(),
-                  status: 0,
-                },
-              });
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            } else {
-              const id =
-                state.documents
-                  .map((item) => item.id)
-                  .reduce((newId, currId) => {
-                    return newId > currId ? newId : currId;
-                  }, -1) + 1;
-              actions.newDocument({
-                id,
-                head: {
-                  doctype: selectedDocType,
-                  fromcontactId: selectedContact,
-                  tocontactId: selectedContact,
-                  date: date.toString(),
-                  status: 0,
-                },
-                lines: [],
-              });
-              navigation.navigate('ViewDocument', { docId: id });
-            }
-          }}
-        >
-          ОК
-        </Button>
-        <Button
-          mode="contained"
-          style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-          onPress={() => {
-            navigation.navigate('DocumentsListScreen');
-          }}
-        >
-          Отмена
-        </Button>
-      </View>
     </>
   );
-};
+});
 
 export { CreateDocumentScreen };
 
