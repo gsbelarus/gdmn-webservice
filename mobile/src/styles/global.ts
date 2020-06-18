@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     height: 50,
     marginTop: 15,
-    padding: 10,
+    //padding: 10,
   },
   rectangularButton: {
     borderRadius: 4,
