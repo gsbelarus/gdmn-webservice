@@ -1,4 +1,4 @@
-import { IHead, ILine, IDocument, IReference } from '../../../../common';
+import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
 import { IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
@@ -11,7 +11,12 @@ export enum ActionAppTypes {
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
   SET_SETTINGS = 'SET_SETTINGS',
-  SET_REFERENCES = 'SET_REFERENCES',
+  // SET_REFERENCES = 'SET_REFERENCES',
+  SET_DOCUMENTS = 'SET_DOCUMENTS',
+  SET_GOODS = 'SET_GOODS',
+  SET_DOCUMENTTYPES = 'SET_DOCUMENTTYPES',
+  SET_CONTACTS = 'SET_CONTACTS',
+  SET_REMAINS = 'SET_REMAINS',
 }
 
 export const AppActions = {
@@ -33,7 +38,14 @@ export const AppActions = {
     ActionAppTypes.DOCUMENT_EDIT_LINE,
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
-  setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, IReference[]>(ActionAppTypes.SET_REFERENCES),
+  // setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, IReference[]>(ActionAppTypes.SET_REFERENCES),
+  setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
+  setRemains: createActionPayload<ActionAppTypes.SET_REMAINS, IRemain[]>(ActionAppTypes.SET_REMAINS),
+  setDocumentTypes: createActionPayload<ActionAppTypes.SET_DOCUMENTTYPES, IDocumentType[]>(
+    ActionAppTypes.SET_DOCUMENTTYPES,
+  ),
+  setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
+  setContacts: createActionPayload<ActionAppTypes.SET_CONTACTS, IContact[]>(ActionAppTypes.SET_CONTACTS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

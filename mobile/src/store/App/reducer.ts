@@ -1,22 +1,22 @@
 import { Reducer } from 'react';
 
-import contacts from '../../mockData//GD_Contact.json';
-import documents from '../../mockData/Document.json';
-import documentTypes from '../../mockData/GD_DocumentType.json';
-import goods from '../../mockData/Goods.json';
-import references from '../../mockData/References.json';
-import remains from '../../mockData/Remains.json';
+// import contacts from '../../mockData//GD_Contact.json';
+// import documents from '../../mockData/Document.json';
+// import documentTypes from '../../mockData/GD_DocumentType.json';
+// import goods from '../../mockData/Goods.json';
+// import references from '../../mockData/References.json';
+// import remains from '../../mockData/Remains.json';
 import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
   settings: undefined,
-  documents,
-  remains,
-  references,
-  goods,
-  contacts,
-  documentTypes,
+  documents: undefined,
+  remains: undefined,
+  // references: undefined,
+  goods: undefined,
+  contacts: undefined,
+  documentTypes: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -121,8 +121,16 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     }
     case ActionAppTypes.SET_SETTINGS:
       return { ...state, settings: action.payload };
-    case ActionAppTypes.SET_REFERENCES:
-      return { ...state, references: action.payload };
+    case ActionAppTypes.SET_DOCUMENTTYPES:
+      return { ...state, documentTypes: action.payload };
+    case ActionAppTypes.SET_DOCUMENTS:
+      return { ...state, documents: action.payload };
+    case ActionAppTypes.SET_REMAINS:
+      return { ...state, remains: action.payload };
+    case ActionAppTypes.SET_CONTACTS:
+      return { ...state, contacts: action.payload };
+    case ActionAppTypes.SET_GOODS:
+      return { ...state, goods: action.payload };
     default:
       return state;
   }

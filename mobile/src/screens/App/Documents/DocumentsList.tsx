@@ -26,21 +26,21 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
+        <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head?.status] }]}>
           <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>
-              {state.documentTypes.find((type) => type.id === item.head.doctype).name}
+              {state.documentTypes?.find((type) => type.id === item.head?.doctype)?.name}
             </Text>
-            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
-              {Statuses.find((type) => type.id === item.head.status).name}
+            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head?.status] }]}>
+              {Statuses.find((type) => type.id === item.head?.status)?.name}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            {state.contacts.find((contact) => contact.id === item.head.fromcontactId).name} от{' '}
-            {new Date(item.head.date).toLocaleDateString()}
+            {state.contacts?.find((contact) => contact.id === item.head?.fromcontactId)?.name} от{' '}
+            {new Date(item.head?.date).toLocaleDateString()}
           </Text>
         </View>
       </View>
@@ -60,7 +60,7 @@ const DocumentsListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
-    const documents = appState.documents.filter((document) => document.head.status === 1);
+    const documents = appState.documents.filter((document) => document.head?.status === 1);
 
     timeout(
       5000,
@@ -74,12 +74,12 @@ const DocumentsListScreen = ({ navigation }) => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Успех!', '', [
+          Alert.alert('Отправлено!', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => {
                 documents.forEach((item) => {
-                  actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+                  actions.editStatusDocument({ id: item.id, status: item?.head?.status + 1 });
                 });
               },
             },
@@ -87,7 +87,7 @@ const DocumentsListScreen = ({ navigation }) => {
         } else {
           Alert.alert('Запрос не был отправлен', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => ({}),
             },
           ]);
@@ -96,7 +96,7 @@ const DocumentsListScreen = ({ navigation }) => {
       .catch((err: Error) =>
         Alert.alert('Ошибка!', err.message, [
           {
-            text: 'OK',
+            text: 'Закрыть',
             onPress: () => ({}),
           },
         ]),

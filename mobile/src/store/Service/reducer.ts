@@ -4,6 +4,7 @@ import { IServiceState } from '../../model';
 import { TServiceActions, ActionServiceTypes } from './actions';
 
 export const initialState: IServiceState = {
+  isLoading: false,
   serverUrl: undefined,
   deviceId: undefined,
   storagePath: undefined,
@@ -12,6 +13,8 @@ export const initialState: IServiceState = {
 export const reducer: Reducer<IServiceState, TServiceActions> = (state = initialState, action): IServiceState => {
   console.log('Service action: ', JSON.stringify(action));
   switch (action.type) {
+    case ActionServiceTypes.SET_LOADING:
+      return { ...state, isLoading: action.payload };
     case ActionServiceTypes.SET_SERVER_URL:
       return { ...state, serverUrl: action.payload };
     case ActionServiceTypes.SET_DEVICE_ID:

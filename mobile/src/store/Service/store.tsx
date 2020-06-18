@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
 import { IServiceContextProps, IServiceState } from '../../model';
@@ -27,17 +28,25 @@ const createStoreContext = () => {
       ServiceActions,
     );
 
+    /* Загружаем глобальные настройки приложения */
     useEffect(() => {
-      (async () => {
+      const loacData = async () => {
+        actions.setLoading(true);
         actions.setServerUrl(await storageService.getServer()); // Загружаем путь к серверу из хранилища в стейт
         actions.setDeviceId(await storageService.getDeviceId()); // Загружаем deviceId из хранилища в стейт
-      })();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        actions.setLoading(false);
+      };
+
+      loacData();
     }, []);
 
+    /* При изменении значения DeviceId в стейте сохраняем в storage */
     useEffect(() => {
       const saveState = async () => {
-        storageService.setDeviceId(state.deviceId); // записываем deviceId в хранилище устройства
+        if (!state.isLoading) {
+          // записываем deviceId в хранилище устройства
+          storageService.setDeviceId(state.deviceId);
+        }
         apiService.setDeviceId(state.deviceId); // в службе Service обновляем deviceId
       };
 
@@ -46,9 +55,13 @@ const createStoreContext = () => {
       }
     }, [actions, state.deviceId]);
 
+    /* При изменении значения serverUrl в стейте сохраняем в storage */
     useEffect(() => {
       const saveState = async () => {
-        storageService.setServer(state.serverUrl); // записываем путь к серверу в хранилище устройства
+        if (!state.isLoading) {
+          // записываем путь к серверу в хранилище утройства
+          storageService.setServer(state.serverUrl);
+        }
         apiService.setUrl(state.serverUrl); // в службе Service обновляем путь к серверу
       };
       if (state.serverUrl) {

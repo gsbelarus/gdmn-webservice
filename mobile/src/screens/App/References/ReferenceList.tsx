@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -37,10 +37,40 @@ const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
   const { state: AppState } = useAppStore();
-  const { actions, apiService } = useServiceStore();
+  const { apiService } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
+
+  const references: IReference[] = useMemo(
+    () => [
+      {
+        id: 0,
+        name: 'Типы документов',
+        type: 'documenttypes',
+        data: AppState.documentTypes,
+      },
+      {
+        id: 1,
+        name: 'Контакты',
+        type: 'contacts',
+        data: AppState.contacts,
+      },
+      {
+        id: 2,
+        name: 'Товары',
+        type: 'goods',
+        data: AppState.goods,
+      },
+      /*{
+        id: 3,
+        name: 'Остатки',
+        type: 'remains',
+        data: AppState.remains,
+      }, */
+    ],
+    [AppState.contacts, AppState.documentTypes, AppState.goods],
+  );
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
@@ -57,18 +87,16 @@ const ReferenceListScreen = () => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          //actions.addMessageUID(response.data.uid);
-          //actions.setSentDocuments(true);
-          Alert.alert('Успех!', '', [
+          Alert.alert('Запрос отправлен!', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => ({}),
             },
           ]);
         } else {
           Alert.alert('Запрос не был отправлен', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => ({}),
             },
           ]);
@@ -77,7 +105,7 @@ const ReferenceListScreen = () => {
       .catch((err: Error) =>
         Alert.alert('Ошибка!', err.message, [
           {
-            text: 'OK',
+            text: 'Закрыть',
             onPress: () => ({}),
           },
         ]),
@@ -88,7 +116,7 @@ const ReferenceListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={AppState.references}
+        data={references.filter((i) => i.data?.length)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
