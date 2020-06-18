@@ -45,7 +45,7 @@ const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ rou
         ]);
         return;
       }
-      if (route.params?.docId) {
+      if (route.params?.docId !== undefined) {
         actions.editDocument({
           id: route.params.docId,
           head: {
