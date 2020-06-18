@@ -1,8 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet } from 'react-native';
-import InputSpinner from 'react-native-input-spinner';
-import { Text, Button } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 
 import { ILine } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
@@ -17,8 +16,6 @@ interface MyInputProps {
   route: any;
   navigation: any;
 }
-
-//export type Handle<T> = T extends ForwardRefExoticComponent<RefAttributes<infer T2>> ? T2 : never;
 
 const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
@@ -66,50 +63,47 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
-      <View style={localeStyles.productPriceView}>
-        <Text style={localeStyles.fontSize16}>Цена:</Text>
-        <Text style={localeStyles.productPrice}>{remain.price}</Text>
-      </View>
-      <View style={localeStyles.productQuantityView}>
-        <Text style={localeStyles.fontSize16}>Количество:</Text>
-        <Text style={localeStyles.productQuantity}>{remain.quantity}</Text>
-      </View>
-      <View style={localeStyles.editQuantityView}>
-        <Text style={localeStyles.fontSize16}>Добавить количество:</Text>
-        <InputSpinner
-          returnKeyType="done"
-          style={localeStyles.inputSpinner}
-          inputStyle={localeStyles.fontSize20}
-          value={value}
-          max={1000}
-          min={0}
-          step={1}
-          colorLeft={colors.primary}
-          colorRight={colors.primary}
-          onChange={setValue}
-          // onMin={() => {
-          //   Alert.alert('Предупреждение', 'Минимальное значение уже выбрано!');
-          // }}
-        />
-      </View>
-      <Button
-        onPress={() => {
-          if (line !== undefined) {
-            actions.editLine({
-              docId: route.params.docId,
-              lineId: line.id,
-              value: route.params.modeCor ? value : value + line.quantity,
-            });
-          } else {
-            actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
-          }
-          navigation.navigate('ViewDocument', { docId: route.params.docId });
+      <TextInput
+        mode={'flat'}
+        label={'Цена'}
+        editable={false}
+        value={remain.price.toString()}
+        theme={{
+          colors: {
+            placeholder: colors.primary,
+          },
         }}
-        mode="contained"
-        style={[styles.rectangularButton, localeStyles.button]}
-      >
-        Добавить
-      </Button>
+        style={{
+          backgroundColor: colors.card,
+        }}
+      />
+      <TextInput
+        mode={'flat'}
+        label={'Остаток'}
+        editable={false}
+        value={remain.quantity.toString()}
+        theme={{
+          colors: {
+            placeholder: colors.primary,
+            accent: colors.primary,
+          },
+        }}
+        style={{
+          backgroundColor: colors.card,
+        }}
+      />
+      <TextInput
+        mode={'flat'}
+        label={'Количество'}
+        editable={true}
+        onChangeText={(newValue) => setValue(Number(newValue))}
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus={true}
+        value={value.toString()}
+        style={{
+          backgroundColor: colors.card,
+        }}
+      />
     </View>
   );
 });
