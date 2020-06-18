@@ -3,20 +3,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import {
-  DocumentsListScreen,
-  ViewDocumentScreen,
-  HeadDocumentScreen,
-  CreateDocumentScreen,
-  ProductsListScreen,
-} from '../screens/App/Documents';
+import { DocumentsListScreen, ViewDocumentScreen, HeadDocumentScreen } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
   DocumentsListScreen: undefined;
   ViewDocument: { docId: number };
   HeadDocument: { docId: number };
-  CreateDocument: { docId?: number };
-  ProductsList: { docId: number };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -50,18 +42,6 @@ const DocumentsNavigator = () => {
         })}
       />
       <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocumentScreen} options={{ title: '' }} />
-      <Stack.Screen
-        key="CreateDocument"
-        name="CreateDocument"
-        component={CreateDocumentScreen}
-        options={{ title: '' }}
-      />
-      <Stack.Screen
-        key="ProductsList"
-        name="ProductsList"
-        component={ProductsListScreen}
-        options={{ title: 'Товары' }}
-      />
     </Stack.Navigator>
   );
 };
