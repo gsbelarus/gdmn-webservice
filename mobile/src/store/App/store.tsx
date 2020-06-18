@@ -40,7 +40,7 @@ const createStoreContext = () => {
         setLoading(true);
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
-        actions.setSettings(storageSettings);
+        actions.setSettings(storageSettings || {});
         // типы документов
         const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
         actions.setDocumentTypes(documentTypes || []);

@@ -29,7 +29,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   app.keys = ['super-secret-key'];
 
   const CONFIG = {
-    key: 'koa:sess-3' /** (string) cookie key (default is koa:sess) */,
+    key: 'koa:sess-5' /** (string) cookie key (default is koa:sess) */,
     maxAge: 28800000 /** (number) maxAge in ms (default is 1 days) */,
     overwrite: true /** (boolean) can overwrite or not (default true) */,
     httpOnly: true /** (boolean) httpOnly or not (default true) */,

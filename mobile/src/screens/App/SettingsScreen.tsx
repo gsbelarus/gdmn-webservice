@@ -7,12 +7,9 @@ import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemai
 import SettingsItem from '../../components/SettingsItem';
 import { timeout } from '../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
-// AppStore
-
-// const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors /* , dark */ } = useTheme();
   const { apiService } = useServiceStore();
   const {
     actions: appActions,
@@ -52,12 +49,6 @@ const SettingsScreen = () => {
             text: 'Отмена',
           },
         ]);
-        /*    Alert.alert('Внимание!', "Удалить все данные?".', [
-         {
-           text: 'Да',
-           onPress: () => ({}),
-         },
-       ]); */
       })(),
     [appActions],
   );
@@ -93,6 +84,8 @@ const SettingsScreen = () => {
           appActions.setGoods(goods);
           const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
           appActions.setRemains(remains);
+
+          apiService.data.deleteMessage(companyID, messages[0].head.id);
           // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
         }
         Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
@@ -142,15 +135,13 @@ const SettingsScreen = () => {
         }
       />
       <Divider />
-      <SettingsItem
+      {/* <SettingsItem
         label="Dark theme"
-        value={dark}
+        value={settings?.dakrTheme}
         onValueChange={() => {
-          //AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
-          // Переделать в глобал стейт
-          // setTheme(t => (t.dark ? DefaultTheme : DarkTheme));
+          appActions.setSettings({ ...settings, dakrTheme: !settings?.dakrTheme })
         }}
-      />
+      />*/}
     </ScrollView>
   );
 };

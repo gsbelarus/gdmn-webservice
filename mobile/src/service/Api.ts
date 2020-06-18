@@ -12,7 +12,7 @@ import {
   IUserCredentials,
 } from '../../../common';
 import { INewDevice } from '../model';
-import { get, post } from './http.service';
+import { get, post, remove } from './http.service';
 
 export default class Api {
   baseUrl: IBaseUrl;
@@ -67,5 +67,8 @@ export default class Api {
 
     getMessages: async (companyId: string): Promise<IResponse<IMessage[]>> =>
       get(this.getUrl(), `/messages/${companyId}?deviceId=${this.deviceId}`),
+
+    deleteMessage: async (companyId: string, uid: string): Promise<IResponse<void>> =>
+      remove(this.getUrl(), `/messages/${companyId}/${uid}?deviceId=${this.deviceId}`),
   };
 }

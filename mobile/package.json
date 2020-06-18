@@ -25,7 +25,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-input-spinner": "^1.2.10",
-    "react-native-paper": "^3.0.8",
+    "react-native-paper": "^3.10.1",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.2.0",
     "react-navigation": "^4.3.9"
@@ -36,7 +36,7 @@
     "@react-navigation/native": "^5.5.1",
     "@react-navigation/stack": "^5.5.1",
     "@types/expo": "^33.0.1",
-    "@types/react": "^16.9.36",
+    "@types/react": "^16.9.38",
     "@types/react-native": "0.62.13",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/eslint-plugin-tslint": "^3.3.0",
