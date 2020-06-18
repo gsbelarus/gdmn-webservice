@@ -33,6 +33,9 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const newCompany: ICompany = { id: title, title, admin: ctx.state.user.id };
 
   await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(allCompanies ? [...allCompanies, newCompany] : [newCompany]));
+
+  /* Добавлям к пользователю gdmn создаваемую организацию */
+  const resGdmn = await addCompanyToUser('gdmn', [title]);
   /* Добавлям к текущему пользователю создаваемую организацию */
   const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);

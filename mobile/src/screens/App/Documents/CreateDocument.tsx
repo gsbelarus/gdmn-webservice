@@ -83,9 +83,9 @@ const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ rou
   useEffect(() => {
     if (route.params?.docId !== undefined) {
       const documet = state.documents.find((item) => item.id === route.params.docId);
-      setSelectedDocType(documet.head.doctype);
-      setSelectedContact(documet.head.fromcontactId);
-      setDate(new Date(documet.head.date));
+      setSelectedDocType(documet.head?.doctype);
+      setSelectedContact(documet.head?.fromcontactId);
+      setDate(new Date(documet.head?.date));
     }
   }, [route.params, state.documents]);
 

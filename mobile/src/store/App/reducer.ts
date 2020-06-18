@@ -1,29 +1,23 @@
 import { Reducer } from 'react';
 
-/*import contacts from '../../mockData//GD_Contact.json';*/
-import documents from '../../mockData/Document.json';
-import { IDocument, IContact, IDocumentType, IInventoryDocumentType, IGood, IReference } from '../../../../common';
-//import documents from '../../mockData/Otves/Document.json';
-//import references from '../../mockData/Otves/References.json';
-/*import documentTypes from '../../mockData/GD_DocumentType.json';*/
-/*import goods from '../../mockData/Goods.json';*/
-import references from '../../mockData/References.json';
-import remains from '../../mockData/Remains.json';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { IAppState, ISellDocument } from '../../model';
+// import contacts from '../../mockData//GD_Contact.json';
+// import documents from '../../mockData/Document.json';
+// import documentTypes from '../../mockData/GD_DocumentType.json';
+// import goods from '../../mockData/Goods.json';
+// import references from '../../mockData/References.json';
+// import remains from '../../mockData/Remains.json';
+import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
-const documentTypes = references.find((ref) => ref.type === 'documentTypes').data as IInventoryDocumentType[] | IDocumentType[];
-const contacts = references.find((ref) => ref.type === 'contacts').data as IContact[];
-const goods = references.find((ref) => ref.type === 'goods').data as IGood[];
+import { IDocument } from '../../../../common';
 
 export const initialState: IAppState = {
   settings: undefined,
-  documents,
-  remains,
-  goods,
-  documentTypes,
-  contacts,
-  references: references as IReference[],
+  documents: undefined,
+  remains: undefined,
+  // references: undefined,
+  goods: undefined,
+  contacts: undefined,
+  documentTypes: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -134,8 +128,16 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     }
     case ActionAppTypes.SET_SETTINGS:
       return { ...state, settings: action.payload };
-    case ActionAppTypes.SET_REFERENCES:
-      return { ...state, references: action.payload };
+    case ActionAppTypes.SET_DOCUMENTTYPES:
+      return { ...state, documentTypes: action.payload };
+    case ActionAppTypes.SET_DOCUMENTS:
+      return { ...state, documents: action.payload };
+    case ActionAppTypes.SET_REMAINS:
+      return { ...state, remains: action.payload };
+    case ActionAppTypes.SET_CONTACTS:
+      return { ...state, contacts: action.payload };
+    case ActionAppTypes.SET_GOODS:
+      return { ...state, goods: action.payload };
     default:
       return state;
   }

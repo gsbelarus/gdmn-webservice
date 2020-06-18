@@ -103,7 +103,7 @@ const ProductsListScreen = () => {
               ]}
               onChangeText={onChangeText}
               value={text}
-              placeholder="Введите шрих-код или название"
+              placeholder="Штрихкод или название товара"
               placeholderTextColor={colors.border}
               multiline={false}
               autoCapitalize="sentences"
@@ -185,5 +185,6 @@ const localStyles = StyleSheet.create({
     marginRight: 15,
     marginTop: 0,
     paddingTop: 0,
+    width: '90%',
   },
 });

@@ -40,6 +40,7 @@ export interface INewDevice {
 }
 
 export interface IServiceState {
+  isLoading: boolean;
   serverUrl?: IBaseUrl;
   deviceId?: string;
   storagePath?: string;
@@ -65,5 +66,4 @@ export interface IAppState {
   goods?: IGood[];
   documentTypes?: (IDocumentType | IInventoryDocumentType)[];
   contacts?: IContact[];
-  references?: IReference[];
 }

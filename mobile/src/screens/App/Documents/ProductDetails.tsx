@@ -67,7 +67,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         mode={'flat'}
         label={'Цена'}
         editable={false}
-        value={remain.price.toString()}
+        value={remain?.price.toString()}
         theme={{
           colors: {
             placeholder: colors.primary,
@@ -81,7 +81,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         mode={'flat'}
         label={'Остаток'}
         editable={false}
-        value={remain.quantity.toString()}
+        value={remain?.quantity.toString()}
         theme={{
           colors: {
             placeholder: colors.primary,
@@ -96,6 +96,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         mode={'flat'}
         label={'Количество'}
         editable={true}
+        keyboardType="decimal-pad"
         onChangeText={(newValue) => setValue(Number(newValue))}
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={true}
