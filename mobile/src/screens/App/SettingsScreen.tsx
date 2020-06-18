@@ -23,12 +23,44 @@ const SettingsScreen = () => {
     actions: authActions,
   } = useAuthStore();
 
-  const logOut = async () => {
-    const res = await apiService.auth.logout();
-    if (res.result) {
-      authActions.logOut();
-    }
-  };
+  const logOut = useCallback(
+    () =>
+      (async () => {
+        const res = await apiService.auth.logout();
+        if (res.result) {
+          authActions.logOut();
+        }
+      })(),
+    [apiService.auth, authActions],
+  );
+
+  const deleteAllData = useCallback(
+    () =>
+      (async () => {
+        Alert.alert('Внимание!', 'Удалить все данные?', [
+          {
+            text: 'Да',
+            onPress: () => {
+              appActions.setContacts([]);
+              appActions.setDocumentTypes([]);
+              appActions.setGoods([]);
+              appActions.setRemains([]);
+              appActions.setDocuments([]);
+            },
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
+        /*    Alert.alert('Внимание!', "Удалить все данные?".', [
+         {
+           text: 'Да',
+           onPress: () => ({}),
+         },
+       ]); */
+      })(),
+    [appActions],
+  );
 
   const sendGetReferencesRequest = useCallback(() => {
     if (documents.some((document) => document.head?.status <= 1)) {
@@ -88,6 +120,11 @@ const SettingsScreen = () => {
       <View style={localStyles.content}>
         <Button mode="contained" onPress={sendGetReferencesRequest}>
           Проверить обновления
+        </Button>
+      </View>
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={deleteAllData}>
+          Удалить все данные
         </Button>
       </View>
       <Divider />

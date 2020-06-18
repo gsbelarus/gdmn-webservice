@@ -52,10 +52,10 @@ const createStoreContext = () => {
         actions.setRemains(remains || []);
         // товары
         const goods = await appStorage.getItem(`${storagePath}/${sections.GOODS}`);
-        actions.setDocuments(goods || []);
+        actions.setGoods(goods || []);
         // контакты
         const contacts = await appStorage.getItem(`${storagePath}/${sections.CONTACTS}`);
-        actions.setRemains(contacts || []);
+        actions.setContacts(contacts || []);
         setLoading(false);
       };
 

@@ -62,7 +62,7 @@ const ReferenceListScreen = () => {
         type: 'goods',
         data: AppState.goods,
       },
-/*       {
+      /*{
         id: 3,
         name: 'Остатки',
         type: 'remains',
@@ -116,7 +116,7 @@ const ReferenceListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={references}
+        data={references.filter((i) => i.data?.length)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
