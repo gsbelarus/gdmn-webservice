@@ -32,7 +32,10 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   const newCompany: ICompany = { id: title, title, admin: ctx.state.user.id };
 
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(allCompanies ? [...allCompanies, newCompany] : [newCompany]));
+  await writeFile({
+    filename: PATH_LOCAL_DB_COMPANIES,
+    data: JSON.stringify(allCompanies ? [...allCompanies, newCompany] : [newCompany]),
+  });
 
   /* Добавлям к пользователю gdmn создаваемую организацию */
   const resGdmn = await addCompanyToUser('gdmn', [title]);
@@ -96,10 +99,10 @@ const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company: ICompany = { ...editPart, id: allCompanies[idx].id, admin: allCompanies[idx].admin };
 
-  await writeFile(
-    PATH_LOCAL_DB_COMPANIES,
-    JSON.stringify([...allCompanies.slice(0, idx), company, ...allCompanies.slice(idx + 1)]),
-  );
+  await writeFile({
+    filename: PATH_LOCAL_DB_COMPANIES,
+    data: JSON.stringify([...allCompanies.slice(0, idx), company, ...allCompanies.slice(idx + 1)]),
+  });
   log.info('a company edited successfully');
   const res: IResponse<ICompany> = { result: true, data: company };
   ctx.status = 200;
@@ -152,17 +155,17 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
   if (allUsers?.some(user => user.companies?.some(comapny => comapny === id))) {
-    await writeFile(
-      PATH_LOCAL_DB_USERS,
-      JSON.stringify(
+    await writeFile({
+      filename: PATH_LOCAL_DB_USERS,
+      data: JSON.stringify(
         allUsers.map(user => {
           return { ...user, companies: user.companies?.filter(company => company !== id) };
         }),
       ),
-    );
+    });
   }
 
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(newCompanies ?? []));
+  await writeFile({ filename: PATH_LOCAL_DB_COMPANIES, data: JSON.stringify(newCompanies ?? []) });
 
   log.info('company removed successfully');
   ctx.status = 204;

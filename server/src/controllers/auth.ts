@@ -96,9 +96,9 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
       companies: newUser.companies ?? [],
       creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
     };
-    await writeFile(
-      PATH_LOCAL_DB_USERS,
-      JSON.stringify(
+    await writeFile({
+      filename: PATH_LOCAL_DB_USERS,
+      data: JSON.stringify(
         allUsers
           ? [...allUsers, newUser]
           : [
@@ -112,7 +112,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
               },
             ],
       ),
-    );
+    });
 
     delete newUser.password;
 
@@ -159,7 +159,10 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
         result = { result: false, error: 'error' };
         log.warn('error');
       }
-      await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(codeList?.filter(el => el.code !== code)));
+      await writeFile({
+        filename: PATH_LOCAL_DB_ACTIVATION_CODES,
+        data: JSON.stringify(codeList?.filter(el => el.code !== code)),
+      });
     } else {
       status = 404;
       result = { result: false, error: 'invalid activation code' };

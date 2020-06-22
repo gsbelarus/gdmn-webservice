@@ -5,7 +5,7 @@ import { PATH_LOCAL_DB_DEVICES } from '../server';
 import { IResponse, IDevice } from '../../../common';
 
 export const deviceMiddleware = async (ctx: Context, next: Function) => {
-  if (ctx.query.deviceId === "WEB") {
+  if (ctx.query.deviceId === 'WEB') {
     await next();
     return;
   }

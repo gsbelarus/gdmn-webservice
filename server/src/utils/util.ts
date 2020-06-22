@@ -25,7 +25,10 @@ const addNewDevice = async ({
 
   if (!(allDevices && allDevices.find(device => device.uid === deviceId && device.user === userId))) {
     const newDevice: IDevice = { uid: deviceId, user: userId, isBlock: false };
-    await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(allDevices ? [...allDevices, newDevice] : [newDevice]));
+    await writeFile({
+      filename: PATH_LOCAL_DB_DEVICES,
+      data: JSON.stringify(allDevices ? [...allDevices, newDevice] : [newDevice]),
+    });
 
     return newDevice;
   }
@@ -38,14 +41,14 @@ const saveActivationCode = async (userId: string) => {
   //   .substr(3, 6);
   const code = `${Math.floor(1000 + Math.random() * 9000)}`;
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  await writeFile(
-    PATH_LOCAL_DB_ACTIVATION_CODES,
-    JSON.stringify(
+  await writeFile({
+    filename: PATH_LOCAL_DB_ACTIVATION_CODES,
+    data: JSON.stringify(
       allCodes
         ? [...allCodes, { code, date: new Date().toString(), user: userId }]
         : [{ code, date: Date().toString(), user: userId }],
     ),
-  );
+  });
   return code;
 };
 

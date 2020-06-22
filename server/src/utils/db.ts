@@ -1,29 +1,12 @@
-import dev from '../../config/dev';
-import { readFile } from './workWithFile';
-import { IUser, IActivationCode, ICompany, IDevice, IMessage } from '../../../common';
+import { Database } from './json-db';
+import { IUser } from '../../../common';
 
-const PATH_LOCAL_DB_USERS = `${dev.FILES_PATH}\\DB_USERS.json`;
-const PATH_LOCAL_DB_ACTIVATION_CODES = `${dev.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
-const PATH_LOCAL_DB_COMPANIES = `${dev.FILES_PATH}\\DB_COMPANIES.json`;
-const PATH_LOCAL_DB_DEVICES = `${dev.FILES_PATH}\\DB_DEVICES.json`;
-const PATH_LOCAL_DB_MESSAGES = `${dev.FILES_PATH}\\DB_MESSAGES\\`;
+const db = new Database('mob-app');
 
-class DB {
-  users: IUser[] = [];
-  activationCodes: IActivationCode[] = [];
-  companies: ICompany[] = [];
-  devices: IDevice[] = [];
-  messages: IMessage[] = [];
+const users = db.collection<IUser>('user');
+const codes = db.collection<IUser>('activation-codes');
+const companies = db.collection<IUser>('companies');
+const messages = db.collection<IUser>('messages');
+const devices = db.collection<IUser>('devices');
 
-  readData = async () => {
-    this.users = (await readFile(PATH_LOCAL_DB_USERS)) || [];
-    this.activationCodes = (await readFile(PATH_LOCAL_DB_ACTIVATION_CODES)) || [];
-    this.companies = (await readFile(PATH_LOCAL_DB_COMPANIES)) || [];
-    this.devices = (await readFile(PATH_LOCAL_DB_DEVICES)) || [];
-    this.messages = (await readFile(PATH_LOCAL_DB_MESSAGES)) || [];
-  };
-}
-
-const db = new DB();
-
-export default db;
+export { users, codes, companies, messages, devices };

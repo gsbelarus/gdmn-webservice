@@ -160,10 +160,10 @@ const editDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
   const device: IDevice = { uid: uid, user: userId, ...editPart };
 
-  await writeFile(
-    PATH_LOCAL_DB_DEVICES,
-    JSON.stringify([...allDevices.slice(0, idx), device, ...allDevices.slice(idx + 1)]),
-  );
+  await writeFile({
+    filename: PATH_LOCAL_DB_DEVICES,
+    data: JSON.stringify([...allDevices.slice(0, idx), device, ...allDevices.slice(idx + 1)]),
+  });
   log.info('a device edited successfully');
   const res: IResponse<IDevice> = { result: true, data: device };
   ctx.status = 200;
@@ -186,7 +186,10 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 422;
     ctx.body = JSON.stringify(result);
   } else {
-    await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]));
+    await writeFile({
+      filename: PATH_LOCAL_DB_DEVICES,
+      data: JSON.stringify([...allDevices.slice(0, idx), ...allDevices.slice(idx + 1)]),
+    });
     log.info('device removed successfully');
     ctx.status = 204;
   }

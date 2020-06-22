@@ -13,10 +13,7 @@ import log from './utils/logger';
 import { findById, validateAuthCreds } from './utils/util';
 import config from '../config';
 import { IUser } from '../../common';
-
-// import log4js from 'log4js';
-// const logger = log4js.getLogger('SERVER');
-// logger.level = 'trace';
+import { errorHandler } from './middleware/errorHandler';
 
 export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
 export const PATH_LOCAL_DB_ACTIVATION_CODES = `${config.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
@@ -29,12 +26,13 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   app.keys = ['super-secret-key'];
 
   const CONFIG = {
-    key: 'koa:sess-5' /** (string) cookie key (default is koa:sess) */,
+    key: 'koa:sess' /** (string) cookie key (default is koa:sess) */,
     maxAge: 28800000 /** (number) maxAge in ms (default is 1 days) */,
     overwrite: true /** (boolean) can overwrite or not (default true) */,
     httpOnly: true /** (boolean) httpOnly or not (default true) */,
     signed: true /** (boolean) signed or not (default true) */,
-    sameSite: true /** (string) lets require that a cookie shouldn't be sent with cross-origin requests (default undefined) */,
+    sameSite: true /** (string) lets require that a cookie shouldn't
+      be sent with cross-origin requests (default undefined) */,
   };
 
   passport.serializeUser((user: IUser, done) => done(null, user.id));
@@ -61,6 +59,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(CONFIG, app))
     .use(bodyParser())
+    .use(errorHandler)
     .use(passport.initialize())
     .use(passport.session())
     .use(koaCors({ credentials: true }))
@@ -69,7 +68,6 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
 
   log.info('Starting listener ...');
   await new Promise(resolve => app.listen(config.PORT, () => resolve()));
-  // log.info('Started');
   log.info(`Server is running on http://localhost:${config.PORT}`);
   return app;
 }

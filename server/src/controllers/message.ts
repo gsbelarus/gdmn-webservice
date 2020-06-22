@@ -56,7 +56,10 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     body,
   };
 
-  await writeFile(`${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`, JSON.stringify(msgObject));
+  await writeFile({
+    filename: `${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`,
+    data: JSON.stringify(msgObject),
+  });
   log.info(`new message in queue: ${uuid}`);
   const result: IResponse<{ uid: string; date: Date }> = {
     result: true,
@@ -75,7 +78,7 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
     const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
     for await (const newFile of nameFiles) {
       const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
-      result.push((data as unknown) as IMessage);
+      result.push(data as IMessage);
     }
     log.info('get message');
     const res: IResponse<IMessage[]> = {

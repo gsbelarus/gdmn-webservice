@@ -136,18 +136,18 @@ export async function initEnvironment(): Promise<void> {
     },
   };
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(users));
-  await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(devices));
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(companies));
-  await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(activationCodes));
-  await writeFile(
-    `${PATH_LOCAL_DB_MESSAGES}\\com\\4945c0bf-0436-46ad-a9c2-669cc33330a9.json`,
-    JSON.stringify(messages4Com),
-  );
-  await writeFile(
-    `${PATH_LOCAL_DB_MESSAGES}\\org\\88895370-5ebf-47de-858d-2d8ef3933328.json`,
-    JSON.stringify(messages4org),
-  );
+  await writeFile({ filename: PATH_LOCAL_DB_USERS, data: JSON.stringify(users) });
+  await writeFile({ filename: PATH_LOCAL_DB_DEVICES, data: JSON.stringify(devices) });
+  await writeFile({ filename: PATH_LOCAL_DB_COMPANIES, data: JSON.stringify(companies) });
+  await writeFile({ filename: PATH_LOCAL_DB_ACTIVATION_CODES, data: JSON.stringify(activationCodes) });
+  await writeFile({
+    filename: `${PATH_LOCAL_DB_MESSAGES}\\com\\4945c0bf-0436-46ad-a9c2-669cc33330a9.json`,
+    data: JSON.stringify(messages4Com),
+  });
+  await writeFile({
+    filename: `${PATH_LOCAL_DB_MESSAGES}\\org\\88895370-5ebf-47de-858d-2d8ef3933328.json`,
+    data: JSON.stringify(messages4org),
+  });
 }
 
 export function getApp(): Koa<Koa.DefaultState, Koa.DefaultContext> {

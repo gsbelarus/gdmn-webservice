@@ -3,6 +3,8 @@ import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CO
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IDevice, IActivationCode, IUser, IMakeUser } from '../../../common';
+import { users } from '../utils/db';
+import { userService } from '../services';
 
 export const makeUser = (user: IUser) => ({
   id: user.id,
@@ -27,21 +29,43 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const user = allUsers && allUsers.find(user => user.id === userId);
   ctx.type = 'application/json';
-  if (!allUsers || user === undefined) {
-    log.info(`no such user`);
-    const res: IResponse<string> = { result: false, error: 'no such user' };
-    ctx.status = 404;
-    ctx.body = JSON.stringify(res);
-    return;
+  const { id: userId } = ctx.params as { id: string };
+  try {
+    if (!userId) {
+      log.info(`id is required`);
+      const res: IResponse<string> = { result: false, error: 'id is required' };
+      ctx.throw(400, JSON.stringify(res));
+    }
+    const profile = await userService.userProfile(userId);
+    if (!profile) {
+      log.info(`no such user`);
+      const res: IResponse<string> = { result: false, error: 'no such user' };
+      ctx.throw(404, JSON.stringify(res));
+    }
+    log.info('getUser successfully returned');
+    const result: IResponse<IMakeUser> = { result: true, data: makeUser(profile) };
+    ctx.status = 200;
+    ctx.body = JSON.stringify(result);
+  } catch (err) {
+    log.info('something wrong');
+    const res: IResponse<string> = { result: false, error: 'something wrong' };
+    ctx.throw(400, JSON.stringify(res));
   }
-  log.info('getUser successfully returned');
-  const result: IResponse<IMakeUser> = { result: true, data: makeUser(user) };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
+
+  // const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
+  // const user = allUsers && allUsers.find(user => user.id === userId);
+  // if (!allUsers || user === undefined) {
+  //   log.info(`no such user`);
+  //   const res: IResponse<string> = { result: false, error: 'no such user' };
+  //   ctx.status = 404;
+  //   ctx.body = JSON.stringify(res);
+  //   return;
+  // }
+  // log.info('getUser successfully returned');
+  // const result: IResponse<IMakeUser> = { result: true, data: makeUser(user) };
+  // ctx.status = 200;
+  // ctx.body = JSON.stringify(result);
 };
 
 const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -64,7 +88,10 @@ const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
   delete newUser.password;
   const user = { ...allUsers[idx], ...newUser };
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify([...allUsers.slice(0, idx), user, ...allUsers.slice(idx + 1)]));
+  await writeFile({
+    filename: PATH_LOCAL_DB_USERS,
+    data: JSON.stringify([...allUsers.slice(0, idx), user, ...allUsers.slice(idx + 1)]),
+  });
   delete user.password;
   const result: IResponse<IMakeUser> = { result: true, data: user };
   log.info('user edited successfully');
@@ -86,8 +113,8 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
       !allDevices || !allDevices.length
         ? []
         : allDevices
-            .filter(device => device.user === userId)
-            .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+          .filter(device => device.user === userId)
+          .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
   };
   log.info('get devices by user successfully');
   ctx.type = 'application/json';
@@ -115,11 +142,13 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
   const newCodes = allCodes?.filter(el => id !== el.user);
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers ?? []));
+  await writeFile({ filename: PATH_LOCAL_DB_USERS, data: JSON.stringify(newUsers ?? []) });
 
-  if (allDevices !== newDevices) await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices ?? []));
+  if (allDevices !== newDevices)
+    await writeFile({ filename: PATH_LOCAL_DB_DEVICES, data: JSON.stringify(newDevices ?? []) });
 
-  if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
+  if (allCodes !== newCodes)
+    await writeFile({ filename: PATH_LOCAL_DB_ACTIVATION_CODES, data: JSON.stringify(newCodes ?? []) });
 
   ctx.status = 204;
   log.info('users removed successfully');
@@ -135,14 +164,14 @@ const addCompanyToUser = async (userId: string, companies: string[]) => {
 
   if (!allUsers || idx === undefined || idx < 0) return 1;
 
-  await writeFile(
-    PATH_LOCAL_DB_USERS,
-    JSON.stringify([
+  await writeFile({
+    filename: PATH_LOCAL_DB_USERS,
+    data: JSON.stringify([
       ...allUsers.slice(0, idx),
       { ...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies },
       ...allUsers.slice(idx + 1),
     ]),
-  );
+  });
   return 1;
 };
 
