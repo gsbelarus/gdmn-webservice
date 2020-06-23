@@ -6,6 +6,7 @@ import { Text, Chip, Button } from 'react-native-paper';
 import SubTitle from '../../components/SubTitle';
 import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
+import { appStorage } from '../../helpers/utils';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
@@ -13,7 +14,7 @@ const CompaniesScreen = () => {
 
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
-  const { actions } = useAuthStore();
+  const { state: { userID }, actions } = useAuthStore();
 
   useEffect(() => {
     const request = async () => {
@@ -24,6 +25,21 @@ const CompaniesScreen = () => {
     };
     request();
   }, [apiService.auth]);
+
+  /* Когда получим список организаций пользователя, проверим,
+  есть ли у пользователя организация, под которой он заходил в последний раз,
+  входит ли этот пользователь ещё в эту организацию. */
+  useEffect(() => {
+    if (userID !== null && companies) {
+      const getCompanyId = async() => {
+        const savedCompany = await appStorage.getItem(`${userID}/companyId`);
+        !!savedCompany && companies.some(company => company === savedCompany)
+          ? actions.setCompanyID(savedCompany)
+          : undefined;
+      };
+      getCompanyId();
+    }
+  }, [userID, companies]);
 
   const logOut = async () => {
     const res = await apiService.auth.logout();
@@ -66,8 +82,10 @@ const CompaniesScreen = () => {
             mode="contained"
             style={[styles.rectangularButton, localeStyles.button]}
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
-            onPress={() => {
+            onPress={async () => {
               actions.setCompanyID(selectedCompany);
+              console.log(`${userID}/companyId`);
+              await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}
           >
             ОК

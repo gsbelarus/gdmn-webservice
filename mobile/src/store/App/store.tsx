@@ -40,7 +40,7 @@ const createStoreContext = () => {
         setLoading(true);
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
-        actions.setSettings(storageSettings);
+        actions.setSettings(storageSettings || {});
         // типы документов
         const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
         actions.setDocumentTypes(documentTypes || []);
@@ -121,6 +121,17 @@ const createStoreContext = () => {
         saveSettings();
       }
     }, [state.documents, storagePath]);
+
+    useEffect(() => {
+      if (!!state.settings?.autodeletingDocument && !isLoading) {
+        const deleteDocs = state.documents.filter(document => document.head.status === 3);
+        if (deleteDocs.length > 0) {
+          deleteDocs.forEach((document) => {
+            actions.deleteDocument(document.id);
+          })
+        }
+      }
+    }, [actions, state.documents, state.settings]);
 
     return <StoreContext.Provider value={{ state, actions }}>{children}</StoreContext.Provider>;
   };

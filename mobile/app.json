@@ -3,7 +3,6 @@
     "name": "mobile-inventory",
     "slug": "mobile-inventory",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
       "android",
@@ -20,7 +19,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["src/assets/**/*"],
+    "assetBundlePatterns": [
+      "src/assets/**/*"
+    ],
     "ios": {
       "supportsTablet": true
     }

@@ -49,3 +49,19 @@ export async function put<T>(baseUrl: string, path: string, body: string): Promi
     throw new Error(err.message);
   }
 }
+
+export async function remove<T>(baseUrl: string, path: string): Promise<T> {
+  try {
+    const response = await fetch(`${baseUrl}${path}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    return response.json();
+  } catch (err) {
+    if (err.response) {
+      throw new Error(err.response.data.message);
+    }
+    throw new Error(err.message);
+  }
+}

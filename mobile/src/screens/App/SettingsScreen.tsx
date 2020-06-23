@@ -5,14 +5,12 @@ import { Divider, Avatar, Button } from 'react-native-paper';
 
 import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemain } from '../../../../common';
 import SettingsItem from '../../components/SettingsItem';
+import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
-// AppStore
-
-// const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 const SettingsScreen = () => {
-  const { colors, dark } = useTheme();
+  const { colors /* , dark */ } = useTheme();
   const { apiService } = useServiceStore();
   const {
     actions: appActions,
@@ -52,12 +50,6 @@ const SettingsScreen = () => {
             text: 'Отмена',
           },
         ]);
-        /*    Alert.alert('Внимание!', "Удалить все данные?".', [
-         {
-           text: 'Да',
-           onPress: () => ({}),
-         },
-       ]); */
       })(),
     [appActions],
   );
@@ -74,31 +66,58 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-      try {
-        const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
-        if (!response.result) {
-          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
-          return;
+      if (config.debug.useMockup) {
+        const mockRef = (await import('../../mockData/References.json')) as IReference[];
+        const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
+        appActions.setContacts(mockContacts);
+      } else {
+        try {
+          const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
+          if (!response.result) {
+            Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+            return;
+          }
+          const messages = response.data.filter((message) => message.body.type === 'data');
+          if (messages.length !== 0) {
+            messages.forEach( message => {
+              /* Обработка данных по справочникам */
+              const ref = (message.body.payload as unknown) as IReference[];
+              const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
+              appActions.setContacts(contacts);
+              const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
+              appActions.setDocumentTypes(documentTypes);
+              const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
+              appActions.setGoods(goods);
+              const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
+              appActions.setRemains(remains);
+
+              apiService.data.deleteMessage(companyID, message.head.id);
+              // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
+            })
+          }
+          /* Обработка сообщений, которые связаны с документами */
+          const messagesForDocuments = response.data.filter((message) => message.body.type === 'response' && message.body.payload.name === 'post_documents');
+          if(messagesForDocuments.length > 0) {
+            messagesForDocuments.forEach(message => {
+              if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
+                message.body.payload.params.forEach(paramDoc => {
+                  if(paramDoc.result) {
+                    const document = documents.find(doc => doc.id === paramDoc.docId);
+                    if(document && document.head.status === 2) {
+                      appActions.editStatusDocument({id: paramDoc.docId, status: 3 })
+                    }
+                  }
+                })
+              }
+              apiService.data.deleteMessage(companyID, message.head.id);
+            })
+          }
+
+        } catch (err) {
+          Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
-        const messages = response.data.filter((message) => message.body.type === 'data');
-        if (messages.length !== 0) {
-          const sortMessages = messages.sort((curr, next) => next.head.dateTime.localeCompare(curr.head.dateTime));
-          /* Обработка данных по справочникам */
-          const ref = (sortMessages[0].body.payload as unknown) as IReference[];
-          const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
-          appActions.setContacts(contacts);
-          const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
-          appActions.setDocumentTypes(documentTypes);
-          const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
-          appActions.setGoods(goods);
-          const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
-          appActions.setRemains(remains);
-          // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
-        }
-        Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
-      } catch (err) {
-        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
       }
+      Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
     };
 
     getMessages();
@@ -142,15 +161,13 @@ const SettingsScreen = () => {
         }
       />
       <Divider />
-      <SettingsItem
+      {/* <SettingsItem
         label="Dark theme"
-        value={dark}
+        value={settings?.dakrTheme}
         onValueChange={() => {
-          //AsyncStorage.setItem(THEME_PERSISTENCE_KEY, dark ? 'light' : 'dark');
-          // Переделать в глобал стейт
-          // setTheme(t => (t.dark ? DefaultTheme : DarkTheme));
+          appActions.setSettings({ ...settings, dakrTheme: !settings?.dakrTheme })
         }}
-      />
+      />*/}
     </ScrollView>
   );
 };

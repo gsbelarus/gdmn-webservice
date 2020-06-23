@@ -57,6 +57,7 @@ export interface IAuthState {
 export interface IAppSettings {
   synchronization?: boolean;
   autodeletingDocument?: boolean;
+  dakrTheme?: boolean;
 }
 
 export interface IAppState {
