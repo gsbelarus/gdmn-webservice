@@ -179,7 +179,11 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
     console.log('DONE', message);
     clients = [];
     ctx.status = 200;
-    ctx.body = JSON.stringify(message);
+    const result: IResponse<IMessage[]> = {
+      result: true,
+      data: message,
+    };
+    ctx.body = JSON.stringify(result);
   }
 };
 
