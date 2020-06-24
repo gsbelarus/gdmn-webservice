@@ -147,6 +147,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   if (!body.result || (body.result && body.data !== [])) {
     ctx.status = response.status;
     ctx.body = response.body;
+    return;
   }
 
   const promise = new Promise<IMessage[]>((resolve, reject) => {
@@ -173,6 +174,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
     };
     ctx.status = 404;
     ctx.body = JSON.stringify(result);
+    return;
   }
 
   if (message && message.length > 0) {
@@ -190,9 +192,6 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
 const publish = async (ctx: ParameterizedContext): Promise<void> => {
   const { head, body } = ctx.request.body;
   ctx.type = 'application/json';
-
-  console.log(head);
-  console.log(body);
 
   const response = createMessage(head, body, ctx.state.user);
 
