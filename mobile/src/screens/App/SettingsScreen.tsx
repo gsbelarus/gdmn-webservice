@@ -17,7 +17,7 @@ const SettingsScreen = () => {
     state: { settings, documents },
   } = useAppStore();
   const {
-    state: { companyID },
+    state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
 
@@ -123,6 +123,18 @@ const SettingsScreen = () => {
     getMessages();
   }, [apiService.data, appActions, companyID, documents]);
 
+  const subscribe = useCallback(async () => {
+    const request = await apiService.data.subscribe(companyID);
+    console.log('result subscribe');
+    console.log(request.result ? request.data : request.error);
+  }, [companyID]);
+
+  const publish = useCallback(async () => {
+    const request = await apiService.data.publich(companyID, userID, {type: 'data', payload: { name: 'get_message', params: ['one message'] }});
+    console.log('result publish');
+    console.log(request.result ? request.data : request.error);
+  }, [companyID, userID])
+
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
       <View style={localStyles.content}>
@@ -161,6 +173,17 @@ const SettingsScreen = () => {
         }
       />
       <Divider />
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={subscribe}>
+          Suscribe
+        </Button>
+      </View>
+      <View style={localStyles.content}>
+        <Button mode="contained" onPress={publish}>
+          Publish
+        </Button>
+      </View>
+
       {/* <SettingsItem
         label="Dark theme"
         value={settings?.dakrTheme}
