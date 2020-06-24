@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Picker } from 'react-native';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput } from 'react-native-paper';
 import styles from '../../../styles/global';
 import { useAppStore } from '../../../store';
@@ -14,14 +14,17 @@ interface IItem {
   id?: number;
   value?: string;
 }
-/*import { IContact, IDocumentType } from '../../../model/sell';
-const contacts: IContact[] = references.find((ref) => ref.type === "contacts").data;
-const people: IContact[] = contacts.filter((item) => item.type === 2);
-const companies: IContact[] = contacts.filter((item) => item.type === 3);
-const departments: IContact[] = contacts.filter((item) => item.type === 4);
-const documentTypes: IDocumentType[] = references.find((ref) => ref.type === "documentTypes").data; */
 
-const CreateSellDocumentScreen = ({ route }) => {
+export interface ICreateSellDocumentRef {
+  done(): void;
+}
+
+interface MyInputProps {
+  route: any;
+  navigation: any;
+}
+
+const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps>(({ route }, ref) => {
   const [date, setDate] = useState(new Date());
   const [oldDate, setOldDate] = useState(new Date());
   const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
@@ -40,18 +43,6 @@ const CreateSellDocumentScreen = ({ route }) => {
   const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
   const listDepartments = getListItems(departments);
 
-  /*const list = [
-    {id: 0, value: 'item0'},
-    {id: 1, value: 'item1'},
-    {id: 2, value: 'item2'},
-    {id: 3, value: 'item3'},
-    {id: 4, value: 'item4'},
-    {id: 5, value: 'item5'},
-  ] 
-   <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={230}>
-    <DropdownList list={list} value={{id: 2, value: 'item2'}} onValueChange={(item) => {console.log(item.value)}}/>
-  </View> */
-
   const today = new Date();
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -62,9 +53,56 @@ const CreateSellDocumentScreen = ({ route }) => {
     setDate(currentDate);
   };
 
-  useEffect(() => {
-    setSelectedDocType(334644058);
-  }, [])
+  useImperativeHandle(ref, () => ({
+    done: () => {
+      if (selectedExpeditor === undefined || selectedToContact === undefined || 
+        selectedFromContact === undefined || numberText === undefined) {
+        Alert.alert('Ошибка!', 'Не все поля заполнены.', [
+          {
+            text: 'OK',
+            onPress: () => ({}),
+          },
+        ]);
+        return;
+      }
+      if (route.params?.docId) {
+        actions.editDocument({
+          id: route.params.docId,
+          head: {
+            doctype: selectedDocType,
+            fromcontactId: selectedFromContact,
+            tocontactId: selectedToContact,
+            date: date.toString(),
+            status: 0,
+            docnumber: numberText,
+            expeditorId: selectedExpeditor,
+          },
+        });
+        navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+      } else {
+        const id =
+          state.documents
+            .map((item) => item.id)
+            .reduce((newId, currId) => {
+              return newId > currId ? newId : currId;
+            }, -1) + 1;
+        actions.newDocument({
+          id,
+          head: {
+            doctype: selectedDocType,
+            fromcontactId: selectedFromContact,
+            tocontactId: selectedToContact,
+            date: date.toString(),
+            status: 0,
+            docnumber: numberText,
+            expeditorId: selectedExpeditor,
+          },
+          lines: [],
+        });
+        navigation.navigate('ViewSellDocument', { docId: id });
+      }
+    },
+  }));
 
   useEffect(() => {
     if (route.params?.docId !== undefined) {
@@ -75,7 +113,7 @@ const CreateSellDocumentScreen = ({ route }) => {
       setDate(new Date(documentItem.head.date));
       setNumberText((documentItem.head as ISellHead).docnumber);
     }
-  }, [route.params]);
+  }, [route.params, state.documents]);
 
   return (
     <>
@@ -203,67 +241,10 @@ const CreateSellDocumentScreen = ({ route }) => {
               </Portal>
             ))}
         </View>
-        <View style={localeStyles.buttonView}>
-          <Button
-            mode="contained"
-            style={[styles.rectangularButton, localeStyles.button]}
-            disabled={selectedExpeditor === undefined || selectedToContact === undefined || 
-              selectedFromContact === undefined || numberText === undefined}
-            onPress={() => {
-              if (route.params?.docId) {
-                actions.editDocument({
-                  id: route.params.docId,
-                  head: {
-                    doctype: selectedDocType,
-                    fromcontactId: selectedFromContact,
-                    tocontactId: selectedToContact,
-                    date: date.toString(),
-                    status: 0,
-                    docnumber: numberText,
-                    expeditorId: selectedExpeditor,
-                  },
-                });
-                navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-              } else {
-                const id =
-                  state.documents
-                    .map((item) => item.id)
-                    .reduce((newId, currId) => {
-                      return newId > currId ? newId : currId;
-                    }, -1) + 1;
-                actions.newDocument({
-                  id,
-                  head: {
-                    doctype: selectedDocType,
-                    fromcontactId: selectedFromContact,
-                    tocontactId: selectedToContact,
-                    date: date.toString(),
-                    status: 0,
-                    docnumber: numberText,
-                    expeditorId: selectedExpeditor,
-                  },
-                  lines: [],
-                });
-                navigation.navigate('ViewSellDocument', { docId: id });
-              }
-            }}
-          >
-            ОК
-          </Button>
-          <Button
-            mode="contained"
-            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-            onPress={() => {
-              navigation.navigate('SellDocumentsListScreen');
-            }}
-          >
-            Отмена
-          </Button>
-        </View>
       </ScrollView>
     </>
   );
-};
+});
 
 export { CreateSellDocumentScreen };
 

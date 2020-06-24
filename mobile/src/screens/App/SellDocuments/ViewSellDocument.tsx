@@ -72,7 +72,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
     <TouchableOpacity
       style={localStyles.listContainer}
       onPress={() =>
-        navigation.navigate('ProductDetail', { lineID: item.id, prodId: item.goodId, docId, modeCor: true })
+        navigation.navigate('SellProductDetail', { lineID: item.id, prodId: item.goodId, docId, modeCor: true })
       }
     >
       <ContentItem item={item} status={status} />

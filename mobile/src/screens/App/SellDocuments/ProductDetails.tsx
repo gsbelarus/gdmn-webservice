@@ -1,5 +1,5 @@
 import { useTheme, useScrollToTop, useNavigation} from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
 import { Text, Button } from 'react-native-paper';
@@ -45,9 +45,17 @@ const TaraItem = React.memo(({ item, line }:  { item: ITara; line: ISellLine; })
     </View> 
   );
 }); 
-/**/
 
-const ProductDetailScreen = ({ route, navigation }) => {
+export interface ISellProductDetailsRef {
+  done(): void;
+}
+
+interface MyInputProps {
+  route: any;
+  navigation: any;
+}
+
+const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -58,13 +66,13 @@ const ProductDetailScreen = ({ route, navigation }) => {
       ? (document as IDocument).lines
       : (document as ISellDocument).lines;
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineID);
-  const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
+ // const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
   const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState(1);
-  const [tara, setTara] = useState<ILineTara[]>(undefined)
+  //const [tara, setTara] = useState<ILineTara[]>(undefined)
 
-  const ref = React.useRef<FlatList<ITara>>(null);
-  useScrollToTop(ref);
+ /* const ref = React.useRef<FlatList<ITara>>(null);
+  useScrollToTop(ref);*/
 
   const renderItem = ({ item }: {item: ITara}) => (
     <TaraItem item={item} line={line} />
@@ -76,9 +84,24 @@ const ProductDetailScreen = ({ route, navigation }) => {
         setValue(lineDocument.quantity);
       }
       setLine(lineDocument);
-      setTara((lineDocument as ISellLine).tara ?? undefined);
+    //  setTara((lineDocument as ISellLine).tara ?? undefined);
     }
   }, [document.lines, route.params.modeCor, route.params.lineID]);
+  
+  useImperativeHandle(ref, () => ({
+    done: () => {
+      if (line !== undefined) {
+        actions.editLine({
+          docId: route.params.docId,
+          lineId: line.id,
+          value: route.params.modeCor ? value : value + line.quantity,
+        });
+      } else {
+        actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+      }
+      navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+    },
+  }));
 
   return (
     <View
@@ -119,37 +142,20 @@ const ProductDetailScreen = ({ route, navigation }) => {
       </View>
       <View style={localeStyles.flatContaner}>
         <FlatList
-          ref={ref}
-          data={taraList ?? []}
+          //ref={ref}
+          data={[]}
+         // data={taraList ?? []}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
           horizontal={true}
         />
       </View>
-      <Button
-        onPress={() => {
-          if (line !== undefined) {
-            actions.editLine({
-              docId: route.params.docId,
-              lineId: line.id,
-              value: route.params.modeCor ? value : value + line.quantity,
-            });
-          } else {
-            actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
-          }
-          navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-        }}
-        mode="contained"
-        style={[styles.rectangularButton, localeStyles.button]}
-      >
-        Подтвердить
-      </Button>
     </View>
   );
-};
+});
 
-export { ProductDetailScreen };
+export { SellProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
   button: {

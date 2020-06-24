@@ -20,7 +20,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('ProductDetail', { prodId: item.id, docId, modeCor: false });
+        navigation.navigate('SellProductDetail', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
@@ -37,7 +37,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 });
 
-const ProductsListScreen = () => {
+const SellProductsListScreen = () => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -142,7 +142,7 @@ const ProductsListScreen = () => {
   );
 };
 
-export { ProductsListScreen };
+export { SellProductsListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
