@@ -2,7 +2,7 @@ import { useTheme, useScrollToTop, useNavigation} from '@react-navigation/native
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import InputSpinner from 'react-native-input-spinner';
-import { Text, Button } from 'react-native-paper';
+import { Text, TextInput } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -69,6 +69,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
  // const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
   const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState(1);
+  const orderQ = (lineDocument as ISellLine)?.orderQuantity ?? 0;
   //const [tara, setTara] = useState<ILineTara[]>(undefined)
 
  /* const ref = React.useRef<FlatList<ITara>>(null);
@@ -114,32 +115,34 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
+      <TextInput
+        mode={'flat'}
+        label={'Кол-во по заявке'}
+        editable={false}
+        value={orderQ.toString()}
+        theme={{
+          colors: {
+            placeholder: colors.primary,
+          },
+        }}
+        style={{
+          backgroundColor: colors.card,
+        }}  
+      />
+      <TextInput
+        mode={'flat'}
+        label={'Количество'}
+        editable={true}
+        keyboardType="decimal-pad"
+        onChangeText={(newValue) => setValue(Number(newValue))}
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus={true}
+        value={value.toString()}
+        style={{
+          backgroundColor: colors.card,
+        }}
+      />
 
-      <View style={localeStyles.productPriceView}>
-        <View style={localeStyles.productQuantity}>
-          <Text style={localeStyles.fontSize16}>Количество: {lineDocument?.quantity ?? 0}</Text>
-        </View>
-        <View  style={localeStyles.productQuantity}>
-          <Text style={localeStyles.fontSize16}>Кол-во по заявке: {(lineDocument as ISellLine)?.orderQuantity ?? 0} </Text>
-        </View>
-      </View>
-     
-      <View style={localeStyles.editQuantityView}>
-        <Text style={localeStyles.fontSize16}>Изменить количество:</Text>
-        <InputSpinner
-          returnKeyType="done"
-          style={localeStyles.inputSpinner}
-          inputStyle={localeStyles.fontSize20}
-          value={value}
-          max={1000}
-          min={0}
-          step={1}
-          type={"float"}
-          colorLeft={colors.primary}
-          colorRight={colors.primary}
-          onChange={setValue}
-        />
-      </View>
       <View style={localeStyles.flatContaner}>
         <FlatList
           //ref={ref}

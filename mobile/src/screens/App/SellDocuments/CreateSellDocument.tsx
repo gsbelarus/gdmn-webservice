@@ -36,11 +36,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
   const { state, actions } = useAppStore();
   const selectedItem = (listItems: IItem[], id: Number) => (listItems.find((item) => item.id === id));
   const getListItems = (contacts: IContact[]) => contacts.map((item) => { return {id: item.id, value: item.name} as IItem});
-  const people: IContact[] = state.contacts.filter((item) => item.type === 2);
+  const people: IContact[] = state.contacts.filter((item) => item.type == 2);
   const listPeople = getListItems(people);
-  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
+  const companies: IContact[] = state.contacts.filter((item) => item.type == 3);
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
+  const departments: IContact[] = state.contacts.filter((item) => item.type == 4);
   const listDepartments = getListItems(departments);
 
   const today = new Date();
@@ -342,6 +342,6 @@ const localeStyles = StyleSheet.create({
   },
   textNumberInput: {
     fontSize: 16,
-    height: 20,
+    height: 40,
   },
 });

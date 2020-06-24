@@ -132,7 +132,7 @@ const AppNavigator = () => {
         <Stack.Screen
           key="SellProductsList"
           name="SellProductsList"
-          component={ProductsListScreen}
+          component={SellProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
             headerLeft: () => <HeaderRight text="Отмена" onPress={() => {

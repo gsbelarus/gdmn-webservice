@@ -243,7 +243,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
                 borderColor: colors.primary,
               },
             ]}
-            onPress={() => navigation.navigate('ProductsList', { docId: document?.id })}
+            onPress={() => navigation.navigate('SellProductsList', { docId: document?.id })}
           >
             <MaterialIcons size={30} color={colors.card} name="add" />
           </TouchableOpacity>

@@ -44,10 +44,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
             {state.contacts?.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)?.name}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {state.contacts.find((contact) => contact.id === (item.head as ISellHead).expeditorId).name}
+            Экспедитор: {state.contacts?.find((contact) => contact.id === (item.head as ISellHead)?.expeditorId).name}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {state.contacts.find((contact) => contact.id === item.head.tocontactId).name}
+            {state.contacts?.find((contact) => contact.id === item.head?.tocontactId).name}
           </Text>
         </View>
       </View>

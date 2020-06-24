@@ -107,7 +107,7 @@ const DocumentsListScreen = ({ navigation }) => {
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={appState.documents.filter(item => item.head.doctype !== 334644058)}
+        data={appState.documents}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
