@@ -3,7 +3,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
-import { Text, Button, Modal, Portal, TextInput } from 'react-native-paper';
+import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
 import styles from '../../../styles/global';
 import { useAppStore } from '../../../store';
 import { IContact } from '../../../../../common';
@@ -112,6 +112,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
       setSelectedFromContact(documentItem.head.fromcontactId);
       setDate(new Date(documentItem.head.date));
       setNumberText((documentItem.head as ISellHead).docnumber);
+      setSelectedDocType(documentItem.head?.doctype);
     }
   }, [route.params, state.documents]);
 
@@ -181,6 +182,27 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
               )}
             </View>
           </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
+          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
+          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+            {state.documentTypes && state.documentTypes.length !== 0 ? (
+              state.documentTypes.map((item, idx) => (
+                <Chip
+                  key={idx}
+                  mode="outlined"
+                  style={[localeStyles.margin, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
+                  onPress={() => setSelectedDocType(item.id)}
+                  selected={selectedDocType === item.id}
+                  selectedColor={selectedDocType === item.id ? colors.card : colors.text}
+                >
+                  {item.name}
+                </Chip>
+              ))
+            ) : (
+              <Text>Не найдено</Text>
+            )}
+          </ScrollView>
+        </View>
 
           {isDatePickerVisible &&
             (Platform.OS !== 'ios' ? (
