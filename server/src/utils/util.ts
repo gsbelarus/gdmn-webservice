@@ -17,14 +17,16 @@ const findByUserName = async (userName: string) => {
 const addNewDevice = async ({
   userId,
   deviceId,
+  title,
 }: {
   userId: string;
   deviceId: string;
+  title: string;
 }): Promise<IDevice | undefined> => {
   const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
 
   if (!(allDevices && allDevices.find(device => device.uid === deviceId && device.user === userId))) {
-    const newDevice: IDevice = { uid: deviceId, user: userId, isBlock: false };
+    const newDevice: IDevice = { uid: deviceId, title, user: userId, isBlock: false };
     await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(allDevices ? [...allDevices, newDevice] : [newDevice]));
 
     return newDevice;

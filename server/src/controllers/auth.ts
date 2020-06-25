@@ -150,7 +150,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
       addDevice({}) */
       const deviceId = uid == '0' ? uuidv1() : uid;
 
-      const newDevice = await addNewDevice({ userId: codeRec.user, deviceId });
+      const newDevice = await addNewDevice({ userId: codeRec.user, deviceId, title: 'unknown' });
       if (newDevice) {
         status = 200;
         result = { result: true, data: { userId: codeRec.user, deviceId: deviceId as string } };

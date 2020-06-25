@@ -87,7 +87,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
         ? []
         : allDevices
             .filter(device => device.user === userId)
-            .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+            .map(device => ({ uid: device.uid, title: device.title, state: device.isBlock ? 'blocked' : 'active' })),
   };
   log.info('get devices by user successfully');
   ctx.type = 'application/json';
