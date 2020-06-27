@@ -35,6 +35,7 @@ export interface IUserCredentials {
 }
 
 export interface IActivationCode {
+  id?: string;
   code: string;
   date: string;
   user: string;
@@ -49,7 +50,7 @@ export interface ICompany {
 export interface IDevice {
   uid: string;
   user: string;
-  isBlock: boolean;
+  blocked: boolean;
 }
 
 export interface IMessageInfo {
@@ -58,6 +59,7 @@ export interface IMessageInfo {
 }
 
 export interface IMessage {
+  id?: string;
   head: {
     id: string;
     producer: string;

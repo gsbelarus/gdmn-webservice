@@ -15,11 +15,11 @@ import config from '../config';
 import { IUser } from '../../common';
 import { errorHandler } from './middleware/errorHandler';
 
-export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
+/* export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
 export const PATH_LOCAL_DB_ACTIVATION_CODES = `${config.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
 export const PATH_LOCAL_DB_COMPANIES = `${config.FILES_PATH}\\DB_COMPANIES.json`;
 export const PATH_LOCAL_DB_DEVICES = `${config.FILES_PATH}\\DB_DEVICES.json`;
-export const PATH_LOCAL_DB_MESSAGES = `${config.FILES_PATH}\\DB_MESSAGES\\`;
+export const PATH_LOCAL_DB_MESSAGES = `${config.FILES_PATH}\\DB_MESSAGES\\`; */
 
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();

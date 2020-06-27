@@ -3,7 +3,6 @@ import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CO
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IDevice, IActivationCode, IUser, IMakeUser } from '../../../common';
-import { users } from '../utils/db';
 import { userService } from '../services';
 
 export const makeUser = (user: IUser) => ({
@@ -33,7 +32,7 @@ const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params as { id: string };
   try {
     if (!userId) {
-      log.info(`id is required`);
+      log.info('id is required');
       const res: IResponse<string> = { result: false, error: 'id is required' };
       ctx.throw(400, JSON.stringify(res));
     }
@@ -113,8 +112,8 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
       !allDevices || !allDevices.length
         ? []
         : allDevices
-          .filter(device => device.user === userId)
-          .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
+            .filter(device => device.user === userId)
+            .map(device => ({ uid: device.uid, state: device.isBlock ? 'blocked' : 'active' })),
   };
   log.info('get devices by user successfully');
   ctx.type = 'application/json';

@@ -1,7 +1,13 @@
-import { userProfile } from './user';
+import { findByUserName, findeByUserId } from './userService';
+import { authenticate } from './AuthService';
 
 const userService = {
-  userProfile,
+  findByUserName,
+  findeByUserId,
 };
 
-export { userService };
+const authService = {
+  authenticate,
+};
+
+export { authService, userService };

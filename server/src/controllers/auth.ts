@@ -1,57 +1,36 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import koaPassport from 'koa-passport';
-import { promisify } from 'util';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_ACTIVATION_CODES, PATH_LOCAL_DB_DEVICES } from '../server';
-import { readFile, writeFile } from '../utils/workWithFile';
-import { findByUserName, saveActivationCode, addNewDevice } from '../utils/util';
+import { findByUserName, genActivationCode, addNewDevice } from '../utils/util';
 import { ParameterizedContext, Next } from 'koa';
-import { IResponse, IActivationCode, IUser, IDevice } from '../../../common';
+import { IResponse, IActivationCode, IUser } from '../../../common';
 import log from '../utils/logger';
 import { v1 as uuidv1 } from 'uuid';
+import { authService } from '../services';
 
+/** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
-  const devices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
-  if (deviceId !== 'WEB') {
-    const currDevice = devices?.find(
-      device => (device.uid === deviceId || deviceId === 'WEB') && device.user === userName,
-    );
-    ctx.type = 'application/json';
-
-    if (!currDevice) {
-      log.info(`not such device (${deviceId})`);
-      const res: IResponse<string> = { result: false, error: 'not device or user' };
-      ctx.status = 404;
-      ctx.body = JSON.stringify(res);
-      return;
-    }
-
-    if (currDevice.isBlock) {
-      log.info(`device(${deviceId}) does not have access`);
-      const res: IResponse<undefined> = { result: false, error: 'does not have access' };
-      ctx.status = 401;
-      ctx.response.body = JSON.stringify(res);
-      return;
-    }
+  if (!userName) {
+    log.info('Failed login attempt: userName is required');
+    const res: IResponse = { result: false, error: 'не указан пользователь' };
+    ctx.throw(404, JSON.stringify(res));
   }
 
-  const user = (await promisify(cb => koaPassport.authenticate('local', cb)(ctx, next))()) as IUser | false;
+  if (!deviceId) {
+    log.info('Failed login attempt: deviceId is required');
+    const res: IResponse = { result: false, error: 'не указан идентификатор устройства' };
+    ctx.throw(404, JSON.stringify(res));
+  }
+
+  const user = await authService.authenticate(ctx, next);
 
   if (!user) {
-    log.info('failed login attempt');
-    const res: IResponse<undefined> = { result: false, error: 'не верный пользователь и\\или пароль' };
-    ctx.status = 404;
-    ctx.response.body = JSON.stringify(res);
-    return;
+    log.info('Failed login attempt: invalid Username or Password');
+    const res: IResponse = { result: false, error: 'неверное имя пользователя или пароль' };
+    ctx.throw(404, JSON.stringify(res));
   }
 
-  ctx.login(user);
-
-  delete user.password;
-
-  log.info(`user ${user.id} successfully logged in`);
+  log.info(`User '${user.id}' is successfully logged in`);
 
   const res: IResponse<IUser> = { result: true, data: user };
   ctx.status = 200;
@@ -79,7 +58,7 @@ const logOut = (ctx: ParameterizedContext): void => {
 
   ctx.logout();
 
-  const res: IResponse<undefined> = { result: true };
+  const res: IResponse = { result: true };
   ctx.status = 200;
   ctx.type = 'application/json';
   ctx.body = JSON.stringify(res);

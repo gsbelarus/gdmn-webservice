@@ -38,7 +38,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   });
 
   /* Добавлям к пользователю gdmn создаваемую организацию */
-  const resGdmn = await addCompanyToUser('gdmn', [title]);
+  await addCompanyToUser('gdmn', [title]);
   /* Добавлям к текущему пользователю создаваемую организацию */
   const res = await addCompanyToUser(ctx.state.user.id, [title]);
   // const res1 = await editCompanies('gdmn', [title]);

@@ -89,7 +89,7 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.body = JSON.stringify(res);
   } catch (e) {
     log.warn(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
-    const result: IResponse<undefined> = {
+    const result: IResponse = {
       result: false,
       error: `file or directory not found`,
     };
@@ -103,7 +103,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const result = await remove(companyId, uid);
   ctx.type = 'application/json';
 
-  let response: IResponse<undefined>;
+  let response: IResponse;
   if (result === 'OK') {
     ctx.status = 200;
     response = {
