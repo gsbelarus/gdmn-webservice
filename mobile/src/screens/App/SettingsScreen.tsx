@@ -68,7 +68,7 @@ const SettingsScreen = () => {
     const getMessages = async () => {
       if (config.debug.useMockup) {
         const mockRef = (await import('../../mockData/References.json')) as IReference[];
-        const mockContacts = mockRef.find((itm) => itm.name === 'contacts')?.data as IContact[];
+        const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
         appActions.setContacts(mockContacts);
       } else {
         try {
@@ -79,21 +79,40 @@ const SettingsScreen = () => {
           }
           const messages = response.data.filter((message) => message.body.type === 'data');
           if (messages.length !== 0) {
-            const sortMessages = messages.sort((curr, next) => next.head.dateTime.localeCompare(curr.head.dateTime));
-            /* Обработка данных по справочникам */
-            const ref = (sortMessages[0].body.payload as unknown) as IReference[];
-            const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
-            appActions.setContacts(contacts);
-            const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
-            appActions.setDocumentTypes(documentTypes);
-            const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
-            appActions.setGoods(goods);
-            const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
-            appActions.setRemains(remains);
+            messages.forEach( message => {
+              /* Обработка данных по справочникам */
+              const ref = (message.body.payload as unknown) as IReference[];
+              const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
+              appActions.setContacts(contacts);
+              const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
+              appActions.setDocumentTypes(documentTypes);
+              const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
+              appActions.setGoods(goods);
+              const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
+              appActions.setRemains(remains);
 
-            apiService.data.deleteMessage(companyID, messages[0].head.id);
-            // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
+              apiService.data.deleteMessage(companyID, message.head.id);
+              // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
+            })
           }
+          /* Обработка сообщений, которые связаны с документами */
+          const messagesForDocuments = response.data.filter((message) => message.body.type === 'response' && message.body.payload.name === 'post_documents');
+          if(messagesForDocuments.length > 0) {
+            messagesForDocuments.forEach(message => {
+              if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
+                message.body.payload.params.forEach(paramDoc => {
+                  if(paramDoc.result) {
+                    const document = documents.find(doc => doc.id === paramDoc.docId);
+                    if(document && document.head.status === 2) {
+                      appActions.editStatusDocument({id: paramDoc.docId, status: 3 })
+                    }
+                  }
+                })
+              }
+              apiService.data.deleteMessage(companyID, message.head.id);
+            })
+          }
+
         } catch (err) {
           Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
         }

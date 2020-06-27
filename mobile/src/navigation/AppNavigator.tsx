@@ -1,14 +1,12 @@
-import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
 
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
 import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
+import { HeaderRight } from '../components/HeaderRight';
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -20,7 +18,6 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
-  const { colors } = useTheme();
   const prodRef = useRef<IProductDetailsRef>(null);
   const docRef = useRef<ICreateDocumentRef>(null);
 
@@ -51,27 +48,13 @@ const AppNavigator = () => {
           initialParams={{ prodId: 0 }}
           options={({ route, navigation }) => ({
             title: '',
-            headerLeft: () => (
-              <TouchableOpacity
-                style={localeStyles.marginLeft}
-                onPress={() => {
-                  navigation.navigate('ViewDocument', { docId: route.params.docId });
-                }}
-              >
-                <Text style={[localeStyles.name, { color: colors.primary }]}>Отмена</Text>
-              </TouchableOpacity>
-            ),
-            headerRight: () => (
-              <TouchableOpacity
-                style={localeStyles.marginRight}
-                onPress={() => {
-                  prodRef.current?.done();
-                  navigation.navigate('ViewDocument', { docId: route.params.docId });
-                }}
-              >
-                <Text style={[localeStyles.name, { color: colors.primary }]}>Готово</Text>
-              </TouchableOpacity>
-            ),
+            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            }} />,
+            headerRight: () => <HeaderRight text="Готово" onPress={() => {
+              prodRef.current?.done();
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            }} />,
           })}
         />
         <Stack.Screen
@@ -80,26 +63,12 @@ const AppNavigator = () => {
           component={CreateDocumentComponent}
           options={({ navigation }) => ({
             title: '',
-            headerLeft: () => (
-              <TouchableOpacity
-                style={localeStyles.marginLeft}
-                onPress={() => {
-                  navigation.navigate('DocumentsListScreen');
-                }}
-              >
-                <Text style={[localeStyles.name, { color: colors.primary }]}>Отмена</Text>
-              </TouchableOpacity>
-            ),
-            headerRight: () => (
-              <TouchableOpacity
-                style={localeStyles.marginRight}
-                onPress={() => {
-                  docRef.current?.done();
-                }}
-              >
-                <Text style={[localeStyles.name, { color: colors.primary }]}>Готово</Text>
-              </TouchableOpacity>
-            ),
+            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
+              navigation.navigate('DocumentsListScreen');
+            }} />,
+            headerRight: () => <HeaderRight text="Готово" onPress={() => {
+              docRef.current?.done();
+            }} />,
           })}
         />
         <Stack.Screen
@@ -108,16 +77,9 @@ const AppNavigator = () => {
           component={ProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerLeft: () => (
-              <TouchableOpacity
-                style={localeStyles.marginLeft}
-                onPress={() => {
-                  navigation.navigate('ViewDocument', { docId: route.params.docId });
-                }}
-              >
-                <Text style={[localeStyles.name, { color: colors.primary }]}>Отмена</Text>
-              </TouchableOpacity>
-            ),
+            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            }} />,
           })}
         />
       </Stack.Navigator>
@@ -126,16 +88,3 @@ const AppNavigator = () => {
 };
 
 export default AppNavigator;
-
-const localeStyles = StyleSheet.create({
-  marginLeft: {
-    marginLeft: 15,
-  },
-  marginRight: {
-    marginRight: 15,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-});
