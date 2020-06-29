@@ -1,6 +1,6 @@
 import { IDocument } from './inventory';
 
-export interface IMakeUser {
+export interface IUserProfile {
   id?: string;
   userName: string;
   companies?: string[];

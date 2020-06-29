@@ -31,36 +31,3 @@ class Database {
 }
 
 export default Database;
-
-/* import { readFile } from '../workWithFile';
-import config from '../../../config';
-
-class DB {
-  private path = '';
-  private db = [];
-
-    constructor(path: string) {
-    this.path = path;
-    // void (async () => {
-    //   this.db = ((await readFile(this.path)) || []) as T[];
-    // })();
-  }
-  // users: IUser[] = [];
-  // activationCodes: IActivationCode[] = [];
-  // companies: ICompany[] = [];
-  // devices: IDevice[] = [];
-  // messages: IMessage[] = [];
-
-  // readData = async () => {
-  //   this.users = (await readFile(PATH_LOCAL_DB_USERS)) || [];
-  //   this.activationCodes = (await readFile(PATH_LOCAL_DB_ACTIVATION_CODES)) || [];
-  //   this.companies = (await readFile(PATH_LOCAL_DB_COMPANIES)) || [];
-  //   this.devices = (await readFile(PATH_LOCAL_DB_DEVICES)) || [];
-  //   this.messages = (await readFile(PATH_LOCAL_DB_MESSAGES)) || [];
-  // };
-}
-
-const db = new DB(config.FILES_PATH);
-
-export default db;
- */

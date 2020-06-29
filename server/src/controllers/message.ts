@@ -1,12 +1,7 @@
-import { readFile, writeFile, removeFile } from '../utils/workWithFile';
-import { PATH_LOCAL_DB_MESSAGES } from '../server';
 import { v1 as uuidv1 } from 'uuid';
-import { promises } from 'fs';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IMessage } from '../../../common';
-
-const remove = async (company: string, uid: string) => removeFile(`${PATH_LOCAL_DB_MESSAGES}${company}\\${uid}.json`);
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { head, body } = ctx.request.body;
@@ -56,15 +51,17 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     body,
   };
 
-  await writeFile({
-    filename: `${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`,
-    data: JSON.stringify(msgObject),
-  });
+  /*   await writeFile({
+      filename: `${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`,
+      data: JSON.stringify(msgObject),
+    });
+  */
   log.info(`new message in queue: ${uuid}`);
   const result: IResponse<{ uid: string; date: Date }> = {
     result: true,
     data: { uid: uuid, date: new Date() },
   };
+
   ctx.status = 201;
   ctx.body = JSON.stringify(result);
 };
@@ -74,50 +71,54 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const result: IMessage[] = [];
   ctx.type = 'application/json';
 
-  try {
-    const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
-    for await (const newFile of nameFiles) {
-      const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
-      result.push(data as IMessage);
-    }
-    log.info('get message');
-    const res: IResponse<IMessage[]> = {
-      result: true,
-      data: result.filter(res => res.head.consumer === ctx.state.user.userName),
-    };
-    ctx.status = 200;
-    ctx.body = JSON.stringify(res);
-  } catch (e) {
-    log.warn(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
-    const result: IResponse = {
-      result: false,
-      error: `file or directory not found`,
-    };
-    ctx.status = 404;
-    ctx.body = JSON.stringify(result);
-  }
+  /*   try {
+      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
+      for await (const newFile of nameFiles) {
+        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
+        result.push(data as IMessage);
+      }
+      log.info('get message');
+      const res: IResponse<IMessage[]> = {
+        result: true,
+        data: result.filter(res => res.head.consumer === ctx.state.user.userName),
+      };
+      ctx.status = 200;
+      ctx.body = JSON.stringify(res);
+    } catch (e) {
+      log.warn(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
+      const result: IResponse = {
+        result: false,
+        error: `file or directory not found`,
+      };
+      ctx.status = 404;
+      ctx.body = JSON.stringify(result);
+    } */
+  ctx.status = 404;
+  ctx.body = JSON.stringify(result);
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, id: uid } = ctx.params;
-  const result = await remove(companyId, uid);
-  ctx.type = 'application/json';
+  /*  const result = await remove(companyId, uid);
+   ctx.type = 'application/json';
 
-  let response: IResponse;
-  if (result === 'OK') {
-    ctx.status = 200;
-    response = {
-      result: true,
-    };
-    log.info('get message');
-  } else {
-    ctx.status = 422;
-    response = {
-      result: false,
-      error: `could not delete file`,
-    };
-  }
-  ctx.body = JSON.stringify(response);
+   let response: IResponse;
+   if (result === 'OK') {
+     ctx.status = 200;
+     response = {
+       result: true,
+     };
+     log.info('get message');
+   } else {
+     ctx.status = 422;
+     response = {
+       result: false,
+       error: `could not delete file`,
+     };
+   }
+   ctx.body = JSON.stringify(response);
+   */
+  ctx.body = JSON.stringify({});
 };
 
 export { newMessage, removeMessage, getMessage };

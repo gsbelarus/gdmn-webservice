@@ -1,13 +1,5 @@
-import { findByUserName, findeByUserId } from './userService';
-import { authenticate } from './AuthService';
+import * as userService from './userService';
+import * as authService from './authService';
+import * as companyService from './companyService';
 
-const userService = {
-  findByUserName,
-  findeByUserId,
-};
-
-const authService = {
-  authenticate,
-};
-
-export { authService, userService };
+export { authService, userService, companyService };

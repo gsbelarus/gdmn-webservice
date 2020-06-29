@@ -10,10 +10,11 @@ import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 import log from './utils/logger';
 
-import { findById, validateAuthCreds } from './utils/util';
+import { validateAuthCreds } from './services/authService';
 import config from '../config';
 import { IUser } from '../../common';
 import { errorHandler } from './middleware/errorHandler';
+import { userService } from './services';
 
 /* export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
 export const PATH_LOCAL_DB_ACTIVATION_CODES = `${config.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
@@ -39,7 +40,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
-      const user = await findById(id);
+      const user = await userService.findByUserId(id);
       done(null, user);
     } catch (err) {
       done(err);
