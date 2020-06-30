@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IResponse, IDevice, IActivationCode, IUser, IUserProfile } from '../../../common';
+import { IResponse, IDeviceState, IDevice, IActivationCode, IUser, IUserProfile } from '../../../common';
 import { userService } from '../services';
 import { users, devices, codes } from '../services/dao/db';
 
@@ -14,92 +14,74 @@ export const makeProfile = (user: IUser) => ({
   creatorId: user.creatorId,
 });
 
-const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const result: IResponse<IUserProfile[]> = {
-    result: true,
-    data: (await users.read()).map(makeProfile),
-  };
-  log.info('USERS: getUsers: <- OK');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
-};
-
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
-  ctx.type = 'application/json';
-  const { id: userId } = ctx.params as { id: string };
-  try {
-    if (!userId) {
-      log.info('id is required');
-      const res: IResponse<string> = { result: false, error: 'id is required' };
-      ctx.throw(400, JSON.stringify(res));
-    }
+  const { id: userId } = ctx.params;
 
-    const profile = await userService.findByUserId(userId);
-
-    if (!profile) {
-      log.info(`no such user`);
-      const res: IResponse<string> = { result: false, error: 'no such user' };
-      ctx.throw(404, JSON.stringify(res));
-    }
-    log.info('getUser successfully returned');
-    const result: IResponse<IUserProfile> = { result: true, data: makeProfile(profile) };
-    ctx.status = 200;
-    ctx.body = JSON.stringify(result);
-  } catch (err) {
-    log.info('something wrong');
-    const res: IResponse<string> = { result: false, error: 'something wrong' };
-    ctx.throw(400, JSON.stringify(res));
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
-  // const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  // const user = allUsers && allUsers.find(user => user.id === userId);
-  // if (!allUsers || user === undefined) {
-  //   log.info(`no such user`);
-  //   const res: IResponse<string> = { result: false, error: 'no such user' };
-  //   ctx.status = 404;
-  //   ctx.body = JSON.stringify(res);
-  //   return;
-  // }
-  // log.info('getUser successfully returned');
-  // const result: IResponse<IMakeUser> = { result: true, data: makeUser(user) };
-  // ctx.status = 200;
-  // ctx.body = JSON.stringify(result);
+  try {
+    const profile = await userService.findOne(userId);
+
+    if (!profile) {
+      ctx.throw(404, 'пользователь не найден');
+    }
+
+    const result: IResponse<IUserProfile> = { result: true, data: makeProfile(profile) };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUser: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
+const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
+  try {
+    const user = await userService.findAll();
+
+    const result: IResponse<IUserProfile[]> = { result: true, data: user };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsers: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const newUser = ctx.request.body;
-  const idx = (await users.read()).findIndex(user => user.id === userId);
-  ctx.type = 'application/json';
+  const { id: userId } = ctx.params;
+  const { body: user } = ctx.request;
 
-  if (!users || idx === undefined || idx < 0) {
-    log.warn(`USERS: updateUser <- user (${newUser.userName}) not found`);
-    const res: IResponse<string> = { result: false, error: 'пользователь не найден' };
-    ctx.throw(422, JSON.stringify(res));
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
-  delete newUser.id;
-  delete newUser.creatorId;
-  delete newUser.password;
+  if (!user) {
+    ctx.throw(400, 'не указаны данные пользователя');
+  }
 
-  await users.insert(newUser);
+  try {
+    const userId = await userService.updateOne(user);
 
-  delete newUser.password;
-  const result: IResponse<IUserProfile> = { result: true, data: newUser };
-  log.warn('USERS: updateUser <-> OK');
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
+    const result: IResponse<string> = { result: true, data: userId };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.warn('updateUser: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
-
-interface IDeviceState {
-  uid: string;
-  state: string;
-}
 
 const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   const userId: string = ctx.params.id;
-  // const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
   const result: IResponse<IDeviceState[]> = {
     result: true,
     data: (await devices.read())
@@ -117,7 +99,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const user = await users.find(el => id !== el.id);
 
   if (!user) {
-    log.warn(`USERS [removeUser]: <- user (${id}) not found`);
+    log.warn(`removeUser: user ${id} not found`);
     const res: IResponse<string> = { result: false, error: 'пользователь не найден' };
     ctx.throw(422, JSON.stringify(res));
   }

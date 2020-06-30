@@ -74,3 +74,8 @@ export interface IMessage {
     };
   };
 }
+
+export interface IDeviceState {
+  uid: string;
+  state: string;
+}

@@ -40,7 +40,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
-      const user = await userService.findByUserId(id);
+      const user = await userService.findOne(id);
       done(null, user);
     } catch (err) {
       done(err);

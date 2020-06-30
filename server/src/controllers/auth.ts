@@ -12,7 +12,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   if (!userName) {
     log.warn('Failed login attempt: userName is required');
-    const res: IResponse = { result: false, error: 'не указан пользователь' };
+    const res: IResponse = { result: false, error: 'не указано имя пользователя' };
     ctx.throw(400, JSON.stringify(res));
   }
 
