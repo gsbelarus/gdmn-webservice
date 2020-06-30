@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Modal, FlatList, Dimensions, KeyboardAvoidingView, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, Modal, FlatList, Dimensions, KeyboardAvoidingView, TouchableOpacity, StyleSheet,  Platform } from 'react-native';
 import { Text, TextInput, Checkbox } from 'react-native-paper';
 import { useTheme,  useScrollToTop } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
@@ -124,8 +124,8 @@ const Dropdown =  React.memo(({list, selectedValue, getSelectedItem, visible}: I
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior="height">
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Modal
         animationType="fade"
         transparent={true}
