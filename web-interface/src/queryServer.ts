@@ -1,4 +1,7 @@
 import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveDevicesResponse, IBlockDevicesResponse, ICreateDeviceNameResponse, IGetUserResponse } from "./queryTypes";
+import { get, post, put, remove } from './service/http.service';
+import { IResponse, ICompany } from '../../common';
+import { IUser, IDevice } from './types';
 
 export const queryServer = async (param: QueryCommand): Promise<QueryResponse> => {
   // посылаем на сервер переданную нам команду
@@ -7,9 +10,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
   // уже сервер внутри смотрит какая команда пришла
   // и что-то делает
   // http://localhost/execute_command
-  const url: string = 'http://localhost:3649/api';
   const deviceId = "WEB";
-  let resFetch;
   let res;
   let body;
   console.log(param.command);
@@ -17,8 +18,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
 
     case 'GET_USER_DATA': {
       try {
-        resFetch = await fetch(`${url}/auth/user?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-        res = await resFetch.json();
+        res = await get<IResponse<IUser>>(`/auth/user?deviceId=${deviceId}`);
 
         if (res.result) {
           return {
@@ -49,8 +49,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         password: param.password
       });
       try {
-        resFetch = await fetch(`${url}/auth/login?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-        res = await resFetch.json();
+        res = await post<IResponse<undefined>>(`/auth/login?deviceId=${deviceId}`, body);
 
         if (res.result) {
           return {
@@ -77,8 +76,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         companies: param.companyId ? [param.companyId] : undefined,
         creatorId: param.creatorId?? param.userName
       });
-      resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await post<IResponse<IUser>>('/auth/signup', body);
 
       if (res.result) {
         return {
@@ -91,8 +89,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         message: res.error
       } as INetworkError;
     case 'GET_COMPANIES':
-      resFetch = await fetch(`${url}/companies/?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<ICompany[]>>(`/companies/?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
@@ -106,8 +103,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_ALL_USERS':
-      resFetch = await fetch(`${url}/users/?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<IUser[]>>(`/users/?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
@@ -121,8 +117,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
       case 'GET_USER':
-      resFetch = await fetch(`${url}/users/${param.userId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<IUser>>(`/users/${param.userId}?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
@@ -136,13 +131,12 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_COMPANY':
-      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<ICompany>>(`/companies/${param.companyId}?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
           type: 'USER_COMPANY',
-          company: {companyId: res.data.id, companyName: res.data.title}
+          company: {companyId: res.data?.id, companyName: res.data?.title}
         } as IGetCompanyResponse;
       }
       return {
@@ -154,13 +148,12 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       body = JSON.stringify({
         title: param.companyName
       });
-      resFetch = await fetch(`${url}/companies/?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await post<IResponse<ICompany>>(`/companies/?deviceId=${deviceId}`, body);
 
       if (res.result) {
         return {
           type: 'NEW_COMPANY',
-          companyId: res.data
+          companyId: res.data?.id
         } as ICreateCompanyResponse;
       }
       return {
@@ -172,8 +165,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       body = JSON.stringify({
         title: param.companyName
       });
-      resFetch = await fetch(`${url}/companies/${param.companyId}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await put<IResponse<ICompany>>(`/companies/${param.companyId}?deviceId=${deviceId}`, body);
 
       if (res.result) {
         return {
@@ -186,11 +178,8 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'UPDATE_USER':
-
       body = JSON.stringify(param.user);
-
-      resFetch = await fetch(`${url}/users/${param.user.id}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await put<IResponse<IUser>>(`/users/${param.user.id}?deviceId=${deviceId}`, body);
 
       if (res.result) {
         return {
@@ -203,8 +192,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'CREATE_CODE':
-      resFetch = await fetch(`${url}/auth/user/${param.userId}/device/code`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<string>>(`/auth/user/${param.userId}/device/code`);
 
       if (res.result) {
         return {
@@ -222,22 +210,20 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         userId: param.userId,
         title: param.title
       });
-      resFetch = await fetch(`http://localhost:3649/api/device/newName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await post<IResponse<undefined>>('/device/newName', body);
 
-      if (res.status === 200) {
+      if (res.result) {
         return {
           type: 'CREATE_DEVICENAME'
         } as ICreateDeviceNameResponse;
       }
       return {
         type: 'ERROR',
-        message: `${res.status} - ${res.result}`
+        message: res.error
       } as INetworkError;
 
     case 'LOGOUT':
-      resFetch = await fetch(`${url}/auth/logout`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<undefined>>('/auth/logout');
 
       if (res.result) {
         return {
@@ -250,8 +236,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_USER_DEVICES':
-      resFetch = await fetch(`${url}/users/${param.userId}/devices?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<IDevice[]>>(`/users/${param.userId}/devices?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
@@ -265,8 +250,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       } as INetworkError;
 
     case 'GET_COMPANY_USERS':
-      resFetch = await fetch(`${url}/companies/${param.companyId}/users?deviceId=${deviceId}`, {method: 'GET', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
-      res = await resFetch.json();
+      res = await get<IResponse<IUser[]>>(`/companies/${param.companyId}/users?deviceId=${deviceId}`);
 
       if (res.result) {
         return {
@@ -283,15 +267,13 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       body = JSON.stringify({
         userId: param.userId
       });
+      res = await remove<IResponse<undefined>>(`/devices/${param.uId}?deviceId=${deviceId}`, body);
 
-      resFetch = await fetch(`${url}/devices/${param.uId}?deviceId=${deviceId}`, {method: 'DELETE', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-
-      if (resFetch.ok) {
+      if (res.result) {
         return {
           type: 'REMOVE_DEVICES'
         } as IRemoveDevicesResponse;
       }
-      res = await resFetch.json();
       return {
         type: 'ERROR',
         message: res.error
@@ -301,14 +283,12 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       body = JSON.stringify({
         isBlock: param.isBlock
       });
-
-      resFetch = await fetch(`${url}/devices/${param.uId}/user/${param.userId}?deviceId=${deviceId}`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
-      res = await resFetch.json();
+      res = await put<IResponse<IDevice>>(`/devices/${param.uId}/user/${param.userId}?deviceId=${deviceId}`, body);
 
       if (res.result) {
         return {
           type: 'BLOCK_DEVICES',
-          device: { ...res.data, state: res.data.isBlock ? 'blocked' : 'active' }
+          device: res.data
         } as IBlockDevicesResponse;
       }
       return {
