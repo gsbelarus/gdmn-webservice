@@ -3,8 +3,9 @@ const HOST = 'localhost';
 const PORT = '3649';
 const PREFIX = 'api';
 const URL = `${PROTOCOL}://${HOST}:${PORT}/${PREFIX}`;
+const DEVICE_ID = 'WEB';
 
-export async function get<T>(path: string): Promise<T> {
+async function get<T>(path: string): Promise<T> {
   try {
     const response = await fetch(`${URL}${path}`, {
       method: 'GET',
@@ -20,7 +21,7 @@ export async function get<T>(path: string): Promise<T> {
   }
 }
 
-export async function post<T>(path: string, body: string): Promise<T> {
+async function post<T>(path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${URL}${path}`, {
       method: 'POST',
@@ -37,10 +38,10 @@ export async function post<T>(path: string, body: string): Promise<T> {
   }
 }
 
-export async function put<T>(path: string, body: string): Promise<T> {
+async function patch<T>(path: string, body: string): Promise<T> {
   try {
     const response = await fetch(`${URL}${path}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body,
@@ -54,7 +55,7 @@ export async function put<T>(path: string, body: string): Promise<T> {
   }
 }
 
-export async function remove<T>(path: string, body?: string): Promise<T> {
+async function remove<T>(path: string, body?: string): Promise<T> {
   try {
     const response = await fetch(`${URL}${path}`, {
       method: 'DELETE',
@@ -70,3 +71,5 @@ export async function remove<T>(path: string, body?: string): Promise<T> {
     throw new Error(err.message);
   }
 }
+
+export { get, post, patch, remove, DEVICE_ID };
