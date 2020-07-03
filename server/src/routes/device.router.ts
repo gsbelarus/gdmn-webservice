@@ -2,7 +2,7 @@ import Router from 'koa-router';
 import {
   addDevice,
   getDevices,
-  editDevice,
+  updateDevice,
   removeDevice,
   getDevice,
   getUsersByDevice,
@@ -19,7 +19,7 @@ router.get('/', compose([deviceMiddleware, authMiddleware]), getDevices);
 router.get('/:id', getDevice);
 router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
 router.get('/:id/users', compose([deviceMiddleware, authMiddleware]), getUsersByDevice);
-router.patch('/:id/user/:userId', compose([deviceMiddleware, authMiddleware]), editDevice);
+router.patch('/:id/user/:userId', compose([deviceMiddleware, authMiddleware]), updateDevice);
 router.delete('/:id', compose([deviceMiddleware, authMiddleware]), removeDevice);
 
 export default router;

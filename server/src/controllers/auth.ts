@@ -1,9 +1,8 @@
-import { genActivationCode, addNewDevice } from '../services/deviceService';
 import { ParameterizedContext, Next, Context } from 'koa';
 import { IResponse, IActivationCode, IUser } from '../../../common';
 import log from '../utils/logger';
-import { v1 as uuidv1 } from 'uuid';
-import { authService } from '../services';
+// import { v1 as uuidv1 } from 'uuid';
+import { authService, deviceService } from '../services';
 
 /** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
@@ -11,65 +10,58 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { userName, password } = ctx.request.body;
 
   if (!userName) {
-    log.warn('Failed login attempt: userName is required');
-    const res: IResponse = { result: false, error: 'не указано имя пользователя' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указано имя пользователя');
   }
 
   if (!password) {
-    log.warn('Failed login attempt: password is required');
-    const res: IResponse = { result: false, error: 'не указан пароль' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан пароль');
   }
 
   if (!deviceId) {
-    log.warn('Failed login attempt: deviceId is required');
-    const res: IResponse = { result: false, error: 'не указан идентификатор устройства' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
 
   try {
     await authService.authenticate(ctx as Context, next);
+
+    const user = ctx.state.user as IUser;
+
+    const result: IResponse<string> = { result: true, data: user.id };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`User '${user.id}' is successfully logged in`);
   } catch (err) {
-    log.warn(`fail login attempt: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(404, JSON.stringify(res));
+    ctx.throw(404, err.message);
   }
-
-  const user = ctx.state.user as IUser;
-
-  log.info(`User '${user.id}' is successfully logged in`);
-
-  const res: IResponse<string> = { result: true, data: user.id };
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
 };
 
 /** Проверка текущего пользователя в сессии koa */
 const getCurrentUser = (ctx: ParameterizedContext): void => {
-  log.info(`user authenticated: ${ctx.state.user.userName}`);
-
   const user = ctx.state.user;
 
   delete user.password;
 
   const res: IResponse<string> = { result: true, data: user.id };
+
   ctx.status = 200;
-  ctx.type = 'application/json';
-  ctx.body = JSON.stringify(res);
+  ctx.body = res;
+
+  log.info(`user authenticated: ${ctx.state.user.userName}`);
 };
 
 const logOut = (ctx: Context): void => {
-  const user = ctx.state.user.userName;
-  log.info(`user '${user}' successfully logged out`);
+  const user = ctx.state.user;
 
   ctx.logout();
 
   const res: IResponse = { result: true };
+
   ctx.status = 200;
-  ctx.type = 'application/json';
-  ctx.body = JSON.stringify(res);
+  ctx.body = res;
+
+  log.info(`user '${user.userName}' successfully logged out`);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
@@ -162,13 +154,23 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId }: { userId: string } = ctx.params;
-  const code = await genActivationCode(userId);
-  ctx.status = 200;
-  ctx.type = 'application/json';
-  const result: IResponse<string> = { result: true, data: code };
-  ctx.body = JSON.stringify(result);
-  log.info('activation code generated successfully');
+  const { userId } = ctx.params;
+
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  try {
+    const code = await deviceService.genActivationCode(userId);
+    const result: IResponse<string> = { result: true, data: code };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('activation code generated successfully');
+} catch (err) {
+    ctx.throw(404, err.message);
+  }
 };
 
 export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };

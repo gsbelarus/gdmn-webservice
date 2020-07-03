@@ -109,7 +109,8 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const devices = await userService.findDevicesByUserId(userId);
+    // TODO сделать вызов deviceService.findUsersByDevice(deviceid)
+    const devices = await userService.findDevices(userId);
 
     const result: IResponse<IDeviceState[]> = { result: true, data: devices };
 

@@ -1,140 +1,126 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Context, ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IDevice, IResponse, IUser } from '../../../common';
-import { addNewDevice } from '../services/deviceService';
-import { devices, users } from '../services/dao/db';
+import { IDevice, IResponse, IDeviceState } from '../../../common';
+import { deviceService } from '../services';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const uid: string = ctx.params.id;
-  const { userName } = ctx.request.body;
+  const { id: deviceId }: { id: string } = ctx.params;
+  const { userId }: { userId: string } = ctx.request.body;
 
-  let device: IDevice | undefined = undefined;
-  let result: IResponse<string | IDevice>;
-  ctx.type = 'application/json';
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
+  }
 
-  if (userName) {
-    // Проверяем по пользователю
-    device = await devices?.find(device => device.uid === uid && device.user === userName);
+  try {
+    const device = await deviceService.findOne({ deviceId, userId });
+
+    const result: IResponse<string | IDevice> = { result: true, data: device };
 
     if (!device) {
-      log.warn(`the device (${uid}) is not assigned to the user`);
-      result = { result: false, error: `the device (${uid}) is not assigned to the user` };
-      ctx.status = 422;
-      ctx.body = JSON.stringify(result);
-      return;
+      ctx.throw(422, `устройство '${deviceId}' не найдено`);
     }
 
-    log.info(`device status for current user:${device.blocked || ' not'} active`);
-    result = { result: true, data: device };
     ctx.status = 200;
-    ctx.body = JSON.stringify(result);
-    return;
-  }
+    ctx.body = result;
 
-  device = await devices?.find(device => device.uid === uid);
-
-  if (!device) {
-    log.warn('device does not exist');
-    result = { result: false, error: 'устройство не найдено' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(result);
-    return;
+    log.info(`getDevice: device status for current user:${device.blocked || ' not'} active`);
+  } catch (err) {
+    ctx.throw(400, err.message);
   }
-  result = { result: true, data: device };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
 };
 
-interface IDeviceState {
-  uid: string;
-  user: string;
-  state: string;
-}
-
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  const result: IResponse<Array<string | IDeviceState>> = {
-    result: true,
-    data: (await devices.read()).map(device => {
-      return { uid: device.user, user: device.user, state: device.blocked ? 'blocked' : 'active' };
-    }),
-  };
-  log.info(`get devices successfully`);
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
+  try {
+    const deviceList = await deviceService.findAll();
+
+    const result: IResponse<IDevice[]> = { result: true, data: deviceList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`getDevices: OK`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
-  const uid: string = ctx.params.id;
-  const userId: string = ctx.state.user.id;
+  const { id: deviceId }: { id: string } = ctx.params;
+  const { id: userId }: { id: string } = ctx.state.user;
 
-  const device: IDevice | undefined = await devices.find(device => device.uid === uid && device.user === userId);
-
-  let result: IResponse<string | IDevice>;
-  ctx.type = 'application/json';
-
-  if (device) {
-    log.info(`device status for current user:${device?.blocked || ' not'} active`);
-    result = { result: true, data: device };
-    ctx.status = 200;
-  } else {
-    log.warn(`the device (${uid}) is not assigned to the current user)`);
-    result = { result: false, error: 'device does not exist' };
-    ctx.status = 422;
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
-  ctx.body = JSON.stringify(result);
+
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  try {
+    const device = await deviceService.findOne({ deviceId, userId });
+
+    if (!device) {
+      ctx.throw(422, `устройство '${deviceId}' не найдено`);
+    }
+
+    const result: IResponse<IDevice> = { result: true, data: device };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`getDevice: device status for current user:${device.blocked || ' not'} active`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { uid, userId } = ctx.request.body;
+  const { uid: deviceId, userId } = ctx.request.body;
 
-  let result: IResponse<string | IDevice>;
-  ctx.type = 'application/json';
-
-  const newDevice = await addNewDevice({ userId, deviceId: uid });
-  if (newDevice) {
-    log.info('a new device has been added');
-    result = { result: true, data: newDevice };
-    ctx.status = 201;
-  } else {
-    log.warn(`the device(${uid}) is assigned to the user(${userId})`);
-    result = { result: false, error: `the device(${uid}) is assigned to the user(${userId})` };
-    ctx.status = 422;
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
-  ctx.body = JSON.stringify(result);
-};
 
-interface IUserState {
-  user: string;
-  state: string;
-}
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  try {
+    const device = await deviceService.addOne({ userId, deviceId });
+
+    const result: IResponse<IDevice> = { result: true, data: device };
+
+    ctx.status = 201;
+    ctx.body = result;
+
+    log.info(`addDevice: OK`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
 
 const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  // const idDevice: string = ctx.params.id;
-  // const result: IResponse<Array<string | IUserState>> = {
-  //   result: true,
-  //   data: (await devices.read())
-  //     .filter(device => device.uid === idDevice)
-  //     .map(async device => {
-  //       const user = await users.find(el => el.id === device.user);
-  //       return user ? { user: user.userName, state: device.blocked ? 'blocked' : 'active' } : 'not found user';
-  //     }),
-  // };
-  const result: IResponse<Array<string | IUserState>> = {
-    result: true,
-    data: [{ user: 'Stas', state: 'active' }],
-  };
+  const { id: deviceId }: { id: string } = ctx.params;
 
-  ctx.status = 200;
-  ctx.type = 'application/json';
-  ctx.body = JSON.stringify(result);
-  log.info('get users by device successfully');
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
+  }
+
+  try {
+    const userList = await deviceService.findUsers(deviceId);
+
+    const result: IResponse<IDeviceState[]> = { result: true, data: userList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsersByDevice: ok');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
-const editDevice = async (ctx: ParameterizedContext): Promise<void> => {
+const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const uid: string = ctx.params.id;
   const userId: string = ctx.params.userId;
   const editPart = ctx.request.body;
@@ -228,4 +214,4 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('get devices by user successfully');
 };*/
 
-export { getDevice, getDevices, getDeviceByCurrentUser, getUsersByDevice, addDevice, editDevice, removeDevice };
+export { getDevice, getDevices, getDeviceByCurrentUser, getUsersByDevice, addDevice, updateDevice, removeDevice };

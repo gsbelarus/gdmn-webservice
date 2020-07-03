@@ -1,10 +1,10 @@
 import { users, devices } from './dao/db';
 import { makeProfile } from '../controllers/user';
-import { IUser } from '../../../common';
+import { IUser, IDeviceState } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
-const findByUserName = async (userName: string) => users.find(user => user.id === userName);
+const findByName = async (userName: string) => users.find(user => user.id === userName);
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
 
@@ -36,28 +36,28 @@ const updateOne = async (user: IUser) => {
  * */
 const deleteOne = async (id: string): Promise<void> => {
   if (!(await users.find(id))) {
-    throw new Error('user not found');
+    throw new Error('пользователь не найден');
   }
 
-  // TODO Если пользователь являестя админом организации то прерывать
+  // TODO Если пользователь является админом организации то прерывать
   // удаление с соответствующим сообщением
   await users.delete(id);
 };
 
 /**
- * Возвращает списолк устройст пользователя
+ * Возвращает список устройств пользователя
  * @param {string} id - идентификатор пользователя
  * */
-const findDevicesByUserId = async (userId: string) => {
-  const user = await users.find(userId);
-
-  if (!user) {
+const findDevices = async (userId: string) => {
+  if (!(await users.find(userId))) {
     throw new Error('пользователь не найден');
   }
 
   return (await devices.read())
     .filter(device => device.user === userId)
-    .map(device => ({ uid: device.uid, state: device.blocked ? 'blocked' : 'active' }));
+    .map(device => {
+      return { uid: device.uid, user: userId, state: device.blocked ? 'blocked' : 'active' } as IDeviceState;
+    });
 };
 
 const addCompanyToUser = async (userId: string, companyName: string) => {
@@ -78,13 +78,4 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
   return users.update({ ...user, companies: user.companies?.filter(i => i === companyName) });
 };
 
-export {
-  findOne,
-  findAll,
-  findByUserName,
-  updateOne,
-  deleteOne,
-  addCompanyToUser,
-  removeCompanyFromUser,
-  findDevicesByUserId,
-};
+export { findOne, findAll, findByName, findDevices, updateOne, deleteOne, addCompanyToUser, removeCompanyFromUser };

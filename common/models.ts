@@ -77,5 +77,6 @@ export interface IMessage {
 
 export interface IDeviceState {
   uid: string;
+  user: string;  
   state: string;
 }
