@@ -77,7 +77,7 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
         companies: param.companyId ? [param.companyId] : undefined,
         creatorId: param.creatorId?? param.userName
       });
-      resFetch = await fetch(`${url}/auth/signup`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      resFetch = await fetch(`${url}/auth/signup?deviceId=${deviceId}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
       res = await resFetch.json();
 
       if (res.result) {

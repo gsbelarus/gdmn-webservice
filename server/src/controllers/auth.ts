@@ -1,7 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
-import { IResponse, IActivationCode, IUser } from '../../../common';
+import { IResponse, IUser } from '../../../common';
 import log from '../utils/logger';
-// import { v1 as uuidv1 } from 'uuid';
 import { authService, deviceService } from '../services';
 
 /** Вход пользователя */
@@ -31,9 +30,9 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info(`User '${user.id}' is successfully logged in`);
+    log.info(`logIn: user '${user.id}' is successfully logged in`);
   } catch (err) {
-    ctx.throw(404, err.message);
+    ctx.throw(400, err.message);
   }
 };
 
@@ -43,12 +42,12 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   delete user.password;
 
-  const res: IResponse<string> = { result: true, data: user.id };
+  const res: IResponse<IUser> = { result: true, data: user };
 
   ctx.status = 200;
   ctx.body = res;
 
-  log.info(`user authenticated: ${ctx.state.user.userName}`);
+  log.info(`getCurrentUser: user '${ctx.state.user.userName}' authenticated`);
 };
 
 const logOut = (ctx: Context): void => {
@@ -61,96 +60,66 @@ const logOut = (ctx: Context): void => {
   ctx.status = 200;
   ctx.body = res;
 
-  log.info(`user '${user.userName}' successfully logged out`);
+  log.info(`logOut: user '${user.userName}' successfully logged out`);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  /*
-  let newUser = ctx.request.body as IUser;
-  ctx.type = 'application/json';
-   if (!(await findByUserName(newUser.userName))) {
-    const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-    newUser = {
-      id: newUser.userName,
-      ...newUser,
-      companies: newUser.companies ?? [],
-      creatorId: ctx.state.user ? ctx.state.user.id : newUser.userName,
-    };
-    await writeFile({
-      filename: PATH_LOCAL_DB_USERS,
-      data: JSON.stringify(
-        allUsers
-          ? [...allUsers, newUser]
-          : [
-              newUser,
-              {
-                id: 'gdmn',
-                userName: 'gdmn',
-                creatorId: newUser.userName,
-                password: 'gdmn',
-                companies: [],
-              },
-            ],
-      ),
-    });
+  const { deviceId } = ctx.query;
+  const { userName, password, firstName, lastName, phoneNumber, companies } = ctx.request.body;
 
-    delete newUser.password;
+  log.info(`deviceId '${deviceId}'`);
 
-    const res = { result: true, data: newUser };
-    ctx.status = 201;
-    ctx.body = JSON.stringify(res);
-    log.info('signed up successful');
-  } else {
-    log.info('a user already exists');
-    const res: IResponse<string> = { result: false, error: 'a user already exists' };
-    ctx.status = 400;
-    ctx.response.body = JSON.stringify(res);
-  } */
+  if (!userName) {
+    ctx.throw(400, 'не указано имя пользователя');
+  }
+
+  if (!password) {
+    ctx.throw(400, 'не указан пароль пользователя');
+  }
+
+  const user = {
+    userName,
+    password,
+    firstName,
+    lastName,
+    phoneNumber,
+    companies: companies || [],
+    creatorId: userName,
+  } as IUser;
+
+  try {
+    const id = await authService.signUp({ user, deviceId });
+
+    const result: IResponse<string> = { result: true, data: id };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`signUp: user '${userName}' is successfully signed up`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  // const { code, uid = '0' } = ctx.request.body;
-  // const codeList: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  // const codeRec = codeList?.find(el => el.code === code);
-  // let result: IResponse<{ userId: string; deviceId: string }>;
-  // let status: number;
-  // ctx.type = 'application/json';
-  // if (codeRec) {
-  //   const date = new Date(codeRec.date);
-  //   date.setDate(date.getDate() + 7);
-  //   if (date >= new Date()) {
-  //     // Сохраняем список кодов без использованного
-  //     /* TODO
-  //       1) Вынести добавление устройства в utils
-  //       2) сделать вызов добавления устройства из метода addDevice (контроллер Device) и отсюда ниже
-  //       3) если uid = 0 то сгенерировать uid
-  //     addDevice({}) */
-  //     const deviceId = uid == '0' ? uuidv1() : uid;
-  //     const newDevice = await addNewDevice({ userId: codeRec.user, deviceId });
-  //     if (newDevice) {
-  //       status = 200;
-  //       result = { result: true, data: { userId: codeRec.user, deviceId: deviceId as string } };
-  //     } else {
-  //       status = 404;
-  //       result = { result: false, error: 'error' };
-  //       log.warn('error');
-  //     }
-  //     await writeFile({
-  //       filename: PATH_LOCAL_DB_ACTIVATION_CODES,
-  //       data: JSON.stringify(codeList?.filter(el => el.code !== code)),
-  //     });
-  //   } else {
-  //     status = 404;
-  //     result = { result: false, error: 'invalid activation code' };
-  //     log.warn('invalid activation code');
-  //   }
-  // } else {
-  //   status = 404;
-  //   result = { result: false, error: 'invalid activation code' };
-  //   log.warn('invalid activation code');
-  // }
-  // ctx.status = status;
-  // ctx.body = JSON.stringify(result);
+  const { code } = ctx.request.body;
+
+  if (!code) {
+    ctx.throw(400, 'не указан код');
+  }
+
+  try {
+    const deviceId = await authService.verifyCode(code);
+
+    const result: IResponse<string> = { result: true, data: deviceId };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('verifyCode: ok');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
@@ -167,9 +136,9 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info('activation code generated successfully');
-} catch (err) {
-    ctx.throw(404, err.message);
+    log.info('getActivationCode: tivation code generated successfully');
+  } catch (err) {
+    ctx.throw(400, err.message);
   }
 };
 

@@ -4,9 +4,21 @@ import { IUser, IDeviceState } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
-const findByName = async (userName: string) => users.find(user => user.id === userName);
+const findByName = async (userName: string) => users.find(user => user.userName === userName);
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
+
+/**
+ * Добавляет одного пользователя
+ * @param {IUser} user - пользователь
+ * @return id, идентификатор пользователя
+ * */
+const addOne = async (user: IUser) => {
+  if (await users.find(i => i.userName === user.userName)) {
+    throw new Error('пользователь с таким именем уже существует');
+  }
+  return await users.insert(user);
+};
 
 /**
  * Обновляет одного пользователя
@@ -16,14 +28,14 @@ const findAll = async () => (await users.read()).map(el => makeProfile(el));
 const updateOne = async (user: IUser) => {
   const oldUser = await users.find(user.id || user.userName);
 
-  // Удаляем поля которые нельзя перезаписывать
-  delete user.password;
-
-  // Проверяем свойство 'companies' => Проверяем что организации существуют
+  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
 
   if (!oldUser) {
     throw new Error('пользователь не найден');
   }
+
+  // Удаляем поля которые нельзя перезаписывать
+  delete user.password;
 
   await users.update({ ...oldUser, ...user });
 
@@ -78,4 +90,14 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
   return users.update({ ...user, companies: user.companies?.filter(i => i === companyName) });
 };
 
-export { findOne, findAll, findByName, findDevices, updateOne, deleteOne, addCompanyToUser, removeCompanyFromUser };
+export {
+  findOne,
+  findAll,
+  findByName,
+  findDevices,
+  addOne,
+  updateOne,
+  deleteOne,
+  addCompanyToUser,
+  removeCompanyFromUser,
+};

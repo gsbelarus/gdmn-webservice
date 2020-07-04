@@ -1,4 +1,4 @@
-import { IDevice, IDeviceState } from '../../../common';
+import { IDevice } from '../../../common';
 import { devices, codes } from './dao/db';
 
 const findOne = async ({ deviceId, userId }: { deviceId: string; userId?: string }) => {
@@ -28,14 +28,51 @@ const findUsers = async (deviceId: string) => {
     });
 };
 
-const addOne = async ({ deviceId, userId }: { deviceId: string; userId: string }): Promise<IDevice | undefined> => {
+/**
+ * Добавляет одно устройство
+ * @param {string} deviceId - id устройства
+ * @param {string} userId - id пользователя
+ * @return uid, идентификатор устройства
+ * */
+
+const addOne = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
   if (await devices.find(device => device.uid === deviceId && device.user === userId)) {
     throw new Error('устройство уже добавлено');
   }
   const newDevice: IDevice = { uid: deviceId, user: userId, blocked: false };
-  await devices.insert(newDevice);
+  return await devices.insert(newDevice);
+};
 
-  return newDevice;
+/**
+ * Обновляет устройство
+ * @param {IDevice} device - устройство
+ * @return uid, идентификатор устройства
+ * */
+const updateOne = async (device: IDevice) => {
+  const oldDevice = await devices.find(i => i.uid === device.uid);
+
+  if (!oldDevice) {
+    throw new Error('устройство не найдено');
+  }
+
+  // Удаляем поля которые нельзя перезаписывать
+  delete device.user;
+
+  await devices.update({ ...oldDevice, ...device });
+
+  return device.uid;
+};
+
+/**
+ * Удаляет одно устройство
+ * @param {string} id - идентификатор устройства
+ * */
+const deleteOne = async ({ deviceId, userId }: { deviceId: string; userId: string }): Promise<void> => {
+  if (!(await devices.find(device => device.uid === deviceId && device.user === userId))) {
+    throw new Error('устройство не найдено');
+  }
+
+  await devices.delete(device => device.uid === deviceId && device.user === userId);
 };
 
 const genActivationCode = async (userId: string) => {
@@ -48,4 +85,4 @@ const genActivationCode = async (userId: string) => {
   return code;
 };
 
-export { findOne, findAll, findUsers, addOne, genActivationCode };
+export { findOne, findAll, findUsers, addOne, deleteOne, updateOne, genActivationCode };

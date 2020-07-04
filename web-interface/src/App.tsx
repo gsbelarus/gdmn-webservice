@@ -662,7 +662,7 @@ const App: React.FC = () => {
             onGetCompanies={() => handleSetAppState('ADMIN')}
             onCreateUser={appState === 'UPDATE_COMPANY' ? () => handleSetAppState('CREATE_USER') : undefined}
             onAddUserFromSystem={appState === 'UPDATE_COMPANY' ? handleGetAllUsers : undefined}
-            onCreateCode={(appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE') ? handleCreateCode : undefined}
+            onCreateCode={(appState === 'CREATE_CODE' || appState === 'SAVED_PROFILE') ? handleCreateCode : undefined}
             isAdmin={isAdmin}
           />
           { appState === 'ADMIN' && companies

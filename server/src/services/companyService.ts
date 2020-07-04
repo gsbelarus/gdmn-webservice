@@ -17,14 +17,19 @@ const addOne = async (company: ICompany): Promise<string> => {
     4. К администратору добавляем созданную организацию
   */
   if (await companies.find(el => el.title === company.title)) {
-    throw new Error('company already exists');
+    throw new Error('организация уже существует');
   }
-  const companyId = await companies.insert(company);
+  const id = await companies.insert(company);
 
   await userService.addCompanyToUser(company.admin, company.title);
-  await userService.addCompanyToUser('gdmn', company.title);
 
-  return companyId;
+  const userId = await users.find(i => i.userName === 'gdmn');
+
+  if (userId.id) {
+    await userService.addCompanyToUser(userId.id, company.title);
+  }
+
+  return id;
 };
 
 /**
@@ -36,7 +41,7 @@ const findOne = async (id: string): Promise<ICompany> => {
   const company = await companies.find(id);
 
   if (!company) {
-    throw new Error('company not found');
+    throw new Error('организация не найдена');
   }
 
   return company;
@@ -57,11 +62,16 @@ const findAll = async (): Promise<ICompany[]> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (company: ICompany): Promise<string> => {
-  if (!(await companies.find(company.id))) {
-    throw new Error('company not found');
+  const oldCompany = await companies.find(company.id);
+
+  if (!oldCompany) {
+    throw new Error('организация не найдена');
   }
 
-  await companies.update(company);
+  // Удаляем поля которые нельзя перезаписывать
+  delete company.admin;
+
+  await companies.update({ ...oldCompany, ...company });
 
   return company.id;
 };
@@ -73,11 +83,11 @@ const updateOne = async (company: ICompany): Promise<string> => {
 const deleteOne = async (company: ICompany): Promise<void> => {
   /*
     1. Проверяем что организация существует
-    2. Удаляем у пользователей организацию
+    2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
   if (!(await companies.find(company.id))) {
-    throw new Error('company not found');
+    throw new Error('организация не найдена');
   }
 
   await companies.delete(company.id);
@@ -92,7 +102,7 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
   const company = await companies.find(id);
 
   if (!company) {
-    throw new Error('company not found');
+    throw new Error('организация не найдена');
   }
 
   // TODO заменить на company.title на companyId

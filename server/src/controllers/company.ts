@@ -4,53 +4,49 @@ import { ICompany, IResponse, IUserProfile } from '../../../common';
 import { companyService } from '../services';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { title } = ctx.request.body as ICompany;
+  const { title } = ctx.request.body;
+
+  const { id: userId } = ctx.state.user;
 
   if (!title) {
-    log.info('addCompany: name is required');
-    const res: IResponse = { result: false, error: 'название организации должно быть заполнено' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указано название организации');
   }
 
-  let companyId;
-  const company: ICompany = { id: title, title, admin: ctx.state.user.id };
+  const company: ICompany = { id: title, title, admin: userId };
 
   try {
-    companyId = await companyService.addOne({ ...company, admin: ctx.state.user.id });
-  } catch (err) {
-    log.info(`addCompany: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(500, JSON.stringify(res));
-  }
+    const companyId = await companyService.addOne({ ...company, admin: userId });
 
-  const result: IResponse<string> = { result: true, data: companyId };
-  log.info('addCompany: OK');
-  ctx.status = 201;
-  ctx.body = JSON.stringify(result);
+    const result: IResponse<string> = { result: true, data: companyId };
+
+    ctx.status = 201;
+    ctx.body = result;
+
+    log.info(`addCompany: OK`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    log.info('getCompany: id is required');
-    const res: IResponse = { result: false, error: 'идентификатор организации должен быть указан' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  const company = await companyService.findOne(companyId);
-  ctx.type = 'application/json';
+  try {
+    const company = await companyService.findOne(companyId);
 
-  if (!company) {
-    log.info(`getCompany: company '${company}' not found`);
-    const res: IResponse = { result: false, error: 'организация не найдена' };
-    ctx.throw(422, JSON.stringify(res));
+    const result: IResponse<ICompany> = { result: true, data: company };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`getCompany: ok`);
+  } catch (err) {
+    ctx.throw(400, err.message);
   }
-
-  log.info('getCompany: OK');
-  const res: IResponse<ICompany> = { result: true, data: company };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
 };
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -58,98 +54,81 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const company = ctx.request.body as ICompany;
 
   if (!companyId) {
-    log.info('updateCompany: id is required');
-    const res: IResponse = { result: false, error: 'идентификатор организации должен быть указан' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  if (!company.title) {
-    log.info('updateCompany: name is required');
-    const res: IResponse = { result: false, error: 'название организации должно быть заполнено' };
-    ctx.throw(400, JSON.stringify(res));
+  if (!company) {
+    ctx.throw(400, 'не указана информация об организации');
   }
 
   try {
-    await companyService.updateOne(company);
-  } catch (err) {
-    log.info(`updateCompany: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(400, JSON.stringify(res));
-  }
+    const id = await companyService.updateOne({ ...company, id: companyId });
+    const result: IResponse<string> = { result: true, data: id };
 
-  log.info('updateCompany: OK');
-  const res: IResponse<string> = { result: true, data: company.id };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('updateCompany: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    log.info('getUsersByCompany: id is required');
-    const res: IResponse = { result: false, error: 'идентификатор организации должен быть указан' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  let users;
   try {
-    users = await companyService.findUsers(companyId);
+    const userList = await companyService.findUsers(companyId);
+
+    const result: IResponse<IUserProfile[]> = { result: true, data: userList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsersByCompany: OK');
   } catch (err) {
-    log.info(`getUsersByCompany: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, err);
   }
-
-  const res: IResponse<IUserProfile[]> = {
-    result: true,
-    data: users,
-  };
-
-  log.info('getUsersByCompany: OK');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
-  let companies;
   try {
-    companies = await companyService.findAll();
+    const companyList = await companyService.findAll();
+
+    const result: IResponse<ICompany[]> = { result: true, data: companyList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getCompanies: OK');
   } catch (err) {
-    log.info(`getCompanies: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, err);
   }
-  const result: IResponse<ICompany[]> = {
-    result: true,
-    data: companies,
-  };
-  log.info('getCompanies: OK');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
 };
 
 const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    log.info('updateCompany: id is required');
-    const res: IResponse = { result: false, error: 'идентификатор организации должен быть указан' };
-    ctx.throw(400, JSON.stringify(res));
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
   try {
     await companyService.deleteOne(companyId);
-  } catch (err) {
-    log.info(`getCompanies: ${err.message}`);
-    const res: IResponse = { result: false, error: err.message };
-    ctx.throw(400, JSON.stringify(res));
-  }
 
-  log.info('deleteCompany: OK');
-  ctx.status = 204;
+    const result: IResponse<void> = { result: true };
+
+    ctx.status = 200;
+    ctx.body = result; //TODO передавать только код 204 без body
+
+    log.info('deleteCompany: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 export { addCompany, updateCompany, getCompany, getUsersByCompany, getCompanies, deleteCompany };

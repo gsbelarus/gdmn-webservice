@@ -1,10 +1,11 @@
 import { Next, Context } from 'koa';
-import { IUser, IResponse } from '../../../common';
-import log from '../utils/logger';
+import { IUser } from '../../../common';
 import koaPassport from 'koa-passport';
-import { devices } from './dao/db';
+import { v1 as uuidv1 } from 'uuid';
+import { devices, users, codes } from './dao/db';
 import { VerifyFunction } from 'passport-local';
 import { userService } from '.';
+import log from '../utils/logger';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
@@ -15,7 +16,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   );
 
   if (!device) {
-    throw new Error(`устройство с идентификатором '${deviceId}' не найдено`);
+    throw new Error(`устройство с идентификатором '${deviceId}' у пользователя ${userName} не найдено`);
   }
 
   if (device.blocked) {
@@ -31,13 +32,36 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
     if (!user) {
       throw new Error('неверный пользователь или пароль');
     }
+
     await ctx.login(user);
+
     return user;
   })(ctx, next);
 };
 
+const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) => {
+  // Если в базе нет пользователей
+  // добавляем пользователя gdmn
+  if (!(await users.read()).length) {
+    await users.insert({
+      userName: 'gdmn',
+      creatorId: user.userName,
+      password: 'gdmn',
+      companies: [],
+    });
+  }
+
+  log.info(`deviceId ${deviceId}`);
+  if (deviceId === 'WEB') {
+    // TODO userName переделать в id
+    await devices.insert({ user: user.userName, uid: 'WEB', blocked: false });
+  }
+
+  return await userService.addOne(user);
+};
+
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
-  const user = await userService.findByUserName(userName);
+  const user = await userService.findByName(userName);
 
   // TODO: use password hash
   if (!user || user.password !== password) {
@@ -47,4 +71,29 @@ const validateAuthCreds: VerifyFunction = async (userName: string, password: str
   }
 };
 
-export { authenticate, validateAuthCreds };
+const verifyCode = async (code: string) => {
+  const rec = await codes.find(i => i.code === code);
+
+  if (!rec) {
+    throw new Error('код не найден');
+  }
+
+  const date = new Date(rec.date);
+
+  date.setDate(date.getDate() + 7);
+
+  if (date >= new Date()) {
+    await codes.delete(i => i.code === code);
+    throw new Error('срок действия колда истёк');
+  }
+
+  // Создаём новое устройство
+  const deviceId = uuidv1();
+  const newDeviceId = await devices.insert({ user: rec.user, uid: deviceId, blocked: false });
+
+  await codes.delete(i => i.code === code);
+
+  return newDeviceId;
+};
+
+export { authenticate, validateAuthCreds, signUp, verifyCode };

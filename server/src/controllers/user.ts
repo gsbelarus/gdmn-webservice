@@ -86,7 +86,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
-  // TODO
+  // TODO пользовате
   try {
     await userService.deleteOne(userId);
 
