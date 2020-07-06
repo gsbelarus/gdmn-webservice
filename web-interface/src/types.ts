@@ -20,7 +20,15 @@ export interface IItem {
   name: string;
 }
 
+export enum IDeviceState {
+  'notActivated' = 'notActivated',
+  'activated' = 'activated',
+  'awaitingActivation' = 'awaitingActivation',
+  'blocked' = 'blocked'
+ }
+
 export interface IDevice {
   uid: string;
+  title: string;
   state?: string;
  }

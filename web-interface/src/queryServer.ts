@@ -1,4 +1,4 @@
-import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveDevicesResponse, IBlockDevicesResponse, IGetUserResponse } from "./queryTypes";
+import { QueryCommand, QueryResponse, INetworkError, ILoginResponse, IUserResponse, ICompaniesResponse, ISignUpResponse, ILogOutResponse, IAllUsersResponse, ICreateCodeResponse, IGetCompanyResponse, ICreateCompanyResponse, IUpdateCompanyResponse, IGetUserDevicesResponse, IUpdateUserResponse, IGetCompanyUsersResponse, IUserNotAuthResponse, IRemoveDevicesResponse, IBlockDevicesResponse, ICreateDeviceNameResponse, IGetUserResponse } from "./queryTypes";
 
 export const queryServer = async (param: QueryCommand): Promise<QueryResponse> => {
   // посылаем на сервер переданную нам команду
@@ -215,6 +215,24 @@ export const queryServer = async (param: QueryCommand): Promise<QueryResponse> =
       return {
         type: 'ERROR',
         message: res.error
+      } as INetworkError;
+
+    case 'CREATE_DEVICENAME':
+      body = JSON.stringify({
+        userId: param.userId,
+        title: param.title
+      });
+      resFetch = await fetch(`http://localhost:3649/api/device/newName`, {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include', body});
+      res = await resFetch.json();
+
+      if (res.status === 200) {
+        return {
+          type: 'CREATE_DEVICENAME'
+        } as ICreateDeviceNameResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: `${res.status} - ${res.result}`
       } as INetworkError;
 
     case 'LOGOUT':
