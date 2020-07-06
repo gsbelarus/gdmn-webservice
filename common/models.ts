@@ -48,6 +48,7 @@ export interface ICompany {
 
 export interface IDevice {
   uid: string;
+  title: string;
   user: string;
   isBlock: boolean;
 }

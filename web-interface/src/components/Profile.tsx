@@ -13,12 +13,15 @@ export interface IProfileProps {
   onClearEditOK?: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
-  onRemoveDevices?: (uIds: string[]) => void;
-  onBlockDevices?:  (uIds: string[], isUnBlock: boolean) => void;
+  onRemoveDevices: (uIds: string[]) => void;
+  onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
+  onGetCode: (uId: string) => void;
   isCanEditUser?: boolean;
+  isCanEditDevices?: boolean;
 }
 
-export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices, isCanEditUser, onRemoveDevices, onBlockDevices }: IProfileProps) => {
+export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices,
+  isCanEditUser, onRemoveDevices, onBlockDevices, onGetCode, isCanEditDevices }: IProfileProps) => {
   return (
     <Stack horizontalAlign='center'>
       <User
@@ -42,7 +45,9 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
             devices={devices}
             onBlockDevices={onBlockDevices}
             onRemoveDevices={onRemoveDevices}
+            onGetCode={onGetCode}
             onClearError={onClearError}
+            isCanEditDevices={isCanEditDevices}
           />
         }
       </Stack>

@@ -53,6 +53,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
 interface IDeviceState {
   uid: string;
+  title: string;
   user: string;
   state: string;
 }
@@ -66,7 +67,12 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
       !allDevices || !allDevices.length
         ? []
         : allDevices.map(device => {
-            return { uid: device.user, user: device.user, state: device.isBlock ? 'blocked' : 'active' };
+            return {
+              uid: device.user,
+              title: device.title,
+              user: device.user,
+              state: device.isBlock ? 'blocked' : 'active',
+            };
           }),
   };
   log.info(`get devices successfully`);
@@ -98,12 +104,12 @@ const getDeviceByCurrentUser = async (ctx: ParameterizedContext): Promise<void> 
 };
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { uid, userId } = ctx.request.body;
+  const { uid, userId, title } = ctx.request.body;
 
   let result: IResponse<string | IDevice>;
   ctx.type = 'application/json';
 
-  const newDevice = await addNewDevice({ userId, deviceId: uid });
+  const newDevice = await addNewDevice({ userId, deviceId: uid, title });
   if (newDevice) {
     log.info('a new device has been added');
     result = { result: true, data: newDevice };
