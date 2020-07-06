@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IDevice, IResponse, IDeviceState } from '../../../common';
+import { IDevice, IResponse, IDeviceInfo } from '../../../common';
 import { deviceService } from '../services';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
@@ -19,7 +19,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info(`getDevice: device status for current user:${device.blocked || ' not'} active`);
+    log.info(`getDevice: OK`);
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -60,7 +60,7 @@ const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info(`getDevice: device status for current user:${device.blocked || ' not'} active`);
+    log.info(`getDevice: OK`);
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -99,9 +99,9 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userList = await deviceService.findUsers(deviceId);
+    const userList = ((await deviceService.findUsers(deviceId)) as unknown) as IDeviceInfo[];
 
-    const result: IResponse<IDeviceState[]> = { result: true, data: userList };
+    const result: IResponse<IDeviceInfo[]> = { result: true, data: userList };
 
     ctx.status = 200;
     ctx.body = result;

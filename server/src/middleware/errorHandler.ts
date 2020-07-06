@@ -1,5 +1,4 @@
 import { Context, Next } from 'koa';
-import log from '../utils/logger';
 
 export const errorHandler = async (ctx: Context, next: Next) => {
   try {
@@ -7,8 +6,12 @@ export const errorHandler = async (ctx: Context, next: Next) => {
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = { result: false, error: err.message };
-    ctx.app.emit('error', err, ctx);
 
-    log.warn(err);
+    if (ctx.status <= 400) {
+      ctx.app.emit('user-error', err, ctx);
+    }
+    if (ctx.status > 400 && ctx.status <= 500) {
+      ctx.app.emit('error', err, ctx);
+    }
   }
 };

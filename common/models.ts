@@ -42,15 +42,32 @@ export interface IActivationCode {
 }
 
 export interface ICompany {
-  id: string;
+  id?: string;
   title: string;
   admin: string;
 }
 
 export interface IDevice {
+  id?: string;
   uid: string;
-  user: string;
-  blocked: boolean;
+  name: string;
+}
+
+export type DeviceState  = 'NON_ACTIVATED' | 'ACTIVE' | 'BLOCKED'
+
+export interface IDeviceBinding {
+  id?: string;
+  deviceId: string;
+  userId: string;
+  state: DeviceState;
+}
+
+export interface IDeviceInfo {
+  deviceId: string;
+  deviceName: string;  
+  userId: string;
+  userName: string;  
+  state: DeviceState;
 }
 
 export interface IMessageInfo {
@@ -73,10 +90,4 @@ export interface IMessage {
       params: IDocument[] | string[];
     };
   };
-}
-
-export interface IDeviceState {
-  uid: string;
-  user: string;  
-  state: string;
 }

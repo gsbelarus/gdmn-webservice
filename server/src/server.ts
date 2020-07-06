@@ -67,6 +67,14 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(router.routes())
     .use(router.allowedMethods());
 
+  app.on('error', err => {
+    log.error('server error', err);
+  });
+
+  app.on('user-error', err => {
+    log.warn(err);
+  });
+
   log.info('Starting listener ...');
   await new Promise(resolve => app.listen(config.PORT, () => resolve()));
   log.info(`Server is running on http://localhost:${config.PORT}`);

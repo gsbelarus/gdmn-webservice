@@ -51,10 +51,9 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
     });
   }
 
-  log.info(`deviceId ${deviceId}`);
   if (deviceId === 'WEB') {
-    // TODO userName переделать в id
-    await devices.insert({ user: user.userName, uid: 'WEB', blocked: false });
+    await devices.insert({ name: 'WEB', uid: 'WEB' });
+    await devices.insert({ name: 'WEB', uid: 'WEB' });
   }
 
   return await userService.addOne(user);
@@ -84,7 +83,7 @@ const verifyCode = async (code: string) => {
 
   if (date >= new Date()) {
     await codes.delete(i => i.code === code);
-    throw new Error('срок действия колда истёк');
+    throw new Error('срок действия кода истёк');
   }
 
   // Создаём новое устройство

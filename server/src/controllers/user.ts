@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IResponse, IDeviceState, IUser, IUserProfile } from '../../../common';
+import { IResponse, IUser, IUserProfile, IDeviceInfo } from '../../../common';
 import { userService } from '../services';
 
 export const makeProfile = (user: IUser) => ({
@@ -109,10 +109,9 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    // TODO сделать вызов deviceService.findUsersByDevice(deviceid)
-    const devices = await userService.findDevices(userId);
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDeviceInfo[];
 
-    const result: IResponse<IDeviceState[]> = { result: true, data: devices };
+    const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
 
     ctx.status = 200;
     ctx.body = result;

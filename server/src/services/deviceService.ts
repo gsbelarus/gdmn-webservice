@@ -1,46 +1,71 @@
-import { IDevice } from '../../../common';
-import { devices, codes } from './dao/db';
+import { IDevice, IDeviceBinding } from '../../../common';
+import { devices, codes, deviceBinding, users } from './dao/db';
 
-const findOne = async ({ deviceId, userId }: { deviceId: string; userId?: string }) => {
-  if (userId) {
-    return devices.find(device => device.uid === deviceId && device.user === userId);
-  }
-  return devices.find(device => device.uid === deviceId);
+const findOne = async (deviceId: string) => {
+  return deviceBinding.find(i => i.deviceId === deviceId);
 };
 
 const findAll = async () => {
   return devices.read();
 };
 
+const findOneByUser = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
+  return deviceBinding.find(i => i.deviceId === deviceId && i.userId === userId);
+};
 /**
  * Возвращает список пользователей по устройству
  * @param {string} id - идентификатор устройства
  * */
 const findUsers = async (deviceId: string) => {
-  if (!(await devices.find(device => device.uid === deviceId))) {
+  if (!(await deviceBinding.find(i => i.deviceId === deviceId))) {
     throw new Error('устройство не найдено');
   }
 
-  return (await devices.read())
-    .filter(device => device.uid === deviceId)
-    .map(device => {
-      return { uid: device.uid, user: device.user, state: device.blocked ? 'blocked' : 'active' };
+  return (await deviceBinding.read())
+    .filter(i => i.deviceId === deviceId)
+    .map(async i => {
+      const device = await devices.find(i.deviceId);
+
+      if (!device) {
+        throw new Error('устройство не найдено');
+      }
+
+      const user = await users.find(i.userId);
+
+      if (!user) {
+        throw new Error('пользователь не найден');
+      }
+
+      return {
+        userId: i.userId,
+        userName: user.userName,
+        deviceId: i.deviceId,
+        deviceName: device.name,
+        state: i.state,
+      };
     });
 };
 
 /**
  * Добавляет одно устройство
- * @param {string} deviceId - id устройства
- * @param {string} userId - id пользователя
- * @return uid, идентификатор устройства
+ * @param {string} name - название устройства
+ * @return id, идентификатор устройства
  * */
 
-const addOne = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
-  if (await devices.find(device => device.uid === deviceId && device.user === userId)) {
-    throw new Error('устройство уже добавлено');
+const addOne = async (deviceName: string) => {
+  if (await devices.find(device => device.name === deviceName)) {
+    throw new Error('устройство с таким названием уже добавлено');
   }
-  const newDevice: IDevice = { uid: deviceId, user: userId, blocked: false };
+  const newDevice: IDevice = { name: deviceName, uid: '' };
   return await devices.insert(newDevice);
+};
+
+const bindOne = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
+  if (await deviceBinding.find(i => i.id === deviceId && i.userId === userId)) {
+    throw new Error('устройство уже уже связано с пользователем');
+  }
+  const newDeviceBinding: IDeviceBinding = { deviceId, userId, state: 'NON_ACTIVATED' };
+  return await deviceBinding.insert(newDeviceBinding);
 };
 
 /**
@@ -85,4 +110,4 @@ const genActivationCode = async (userId: string) => {
   return code;
 };
 
-export { findOne, findAll, findUsers, addOne, deleteOne, updateOne, genActivationCode };
+export { findOne, findAll, findUsers, addOne, deleteOne, updateOne, bindOne, findOneByUser, genActivationCode };
