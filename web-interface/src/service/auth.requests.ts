@@ -48,7 +48,7 @@ const signup = async (userName: string, password: string, companyId?: string, cr
     companies: companyId ? [companyId] : undefined,
     creatorId: creatorId?? userName
   });
-  const res = await post<IResponse<IUser>>('/auth/signup', body);
+  const res = await post<IResponse<IUser>>(`/auth/signup?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {
@@ -63,7 +63,7 @@ const signup = async (userName: string, password: string, companyId?: string, cr
 };
 
 const createCode = async (userId: string) => {
-  const res = await get<IResponse<string>>(`/auth/user/${userId}/device/code`);
+  const res = await get<IResponse<string>>(`/auth/user/${userId}/device/code?deviceId=${DEVICE_ID}`);
 
   if (res.result) {
     return {
@@ -78,7 +78,7 @@ const createCode = async (userId: string) => {
 };
 
 const logout = async () => {
-  const res = await get<IResponse<undefined>>('/auth/logout');
+  const res = await get<IResponse<undefined>>(`/auth/logout?deviceId=${DEVICE_ID}`);
 
   if (res.result) {
     return {

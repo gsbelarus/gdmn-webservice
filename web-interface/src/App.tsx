@@ -319,7 +319,7 @@ const App: React.FC = () => {
       .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
   };
 
-  const handleCreateCode= (title: string) => {
+  const handleCreateCode = (title: string) => {
     if (user?.id) {
       createCode(user.id)
         .then( data => {
@@ -336,7 +336,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleCreateCurrentCode= (title: string) => {
+  const handleCreateCurrentCode = (title: string) => {
     if (currentUser?.id) {
       createCode(currentUser.id)
         .then( data => {
@@ -354,6 +354,7 @@ const App: React.FC = () => {
   };
 
   const handleCreateDevice = (title: string) => {
+    console.log('handleCreateDevice.user: ', user);
     if (user?.id) {
       createDevice(title, user.id)
         .then( data => {
@@ -370,6 +371,7 @@ const App: React.FC = () => {
   };
 
   const handleCreateCurrentDevice = (title: string) => {
+    console.log('handleCreateCurrentDevice.currentUser: ', currentUser);
     if (currentUser?.id) {
       createDevice(title, currentUser.id)
         .then( data => {

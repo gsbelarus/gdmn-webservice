@@ -1,6 +1,6 @@
-import { users, devices, deviceBinding } from './dao/db';
+import { users, devices } from './dao/db';
 import { makeProfile } from '../controllers/user';
-import { IUser, IDeviceInfo } from '../../../common';
+import { IUser } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
@@ -65,15 +65,9 @@ const findDevices = async (userId: string) => {
     throw new Error('пользователь не найден');
   }
 
-  return (await deviceBinding.read())
+  return (await devices.read())
     .filter(i => i.userId === userId)
     .map(async i => {
-      const device = await devices.find(i.deviceId);
-
-      if (!device) {
-        throw new Error('устройство не найдено');
-      }
-
       const user = await users.find(i.userId);
 
       if (!user) {
@@ -83,8 +77,8 @@ const findDevices = async (userId: string) => {
       return {
         userId: i.userId,
         userName: user.userName,
-        deviceId: i.deviceId,
-        deviceName: device.name,
+        deviceId: i.uid,
+        deviceName: i.name,
         state: i.state,
       };
     });

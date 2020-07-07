@@ -101,15 +101,16 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { code } = ctx.request.body;
+  const { deviceId }: { deviceId?: string } = ctx.query;
 
   if (!code) {
     ctx.throw(400, 'не указан код');
   }
 
   try {
-    const deviceId = await authService.verifyCode(code);
+    const uid = await authService.verifyCode({ code, uid: deviceId });
 
-    const result: IResponse<string> = { result: true, data: deviceId };
+    const result: IResponse<string> = { result: true, data: uid };
 
     ctx.status = 200;
     ctx.body = result;

@@ -1,5 +1,5 @@
 import { Context, Next } from 'koa';
-import { devices, deviceBinding } from '../services/dao/db';
+import { devices } from '../services/dao/db';
 
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
   if (ctx.query.deviceId === 'WEB') {
@@ -13,7 +13,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     throw new Error('устройство не найдено');
   }
 
-  const currDevice = await deviceBinding.find(i => i.deviceId === device.id && i.userId === ctx.state.user.id);
+  const currDevice = await devices.find(i => i.uid === device.id && i.userId === ctx.state.user.id);
 
   if (!currDevice) {
     throw new Error('устройство для пользователя не найдено');

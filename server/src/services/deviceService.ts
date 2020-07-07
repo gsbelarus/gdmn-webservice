@@ -1,30 +1,35 @@
-import { IDevice, IDeviceBinding } from '../../../common';
-import { devices, codes, deviceBinding, users } from './dao/db';
+import { IDevice } from '../../../common';
+import { devices, codes, users } from './dao/db';
 
-const findOne = async (deviceId: string) => {
-  return deviceBinding.find(i => i.deviceId === deviceId);
+const findOne = async (id: string) => {
+  return devices.find(id);
 };
 
 const findAll = async () => {
   return devices.read();
 };
 
-const findOneByUser = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
-  return deviceBinding.find(i => i.deviceId === deviceId && i.userId === userId);
+const findOneByUidAndUser = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
+  return devices.find(i => i.uid === deviceId && i.userId === userId);
 };
+
+const findOneByUid = async (uid: string) => {
+  return devices.find(i => i.uid === uid);
+};
+
 /**
  * Возвращает список пользователей по устройству
  * @param {string} id - идентификатор устройства
  * */
 const findUsers = async (deviceId: string) => {
-  if (!(await deviceBinding.find(i => i.deviceId === deviceId))) {
+  if (!(await devices.find(deviceId))) {
     throw new Error('устройство не найдено');
   }
 
-  return (await deviceBinding.read())
-    .filter(i => i.deviceId === deviceId)
+  return (await devices.read())
+    .filter(i => i.uid === deviceId)
     .map(async i => {
-      const device = await devices.find(i.deviceId);
+      const device = await devices.find(deviceId);
 
       if (!device) {
         throw new Error('устройство не найдено');
@@ -39,7 +44,7 @@ const findUsers = async (deviceId: string) => {
       return {
         userId: i.userId,
         userName: user.userName,
-        deviceId: i.deviceId,
+        deviceId: i.uid,
         deviceName: device.name,
         state: i.state,
       };
@@ -49,24 +54,26 @@ const findUsers = async (deviceId: string) => {
 /**
  * Добавляет одно устройство
  * @param {string} name - название устройства
+ * @param {string} userId - идентификатор пользователя
  * @return id, идентификатор устройства
  * */
 
-const addOne = async (deviceName: string) => {
-  if (await devices.find(device => device.name === deviceName)) {
-    throw new Error('устройство с таким названием уже добавлено');
+const addOne = async ({ deviceName, userId }: { deviceName: string; userId: string }) => {
+  if (await devices.find(device => device.name === deviceName && device.userId === userId)) {
+    throw new Error('устройство с таким названием уже добавлено пользователю');
   }
-  const newDevice: IDevice = { name: deviceName, uid: '' };
-  return await devices.insert(newDevice);
+
+  return await devices.insert({ name: deviceName, uid: '', state: 'NEW', userId: userId });
 };
 
-const bindOne = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
-  if (await deviceBinding.find(i => i.id === deviceId && i.userId === userId)) {
-    throw new Error('устройство уже уже связано с пользователем');
+/* const bindOne = async ({ deviceId, userId }: { uid: string; userId: string }) => {
+  devices.find(i => i.id === deviceId && i.userId === userId)
+  if (await ) {
+    throw new Error('устройство уже связано с пользователем');
   }
-  const newDeviceBinding: IDeviceBinding = { deviceId, userId, state: 'NON_ACTIVATED' };
-  return await deviceBinding.insert(newDeviceBinding);
-};
+
+  return await device.insert({ deviceId, userId, state: '' });
+}; */
 
 /**
  * Обновляет устройство
@@ -81,7 +88,8 @@ const updateOne = async (device: IDevice) => {
   }
 
   // Удаляем поля которые нельзя перезаписывать
-  delete device.user;
+  delete device.userId;
+  delete device.id;
 
   await devices.update({ ...oldDevice, ...device });
 
@@ -93,21 +101,31 @@ const updateOne = async (device: IDevice) => {
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId, userId }: { deviceId: string; userId: string }): Promise<void> => {
-  if (!(await devices.find(device => device.uid === deviceId && device.user === userId))) {
+  if (!(await devices.find(device => device.uid === deviceId && device.userId === userId))) {
     throw new Error('устройство не найдено');
   }
 
-  await devices.delete(device => device.uid === deviceId && device.user === userId);
+  await devices.delete(device => device.uid === deviceId && device.userId === userId);
 };
 
-const genActivationCode = async (userId: string) => {
+const genActivationCode = async (deviceId: string) => {
   // const code = Math.random()
   //   .toString(36)
   //   .substr(3, 6);
   const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-  await codes.insert({ code, date: new Date().toString(), user: userId });
+  await codes.insert({ code, date: new Date().toString(), deviceId });
 
   return code;
 };
 
-export { findOne, findAll, findUsers, addOne, deleteOne, updateOne, bindOne, findOneByUser, genActivationCode };
+export {
+  findOne,
+  findAll,
+  findUsers,
+  addOne,
+  deleteOne,
+  updateOne,
+  findOneByUidAndUser,
+  findOneByUid,
+  genActivationCode,
+};

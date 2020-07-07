@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { IColumn, DetailsList, SelectionMode, Stack, PrimaryButton, Selection } from 'office-ui-fabric-react';
-import { IItem, IDevice, IDeviceState } from '../types';
+import { IItem, IDevice } from '../types';
 
 export interface IDeviceListProps {
   devices: IDevice[];

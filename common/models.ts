@@ -29,37 +29,27 @@ export interface IBaseUrl {
   apiPath: string;
 }
 
-export interface IUserCredentials {
-  userName: string;
-  password: string;
-}
-
 export interface IActivationCode {
   id?: string;
   code: string;
   date: string;
-  user: string;
+  deviceId: string;
 }
 
 export interface ICompany {
-  id?: string;
+  id: string;
   title: string;
   admin: string;
 }
 
+export type DeviceState  = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED'
+
 export interface IDevice {
   id?: string;
+  name: string;  
+  userId: string;  
   uid: string;
-  name: string;
-}
-
-export type DeviceState  = 'NON_ACTIVATED' | 'ACTIVE' | 'BLOCKED'
-
-export interface IDeviceBinding {
-  id?: string;
-  deviceId: string;
-  userId: string;
-  state: DeviceState;
+  state: DeviceState;  
 }
 
 export interface IDeviceInfo {
@@ -90,4 +80,9 @@ export interface IMessage {
       params: IDocument[] | string[];
     };
   };
+}
+
+export interface IUserCredentials {
+  userName: string;
+  password: string;
 }

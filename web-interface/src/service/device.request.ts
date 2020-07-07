@@ -7,7 +7,7 @@ const createDevice = async (title: string, userId: string) => {
     userId,
     title
   });
-  const res = await post<IResponse<undefined>>('/devices/newName', body);
+  const res = await post<IResponse<undefined>>(`/devices?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {
@@ -47,7 +47,7 @@ const blockDevice = async (uId: string, userId: string, isBlock: boolean) => {
     return {
       type: 'BLOCK_DEVICES',
       device: res.data
-    } as IBlockDevicesResponse;
+    } as unknown as IBlockDevicesResponse;
   }
   return {
     type: 'ERROR',

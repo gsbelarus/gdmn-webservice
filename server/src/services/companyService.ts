@@ -62,7 +62,15 @@ const findAll = async (): Promise<ICompany[]> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (company: ICompany): Promise<string> => {
-  const oldCompany = await companies.find(company.id);
+  let oldCompany;
+
+  if (company.id) {
+    oldCompany = await companies.find(company.id);
+  }
+
+  if (!oldCompany) {
+    oldCompany = await companies.find(i => i.title === company.title);
+  }
 
   if (!oldCompany) {
     throw new Error('организация не найдена');
@@ -73,7 +81,7 @@ const updateOne = async (company: ICompany): Promise<string> => {
 
   await companies.update({ ...oldCompany, ...company });
 
-  return company.id;
+  return oldCompany.id;
 };
 
 /**

@@ -55,7 +55,7 @@ const getUserDevices = async (userId: string) => {
     return {
       type: 'USER_DEVICES',
       devices: res.data
-    } as IGetUserDevicesResponse;
+    } as unknown as IGetUserDevicesResponse;
   }
   return {
     type: 'ERROR',
