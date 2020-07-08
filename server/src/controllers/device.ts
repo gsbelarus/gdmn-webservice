@@ -169,18 +169,13 @@ const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
-  const { userId } = ctx.request.body;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');
   }
 
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
-  }
-
   try {
-    await deviceService.deleteOne({ deviceId, userId });
+    await deviceService.deleteOne({ deviceId });
 
     const result: IResponse<void> = { result: true };
 

@@ -567,7 +567,9 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'REMOVE_DEVICES') {
-            dispatch({ type: 'SET_DEVICES', devices: devices?.filter(c => uIds.findIndex(u => u === c.deviceName) === -1)});
+            const newDevices = devices?.filter(c => uId !== c.id);
+            console.log(newDevices);
+            dispatch({ type: 'SET_DEVICES', devices: newDevices});
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
@@ -618,7 +620,10 @@ const App: React.FC = () => {
           }
           else if (data.type === 'REMOVE_DEVICES') {
             dispatch({ type: 'DELETE_CURRENT_DEVICE', uId});
-            dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+            const newDevices = currentDevices?.filter(c => uId !== c.id);
+            console.log(newDevices);
+            dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices});
+            //dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );

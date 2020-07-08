@@ -70,6 +70,7 @@ const findDevices = async (userId: string) => {
     .filter(i => i.userId === userId)
     .map(i => {
       return {
+        id: i.id,
         userId: i.userId,
         userName: user.userName,
         deviceId: i.uid,

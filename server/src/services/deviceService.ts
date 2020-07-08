@@ -42,6 +42,7 @@ const findUsers = async (deviceId: string) => {
       }
 
       return {
+        id: i.id,
         userId: i.userId,
         userName: user.userName,
         deviceId: i.uid,
@@ -81,7 +82,7 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
  * @return uid, идентификатор устройства
  * */
 const updateOne = async (device: IDevice) => {
-  const oldDevice = await devices.find(i => i.uid === device.uid);
+  const oldDevice = await devices.find(i => i.id === device.id);
 
   if (!oldDevice) {
     throw new Error('устройство не найдено');
@@ -100,12 +101,12 @@ const updateOne = async (device: IDevice) => {
  * Удаляет одно устройство
  * @param {string} id - идентификатор устройства
  * */
-const deleteOne = async ({ deviceId, userId }: { deviceId: string; userId: string }): Promise<void> => {
-  if (!(await devices.find(device => device.uid === deviceId && device.userId === userId))) {
+const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
+  if (!(await devices.find(device => device.id === deviceId))) {
     throw new Error('устройство не найдено');
   }
 
-  await devices.delete(device => device.uid === deviceId && device.userId === userId);
+  await devices.delete(device => device.id === deviceId);
 };
 
 const genActivationCode = async (deviceId: string) => {
