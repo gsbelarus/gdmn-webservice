@@ -2,10 +2,10 @@ import { DEVICE_ID, patch, remove, post } from './http.service';
 import { IResponse, IDevice } from '../../../common';
 import { INetworkError, IRemoveDevicesResponse, IBlockDevicesResponse, ICreateDeviceNameResponse } from '../queryTypes';
 
-const createDevice = async (title: string, userId: string) => {
+const createDevice = async (deviceName: string, userId: string) => {
   const body = JSON.stringify({
-    userId,
-    title
+    deviceName,
+    userId
   });
   const res = await post<IResponse<undefined>>(`/devices?deviceId=${DEVICE_ID}`, body);
 
