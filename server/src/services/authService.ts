@@ -5,6 +5,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { devices, users, codes } from './dao/db';
 import { VerifyFunction } from 'passport-local';
 import { userService } from '.';
+import log from '../utils/logger';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
@@ -13,7 +14,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   const user = await users.find(i => i.userName === userName);
 
   if (!user) {
-    throw new Error(`пользователь '${userName}' не найден`);
+    throw new Error(`пользователь не найден`);
   }
 
   const device = await devices.find(
@@ -21,11 +22,12 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   );
 
   if (!device) {
-    throw new Error(`устройство с идентификатором '${deviceId}' у пользователя ${userName} не найдено`);
+    // ctx.throw(401, 'не пройдена аутентификация');
+    throw new Error(`устройство ${deviceId} у пользователя не найдено`);
   }
 
   if (device.state === 'BLOCKED') {
-    throw new Error(`устройство с идентификатором '${deviceId}' заблокировано`);
+    throw new Error(`устройство заблокировано`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -85,10 +87,12 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
 
   const date = new Date(rec.date);
 
+  log.info(date);
   date.setDate(date.getDate() + 7);
+  log.info(date);
 
-  if (date >= new Date()) {
-    await codes.delete(i => i.code === code);
+  if (date.getDate() - new Date().getDate() < 0 ) {
+    // await codes.delete(i => i.code === code);
     throw new Error('срок действия кода истёк');
   }
 

@@ -42,6 +42,10 @@ export default class Api {
     /* Проверка устройства - есть ли в базе сервера */
     getDevice: async (): Promise<IResponse<IDevice>> => get(this.getUrl(), `/devices/${this.deviceId}`),
 
+    /* Проверка устройства по пользователю - есть ли в базе сервера */
+    getDeviceByUser: async (userName: string): Promise<IResponse<IDevice>> =>
+      get(this.getUrl(), `/devices/${this.deviceId}/user/${userName}`),
+
     verifyActivationCode: async (code: string): Promise<IResponse<{ userId: string; deviceId: string }>> =>
       post(this.getUrl(), '/auth/device/code', JSON.stringify({ uid: this.deviceId, code })),
 

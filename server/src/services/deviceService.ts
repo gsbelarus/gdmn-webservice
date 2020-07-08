@@ -9,8 +9,14 @@ const findAll = async () => {
   return devices.read();
 };
 
-const findOneByUidAndUser = async ({ deviceId, userId }: { deviceId: string; userId: string }) => {
-  return devices.find(i => i.uid === deviceId && i.userId === userId);
+const findOneByUidAndUser = async ({ deviceId, userName }: { deviceId: string; userName: string }) => {
+  const user = await users.find(i => i.userName === userName);
+
+  if (!user) {
+    throw new Error('пользователь не найден');
+  }
+
+  return devices.find(i => i.uid === deviceId && i.userId === user.id);
 };
 
 const findOneByUid = async (uid: string) => {
@@ -114,7 +120,8 @@ const genActivationCode = async (deviceId: string) => {
   //   .toString(36)
   //   .substr(3, 6);
   const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-  await codes.insert({ code, date: new Date().toString(), deviceId });
+  const date = new Date();
+  await codes.insert({ code, date: date.toISOString(), deviceId });
 
   return code;
 };

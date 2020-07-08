@@ -30,6 +30,8 @@ const SignInScreen = () => {
     status: undefined,
   });
 
+  const { actions: authActions } = useAuthStore();
+
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
     password: '',
@@ -76,26 +78,62 @@ const SignInScreen = () => {
     if (!loginState.isLoading) {
       return;
     }
-    timeout(5000, apiService.auth.login(credential))
-      .then((data: IResponse<IUser>) => {
+
+    const LoginUser = async () => {
+      try {
+        const device = await apiService.auth.getDeviceByUser(credential.userName);
+        if (device.error) {
+          authActions.setUserStatus({ userID: null });
+          authActions.setDeviceStatus(false);
+          return;
+        }
+      } catch (err) {
+        console.log('err', err);
+        if (err.code === 404) {
+          authActions.setUserStatus({ userID: null });
+          authActions.setDeviceStatus(false);
+          return;
+        }
+        if (err.code !== 400) {
+          setLoginState({
+            isLoading: false,
+            status: err.message,
+            isError: true,
+          });
+          return;
+        }
+
+        // Устройство не найдено. Перенаправляем на ввод кода активации
+        // console.log('res');
+        // setLoginState({
+        //   isLoading: false,
+        //   status: err.message,
+        //   isError: true,
+        // });
+      }
+
+      try {
+        const data = await timeout<IResponse<IUser>>(5000, apiService.auth.login(credential));
+
         data.result
           ? actions.setUserStatus({
               userID: data.data.id,
-            }) /* Сделать как в AuthNav а лучше 1 вариант на 2 запроса*/
+            })
           : setLoginState({
               isLoading: false,
               status: data.error,
               isError: true,
             });
-      })
-      .catch((err: Error) =>
+      } catch (err) {
         setLoginState({
           isLoading: false,
           status: err.message,
           isError: true,
-        }),
-      );
-  }, [actions, apiService.auth, credential, credential.userName, loginState.isLoading]);
+        });
+      }
+    };
+    LoginUser();
+  }, [actions, apiService.auth, authActions, credential, credential.userName, loginState.isLoading]);
 
   return (
     <>

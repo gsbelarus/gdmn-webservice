@@ -68,7 +68,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(router.allowedMethods());
 
   app.on('error', err => {
-    log.error('server error', err);
+    log.error(err);
   });
 
   app.on('user-error', err => {

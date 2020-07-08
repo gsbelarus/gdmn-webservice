@@ -8,13 +8,13 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   // }
 
   if (!ctx.query.deviceId) {
-    throw new Error('не указан идентификатор устройства');
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
 
   const currDevice = await devices.find(device => device.uid === ctx.query.deviceId);
 
   if (!currDevice) {
-    throw new Error('устройство не найдено');
+    ctx.throw(400, 'устройство не найдено');
   }
 
   // ctx.params.deviceId = currDevice.id;
