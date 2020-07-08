@@ -37,7 +37,7 @@ const deleteDevice = async (uId: string) => {
 
 const blockDevice = async (updateDevice: IDevice) => {
   const body = JSON.stringify(updateDevice);
-  const res = await patch<IResponse<IDevice>>(`/devices/${updateDevice.uid}/user/${updateDevice.userId}?deviceId=${DEVICE_ID}`, body);
+  const res = await patch<IResponse<IDevice>>(`/devices/${updateDevice.id}?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {

@@ -138,15 +138,11 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId, userId } = ctx.params;
+  const { id: deviceId } = ctx.params;
   const deviceInfo = ctx.request.body;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');
-  }
-
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   if (!deviceInfo) {

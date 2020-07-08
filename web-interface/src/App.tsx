@@ -568,7 +568,6 @@ const App: React.FC = () => {
           }
           else if (data.type === 'REMOVE_DEVICES') {
             const newDevices = devices?.filter(c => uId !== c.id);
-            console.log(newDevices);
             dispatch({ type: 'SET_DEVICES', devices: newDevices});
           }
         })
@@ -580,12 +579,12 @@ const App: React.FC = () => {
   const handleBlockDevices = (uIds: string[], isUnBlock: boolean) => {
     uIds.forEach(uId => {
       if (user && user.id) {
-        const device = devices?.find(dev => dev.deviceId === uId);
+        const device = devices?.find(dev => dev.id === uId);
         if (!device) {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
+        blockDevice({id: device.id, uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
@@ -621,9 +620,7 @@ const App: React.FC = () => {
           else if (data.type === 'REMOVE_DEVICES') {
             dispatch({ type: 'DELETE_CURRENT_DEVICE', uId});
             const newDevices = currentDevices?.filter(c => uId !== c.id);
-            console.log(newDevices);
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices});
-            //dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
@@ -634,12 +631,12 @@ const App: React.FC = () => {
   const handleBlockCurrentDevices  = (uIds: string[], isUnBlock: boolean) => {
     uIds.forEach(uId => {
       if (currentUser?.id) {
-        const device = currentDevices?.find(dev => dev.deviceId === uId);
+        const device = currentDevices?.find(dev => dev.id === uId);
         if (!device) {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
+        blockDevice({id: device.id, uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });

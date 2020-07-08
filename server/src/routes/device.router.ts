@@ -21,7 +21,7 @@ router.get('/:id', getDevice);
 router.get('/:id/user/:userId', getDeviceByUser);
 router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
 router.get('/:id/users', compose([deviceMiddleware, authMiddleware]), getUsersByDevice);
-router.patch('/:id/user/:userId', compose([deviceMiddleware, authMiddleware]), updateDevice);
+router.patch('/:id', compose([deviceMiddleware, authMiddleware]), updateDevice);
 router.delete('/:id', compose([deviceMiddleware, authMiddleware]), removeDevice);
 
 export default router;
