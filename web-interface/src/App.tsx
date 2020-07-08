@@ -578,8 +578,18 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'BLOCK_DEVICES') {
-            //dispatch({ type: 'SET_DEVICES', devices: devices?.map(c => uIds.findIndex(u => u === c.deviceName) > -1 ? {...c, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'} : c)});
-            dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+            const idx = devices?.findIndex(dev => dev.deviceId === uId);
+            if (devices && idx !== undefined) {
+              const newDevices: IDeviceInfo[] = [
+                  ...devices.slice(0, idx),
+                  {
+                    ...device,
+                    state: !isUnBlock ? 'BLOCKED' : 'ACTIVE',
+                  },
+                  ...devices.slice(idx + 1),
+                ];
+              dispatch({ type: 'SET_DEVICES', devices: newDevices});
+            }
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
@@ -619,9 +629,18 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'BLOCK_DEVICES') {
-            //dispatch({ type: 'UPDATE_CURRENT_DEVICE', device: data});
-            //dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(c => uIds.findIndex(u => u === c.deviceName) > -1 ? {...c, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'} : c)});
-            dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+            const idx = currentDevices?.findIndex(dev => dev.deviceId === uId);
+            if (currentDevices && idx !== undefined) {
+              const newDevices: IDeviceInfo[] = [
+                  ...currentDevices.slice(0, idx),
+                  {
+                    ...device,
+                    state: !isUnBlock ? 'BLOCKED' : 'ACTIVE',
+                  },
+                  ...currentDevices.slice(idx + 1),
+                ];
+              dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices});
+            }
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
