@@ -283,7 +283,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'SIGNUP') {
-          dispatch({ type: 'SET_USER', user: data.user });
+          //dispatch({ type: 'SET_USER', user: data.user });
           dispatch({ type: 'SET_STATE', appState: 'LOGIN' });
         }
       })
@@ -427,8 +427,8 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'SIGNUP') {
-            dispatch({ type: 'SET_CURRENT_USER', user: data.user });
-            dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, data.user] : [data.user]});
+            //dispatch({ type: 'SET_CURRENT_USER', user: data.user });
+            dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, {...new_user, id: data.userId }] : [{...new_user, id: data.userId}]});
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: [] });
             dispatch({ type: 'SET_COMPANIES', companies: companies?.filter(c => c.companyId === company.companyId) });
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });

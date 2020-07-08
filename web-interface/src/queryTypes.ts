@@ -139,7 +139,7 @@ export interface ICompaniesResponse extends IQueryResponse {
 
 export interface ISignUpResponse extends IQueryResponse {
   type: 'SIGNUP';
-  user: IUser;
+  userId: string;
 };
 
 export interface IAllUsersResponse extends IQueryResponse {

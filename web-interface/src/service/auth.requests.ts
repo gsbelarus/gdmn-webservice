@@ -48,12 +48,12 @@ const signup = async (userName: string, password: string, companyId?: string, cr
     companies: companyId ? [companyId] : undefined,
     creatorId: creatorId?? userName
   });
-  const res = await post<IResponse<IUser>>(`/auth/signup?deviceId=${DEVICE_ID}`, body);
+  const res = await post<IResponse<string>>(`/auth/signup?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {
       type: 'SIGNUP',
-      user: res.data
+      userId: res.data
     } as ISignUpResponse;
   }
   return {
