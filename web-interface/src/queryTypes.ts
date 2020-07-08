@@ -1,5 +1,5 @@
-import { IUser, IUserCompany, IDevice } from "./types";
-import { ICompany } from '../../common';
+import { IUser, IUserCompany } from "./types";
+import { ICompany, IDeviceInfo } from '../../common';
 
 export interface IQueryCommand {
   command: 'LOGIN' | 'GET_USER_DATA' | 'GET_COMPANIES' | 'SIGNUP' | 'LOGOUT' | 'GET_ALL_USERS' | 'GET_USER' | 'CREATE_CODE'
@@ -183,11 +183,12 @@ export interface ICreateUserResponse extends IQueryResponse {
 
 export interface ICreateDeviceNameResponse extends IQueryResponse {
   type: 'CREATE_DEVICENAME';
+  uid: string;
 };
 
 export interface IGetUserDevicesResponse extends IQueryResponse {
   type: 'USER_DEVICES';
-  devices: IDevice[];
+  devices: IDeviceInfo[];
 };
 
 export interface IUpdateUserResponse extends IQueryResponse {
@@ -205,7 +206,7 @@ export interface IRemoveDevicesResponse extends IQueryResponse {
 
 export interface IBlockDevicesResponse extends IQueryResponse {
   type: 'BLOCK_DEVICES';
-  device: IDevice;
+  deviceId: string;
 };
 
 export type QueryResponse = INetworkError | ILoginResponse | IUserResponse | ICompaniesResponse | ISignUpResponse | ICreateDeviceNameResponse

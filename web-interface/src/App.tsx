@@ -1,5 +1,5 @@
 import React, { useReducer, useCallback, useEffect } from 'react';
-import { IUser, IUserCompany, IDevice, IDeviceState  } from './types';
+import { IUser, IUserCompany } from './types';
 import { Login } from './components/Login';
 import { Profile } from './components/Profile';
 import { Menu } from './components/Menu';
@@ -15,6 +15,7 @@ import { login, signup, logout, createCode, getCurrentUser } from './service/aut
 import { getAllUsers, updateUser, getUserDevices, getUser } from './service/user.requests';
 import { createDevice, deleteDevice, blockDevice } from './service/device.request';
 import { getCompany, createCompany, updateCompany, getAllCompanies, getCompanyUsers } from './service/company.requests';
+import { IDeviceInfo } from '../../common';
 
 type AppState = 'LOGIN' | 'QUERY_LOGIN' |'QUERY_LOGOUT' | 'SIGNUP' | 'SIGNUP_CODE' | 'QUERY_SIGNUP' | 'PROFILE' | 'SAVED_PROFILE'
   | 'ADMIN' | 'CREATE_COMPANY' | 'UPDATE_COMPANY' | 'CREATE_USER' | 'ADD_USER_FROM_SYSTEM' | 'SHOW_CODE' | 'SHOW_CURRENT_CODE' | 'UPDATE_USER' | 'CREATE_DEVICENAME' | 'CREATE_CURRENT_DEVICENAME';
@@ -35,10 +36,10 @@ interface IState {
   activationCode?: string;
   company?: IUserCompany;
   companies?: IUserCompany[];
-  devices?: IDevice[];
+  devices?: IDeviceInfo[];
   currentUser?: IUser;
   currentCompanies?: IUserCompany[];
-  currentDevices?: IDevice[];
+  currentDevices?: IDeviceInfo[];
   companyUsers?: IUser[];
   allUsers?: IUser[];
   errorMessage?: string;
@@ -60,9 +61,9 @@ type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_CURRENT_USER', user?: IUser }
   | { type: 'SET_IS_ADMIN', isAdmin?: boolean }
   | { type: 'UPDATE_COMPANY', companyId: string, companyName: string }
-  | { type: 'SET_DEVICES', devices?: IDevice[] }
-  | { type: 'SET_CURRENT_DEVICES', devices?: IDevice[] }
-  | { type: 'UPDATE_CURRENT_DEVICE', device: IDevice }
+  | { type: 'SET_DEVICES', devices?: IDeviceInfo[] }
+  | { type: 'SET_CURRENT_DEVICES', devices?: IDeviceInfo[] }
+  | { type: 'UPDATE_CURRENT_DEVICE', device: IDeviceInfo }
   | { type: 'DELETE_CURRENT_DEVICE', uId: string }
   | { type: 'SET_ERROR', errorMessage?: string };
 
@@ -215,7 +216,7 @@ const reducer = (state: IState, action: Action): IState => {
     case 'UPDATE_CURRENT_DEVICE': {
       const { device } = action;
       const { currentDevices } = state;
-      const idx = currentDevices?.findIndex(item => item.uid === device.uid);
+      const idx = currentDevices?.findIndex(item => item.deviceId === device.deviceId);
       if(currentDevices && idx !== undefined && idx > -1) {
         return {
           ...state,
@@ -232,7 +233,7 @@ const reducer = (state: IState, action: Action): IState => {
       if(currentDevices) {
         return {
           ...state,
-          currentDevices: currentDevices.filter(item => item.uid !== uId)
+          currentDevices: currentDevices.filter(item => item.deviceId !== uId)
         }
       } else {
         return state;
@@ -328,7 +329,7 @@ const App: React.FC = () => {
           }
           else if (data.type === 'USER_CODE') {
             dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
-            dispatch({ type: 'SET_DEVICES', devices: devices?.map(d => d.title === title ? {...d, state: IDeviceState.awaitingActivation} : {...d}) });
+            dispatch({ type: 'SET_DEVICES', devices: devices?.map(d => d.deviceName === title ? {...d, state: 'NON-ACTIVATED'} : {...d}) });
             dispatch({ type: 'SET_STATE', appState: 'SHOW_CODE' })
           }
         })
@@ -345,7 +346,7 @@ const App: React.FC = () => {
           }
           else if (data.type === 'USER_CODE') {
             dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(d => d.title === title ? {...d, state: IDeviceState.awaitingActivation} : {...d}) });
+            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(d => d.deviceName === title ? {...d, state: 'NON-ACTIVATED'} : {...d}) });
             dispatch({ type: 'SET_STATE', appState: 'SHOW_CURRENT_CODE' });
           }
         })
@@ -362,7 +363,7 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'CREATE_DEVICENAME') {
-            dispatch({ type: 'SET_DEVICES', devices: devices ? [...devices, {uid: '', title, state: IDeviceState.notActivated}] : [{uid: '', title: title, state: IDeviceState.notActivated}] } );
+            dispatch({ type: 'SET_DEVICES', devices: devices ? [...devices, {deviceId: data.uid, deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] : [{deviceId: data.uid, deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] } );
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
@@ -379,7 +380,7 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'CREATE_DEVICENAME') {
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices ? [...currentDevices, {uid: '', title, state: IDeviceState.notActivated}] : [{uid: '', title: title, state: IDeviceState.notActivated}] } );
+            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices ? [...currentDevices, {deviceId: data.uid, deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] : [{deviceId: data.uid, deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] } );
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
@@ -547,38 +548,43 @@ const App: React.FC = () => {
   };
 
   const handleRemoveDevices = async (uIds: string[]) => {
-    if (user && user.id) {
-      uIds.forEach(uId => {
-        deleteDevice(user.id ?? '', uId)
+    uIds.forEach(uId => {
+      if (user && user.id) {
+        deleteDevice(user.id, uId)
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'REMOVE_DEVICES') {
-            dispatch({ type: 'SET_DEVICES', devices: devices?.filter(c => uIds.findIndex(u => u === c.title) === -1)});
+            dispatch({ type: 'SET_DEVICES', devices: devices?.filter(c => uIds.findIndex(u => u === c.deviceName) === -1)});
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
-      });
-    }
+      }
+    });
   };
 
   const handleBlockDevices = (uIds: string[], isUnBlock: boolean) => {
-    if (user && user.id) {
-      uIds.forEach(uId => {
-        blockDevice(uId, user.id?? '', isUnBlock)
+    uIds.forEach(uId => {
+      if (user && user.id) {
+        const device = devices?.find(dev => dev.deviceId === uId);
+        if (!device) {
+          dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
+          return;
+        }
+        blockDevice({uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'BLOCK_DEVICES') {
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(c => uIds.findIndex(u => u === c.title) > -1 ? {...c, state: !isUnBlock ? IDeviceState.blocked : IDeviceState.activated} : c)});
-        //    dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+            //dispatch({ type: 'SET_DEVICES', devices: devices?.map(c => uIds.findIndex(u => u === c.deviceName) > -1 ? {...c, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'} : c)});
+            dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
           }
         })
         .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
-      });
-    }
+      }
+    });
   };
 
   const handleRemoveCurrentDevices = (uIds: string[]) => {
@@ -602,13 +608,19 @@ const App: React.FC = () => {
   const handleBlockCurrentDevices  = (uIds: string[], isUnBlock: boolean) => {
     uIds.forEach(uId => {
       if (currentUser?.id) {
-        blockDevice(uId, currentUser.id, isUnBlock)
+        const device = currentDevices?.find(dev => dev.deviceId === uId);
+        if (!device) {
+          dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
+          return;
+        }
+        blockDevice({uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'BLOCK_DEVICES') {
-            dispatch({ type: 'UPDATE_CURRENT_DEVICE', device: data.device});
+            //dispatch({ type: 'UPDATE_CURRENT_DEVICE', device: data});
+            //dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(c => uIds.findIndex(u => u === c.deviceName) > -1 ? {...c, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'} : c)});
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
           }
         })
@@ -708,16 +720,6 @@ const App: React.FC = () => {
           onSignUp={handleSignUp}
           onClearError={handleSetError}
         />
-      /*:  appState === 'SIGNUP_CODE' && activationCode
-        ?
-          <ModalBox
-            title={'Код для активации устройства'}
-            text={activationCode}
-            onClose={() => {
-              dispatch({ type: 'SET_ACTIVATION_CODE' });
-              handleSetAppState('LOGIN');
-            }}
-          />*/
       : user
         ?
         <div>
@@ -801,14 +803,11 @@ const App: React.FC = () => {
                         onBlockDevices={handleBlockCurrentDevices}
                         onGetCode={handleCreateCurrentCode}
                       />
-                      :((appState === 'SHOW_CODE' && activationCode) || (appState === 'SHOW_CURRENT_CODE' && activationCode))
+                      : (appState === 'SHOW_CODE' || appState === 'SHOW_CURRENT_CODE') && activationCode
                       ?
                         <ModalBox
                           title={'Код для активации устройства'}
-                          text={
-                            appState === 'SHOW_CODE' && activationCode
-                            ? activationCode
-                            : ''}
+                          text={activationCode}
                           onClose={() => {
                             dispatch({ type: 'SET_ACTIVATION_CODE' });
                             handleSetAppState('UPDATE_USER');

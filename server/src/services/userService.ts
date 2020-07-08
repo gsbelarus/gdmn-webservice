@@ -61,19 +61,14 @@ const deleteOne = async (id: string): Promise<void> => {
  * @param {string} id - идентификатор пользователя
  * */
 const findDevices = async (userId: string) => {
-  if (!(await users.find(userId))) {
+  const user = await users.find(userId);
+  if (!user) {
     throw new Error('пользователь не найден');
   }
 
   return (await devices.read())
     .filter(i => i.userId === userId)
-    .map(async i => {
-      const user = await users.find(i.userId);
-
-      if (!user) {
-        throw new Error('пользователь не найден');
-      }
-
+    .map(i => {
       return {
         userId: i.userId,
         userName: user.userName,

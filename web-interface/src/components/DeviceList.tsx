@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { IColumn, DetailsList, SelectionMode, Stack, PrimaryButton, Selection } from 'office-ui-fabric-react';
-import { IItem, IDevice } from '../types';
+import { IItem } from '../types';
+import { IDeviceInfo } from '../../../common';
 
 export interface IDeviceListProps {
-  devices: IDevice[];
+  devices: IDeviceInfo[];
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
   onGetCode: (uId: string) => void;
@@ -19,7 +20,8 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
       setSelectedItems(newSelection);
     }
   }));
-  const deviceItems: IItem[] = devices.map(d => ({key: d.uid, name: d.title, state: d.state})) || [];
+
+  const deviceItems: IItem[] = devices.map(d => ({key: d.deviceId, name: d.deviceName, state: d.state})) || [];
   const deviceColumns: IColumn[] = [{
     key: 'title',
     name: 'Устройство',

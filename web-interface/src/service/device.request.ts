@@ -7,11 +7,12 @@ const createDevice = async (deviceName: string, userId: string) => {
     deviceName,
     userId
   });
-  const res = await post<IResponse<undefined>>(`/devices?deviceId=${DEVICE_ID}`, body);
+  const res = await post<IResponse<string>>(`/devices?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {
-      type: 'CREATE_DEVICENAME'
+      type: 'CREATE_DEVICENAME',
+      uid: res.data
     } as ICreateDeviceNameResponse;
   }
   return {
@@ -37,11 +38,9 @@ const deleteDevice = async (userId: string, uId: string) => {
   } as INetworkError;
 };
 
-const blockDevice = async (uId: string, userId: string, isBlock: boolean) => {
-  const body = JSON.stringify({
-    isBlock
-  });
-  const res = await patch<IResponse<IDevice>>(`/devices/${uId}/user/${userId}?deviceId=${DEVICE_ID}`, body);
+const blockDevice = async (updateDevice: IDevice) => {
+  const body = JSON.stringify(updateDevice);
+  const res = await patch<IResponse<IDevice>>(`/devices/${updateDevice.uid}/user/${updateDevice.userId}?deviceId=${DEVICE_ID}`, body);
 
   if (res.result) {
     return {
