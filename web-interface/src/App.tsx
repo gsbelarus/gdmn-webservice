@@ -363,7 +363,11 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'CREATE_DEVICENAME') {
-            dispatch({ type: 'SET_DEVICES', devices: devices ? [...devices, {deviceId: data.uid, deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] : [{deviceId: data.uid, deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] } );
+            dispatch({
+              type: 'SET_DEVICES',
+              devices: devices
+                ? [...devices, { id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}]
+                : [{id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] } );
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
@@ -380,7 +384,14 @@ const App: React.FC = () => {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'CREATE_DEVICENAME') {
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices ? [...currentDevices, {deviceId: data.uid, deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] : [{deviceId: data.uid, deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] } );
+            dispatch({
+              type: 'SET_CURRENT_DEVICES',
+              devices: currentDevices
+                ? [
+                  ...currentDevices,
+                  {id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}
+                ]
+                : [{id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] } );
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
@@ -550,7 +561,7 @@ const App: React.FC = () => {
   const handleRemoveDevices = async (uIds: string[]) => {
     uIds.forEach(uId => {
       if (user && user.id) {
-        deleteDevice(user.id, uId)
+        deleteDevice(uId)
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
@@ -600,7 +611,7 @@ const App: React.FC = () => {
   const handleRemoveCurrentDevices = (uIds: string[]) => {
     uIds.forEach(uId => {
       if (currentUser?.id) {
-        deleteDevice(currentUser.id, uId)
+        deleteDevice(uId)
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });

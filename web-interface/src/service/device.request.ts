@@ -21,11 +21,8 @@ const createDevice = async (deviceName: string, userId: string) => {
   } as INetworkError;
 };
 
-const deleteDevice = async (userId: string, uId: string) => {
-  const body = JSON.stringify({
-    userId: userId
-  });
-  const res = await remove<IResponse<undefined>>(`/devices/${uId}?deviceId=${DEVICE_ID}`, body);
+const deleteDevice = async (uId: string) => {
+  const res = await remove<IResponse<undefined>>(`/devices/${uId}?deviceId=${DEVICE_ID}`);
 
   if (res.result) {
     return {

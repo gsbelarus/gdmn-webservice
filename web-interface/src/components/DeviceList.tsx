@@ -21,7 +21,7 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
     }
   }));
 
-  const deviceItems: IItem[] = devices.map(d => ({key: d.deviceId, name: d.deviceName, state: d.state})) || [];
+  const deviceItems: IItem[] = devices.map(d => ({key: d.id, name: d.deviceName, state: d.state})) || [];
   const deviceColumns: IColumn[] = [{
     key: 'title',
     name: 'Устройство',
