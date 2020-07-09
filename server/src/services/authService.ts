@@ -91,7 +91,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   date.setDate(date.getDate() + 7);
   log.info(date);
 
-  if (date.getDate() - new Date().getDate() < 0 ) {
+  if (date.getDate() - new Date().getDate() < 0) {
     // await codes.delete(i => i.code === code);
     throw new Error('срок действия кода истёк');
   }

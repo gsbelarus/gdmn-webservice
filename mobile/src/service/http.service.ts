@@ -1,5 +1,3 @@
-// import { baseUrl } from '../helpers/utils';
-
 export async function get<T>(baseUrl: string, path: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
@@ -7,6 +5,7 @@ export async function get<T>(baseUrl: string, path: string): Promise<T> {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
+
     return response.json();
   } catch (err) {
     if (err.response) {

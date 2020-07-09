@@ -46,7 +46,7 @@ export default class Api {
     getDeviceByUser: async (userName: string): Promise<IResponse<IDevice>> =>
       get(this.getUrl(), `/devices/${this.deviceId}/user/${userName}`),
 
-    verifyActivationCode: async (code: string): Promise<IResponse<{ userId: string; deviceId: string }>> =>
+    verifyActivationCode: async (code: string): Promise<IResponse<string>> =>
       post(this.getUrl(), '/auth/device/code', JSON.stringify({ uid: this.deviceId, code })),
 
     //TODO: избавиться от роута

@@ -10,7 +10,7 @@ router.post('/signup', signUp);
 router.post('/login', logIn);
 router.get('/logout', authMiddleware, logOut);
 router.get('/user', compose([authMiddleware, deviceMiddleware]), getCurrentUser);
-router.get('/user/:userId/device/code', getActivationCode);
+router.get('/device/:deviceId/code', getActivationCode);
 router.post('/device/code', verifyCode);
 
 export default router;

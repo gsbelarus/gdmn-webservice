@@ -7,7 +7,7 @@ export interface IDeviceListProps {
   devices: IDeviceInfo[];
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
-  onGetCode: (uId: string) => void;
+  onGetCode: ( deviceId: string) => void;
   onClearError: () => void;
   isCanEditDevices?: boolean;
 }
@@ -16,7 +16,7 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
   const [selectedItems, setSelectedItems] = useState([] as string[]);
   const selection = useRef(new Selection({
     onSelectionChanged: () => {
-      const newSelection = selection.current.getSelection().map( s => s.key ).filter( s => typeof s === 'string' ) as typeof selectedItems;
+      const newSelection = selection.current.getSelection().map(s => s.key).filter( s => typeof s === 'string' ) as typeof selectedItems;
       setSelectedItems(newSelection);
     }
   }));

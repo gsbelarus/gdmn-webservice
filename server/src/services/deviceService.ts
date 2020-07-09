@@ -116,12 +116,20 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
 };
 
 const genActivationCode = async (deviceId: string) => {
+  const device = await devices.find(deviceId);
+
+  if (!device) {
+    throw new Error('устройство не найдено');
+  }
+
   // const code = Math.random()
   //   .toString(36)
   //   .substr(3, 6);
   const code = `${Math.floor(1000 + Math.random() * 9000)}`;
   const date = new Date();
   await codes.insert({ code, date: date.toISOString(), deviceId });
+
+  await devices.update({ ...device, state: 'NON-ACTIVATED' });
 
   return code;
 };

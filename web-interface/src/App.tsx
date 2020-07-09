@@ -17,7 +17,7 @@ import { createDevice, deleteDevice, blockDevice } from './service/device.reques
 import { getCompany, createCompany, updateCompany, getAllCompanies, getCompanyUsers } from './service/company.requests';
 import { IDeviceInfo } from '../../common';
 
-type AppState = 'LOGIN' | 'QUERY_LOGIN' |'QUERY_LOGOUT' | 'SIGNUP' | 'SIGNUP_CODE' | 'QUERY_SIGNUP' | 'PROFILE' | 'SAVED_PROFILE'
+type AppState = 'LOGIN' | 'QUERY_LOGIN' | 'QUERY_LOGOUT' | 'SIGNUP' | 'SIGNUP_CODE' | 'QUERY_SIGNUP' | 'PROFILE' | 'SAVED_PROFILE'
   | 'ADMIN' | 'CREATE_COMPANY' | 'UPDATE_COMPANY' | 'CREATE_USER' | 'ADD_USER_FROM_SYSTEM' | 'SHOW_CODE' | 'SHOW_CURRENT_CODE' | 'UPDATE_USER' | 'CREATE_DEVICENAME' | 'CREATE_CURRENT_DEVICENAME';
 
 interface IState {
@@ -96,7 +96,7 @@ const reducer = (state: IState, action: Action): IState => {
       return {
         ...state,
         appState: action.appState,
-      //  needReReadCompanies: state.needReReadCompanies || (state.appState !== action.appState && (action.appState === 'LOGIN' ))
+        //  needReReadCompanies: state.needReReadCompanies || (state.appState !== action.appState && (action.appState === 'LOGIN' ))
       }
     }
     case 'SET_ERROR': {
@@ -147,7 +147,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { companyId, companyName } = action;
       return {
         ...state,
-        companies: state.companies?.map(comp => comp.companyId === companyId ? {...comp, companyName} : comp)
+        companies: state.companies?.map(comp => comp.companyId === companyId ? { ...comp, companyName } : comp)
       }
     }
     case 'SET_COMPANIES': {
@@ -158,7 +158,7 @@ const reducer = (state: IState, action: Action): IState => {
        */
 
       const { companies } = action;
-      const isAdmin = companies?.some( c => c.userRole === 'Admin' );
+      const isAdmin = companies?.some(c => c.userRole === 'Admin');
       return {
         ...state,
         companies,
@@ -217,7 +217,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { device } = action;
       const { currentDevices } = state;
       const idx = currentDevices?.findIndex(item => item.deviceId === device.deviceId);
-      if(currentDevices && idx !== undefined && idx > -1) {
+      if (currentDevices && idx !== undefined && idx > -1) {
         return {
           ...state,
           currentDevices: [...currentDevices?.slice(0, idx), device, ...currentDevices?.slice(idx + 1)]
@@ -230,7 +230,7 @@ const reducer = (state: IState, action: Action): IState => {
     case 'DELETE_CURRENT_DEVICE': {
       const { uId } = action;
       const { currentDevices } = state;
-      if(currentDevices) {
+      if (currentDevices) {
         return {
           ...state,
           currentDevices: currentDevices.filter(item => item.deviceId !== uId)
@@ -247,25 +247,26 @@ const reducer = (state: IState, action: Action): IState => {
 
 const App: React.FC = () => {
   const [{ appState, user, activationCode, companies, currentCompanies, company, companyUsers, allUsers, errorMessage, isAdmin, currentUser,
-    devices, currentDevices, needReReadCompanies, needReReadUsers, needReReadUserData }, dispatch] = useReducer(reducer, {    appState: 'LOGIN',
-    needReReadUserData: true
+    devices, currentDevices, needReReadCompanies, needReReadUsers, needReReadUserData }, dispatch] = useReducer(reducer, {
+      appState: 'LOGIN',
+      needReReadUserData: true
 
-  });
+    });
 
   console.log('appState: ' + appState);
 
   const handleSetError = useCallback((errorMessage?: string) => {
-    dispatch({ type: 'SET_ERROR', errorMessage})
+    dispatch({ type: 'SET_ERROR', errorMessage })
   }, [dispatch]);
 
   const handleSetAppState = useCallback((appState: AppState) => {
-    dispatch({ type: 'SET_STATE', appState})
+    dispatch({ type: 'SET_STATE', appState })
   }, [dispatch]);
 
   const handleLogin = (userName: string, password: string) => {
     console.log('handleLogin');
     login(userName, password)
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
@@ -273,12 +274,12 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_USER', needReReadUserData: true });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleSignUp = (userName: string, password: string) => {
     signup(userName, password)
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
@@ -287,28 +288,28 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_STATE', appState: 'LOGIN' });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleLogOut = () => {
     logout()
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'LOGOUT') {
-          dispatch({ type: 'SET_COMPANY', company: undefined});
-          dispatch({ type: 'SET_USER', user: undefined});
-          dispatch({ type: 'SET_IS_ADMIN', isAdmin: undefined});
+          dispatch({ type: 'SET_COMPANY', company: undefined });
+          dispatch({ type: 'SET_USER', user: undefined });
+          dispatch({ type: 'SET_IS_ADMIN', isAdmin: undefined });
           dispatch({ type: 'SET_STATE', appState: 'LOGIN' });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleGetAllUsers = () => {
     getAllUsers()
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
@@ -317,40 +318,40 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_STATE', appState: 'ADD_USER_FROM_SYSTEM' })
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
-  const handleCreateCode = (title: string) => {
-    if (user?.id) {
-      createCode(user.id)
-        .then( data => {
+  const handleCreateCode = (deviceId: string) => {
+    if (deviceId) {
+      createCode(deviceId)
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'USER_CODE') {
             dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
-            dispatch({ type: 'SET_DEVICES', devices: devices?.map(d => d.deviceName === title ? {...d, state: 'NON-ACTIVATED'} : {...d}) });
+            dispatch({ type: 'SET_DEVICES', devices: devices?.map(d => d.id === deviceId ? { ...d, state: d.state } : { ...d }) });
             dispatch({ type: 'SET_STATE', appState: 'SHOW_CODE' })
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
-  const handleCreateCurrentCode = (title: string) => {
-    if (currentUser?.id) {
-      createCode(currentUser.id)
-        .then( data => {
+  const handleCreateCurrentCode = (deviceId: string) => {
+    if (deviceId) {
+      createCode(deviceId)
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'USER_CODE') {
             dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(d => d.deviceName === title ? {...d, state: 'NON-ACTIVATED'} : {...d}) });
+            dispatch({ type: 'SET_CURRENT_DEVICES', devices: currentDevices?.map(d => d.id === deviceId ? { ...d, state: 'NON-ACTIVATED' } : { ...d }) });
             dispatch({ type: 'SET_STATE', appState: 'SHOW_CURRENT_CODE' });
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
@@ -358,7 +359,7 @@ const App: React.FC = () => {
     console.log('handleCreateDevice.user: ', user);
     if (user?.id) {
       createDevice(title, user.id)
-        .then( data => {
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
@@ -366,12 +367,13 @@ const App: React.FC = () => {
             dispatch({
               type: 'SET_DEVICES',
               devices: devices
-                ? [...devices, { id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}]
-                : [{id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW'}] } );
+                ? [...devices, { id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW' }]
+                : [{ id: data.uid, deviceId: '', deviceName: title, userId: user.id ?? '', userName: user.userName, state: 'NEW' }]
+            });
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
@@ -379,7 +381,7 @@ const App: React.FC = () => {
     console.log('handleCreateCurrentDevice.currentUser: ', currentUser);
     if (currentUser?.id) {
       createDevice(title, currentUser.id)
-        .then( data => {
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
@@ -389,19 +391,20 @@ const App: React.FC = () => {
               devices: currentDevices
                 ? [
                   ...currentDevices,
-                  {id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}
+                  { id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW' }
                 ]
-                : [{id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW'}] } );
+                : [{ id: data.uid, deviceId: '', deviceName: title, userId: currentUser.id ?? '', userName: currentUser.userName, state: 'NEW' }]
+            });
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' })
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
   const handleSelectCompany = (companyId: string) => {
     getCompany(companyId)
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
@@ -410,42 +413,42 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleCreateCompany = (companyName: string) => {
     createCompany(companyName)
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
         else if (data.type === 'NEW_COMPANY') {
-          const newCompany: IUserCompany = {companyName, companyId: companyName, userRole: 'Admin'}
+          const newCompany: IUserCompany = { companyName, companyId: companyName, userRole: 'Admin' }
           dispatch({ type: 'SET_COMPANY', company: newCompany });
-          dispatch({ type: 'SET_COMPANIES', companies: (companies ? [...companies, newCompany] : [newCompany]).filter(c => c.userRole === 'Admin')  });
+          dispatch({ type: 'SET_COMPANIES', companies: (companies ? [...companies, newCompany] : [newCompany]).filter(c => c.userRole === 'Admin') });
           dispatch({ type: 'SET_IS_ADMIN', isAdmin: true });
           dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleCreateUser = (new_user: IUser) => {
     if (company?.companyId && user?.id) {
       signup(new_user.userName, new_user.password ?? '', company.companyId, user.id)
-        .then( data => {
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'SIGNUP') {
             //dispatch({ type: 'SET_CURRENT_USER', user: data.user });
-            dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, {...new_user, id: data.userId }] : [{...new_user, id: data.userId}]});
+            dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, { ...new_user, id: data.userId }] : [{ ...new_user, id: data.userId }] });
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: [] });
             dispatch({ type: 'SET_COMPANIES', companies: companies?.filter(c => c.companyId === company.companyId) });
             dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
@@ -453,26 +456,26 @@ const App: React.FC = () => {
     const systemUuser = allUsers?.find(item => item.id === userId);
     if (company?.companyId && systemUuser) {
       updateUser({ ...systemUuser, companies: systemUuser.companies ? [...systemUuser.companies, company?.companyId] : [company?.companyId] })
-        .then( data => {
+        .then(data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           }
           else if (data.type === 'UPDATE_USER') {
             const addedUser = allUsers?.find(u => u.id === userId);
             if (addedUser) {
-              dispatch({ type: 'SET_CURRENT_USER', user: {...addedUser} });
+              dispatch({ type: 'SET_CURRENT_USER', user: { ...addedUser } });
               dispatch({ type: 'SET_COMPANY_USERS', companyUsers: companyUsers ? [...companyUsers, addedUser] : [addedUser] });
               dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
             }
           }
         })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   };
 
   const handleUpdateCompany = (companyId: string, companyName: string) => {
     updateCompany(companyName, companyId)
-      .then( data => {
+      .then(data => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         }
@@ -481,50 +484,50 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
         }
       })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleGetCompanies = (companies: string[], userId: string, type: 'SET_COMPANIES' | 'SET_CURRENT_COMPANIES') => {
     getAllCompanies()
-    .then( data => {
-      if (data.type === 'ERROR') {
-        dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-      }
-      else if (data.type === 'USER_COMPANIES') {
-        const getCompanies = data.companies
-          .filter(item => companies.some(company => company === item.id ))
-          .map(item => {return {companyId: item.id, companyName: item.title, userRole: item.admin === userId ? 'Admin' : undefined} as IUserCompany});
+      .then(data => {
+        if (data.type === 'ERROR') {
+          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+        }
+        else if (data.type === 'USER_COMPANIES') {
+          const getCompanies = data.companies
+            .filter(item => companies.some(company => company === item.id))
+            .map(item => { return { companyId: item.id, companyName: item.title, userRole: item.admin === userId ? 'Admin' : undefined } as IUserCompany });
           dispatch({ type: type, companies: getCompanies });
         }
-    })
-    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      })
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleGetUserDevices = (userId: string, type: 'SET_DEVICES' | 'SET_CURRENT_DEVICES') => {
     getUserDevices(userId)
-    .then( data => {
-      if (data.type === 'ERROR') {
-        dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-      }
-      else if (data.type === 'USER_DEVICES') {
-        dispatch({ type, devices: data.devices })
-      }
-    })
-    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .then(data => {
+        if (data.type === 'ERROR') {
+          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+        }
+        else if (data.type === 'USER_DEVICES') {
+          dispatch({ type, devices: data.devices })
+        }
+      })
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
   const handleUpdateUser = (editUser: IUser, type: 'SET_USER' | 'SET_CURRENT_USER') => {
     updateUser(editUser)
-    .then( data => {
-      if (data.type === 'ERROR') {
-        dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-      }
-      else if (data.type === 'UPDATE_USER') {
-        dispatch({ type, user: editUser});
-        dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
-      }
-    })
-    .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+      .then(data => {
+        if (data.type === 'ERROR') {
+          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+        }
+        else if (data.type === 'UPDATE_USER') {
+          dispatch({ type, user: editUser });
+          dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
+        }
+      })
+      .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
 
@@ -533,27 +536,27 @@ const App: React.FC = () => {
       const uIds = userIds.filter(u => u !== user?.id);
       uIds.forEach(uId => {
         getUser(uId)
-          .then( data => {
+          .then(data => {
             if (data.type === 'ERROR') {
               dispatch({ type: 'SET_ERROR', errorMessage: data.message });
             }
             else if (data.type === 'GET_USER') {
-              if(data.user && data.user.companies) {
-                updateUser({...data.user,  companies: data.user.companies.filter((item) => item !== company?.companyId)})
-                .then( data => {
-                  if (data.type === 'ERROR') {
-                    dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-                  }
-                  else if (data.type === 'UPDATE_USER') {
-                    dispatch({ type: 'SET_USER', user});
-                    dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
-                  }
-                })
-                .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+              if (data.user && data.user.companies) {
+                updateUser({ ...data.user, companies: data.user.companies.filter((item) => item !== company?.companyId) })
+                  .then(data => {
+                    if (data.type === 'ERROR') {
+                      dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+                    }
+                    else if (data.type === 'UPDATE_USER') {
+                      dispatch({ type: 'SET_USER', user });
+                      dispatch({ type: 'SET_STATE', appState: 'SAVED_PROFILE' });
+                    }
+                  })
+                  .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
               }
             }
           })
-          .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       });
     }
   };
@@ -562,17 +565,17 @@ const App: React.FC = () => {
     uIds.forEach(uId => {
       if (user && user.id) {
         deleteDevice(uId)
-        .then( data => {
-          if (data.type === 'ERROR') {
-            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-          }
-          else if (data.type === 'REMOVE_DEVICES') {
-            const newDevices = devices?.filter(c => uId !== c.id);
-            console.log(newDevices);
-            dispatch({ type: 'SET_DEVICES', devices: newDevices});
-          }
-        })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+          .then(data => {
+            if (data.type === 'ERROR') {
+              dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+            }
+            else if (data.type === 'REMOVE_DEVICES') {
+              const newDevices = devices?.filter(c => uId !== c.id);
+              console.log(newDevices);
+              dispatch({ type: 'SET_DEVICES', devices: newDevices });
+            }
+          })
+          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
     });
   };
@@ -585,15 +588,15 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
-        .then( data => {
-          if (data.type === 'ERROR') {
-            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-          }
-          else if (data.type === 'BLOCK_DEVICES') {
-            const idx = devices?.findIndex(dev => dev.deviceId === uId);
-            if (devices && idx !== undefined) {
-              const newDevices: IDeviceInfo[] = [
+        blockDevice({ uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE' })
+          .then(data => {
+            if (data.type === 'ERROR') {
+              dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+            }
+            else if (data.type === 'BLOCK_DEVICES') {
+              const idx = devices?.findIndex(dev => dev.deviceId === uId);
+              if (devices && idx !== undefined) {
+                const newDevices: IDeviceInfo[] = [
                   ...devices.slice(0, idx),
                   {
                     ...device,
@@ -601,11 +604,11 @@ const App: React.FC = () => {
                   },
                   ...devices.slice(idx + 1),
                 ];
-              dispatch({ type: 'SET_DEVICES', devices: newDevices});
+                dispatch({ type: 'SET_DEVICES', devices: newDevices });
+              }
             }
-          }
-        })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+          })
+          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
     });
   };
@@ -614,24 +617,24 @@ const App: React.FC = () => {
     uIds.forEach(uId => {
       if (currentUser?.id) {
         deleteDevice(uId)
-        .then( data => {
-          if (data.type === 'ERROR') {
-            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-          }
-          else if (data.type === 'REMOVE_DEVICES') {
-            dispatch({ type: 'DELETE_CURRENT_DEVICE', uId});
-            const newDevices = currentDevices?.filter(c => uId !== c.id);
-            console.log(newDevices);
-            dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices});
-            //dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
-          }
-        })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+          .then(data => {
+            if (data.type === 'ERROR') {
+              dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+            }
+            else if (data.type === 'REMOVE_DEVICES') {
+              dispatch({ type: 'DELETE_CURRENT_DEVICE', uId });
+              const newDevices = currentDevices?.filter(c => uId !== c.id);
+              console.log(newDevices);
+              dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices });
+              //dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
+            }
+          })
+          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
     });
   };
 
-  const handleBlockCurrentDevices  = (uIds: string[], isUnBlock: boolean) => {
+  const handleBlockCurrentDevices = (uIds: string[], isUnBlock: boolean) => {
     uIds.forEach(uId => {
       if (currentUser?.id) {
         const device = currentDevices?.find(dev => dev.deviceId === uId);
@@ -639,15 +642,15 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
-        .then( data => {
-          if (data.type === 'ERROR') {
-            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-          }
-          else if (data.type === 'BLOCK_DEVICES') {
-            const idx = currentDevices?.findIndex(dev => dev.deviceId === uId);
-            if (currentDevices && idx !== undefined) {
-              const newDevices: IDeviceInfo[] = [
+        blockDevice({ uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED' })
+          .then(data => {
+            if (data.type === 'ERROR') {
+              dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+            }
+            else if (data.type === 'BLOCK_DEVICES') {
+              const idx = currentDevices?.findIndex(dev => dev.deviceId === uId);
+              if (currentDevices && idx !== undefined) {
+                const newDevices: IDeviceInfo[] = [
                   ...currentDevices.slice(0, idx),
                   {
                     ...device,
@@ -655,11 +658,11 @@ const App: React.FC = () => {
                   },
                   ...currentDevices.slice(idx + 1),
                 ];
-              dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices});
+                dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices });
+              }
             }
-          }
-        })
-        .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+          })
+          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
     })
   };
@@ -669,23 +672,23 @@ const App: React.FC = () => {
     dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
   };
 
-  useEffect( () => {
+  useEffect(() => {
     if (needReReadCompanies && user?.id) {
       console.log('useEffect: needReReadCompanies');
-      handleGetCompanies(user.companies?? [], user.id, 'SET_COMPANIES');
+      handleGetCompanies(user.companies ?? [], user.id, 'SET_COMPANIES');
       handleGetUserDevices(user.id, 'SET_DEVICES');
     }
   }, [needReReadCompanies, user]);
 
-  useEffect( () => {
+  useEffect(() => {
     if (currentUser?.id) {
       console.log('useEffect: currentUser');
-      handleGetCompanies(currentUser.companies?? [], currentUser.id, 'SET_CURRENT_COMPANIES');
+      handleGetCompanies(currentUser.companies ?? [], currentUser.id, 'SET_CURRENT_COMPANIES');
       handleGetUserDevices(currentUser.id, 'SET_CURRENT_DEVICES');
     }
   }, [currentUser]);
 
-  useEffect( () => {
+  useEffect(() => {
     console.log('useEffect: isAdmin = ' + isAdmin);
     if (isAdmin !== undefined) {
       dispatch({ type: 'SET_STATE', appState: isAdmin ? 'ADMIN' : 'PROFILE' });
@@ -696,18 +699,18 @@ const App: React.FC = () => {
     if (needReReadUserData) {
       console.log('useEffect: needReReadUserData');
       getCurrentUser()
-      .then( data => {
-        if (data.type === 'ERROR') {
-          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-        }
-        else if (data.type === 'USER') {
-          dispatch({ type: 'SET_USER', user: data.user, needReReadCompanies: true});
-        } else if (data.type === 'USER_NOT_AUTHENTICATED') {
-          dispatch({ type: 'SET_STATE', appState: 'LOGIN'});
-          dispatch({ type: 'SET_USER'});
-        }
-      })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .then(data => {
+          if (data.type === 'ERROR') {
+            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+          }
+          else if (data.type === 'USER') {
+            dispatch({ type: 'SET_USER', user: data.user, needReReadCompanies: true });
+          } else if (data.type === 'USER_NOT_AUTHENTICATED') {
+            dispatch({ type: 'SET_STATE', appState: 'LOGIN' });
+            dispatch({ type: 'SET_USER' });
+          }
+        })
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     }
   }, [needReReadUserData])
 
@@ -720,23 +723,23 @@ const App: React.FC = () => {
     if (company?.companyId && needReReadUsers && user) {
       console.log('useEffect: company');
       getCompanyUsers(company.companyId)
-      .then( data => {
-        if (data.type === 'ERROR') {
-          dispatch({ type: 'SET_ERROR', errorMessage: data.message });
-        }
-        else if (data.type === 'COMPANY_USERS') {
-          dispatch({ type: 'SET_COMPANY_USERS', companyUsers: data.users.map(u => u.id === user?.id ? {...u, isAdmin: true} : u)});
-        }
-      })
-      .catch( error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }) );
+        .then(data => {
+          if (data.type === 'ERROR') {
+            dispatch({ type: 'SET_ERROR', errorMessage: data.message });
+          }
+          else if (data.type === 'COMPANY_USERS') {
+            dispatch({ type: 'SET_COMPANY_USERS', companyUsers: data.users.map(u => u.id === user?.id ? { ...u, isAdmin: true } : u) });
+          }
+        })
+        .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
     } else {
-      dispatch({ type: 'SET_COMPANY_USERS', companyUsers: undefined});
+      dispatch({ type: 'SET_COMPANY_USERS', companyUsers: undefined });
     }
   }, [company, needReReadUsers, user])
 
   return (
     appState === 'LOGIN' || appState === 'QUERY_LOGIN'
-    ?
+      ?
       <Login
         userName={user?.userName}
         password={user?.password}
@@ -746,128 +749,128 @@ const App: React.FC = () => {
         onSetSignUp={() => handleSetAppState('SIGNUP')}
         onClearError={handleSetError}
       />
-    :
+      :
       appState === 'SIGNUP' || appState === 'QUERY_SIGNUP'
-      ?
+        ?
         <SignUp
           querying={appState === 'QUERY_SIGNUP'}
           errorMessage={errorMessage}
           onSignUp={handleSignUp}
           onClearError={handleSetError}
         />
-      : user
-        ?
-        <div>
-          <Menu
-            querying={appState === 'QUERY_LOGOUT'}
-            errorMessage={errorMessage}
-            onEditProfile={() => handleSetAppState('PROFILE')}
-            onLogOut={handleLogOut}
-            onClearError={handleSetError}
-            onCreateCompany={() => handleSetAppState('CREATE_COMPANY')}
-            onGetCompanies={() => handleSetAppState('ADMIN')}
-            onCreateUser={appState === 'UPDATE_COMPANY' ? () => handleSetAppState('CREATE_USER') : undefined}
-            onAddUserFromSystem={appState === 'UPDATE_COMPANY' ? handleGetAllUsers : undefined}
-            onCreateDevice={
-              appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
-              ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
-              : appState === 'PROFILE' && isAdmin
-                ? () => handleSetAppState('CREATE_DEVICENAME')
-                : undefined}
-            isAdmin={isAdmin}
-          />
-          { appState === 'ADMIN' && companies
-            ?
-             <AdminBox
+        : user
+          ?
+          <div>
+            <Menu
+              querying={appState === 'QUERY_LOGOUT'}
+              errorMessage={errorMessage}
+              onEditProfile={() => handleSetAppState('PROFILE')}
+              onLogOut={handleLogOut}
+              onClearError={handleSetError}
+              onCreateCompany={() => handleSetAppState('CREATE_COMPANY')}
+              onGetCompanies={() => handleSetAppState('ADMIN')}
+              onCreateUser={appState === 'UPDATE_COMPANY' ? () => handleSetAppState('CREATE_USER') : undefined}
+              onAddUserFromSystem={appState === 'UPDATE_COMPANY' ? handleGetAllUsers : undefined}
+              onCreateDevice={
+                appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
+                  ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
+                  : appState === 'PROFILE' && isAdmin
+                    ? () => handleSetAppState('CREATE_DEVICENAME')
+                    : undefined}
+              isAdmin={isAdmin}
+            />
+            {appState === 'ADMIN' && companies
+              ?
+              <AdminBox
                 companies={companies?.filter(comp => comp.userRole)}
                 onClearError={handleSetError}
                 onSelectCompany={handleSelectCompany}
               />
               : appState === 'CREATE_DEVICENAME' || appState === 'CREATE_CURRENT_DEVICENAME'
-              ?
+                ?
                 <Device
                   onUpdateDevice={(title: string) => appState === 'CREATE_DEVICENAME' ? handleCreateDevice(title) : handleCreateCurrentDevice(title)}
                   onClearError={handleSetError}
                 />
-            : appState === 'CREATE_COMPANY'
-              ?
-                <Company
-                  onUpdateCompany={handleCreateCompany}
-                  onClearError={handleSetError}
-                />
-                : appState === 'CREATE_USER' && user?.id
+                : appState === 'CREATE_COMPANY'
                   ?
+                  <Company
+                    onUpdateCompany={handleCreateCompany}
+                    onClearError={handleSetError}
+                  />
+                  : appState === 'CREATE_USER' && user?.id
+                    ?
                     <User
-                      user={{userName: '', creatorId: user.id}}
+                      user={{ userName: '', creatorId: user.id }}
                       onEditProfile={handleCreateUser}
                       onClearError={handleSetError}
                       isCanEditUser={true}
                     />
                     : appState === 'ADD_USER_FROM_SYSTEM'
-                    ?
+                      ?
                       <SystemUser
                         allUsers={allUsers}
                         companyUsers={companyUsers}
                         onAddUser={handleAddSystemUser}
                         onClearError={handleSetError}
                       />
-                     : appState === 'UPDATE_COMPANY' && company
-                    ?
-                      <CompanyBox
-                        companyName={company.companyName}
-                        companyId={company.companyId}
-                        users={companyUsers}
-                        allUsers={allUsers}
-                        onUpdateCompany={handleUpdateCompany}
-                        onClearError={handleSetError}
-                        onSelectUser={handleGetCurrentUser}
-                        onRemoveUsersFromCompany={handleRemoveCompanyUsers}
-                      />
-                    : (appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE') && currentUser
-                      ?
-                      <Profile
-                        user={currentUser}
-                        companies={currentCompanies}
-                        devices={currentDevices}
-                        onClearEditOK={() => handleSetAppState('PROFILE')}
-                        onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_CURRENT_USER')}
-                        onClearError={handleSetError}
-                        isCanEditUser={currentUser.creatorId === user.id}
-                        isCanEditDevices={isAdmin}
-                        onRemoveDevices={handleRemoveCurrentDevices}
-                        onBlockDevices={handleBlockCurrentDevices}
-                        onGetCode={handleCreateCurrentCode}
-                      />
-                      : (appState === 'SHOW_CODE' || appState === 'SHOW_CURRENT_CODE') && activationCode
-                      ?
-                        <ModalBox
-                          title={'Код для активации устройства'}
-                          text={activationCode}
-                          onClose={() => {
-                            dispatch({ type: 'SET_ACTIVATION_CODE' });
-                            handleSetAppState('UPDATE_USER');
-                          }}
-                        />
-                      :
-                        <Profile
-                          user={user}
-                          companies={companies}
-                          devices={devices}
-                          isEditOK={appState === 'SAVED_PROFILE'}
-                          onClearEditOK={() => handleSetAppState('PROFILE')}
-                          onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_USER')}
+                      : appState === 'UPDATE_COMPANY' && company
+                        ?
+                        <CompanyBox
+                          companyName={company.companyName}
+                          companyId={company.companyId}
+                          users={companyUsers}
+                          allUsers={allUsers}
+                          onUpdateCompany={handleUpdateCompany}
                           onClearError={handleSetError}
-                          isCanEditUser={true}
-                          isCanEditDevices={isAdmin}
-                          onRemoveDevices={handleRemoveDevices}
-                          onBlockDevices={handleBlockDevices}
-                          onGetCode={handleCreateCode}
+                          onSelectUser={handleGetCurrentUser}
+                          onRemoveUsersFromCompany={handleRemoveCompanyUsers}
                         />
-          }
+                        : (appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE') && currentUser
+                          ?
+                          <Profile
+                            user={currentUser}
+                            companies={currentCompanies}
+                            devices={currentDevices}
+                            onClearEditOK={() => handleSetAppState('PROFILE')}
+                            onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_CURRENT_USER')}
+                            onClearError={handleSetError}
+                            isCanEditUser={currentUser.creatorId === user.id}
+                            isCanEditDevices={isAdmin}
+                            onRemoveDevices={handleRemoveCurrentDevices}
+                            onBlockDevices={handleBlockCurrentDevices}
+                            onGetCode={handleCreateCurrentCode}
+                          />
+                          : (appState === 'SHOW_CODE' || appState === 'SHOW_CURRENT_CODE') && activationCode
+                            ?
+                            <ModalBox
+                              title={'Код для активации устройства'}
+                              text={activationCode}
+                              onClose={() => {
+                                dispatch({ type: 'SET_ACTIVATION_CODE' });
+                                handleSetAppState('UPDATE_USER');
+                              }}
+                            />
+                            :
+                            <Profile
+                              user={user}
+                              companies={companies}
+                              devices={devices}
+                              isEditOK={appState === 'SAVED_PROFILE'}
+                              onClearEditOK={() => handleSetAppState('PROFILE')}
+                              onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_USER')}
+                              onClearError={handleSetError}
+                              isCanEditUser={true}
+                              isCanEditDevices={isAdmin}
+                              onRemoveDevices={handleRemoveDevices}
+                              onBlockDevices={handleBlockDevices}
+                              onGetCode={handleCreateCode}
+                            />
+            }
 
-        </div>
-      :
-        <div>Тест</div>
+          </div>
+          :
+          <div>Тест</div>
   );
 };
 

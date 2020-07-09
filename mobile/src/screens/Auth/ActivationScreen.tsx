@@ -27,17 +27,16 @@ const ActivationScreen = () => {
     /* Запрос к серверу на проверку кода активации */
     setServerReq({ isError: false, isLoading: true, status: undefined });
     try {
-      const resp = await timeout<IResponse<{ userId: string; deviceId: string }>>(
-        5000,
-        apiService.auth.verifyActivationCode(activationCode),
-      );
+      const resp = await timeout<IResponse<string>>(5000, apiService.auth.verifyActivationCode(activationCode));
 
       if (!resp.result) {
         setActivationCode('');
         setServerReq({ isError: true, isLoading: false, status: resp.error });
         return;
       }
-      serviceActions.setDeviceId(resp.data.deviceId);
+      console.log(`respdata: ${resp.data}`);
+
+      serviceActions.setDeviceId(resp.data);
       actions.setDeviceStatus(true); // Возможно нужно сделать перенаправление на первую страницу
     } catch (err) {
       setServerReq({ isLoading: false, isError: true, status: err.message });

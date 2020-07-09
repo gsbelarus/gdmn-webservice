@@ -82,46 +82,42 @@ const SignInScreen = () => {
     const LoginUser = async () => {
       try {
         const device = await apiService.auth.getDeviceByUser(credential.userName);
-        if (device.error) {
+
+        if (device.error === 'устройство не найдено') {
+          // Устройство не найдено. Перенаправляем на ввод кода активации
           authActions.setUserStatus({ userID: null });
           authActions.setDeviceStatus(false);
           return;
         }
-      } catch (err) {
-        console.log('err', err);
-        if (err.code === 404) {
-          authActions.setUserStatus({ userID: null });
-          authActions.setDeviceStatus(false);
-          return;
-        }
-        if (err.code !== 400) {
+
+        if (!device.result) {
           setLoginState({
             isLoading: false,
-            status: err.message,
+            status: device.error,
             isError: true,
           });
           return;
         }
-
-        // Устройство не найдено. Перенаправляем на ввод кода активации
-        // console.log('res');
-        // setLoginState({
-        //   isLoading: false,
-        //   status: err.message,
-        //   isError: true,
-        // });
+      } catch (err) {
+        setLoginState({
+          isLoading: false,
+          status: err.message,
+          isError: true,
+        });
+        return;
       }
 
       try {
-        const data = await timeout<IResponse<IUser>>(5000, apiService.auth.login(credential));
+        const res = await timeout<IResponse<string>>(5000, apiService.auth.login(credential));
 
-        data.result
+        console.log('res', res);
+        res.result
           ? actions.setUserStatus({
-              userID: data.data.id,
+              userID: res.data,
             })
           : setLoginState({
               isLoading: false,
-              status: data.error,
+              status: res.error,
               isError: true,
             });
       } catch (err) {
