@@ -26,7 +26,7 @@ export default {
       title: 'Инвенторизация',
       tabBarLabel: 'Инвенторизация',
       tabBarIcon: 'file-document-box',
-      tabBarColor: '#CEE7E3',
+      tabBarColor: '#C9E7F8',
     }
   }]
 };
