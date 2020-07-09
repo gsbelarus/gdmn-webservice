@@ -63,6 +63,7 @@ export interface IMessage {
     producer: string;
     consumer: string;
     dateTime: string;
+    appSystem: string;
   };
   body: {
     type: string;
