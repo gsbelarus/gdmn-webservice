@@ -86,17 +86,17 @@ const ViewDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   const document: IDocument | undefined = state.documents.find((item) => item.id === route.params.docId);
-  const type: IDocumentType | undefined = state.documentTypes.find((item) => item.id === document.head?.doctype);
-  const contact: IContact | undefined = state.contacts?.find((item) => item.id === document.head?.tocontactId);
+  const type: IDocumentType | undefined = state.documentTypes.find((item) => item.id === document?.head?.doctype);
+  const contact: IContact | undefined = state.contacts?.find((item) => item.id === document?.head?.tocontactId);
   const ref = React.useRef<FlatList<ILine>>(null);
 
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: ILine }) => (
-    <LineItem item={item} status={document.head?.status} docId={document?.id} />
+    <LineItem item={item} status={document?.head ? document.head.status : -1} docId={document?.id} />
   );
 
-  return (
+  return document ? (
     <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
       <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
         <View style={localStyles.header}>
@@ -120,7 +120,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
       </View>
       <FlatList
         ref={ref}
-        data={document ? document.lines : []}
+        data={document.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -149,7 +149,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
                 {
                   text: 'OK',
                   onPress: () => {
-                    actions.deleteDocument(document?.id);
+                    actions.deleteDocument(document.id);
                     navigation.navigate('DocumentsListScreen');
                   },
                 },
@@ -232,7 +232,7 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         ) : undefined}
       </View>
     </View>
-  );
+  ) : null;
 };
 
 export { ViewDocumentScreen };
