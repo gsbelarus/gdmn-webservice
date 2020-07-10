@@ -58,6 +58,7 @@ const ActivationScreen = () => {
             {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
           <TextInput
+            autoFocus
             placeholder="Введите код"
             keyboardType="number-pad"
             returnKeyType="done"
