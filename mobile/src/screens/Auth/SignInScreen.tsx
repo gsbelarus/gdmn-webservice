@@ -110,7 +110,6 @@ const SignInScreen = () => {
       try {
         const res = await timeout<IResponse<string>>(5000, apiService.auth.login(credential));
 
-        console.log('res', res);
         res.result
           ? actions.setUserStatus({
               userID: res.data,

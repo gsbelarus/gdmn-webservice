@@ -17,9 +17,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
     throw new Error(`пользователь не найден`);
   }
 
-  const device = await devices.find(
-    device => (device.uid === deviceId || deviceId === 'WEB') && device.userId === user.id,
-  );
+  const device = await devices.find(device => device.uid === deviceId && device.userId === user.id);
 
   if (!device) {
     // ctx.throw(401, 'не пройдена аутентификация');
