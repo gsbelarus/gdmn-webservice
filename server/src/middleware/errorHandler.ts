@@ -7,11 +7,15 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = { result: false, error: err.message };
 
-    if (ctx.status <= 400) {
-      ctx.app.emit('user-error', err, ctx);
-    }
-    if (ctx.status > 400 && ctx.status <= 500) {
-      ctx.app.emit('error', err, ctx);
+    switch (true) {
+      case ctx.status >= 400 && ctx.status < 500:
+        ctx.app.emit('user-error', err, ctx);
+        break;
+      case ctx.status >= 500:
+        ctx.app.emit('error', err, ctx);
+        break;
+      default:
+        ctx.app.emit('error', err, ctx);
     }
   }
 };

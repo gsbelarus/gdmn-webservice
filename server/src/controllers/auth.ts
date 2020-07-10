@@ -100,17 +100,19 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { code } = ctx.request.body;
-  const { deviceId }: { deviceId?: string } = ctx.query;
+  const { code, uid }: { code: string; uid?: string } = ctx.request.body;
+
+  log.info(`uid: ${uid}`);
+  log.info(`code: ${code}`);
 
   if (!code) {
     ctx.throw(400, 'не указан код');
   }
 
   try {
-    const uid = await authService.verifyCode({ code, uid: deviceId });
+    const deviceUid = await authService.verifyCode({ code, uid });
 
-    const result: IResponse<string> = { result: true, data: uid };
+    const result: IResponse<string> = { result: true, data: deviceUid };
 
     ctx.status = 200;
     ctx.body = result;
@@ -122,20 +124,20 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId } = ctx.params;
+  const { deviceId } = ctx.params;
 
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
 
   try {
-    const code = await deviceService.genActivationCode(userId);
+    const code = await deviceService.genActivationCode(deviceId);
     const result: IResponse<string> = { result: true, data: code };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info('getActivationCode: tivation code generated successfully');
+    log.info('getActivationCode: ativation code generated successfully');
   } catch (err) {
     ctx.throw(400, err.message);
   }

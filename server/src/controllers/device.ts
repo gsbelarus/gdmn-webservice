@@ -1,4 +1,4 @@
-import { Context, ParameterizedContext } from 'koa';
+import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IDevice, IResponse, IDeviceInfo } from '../../../common';
 import { deviceService } from '../services';
@@ -14,6 +14,10 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     const device = await deviceService.findOneByUid(deviceId);
 
+    if (!device) {
+      ctx.throw(404, 'устройство не найдено');
+    }
+
     const result: IResponse<IDevice> = { result: true, data: device };
 
     ctx.status = 200;
@@ -26,18 +30,22 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId, userId }: { id: string; userId: string } = ctx.params;
+  const { id: deviceId, userName }: { id: string; userName: string } = ctx.params;
 
   if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
+    ctx.throw(400, 'не указан uid устройства');
   }
 
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
+  if (!userName) {
+    ctx.throw(400, 'не указано имя пользователя');
   }
 
   try {
-    const device = await deviceService.findOneByUidAndUser({ deviceId, userId });
+    const device = await deviceService.findOneByUidAndUser({ deviceId, userName });
+
+    if (!device) {
+      ctx.throw(404, 'устройство не найдено');
+    }
 
     const result: IResponse<IDevice> = { result: true, data: device };
 
@@ -46,7 +54,7 @@ const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
 
     log.info(`getDevice: OK`);
   } catch (err) {
-    ctx.throw(400, err.message);
+    ctx.throw(404, err.message);
   }
 };
 
@@ -65,7 +73,7 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
+/* const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
   const { id: userId }: { id: string } = ctx.state.user;
 
@@ -89,7 +97,7 @@ const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
   } catch (err) {
     ctx.throw(400, err.message);
   }
-};
+}; */
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { deviceName, userId } = ctx.request.body;
@@ -211,13 +219,4 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 */
-export {
-  getDevice,
-  getDevices,
-  getDeviceByCurrentUser,
-  getUsersByDevice,
-  addDevice,
-  updateDevice,
-  removeDevice,
-  getDeviceByUser,
-};
+export { getDevice, getDevices, getUsersByDevice, addDevice, updateDevice, removeDevice, getDeviceByUser };

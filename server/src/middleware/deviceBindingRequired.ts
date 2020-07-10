@@ -10,17 +10,17 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   const device = await devices.find(ctx.query.deviceId);
 
   if (!device) {
-    throw new Error('устройство не найдено');
+    ctx.throw(400, 'устройство не найдено');
   }
 
   const currDevice = await devices.find(i => i.uid === device.id && i.userId === ctx.state.user.id);
 
   if (!currDevice) {
-    throw new Error('устройство для пользователя не найдено');
+    ctx.throw(400, 'устройство для пользователя не найдено');
   }
 
   if (currDevice.state !== 'ACTIVE') {
-    throw new Error('устройство заблокировано');
+    ctx.throw(400, 'устройство заблокировано');
   }
 
   await next();

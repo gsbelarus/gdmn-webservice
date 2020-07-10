@@ -5,6 +5,7 @@ import { Text, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 import styles from '../../styles/global';
+import { useAuthStore } from '../../store';
 
 type Props = {
   deviceRegistered?: boolean;

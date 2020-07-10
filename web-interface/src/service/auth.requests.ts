@@ -62,8 +62,8 @@ const signup = async (userName: string, password: string, companyId?: string, cr
   } as INetworkError;
 };
 
-const createCode = async (userId: string) => {
-  const res = await get<IResponse<string>>(`/auth/user/${userId}/device/code?deviceId=${DEVICE_ID}`);
+const createCode = async (deviceId: string) => {
+  const res = await get<IResponse<string>>(`/auth/device/${deviceId}/code`);
 
   if (res.result) {
     return {

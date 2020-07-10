@@ -70,7 +70,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, userID, companyID },
+    state: { deviceRegistered, deviceId, userID, companyID },
     actions: authActions,
   } = useAuthStore();
 
@@ -109,6 +109,10 @@ const AuthNavigator = () => {
         // );
         setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
         authActions.setUserStatus({ userID: null });
+        if (!response.result) {
+          // устройства нет на сервере, сбросим DeviceId на сутройстве
+          actions.setDeviceId(null);
+        }
         authActions.setDeviceStatus(response.result);
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });
@@ -118,22 +122,7 @@ const AuthNavigator = () => {
     if (deviceRegistered === undefined && state.serverReq?.isLoading) {
       getDeviceStatus();
     }
-    // if (deviceRegistered === undefined && state.serverReq?.isLoading) {
-    //   console.log('break request');
-    //   timeoutWithСancellation(signal, 5000, apiService.auth.getDevice())
-    //     .then((response: IResponse<IDevice>) =>
-    //       setState({ type: 'SET_RESPONSE', result: response.result, data: response.data }),
-    //     )
-    //     .catch((err: Error) => setState({ type: 'SET_ERROR', text: err.message }));
-    // }
-  }, [apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
-
-  /*   useEffect(() => {
-    if (state.serverResp) {
-      // TODO вызов 3 раза
-      authActions.setDeviceStatus(state.serverResp.result as boolean);
-    }
-  }, [authActions, state.serverResp]); */
+  }, [actions, apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
 
   useEffect(() => {
     /* 2. Если устройства найдено (deviceRegistered = true)
@@ -253,8 +242,9 @@ const AuthNavigator = () => {
     [deviceRegistered, LoginComponent],
   );
 
+  /* Еели deviceRegistered и userId не определены то отображаем страницу подключения */
   const AuthConfig = useMemo(() => {
-    return deviceRegistered !== undefined && userID !== undefined ? (
+    return !(deviceRegistered === undefined || userID === undefined) ? (
       RegisterComponent
     ) : (
       <Stack.Screen
