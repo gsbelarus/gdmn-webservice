@@ -8,7 +8,6 @@ export default {
   debug: {
     showWarnings: true,
     useMockup: true,
-    deviceId: '11B67E8B-9D5D-4D39-B22B-72FE93154536',
   },
   system: [{
     name: "SellDocuments",
@@ -19,5 +18,5 @@ export default {
       tabBarIcon: 'file-document-box',
       tabBarColor: '#CEE7E3',
     }
-  }]  
+  }]
 };

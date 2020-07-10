@@ -79,7 +79,7 @@ const SettingsScreen = () => {
           }
           const messages = response.data.filter((message) => message.body.type === 'data');
           if (messages.length !== 0) {
-            messages.forEach( message => {
+            messages.forEach((message) => {
               /* Обработка данных по справочникам */
               const ref = (message.body.payload as unknown) as IReference[];
               const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
@@ -93,26 +93,27 @@ const SettingsScreen = () => {
 
               apiService.data.deleteMessage(companyID, message.head.id);
               // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
-            })
+            });
           }
           /* Обработка сообщений, которые связаны с документами */
-          const messagesForDocuments = response.data.filter((message) => message.body.type === 'response' && message.body.payload.name === 'post_documents');
-          if(messagesForDocuments.length > 0) {
-            messagesForDocuments.forEach(message => {
+          const messagesForDocuments = response.data.filter(
+            (message) => message.body.type === 'response' && message.body.payload.name === 'post_documents',
+          );
+          if (messagesForDocuments.length > 0) {
+            messagesForDocuments.forEach((message) => {
               if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-                message.body.payload.params.forEach(paramDoc => {
-                  if(paramDoc.result) {
-                    const document = documents.find(doc => doc.id === paramDoc.docId);
-                    if(document && document.head.status === 2) {
-                      appActions.editStatusDocument({id: paramDoc.docId, status: 3 })
+                message.body.payload.params.forEach((paramDoc) => {
+                  if (paramDoc.result) {
+                    const document = documents.find((doc) => doc.id === paramDoc.docId);
+                    if (document && document.head.status === 2) {
+                      appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
                     }
                   }
-                })
+                });
               }
               apiService.data.deleteMessage(companyID, message.head.id);
-            })
+            });
           }
-
         } catch (err) {
           Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
