@@ -4,9 +4,9 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
+import { appStorage } from '../../helpers/utils';
 import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
-import { appStorage } from '../../helpers/utils';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
@@ -14,7 +14,10 @@ const CompaniesScreen = () => {
 
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
-  const { state: { userID }, actions } = useAuthStore();
+  const {
+    state: { userID },
+    actions,
+  } = useAuthStore();
 
   useEffect(() => {
     const request = async () => {
@@ -26,20 +29,29 @@ const CompaniesScreen = () => {
     request();
   }, [apiService.auth]);
 
-  /* Когда получим список организаций пользователя, проверим,
-  есть ли у пользователя организация, под которой он заходил в последний раз,
-  входит ли этот пользователь ещё в эту организацию. */
   useEffect(() => {
+    const getCompanyId = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const savedCompany = await appStorage.getItem(`${userID}/companyId`);
+
+      /*
+        Автоматический вход:
+          Когда получим список организаций пользователя, проверим,
+          есть ли у пользователя организация, под которой он заходил в последний раз,
+          входит ли этот пользователь ещё в эту организацию.
+
+        TODO Если хотим сменить то происходит снова автоматический вход
+      */
+
+      // !!savedCompany && companies.some((company) => company === savedCompany)
+      //   ? actions.setCompanyID(savedCompany)
+      //   : undefined;
+    };
+
     if (userID !== null && companies) {
-      const getCompanyId = async() => {
-        const savedCompany = await appStorage.getItem(`${userID}/companyId`);
-        !!savedCompany && companies.some(company => company === savedCompany)
-          ? actions.setCompanyID(savedCompany)
-          : undefined;
-      };
       getCompanyId();
     }
-  }, [userID, companies]);
+  }, [userID, companies, actions]);
 
   const logOut = async () => {
     const res = await apiService.auth.logout();

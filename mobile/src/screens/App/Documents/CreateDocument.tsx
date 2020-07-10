@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert, Route } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
 import { useAppStore } from '../../../store';
@@ -12,8 +12,8 @@ export interface ICreateDocumentRef {
 }
 
 interface MyInputProps {
-  route: any;
-  navigation: any;
+  route: Route;
+  navigation: unknown;
 }
 
 const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ route }, ref) => {

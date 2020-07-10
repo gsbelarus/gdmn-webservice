@@ -1,21 +1,22 @@
 import React from 'react';
 import { Stack } from 'office-ui-fabric-react';
-import { IUser, IUserCompany, IDevice } from '../types';
+import { IUser, IUserCompany } from '../types';
 import { User } from './User';
 import { CompanyList } from './CompanyList';
 import { DeviceList } from './DeviceList';
+import { IDeviceInfo } from '../../../common';
 
 export interface IProfileProps {
   user: IUser;
   companies?: IUserCompany[];
-  devices?: IDevice[];
+  devices?: IDeviceInfo[];
   isEditOK?: boolean;
   onClearEditOK?: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
-  onGetCode: (uId: string) => void;
+  onGetCode: (deviceId: string) => void;
   isCanEditUser?: boolean;
   isCanEditDevices?: boolean;
 }

@@ -1,12 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { IColumn, DetailsList, SelectionMode, Stack, PrimaryButton, Selection } from 'office-ui-fabric-react';
-import { IItem, IDevice, IDeviceState } from '../types';
+import { IItem } from '../types';
+import { IDeviceInfo } from '../../../common';
 
 export interface IDeviceListProps {
-  devices: IDevice[];
+  devices: IDeviceInfo[];
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
-  onGetCode: (uId: string) => void;
+  onGetCode: ( deviceId: string) => void;
   onClearError: () => void;
   isCanEditDevices?: boolean;
 }
@@ -15,11 +16,12 @@ export const DeviceList = ({ devices, onClearError, onRemoveDevices, onBlockDevi
   const [selectedItems, setSelectedItems] = useState([] as string[]);
   const selection = useRef(new Selection({
     onSelectionChanged: () => {
-      const newSelection = selection.current.getSelection().map( s => s.key ).filter( s => typeof s === 'string' ) as typeof selectedItems;
+      const newSelection = selection.current.getSelection().map(s => s.key).filter( s => typeof s === 'string' ) as typeof selectedItems;
       setSelectedItems(newSelection);
     }
   }));
-  const deviceItems: IItem[] = devices.map(d => ({key: d.title, name: d.title, state: d.state})) || [];
+
+  const deviceItems: IItem[] = devices.map(d => ({key: d.id, name: d.deviceName, state: d.state})) || [];
   const deviceColumns: IColumn[] = [{
     key: 'title',
     name: 'Устройство',

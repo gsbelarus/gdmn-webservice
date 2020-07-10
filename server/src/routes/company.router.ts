@@ -1,8 +1,8 @@
 import Router from 'koa-router';
 import {
   addCompany,
-  editCompanyProfile,
-  getCompanyProfile,
+  updateCompany,
+  getCompany,
   getUsersByCompany,
   getCompanies,
   deleteCompany,
@@ -14,8 +14,8 @@ import { deviceMiddleware } from '../middleware/deviceRequired';
 const router = new Router({ prefix: '/companies' });
 
 router.post('/', addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
-router.get('/:id', compose([authMiddleware, deviceMiddleware]), getCompanyProfile);
-router.patch('/:id', compose([authMiddleware, deviceMiddleware]), editCompanyProfile);
+router.get('/:id', compose([authMiddleware, deviceMiddleware]), getCompany);
+router.patch('/:id', compose([authMiddleware, deviceMiddleware]), updateCompany);
 router.get('/:id/users', compose([authMiddleware, deviceMiddleware]), getUsersByCompany);
 router.delete('/:id', compose([authMiddleware, deviceMiddleware]), deleteCompany);
 router.get('/', compose([authMiddleware, deviceMiddleware]), getCompanies);

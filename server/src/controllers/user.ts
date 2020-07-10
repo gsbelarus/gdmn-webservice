@@ -1,10 +1,9 @@
-import { readFile, writeFile } from '../utils/workWithFile';
-import { PATH_LOCAL_DB_USERS, PATH_LOCAL_DB_DEVICES, PATH_LOCAL_DB_ACTIVATION_CODES } from '../server';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
-import { IResponse, IDevice, IActivationCode, IUser, IMakeUser } from '../../../common';
+import { IResponse, IUser, IUserProfile, IDeviceInfo } from '../../../common';
+import { userService } from '../services';
 
-export const makeUser = (user: IUser) => ({
+export const makeProfile = (user: IUser) => ({
   id: user.id,
   userName: user.userName,
   firstName: user.firstName,
@@ -14,158 +13,113 @@ export const makeUser = (user: IUser) => ({
   creatorId: user.creatorId,
 });
 
+const getUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: userId } = ctx.params;
+
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  try {
+    const profile = await userService.findOne(userId);
+
+    if (!profile) {
+      ctx.throw(404, 'пользователь не найден');
+    }
+
+    const result: IResponse<IUserProfile> = { result: true, data: makeProfile(profile) };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUser: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const result: IResponse<IMakeUser[]> = {
-    result: true,
-    data: !allUsers || !allUsers.length ? [] : allUsers.map(makeUser),
-  };
-  log.info('get users by device successfully');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
-};
+  try {
+    const user = await userService.findAll();
 
-const getProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const user = allUsers && allUsers.find(user => user.id === userId);
-  ctx.type = 'application/json';
-  if (!allUsers || user === undefined) {
-    log.info(`no such user`);
-    const res: IResponse<string> = { result: false, error: 'no such user' };
-    ctx.status = 404;
-    ctx.body = JSON.stringify(res);
-    return;
+    const result: IResponse<IUserProfile[]> = { result: true, data: user };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsers: OK');
+  } catch (err) {
+    ctx.throw(400, err);
   }
-  log.info('getUser successfully returned');
-  const result: IResponse<IMakeUser> = { result: true, data: makeUser(user) };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
 };
 
-const editProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const newUser = ctx.request.body;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const idx = allUsers && allUsers.findIndex(user => user.id === userId);
-  ctx.type = 'application/json';
+const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: userId } = ctx.params;
+  const { body: user } = ctx.request;
 
-  if (!allUsers || idx === undefined || idx < 0) {
-    log.warn(`no such user(${newUser.userName})`);
-    const res: IResponse<string> = { result: false, error: 'no such user' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
-  delete newUser.id;
-  delete newUser.creatorId;
-  delete newUser.password;
-  const user = { ...allUsers[idx], ...newUser };
+  if (!user) {
+    ctx.throw(400, 'не указаны данные пользователя');
+  }
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify([...allUsers.slice(0, idx), user, ...allUsers.slice(idx + 1)]));
-  delete user.password;
-  const result: IResponse<IMakeUser> = { result: true, data: user };
-  log.info('user edited successfully');
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
-};
+  try {
+    const id = await userService.updateOne({ ...user, id: userId });
 
-interface IDeviceState {
-  uid: string;
-  state: string;
-}
+    const result: IResponse<string> = { result: true, data: id };
 
-const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const userId: string = ctx.params.id;
-  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const result: IResponse<IDeviceState[]> = {
-    result: true,
-    data:
-      !allDevices || !allDevices.length
-        ? []
-        : allDevices
-            .filter(device => device.user === userId)
-            .map(device => ({ uid: device.uid, title: device.title, state: device.isBlock ? 'blocked' : 'active' })),
-  };
-  log.info('get devices by user successfully');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('updateUser: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const newUsers = allUsers?.filter(el => id !== el.id);
-  ctx.type = 'application/json';
+  const { id: userId } = ctx.params;
 
-  if (allUsers?.length === newUsers?.length) {
-    log.warn('no such user');
-    const res: IResponse<string> = { result: false, error: 'no such user' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
-  const allDevices: IDevice[] | undefined = await readFile(PATH_LOCAL_DB_DEVICES);
-  const newDevices = allDevices?.filter(el => id !== el.user);
+  // TODO пользовате
+  try {
+    await userService.deleteOne(userId);
 
-  const allCodes: IActivationCode[] | undefined = await readFile(PATH_LOCAL_DB_ACTIVATION_CODES);
-  const newCodes = allCodes?.filter(el => id !== el.user);
+    const result: IResponse<void> = { result: true };
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers ?? []));
+    ctx.status = 200;
+    ctx.body = result; //TODO передавать только код 204 без body
 
-  if (allDevices !== newDevices) await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(newDevices ?? []));
-
-  if (allCodes !== newCodes) await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(newCodes ?? []));
-
-  ctx.status = 204;
-  log.info('users removed successfully');
+    log.info('removeUser: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
-const addCompanyToUser = async (userId: string, companies: string[]) => {
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  const user = allUsers?.filter(item => item.id === userId)[0];
+const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: userId } = ctx.params;
 
-  if (!(user && allUsers)) return;
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
 
-  const idx = allUsers.findIndex(item => item.userName === user.userName);
+  try {
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDeviceInfo[];
 
-  if (!allUsers || idx === undefined || idx < 0) return 1;
+    const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
 
-  await writeFile(
-    PATH_LOCAL_DB_USERS,
-    JSON.stringify([
-      ...allUsers.slice(0, idx),
-      { ...user, companies: user && user.companies ? [...user?.companies, ...companies] : companies },
-      ...allUsers.slice(idx + 1),
-    ]),
-  );
-  return 1;
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getDevicesByUser: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
-// const removeUsersFromCompany = async (ctx: ParameterizedContext): Promise<void> => {
-//   if (ctx.isAuthenticated()) {
-//     const companyId: string = ctx.params.id;
-//     const users: string[] = ctx.request.body?.users;
-//     const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-//     const newUsers = allUsers?.map(el =>
-//       users.findIndex((u: string) => u === el.id) !== -1
-//         ? { ...el, companies: el.companies?.filter(o => o !== companyId) }
-//         : el,
-//     );
-//     /** Пока только удалим организацию у пользователей */
-//     await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(newUsers));
-
-//     ctx.body = JSON.stringify({ status: 200, result: 'users removed successfully' });
-//     log.info('users removed successfully');
-//   } else {
-//     ctx.status = 403;
-//     ctx.body = JSON.stringify({ status: 403, result: 'access denied' });
-//     log.warn('access denied');
-//   }
-// };
-
-export { getDevicesByUser, getUsers, getProfile, removeUser, editProfile, addCompanyToUser };
+export { getDevicesByUser, getUsers, getUser, removeUser, updateUser };

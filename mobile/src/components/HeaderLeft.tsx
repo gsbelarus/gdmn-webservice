@@ -7,18 +7,13 @@ interface IProps {
   onPress: () => void;
 }
 
-const HeaderLeft = ({text, onPress}: IProps) => {
-
+const HeaderLeft = ({ text, onPress }: IProps) => {
   return (
-    <Button
-      onPress={onPress}
-      mode="text"
-      style={localeStyles.marginLeft}
-    >
+    <Button onPress={onPress} mode="text" style={localeStyles.marginLeft}>
       {text}
     </Button>
   );
-}
+};
 
 export { HeaderLeft };
 
