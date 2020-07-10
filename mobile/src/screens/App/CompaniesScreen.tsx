@@ -31,6 +31,7 @@ const CompaniesScreen = () => {
 
   useEffect(() => {
     const getCompanyId = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const savedCompany = await appStorage.getItem(`${userID}/companyId`);
 
       /*
@@ -84,8 +85,8 @@ const CompaniesScreen = () => {
                 </Chip>
               ))
             ) : (
-                <Text>Вы не состоите ни в одной Организации</Text>
-              )}
+              <Text>Вы не состоите ни в одной Организации</Text>
+            )}
           </ScrollView>
         </View>
         <View style={localeStyles.buttonView}>

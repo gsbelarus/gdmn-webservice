@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials, IUser } from '../../../../common';
+import { IResponse, IUserCredentials } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';

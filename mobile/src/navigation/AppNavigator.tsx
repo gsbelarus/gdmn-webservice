@@ -1,12 +1,12 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 
+import { HeaderRight } from '../components/HeaderRight';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
 import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
-import { HeaderRight } from '../components/HeaderRight';
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -48,13 +48,23 @@ const AppNavigator = () => {
           initialParams={{ prodId: 0 }}
           options={({ route, navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              prodRef.current?.done();
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  prodRef.current?.done();
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -63,12 +73,22 @@ const AppNavigator = () => {
           component={CreateDocumentComponent}
           options={({ navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('DocumentsListScreen');
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              docRef.current?.done();
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('DocumentsListScreen');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  docRef.current?.done();
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -77,9 +97,14 @@ const AppNavigator = () => {
           component={ProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
       </Stack.Navigator>

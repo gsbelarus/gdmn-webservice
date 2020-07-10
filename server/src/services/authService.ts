@@ -20,8 +20,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   const device = await devices.find(device => device.uid === deviceId && device.userId === user.id);
 
   if (!device) {
-    // ctx.throw(401, 'не пройдена аутентификация');
-    throw new Error(`устройство ${deviceId} у пользователя не найдено`);
+    throw new Error(`связанное с пользователем устройство не найдено`);
   }
 
   if (device.state === 'BLOCKED') {
@@ -48,12 +47,13 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   if (!(await users.read()).length) {
-    await users.insert({
+    const gdmnUser = await users.insert({
       userName: 'gdmn',
       creatorId: user.userName,
       password: 'gdmn',
       companies: [],
     });
+    await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
   }
 
   const userid = await userService.addOne(user);

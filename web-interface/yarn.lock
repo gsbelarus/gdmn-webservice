@@ -1501,10 +1501,10 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/react@^10.4.4":
-  version "10.4.4"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-10.4.4.tgz#f05edf827df288c6c7b19fe96fff2b33cddbb809"
-  integrity sha512-SKDQ2jBdg9UQQYQragkvXOzNp4hnCdOvXyZ52rg+OXiiumVxkAutdvvRzBF4PrbvMQ27Z6gx0GVo2YQ1Mcip8g==
+"@testing-library/react@^10.4.5":
+  version "10.4.5"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-10.4.5.tgz#e66e004d6beb60a26b4e5d4e4d9989738d7077f3"
+  integrity sha512-M5A0W4VphBiEm4vgnq7vHC+/e4Bp/3iIOAWap1FtIiA+Zom6BtXpY3RSTOqc8bZsCcu9gFBZ/lxaiMW6uJddWg==
   dependencies:
     "@babel/runtime" "^7.10.3"
     "@testing-library/dom" "^7.17.1"
@@ -1624,10 +1624,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
   integrity sha512-syUgf67ZQpaJj01/tRTknkMNoBBLWJOBODF0Zm4NrXmiSuxjymFrxnTu1QVYRubhVkRcZLYZG8STTwJRdVm/WQ==
 
-"@types/node@^14.0.18":
-  version "14.0.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.18.tgz#5111b2285659442f9f95697386a2b42b875bd7e9"
-  integrity sha512-0Z3nS5acM0cIV4JPzrj9g/GH0Et5vmADWtip3YOXOp1NpOLU8V3KoZDc8ny9c1pe/YSYYzQkAWob6dyV/EWg4g==
+"@types/node@^14.0.20":
+  version "14.0.20"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.20.tgz#0da05cddbc761e1fa98af88a17244c8c1ff37231"
+  integrity sha512-MRn/NP3dee8yL5QhbSA6riuwkS+UOcsPUMOIOG3KMUQpuor/2TopdRBu8QaaB4fGU+gz/bzyDWt0FtUbeJ8H1A==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"

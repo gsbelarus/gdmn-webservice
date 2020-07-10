@@ -70,10 +70,11 @@ export interface IMessage {
   id?: string;
   head: {
     id: string;
+    appSystem: string;    
+    companyid: string;
     producer: string;
     consumer: string;
     dateTime: string;
-    appSystem: string;
   };
   body: {
     type: string;

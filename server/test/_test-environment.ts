@@ -52,8 +52,16 @@ export async function initEnvironment(): Promise<void> {
     { id: 'fir', title: 'fir', admin: '1' },
   ];
   const activationCodes: IActivationCode[] = [
-    { code: '123qwe', user: 'admin', date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString() },
-    { code: 'asd456', user: 'admin', date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString() },
+    {
+      code: '123qwe',
+      deviceId: '',
+      date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString(),
+    },
+    {
+      code: 'asd456',
+      deviceId: '',
+      date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString(),
+    },
   ];
   const messages4Com = {
     head: {

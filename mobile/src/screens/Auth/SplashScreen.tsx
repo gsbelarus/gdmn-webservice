@@ -5,7 +5,6 @@ import { Text, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 import styles from '../../styles/global';
-import { useServiceStore } from '../../store';
 
 type Props = {
   deviceRegistered?: boolean;
@@ -21,7 +20,6 @@ type Props = {
 const SplashScreen = (props: Props) => {
   const { serverName, isLoading, isError, status, connection, breakConnection, showSettings } = props;
   const { colors } = useTheme();
-  const { actions, state } = useServiceStore();
 
   return (
     <>
@@ -34,8 +32,6 @@ const SplashScreen = (props: Props) => {
             backgroundColor: colors.background,
           }}
         >
-          {/* actions, state */}
-          <Text style={localStyles.errorText}>deviceId: {state.deviceId}</Text>
           {isError && <Text style={localStyles.errorText}>Ошибка: {status}</Text>}
           {isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
@@ -63,8 +59,7 @@ const SplashScreen = (props: Props) => {
         <IconButton
           icon="settings"
           size={30}
-          // onPress={showSettings}
-          onPress={() => actions.setDeviceId(null)}
+          onPress={showSettings}
           style={{
             ...styles.circularButton,
             backgroundColor: colors.primary,

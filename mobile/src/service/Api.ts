@@ -11,9 +11,9 @@ import {
   IGood,
   IUserCredentials,
 } from '../../../common';
+import config from '../config';
 import { INewDevice } from '../model';
 import { get, post, remove } from './http.service';
-import config from '../config';
 
 export default class Api {
   baseUrl: IBaseUrl;
@@ -66,12 +66,12 @@ export default class Api {
     ): Promise<IResponse<IMessageInfo>> =>
       post(
         this.getUrl(),
-        `/messages/?deviceId=${this.deviceId}`,
+        `/messages?deviceId=${this.deviceId}`,
         JSON.stringify({ head: { companyId, consumer, appSystem: config.system[0].name }, body }),
       ),
 
     getMessages: async (companyId: string): Promise<IResponse<IMessage[]>> =>
-      get(this.getUrl(), `/messages/${companyId}?deviceId=${this.deviceId}`),
+      get(this.getUrl(), `/messages/${companyId}/${config.system[0].name}?deviceId=${this.deviceId}`),
 
     deleteMessage: async (companyId: string, uid: string): Promise<IResponse<void>> =>
       remove(this.getUrl(), `/messages/${companyId}/${uid}?deviceId=${this.deviceId}`),

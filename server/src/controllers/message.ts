@@ -2,124 +2,99 @@ import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IMessage } from '../../../common';
+import { messageService, companyService } from '../services';
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { head, body } = ctx.request.body;
-  ctx.type = 'application/json';
 
-  if (!ctx.state.user.companies) {
-    log.warn(`The User (${ctx.state.user.id}) does not belongs to the Company (${head.companyId})`);
-    const result: IResponse<string> = {
-      result: false,
-      error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
-    };
-    ctx.status = 403;
-    ctx.body = JSON.stringify(result);
-    return;
+  if (!head) {
+    ctx.throw(400, 'отсутствует заголовок сообщения');
   }
 
-  if (!((ctx.state.user.companies as unknown) as string[]).find(item => item === head.companyId)) {
-    log.warn(`The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`);
-    const result: IResponse<string> = {
-      result: false,
-      error: `The User (${ctx.state.user.id}) does not belong to the Company (${head.companyId})`,
-    };
-    ctx.status = 403;
-    ctx.body = JSON.stringify(result);
-    return;
+  if (!body) {
+    ctx.throw(400, 'отсутствует сообщение');
   }
 
-  if (!body || !body.type || !body.payload) {
-    log.warn('incorrect format message');
-    const result: IResponse<string> = {
-      result: false,
-      error: `incorrect format message`,
-    };
-    ctx.status = 400;
-    ctx.body = JSON.stringify(result);
-    return;
+  if (!(body.type && body.payload && head.companyId)) {
+    ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  const uuid = uuidv1();
-  const msgObject: IMessage = {
-    head: {
-      id: uuid,
-      consumer: head.consumer || 'gdmn',
-      producer: ctx.state.user.id,
-      dateTime: new Date().toISOString(),
-      appSystem: head.appSystem,
-    },
-    body,
-  };
+  if (!(ctx.state.user.companies as string[]).find(item => item === head.companyId)) {
+    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
+  }
 
-  /*   await writeFile({
-      filename: `${PATH_LOCAL_DB_MESSAGES}${head.companyId}\\${uuid}.json`,
-      data: JSON.stringify(msgObject),
-    });
-  */
-  log.info(`new message in queue: ${uuid}`);
-  const result: IResponse<{ uid: string; date: Date }> = {
-    result: true,
-    data: { uid: uuid, date: new Date() },
-  };
+  try {
+    const msgObject: IMessage = {
+      head: {
+        id: uuidv1(),
+        companyid: head.companyId,
+        consumer: head.consumer || 'gdmn',
+        producer: ctx.state.user.id,
+        dateTime: new Date().toISOString(),
+        appSystem: head.appSystem,
+      },
+      body,
+    };
+    const messageId = await messageService.addOne(msgObject);
 
-  ctx.status = 201;
-  ctx.body = JSON.stringify(result);
+    const result: IResponse<{ uid: string; date: Date }> = { result: true, data: { uid: messageId, date: new Date() } };
+
+    ctx.status = 201;
+    ctx.body = result;
+
+    log.info(`newMessage: OK`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId } = ctx.params;
-  const result: IMessage[] = [];
-  ctx.type = 'application/json';
+  const { companyId: companyName, appSystem } = ctx.params;
 
-  /*   try {
-      const nameFiles = await promises.readdir(`${PATH_LOCAL_DB_MESSAGES}${companyId}`);
-      for await (const newFile of nameFiles) {
-        const data = await readFile(`${PATH_LOCAL_DB_MESSAGES}${companyId}\\${newFile}`);
-        result.push(data as IMessage);
-      }
-      log.info('get message');
-      const res: IResponse<IMessage[]> = {
-        result: true,
-        data: result.filter(res => res.head.consumer === ctx.state.user.userName),
-      };
-      ctx.status = 200;
-      ctx.body = JSON.stringify(res);
-    } catch (e) {
-      log.warn(`Error reading data from directory ${PATH_LOCAL_DB_MESSAGES}${companyId} - ${e}`);
-      const result: IResponse = {
-        result: false,
-        error: `file or directory not found`,
-      };
-      ctx.status = 404;
-      ctx.body = JSON.stringify(result);
-    } */
-  ctx.status = 404;
-  ctx.body = JSON.stringify(result);
+  if (!companyName) {
+    ctx.throw(400, 'не указана органиазция');
+  }
+
+  const company = await companyService.findOneByName(companyName);
+
+  try {
+    const userId = ctx.state.user.id;
+    const messageList = await messageService.FindMany({ appSystem, companyId: company.id, userId });
+
+    const result: IResponse<IMessage[]> = { result: true, data: messageList };
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('get message');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, id: uid } = ctx.params;
-  /*  const result = await remove(companyId, uid);
-   ctx.type = 'application/json';
 
-   let response: IResponse;
-   if (result === 'OK') {
-     ctx.status = 200;
-     response = {
-       result: true,
-     };
-     log.info('get message');
-   } else {
-     ctx.status = 422;
-     response = {
-       result: false,
-       error: `could not delete file`,
-     };
-   }
-   ctx.body = JSON.stringify(response);
-   */
-  ctx.body = JSON.stringify({});
+  if (!companyId) {
+    ctx.throw(400, 'не указана органиазция');
+  }
+
+  if (!uid) {
+    ctx.throw(400, 'не указан идентификатор сообщения');
+  }
+
+  try {
+    const userId = ctx.state.user.id;
+    await messageService.deleteByUid({ companyId, uid, userId });
+
+    const result: IResponse<void> = { result: true };
+
+    ctx.status = 200;
+    ctx.body = result; //TODO передавать только код 204 без body
+
+    log.info('removeMessage: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
 export { newMessage, removeMessage, getMessage };

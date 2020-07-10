@@ -73,15 +73,6 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
   return await devices.insert({ name: deviceName, uid: '', state: 'NEW', userId: userId });
 };
 
-/* const bindOne = async ({ deviceId, userId }: { uid: string; userId: string }) => {
-  devices.find(i => i.id === deviceId && i.userId === userId)
-  if (await ) {
-    throw new Error('устройство уже связано с пользователем');
-  }
-
-  return await device.insert({ deviceId, userId, state: '' });
-}; */
-
 /**
  * Обновляет устройство
  * @param {IDevice} device - устройство

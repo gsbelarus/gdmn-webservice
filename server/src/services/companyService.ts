@@ -48,6 +48,21 @@ const findOne = async (id: string): Promise<ICompany> => {
 };
 
 /**
+ * Возвращает одну организацию
+ * @param {string} name - наименование организации
+ * @return company, организация
+ * */
+const findOneByName = async (name: string): Promise<ICompany> => {
+  const company = await companies.find(i => i.title === name);
+
+  if (!company) {
+    throw new Error('организация не найдена');
+  }
+
+  return company;
+};
+
+/**
  * Возвращает все органиции
  * @param {string} id - идентификатор организации
  * @return company, организация
@@ -117,4 +132,4 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
   return (await users.read()).filter(el => el.companies?.some(i => i === company.title)).map(el => makeProfile(el));
 };
 
-export { findOne, findAll, addOne, updateOne, deleteOne, findUsers };
+export { findOne, findAll, addOne, updateOne, deleteOne, findUsers, findOneByName };

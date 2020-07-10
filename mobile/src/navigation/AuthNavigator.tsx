@@ -70,7 +70,7 @@ const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in 
 
 const AuthNavigator = () => {
   const {
-    state: { deviceRegistered, deviceId, userID, companyID },
+    state: { deviceRegistered, userID, companyID },
     actions: authActions,
   } = useAuthStore();
 
