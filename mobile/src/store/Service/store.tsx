@@ -50,7 +50,7 @@ const createStoreContext = () => {
         apiService.setDeviceId(state.deviceId); // в службе Service обновляем deviceId
       };
 
-      if (state.deviceId) {
+      if (state.deviceId !== undefined) {
         saveState();
       }
     }, [actions, state.deviceId]);

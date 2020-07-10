@@ -2,11 +2,11 @@ import Router from 'koa-router';
 import {
   addDevice,
   getDevices,
-  editDevice,
+  updateDevice,
   removeDevice,
   getDevice,
   getUsersByDevice,
-  getDeviceByCurrentUser,
+  getDeviceByUser,
 } from '../controllers/device';
 import compose from 'koa-compose';
 import { authMiddleware } from '../middleware/authRequired';
@@ -17,9 +17,11 @@ const router = new Router({ prefix: '/devices' });
 router.post('/', compose([deviceMiddleware, authMiddleware]), addDevice);
 router.get('/', compose([deviceMiddleware, authMiddleware]), getDevices);
 router.get('/:id', getDevice);
-router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
+router.get('/:id/user/:userName', getDeviceByUser);
+router.get('/:id/user/', getDeviceByUser);
+// router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
 router.get('/:id/users', compose([deviceMiddleware, authMiddleware]), getUsersByDevice);
-router.patch('/:id/user/:userId', compose([deviceMiddleware, authMiddleware]), editDevice);
+router.patch('/:id', compose([deviceMiddleware, authMiddleware]), updateDevice);
 router.delete('/:id', compose([deviceMiddleware, authMiddleware]), removeDevice);
 
 export default router;

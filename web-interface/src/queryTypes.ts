@@ -1,9 +1,9 @@
-import { IUser, IUserCompany, IDevice } from "./types";
-import { ICompany } from '../../common';
+import { IUser, IUserCompany } from "./types";
+import { ICompany, IDeviceInfo } from '../../common';
 
 export interface IQueryCommand {
   command: 'LOGIN' | 'GET_USER_DATA' | 'GET_COMPANIES' | 'SIGNUP' | 'LOGOUT' | 'GET_ALL_USERS' | 'GET_USER' | 'CREATE_CODE'
-  | 'GET_COMPANY' | 'CREATE_COMPANY' | 'UPDATE_COMPANY' | 'GET_USER_DEVICES' | 'UPDATE_USER' | 'GET_COMPANY_USERS'
+  | 'CREATE_DEVICENAME' | 'GET_COMPANY' | 'CREATE_COMPANY' | 'UPDATE_COMPANY' | 'GET_USER_DEVICES' | 'UPDATE_USER' | 'GET_COMPANY_USERS'
   | 'REMOVE_DEVICES' | 'BLOCK_DEVICES';
 };
 
@@ -44,6 +44,13 @@ export interface IUserData extends IQueryCommand {
 
 export interface ICreateCodeData extends IQueryCommand {
   command: 'CREATE_CODE';
+  userId: string;
+  deviceId: string;
+};
+
+export interface ICreateDeviceNameData extends IQueryCommand {
+  command: 'CREATE_DEVICENAME';
+  title: string;
   userId: string;
 };
 
@@ -91,7 +98,7 @@ export interface IBlockDevices extends IQueryCommand {
   isBlock: boolean
 };
 
-export type QueryCommand = ILoginCommand | IGetUserData | IGetCompaniesData | ISignUpCommand | ILogOutCommand
+export type QueryCommand = ILoginCommand | IGetUserData | IGetCompaniesData | ISignUpCommand | ILogOutCommand | ICreateDeviceNameData
   | IGetAllUsersData | IUserData | ICreateCodeData | IGetCompanyData | ICreateCompanyData
   | IUpdateCompanyData | IGetUserDevicesData | IUpdateUserData | IGetCompanyUsers | IRemoveDevices | IBlockDevices;
 
@@ -101,7 +108,7 @@ export interface INetworkError {
 };
 
 export interface IQueryResponse {
-  type: 'LOGIN' | 'USER' | 'USER_COMPANIES' | 'SIGNUP' | 'LOGOUT' | 'ALL_USERS' |  'GET_USER' | 'USER_CODE' | 'USER_COMPANY'
+  type: 'LOGIN' | 'USER' | 'USER_COMPANIES' | 'SIGNUP' | 'LOGOUT' | 'ALL_USERS' |  'GET_USER' | 'USER_CODE' | 'USER_COMPANY' | 'CREATE_DEVICENAME'
   | 'NEW_COMPANY' | 'NEW_USER' | 'UPDATE_COMPANY' | 'USER_DEVICES' | 'UPDATE_USER' | 'COMPANY_USERS' | 'USER_NOT_AUTHENTICATED'
   | 'USER_BY_NAME' | 'REMOVE_DEVICES' | 'BLOCK_DEVICES';
 };
@@ -132,7 +139,7 @@ export interface ICompaniesResponse extends IQueryResponse {
 
 export interface ISignUpResponse extends IQueryResponse {
   type: 'SIGNUP';
-  user: IUser;
+  userId: string;
 };
 
 export interface IAllUsersResponse extends IQueryResponse {
@@ -174,9 +181,14 @@ export interface ICreateUserResponse extends IQueryResponse {
   user: IUser;
 };
 
+export interface ICreateDeviceNameResponse extends IQueryResponse {
+  type: 'CREATE_DEVICENAME';
+  uid: string;
+};
+
 export interface IGetUserDevicesResponse extends IQueryResponse {
   type: 'USER_DEVICES';
-  devices: IDevice[];
+  devices: IDeviceInfo[];
 };
 
 export interface IUpdateUserResponse extends IQueryResponse {
@@ -194,10 +206,10 @@ export interface IRemoveDevicesResponse extends IQueryResponse {
 
 export interface IBlockDevicesResponse extends IQueryResponse {
   type: 'BLOCK_DEVICES';
-  device: IDevice;
+  deviceId: string;
 };
 
-export type QueryResponse = INetworkError | ILoginResponse | IUserResponse | ICompaniesResponse | ISignUpResponse
+export type QueryResponse = INetworkError | ILoginResponse | IUserResponse | ICompaniesResponse | ISignUpResponse | ICreateDeviceNameResponse
   | ILogOutResponse | IAllUsersResponse | IGetUserResponse | ICreateCodeResponse | IGetCompanyResponse | ICreateCompanyResponse
   | ICreateUserResponse | IUpdateCompanyResponse | IGetUserDevicesResponse | IUpdateUserResponse
   | IGetCompanyUsersResponse | IUserNotAuthResponse | IUserByNameResponse | IRemoveDevicesResponse | IBlockDevicesResponse;

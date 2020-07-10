@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Route } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
 import { ILine } from '../../../../../common';
@@ -13,7 +13,7 @@ export interface IProductDetailsRef {
 }
 
 interface MyInputProps {
-  route: any;
+  route: Route;
   navigation: any;
 }
 

@@ -7,7 +7,7 @@ import { deviceMiddleware } from '../middleware/deviceRequired';
 const router = new Router({ prefix: '/messages' });
 
 router.post('/', compose([authMiddleware, deviceMiddleware]), newMessage);
-router.get('/:companyId', compose([authMiddleware, deviceMiddleware]), getMessage);
+router.get('/:companyId/:appSystem', compose([authMiddleware, deviceMiddleware]), getMessage);
 router.delete('/:companyId/:id', compose([authMiddleware, deviceMiddleware]), removeMessage);
 
 export default router;
