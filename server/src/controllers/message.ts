@@ -47,6 +47,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
       consumer: head.consumer || 'gdmn',
       producer: ctx.state.user.id,
       dateTime: new Date().toISOString(),
+      appSystem: head.appSystem,
     },
     body,
   };

@@ -13,6 +13,7 @@ import {
 } from '../../../common';
 import { INewDevice } from '../model';
 import { get, post, remove } from './http.service';
+import config from '../config';
 
 export default class Api {
   baseUrl: IBaseUrl;
@@ -66,7 +67,7 @@ export default class Api {
       post(
         this.getUrl(),
         `/messages/?deviceId=${this.deviceId}`,
-        JSON.stringify({ head: { companyId, consumer }, body }),
+        JSON.stringify({ head: { companyId, consumer, appSystem: config.system[0].name }, body }),
       ),
 
     getMessages: async (companyId: string): Promise<IResponse<IMessage[]>> =>
