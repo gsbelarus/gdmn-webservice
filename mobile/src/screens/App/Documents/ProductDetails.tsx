@@ -25,13 +25,13 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
   const remain = state.remains.find((item) => item.goodId === route.params.prodId);
   const document = state.documents.find((item) => item.id === route.params.docId);
   const [line, setLine] = useState<ILine>(undefined);
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState('1.0');
 
   useEffect(() => {
     const lineDocument = document.lines.find((item) => item.goodId === route.params.prodId);
     if (lineDocument) {
       if (route.params.modeCor) {
-        setValue(lineDocument.quantity);
+        setValue(lineDocument.quantity.toString());
       }
       setLine(lineDocument);
     }
@@ -43,10 +43,13 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         actions.editLine({
           docId: route.params.docId,
           lineId: line.id,
-          value: route.params.modeCor ? value : value + line.quantity,
+          value: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
         });
       } else {
-        actions.addLine({ docId: route.params.docId, line: { id: '0', goodId: product.id, quantity: value } });
+        actions.addLine({
+          docId: route.params.docId,
+          line: { id: '0', goodId: product.id, quantity: Number.parseFloat(value) },
+        });
       }
       navigation.navigate('ViewDocument', { docId: route.params.docId });
     },
@@ -97,7 +100,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         label={'Количество'}
         editable={true}
         keyboardType="decimal-pad"
-        onChangeText={(newValue) => setValue(Number(newValue))}
+        onChangeText={(newValue) => setValue(newValue)}
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={true}
         value={value.toString()}

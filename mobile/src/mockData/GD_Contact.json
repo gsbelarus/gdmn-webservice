@@ -30,6 +30,16 @@
 		"type": 2
 	},
 	{
+		"id": 10,
+		"name": "&",
+		"type": 3
+  },
+  {
+		"id": 11,
+		"name": "GS",
+		"type": 3
+	},
+	{
 		"id": 6,
 		"name": "Sklad",
 		"type": 4

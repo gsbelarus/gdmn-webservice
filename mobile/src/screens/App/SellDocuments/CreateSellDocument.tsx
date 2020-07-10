@@ -4,11 +4,12 @@ import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
-import styles from '../../../styles/global';
-import { useAppStore } from '../../../store';
+
 import { IContact } from '../../../../../common';
-import { ISellHead } from '../../../model';
 import DropdownList from '../../../components/dropDown';
+import { ISellHead } from '../../../model';
+import { useAppStore } from '../../../store';
+import styles from '../../../styles/global';
 
 interface IItem {
   id?: number;
@@ -34,13 +35,16 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
-  const selectedItem = (listItems: IItem[], id: Number) => (listItems.find((item) => item.id === id));
-  const getListItems = (contacts: IContact[]) => contacts.map((item) => { return {id: item.id, value: item.name} as IItem});
-  const people: IContact[] = state.contacts.filter((item) => item.type == 2);
+  const selectedItem = (listItems: IItem[], id: number) => listItems.find((item) => item.id === id);
+  const getListItems = (contacts: IContact[]) =>
+    contacts.map((item) => {
+      return { id: item.id, value: item.name } as IItem;
+    });
+  const people: IContact[] = state.contacts.filter((item) => item.type === 2);
   const listPeople = getListItems(people);
-  const companies: IContact[] = state.contacts.filter((item) => item.type == 3);
+  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type == 4);
+  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
   const listDepartments = getListItems(departments);
 
   const today = new Date();
@@ -55,8 +59,12 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
 
   useImperativeHandle(ref, () => ({
     done: () => {
-      if (selectedExpeditor === undefined || selectedToContact === undefined || 
-        selectedFromContact === undefined || numberText === undefined) {
+      if (
+        selectedExpeditor === undefined ||
+        selectedToContact === undefined ||
+        selectedFromContact === undefined ||
+        numberText === undefined
+      ) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [
           {
             text: 'OK',
@@ -119,7 +127,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
   return (
     <>
       <ScrollView>
-        <View style={localeStyles.container}> 
+        <View style={localeStyles.container}>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
             <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
             <TouchableOpacity
@@ -159,14 +167,26 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
             <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
             <View key={11}>
-              <DropdownList list={listPeople} value = {selectedItem(listPeople, selectedExpeditor)} onValueChange={(item) => {setSelectedExpeditor(item.id)}}/>
+              <DropdownList
+                list={listPeople}
+                value={selectedItem(listPeople, selectedExpeditor)}
+                onValueChange={(item) => {
+                  setSelectedExpeditor(item.id);
+                }}
+              />
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-            <View  key={12}>
+            <View key={12}>
               {departments && departments.length !== 0 ? (
-                <DropdownList list={listDepartments} value = {selectedItem(listDepartments, selectedFromContact)} onValueChange={(item) => {setSelectedFromContact(item.id)}}/>
+                <DropdownList
+                  list={listDepartments}
+                  value={selectedItem(listDepartments, selectedFromContact)}
+                  onValueChange={(item) => {
+                    setSelectedFromContact(item.id);
+                  }}
+                />
               ) : (
                 <Text>Не найдено</Text>
               )}
@@ -176,33 +196,42 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
             <Text style={localeStyles.subdivisionText}>Организация: </Text>
             <View key={13}>
               {companies && companies.length !== 0 ? (
-                 <DropdownList list={listCompanies} value = {selectedItem(listCompanies, selectedToContact)} onValueChange={(item) => {setSelectedToContact(item.id)}}/>
+                <DropdownList
+                  list={listCompanies}
+                  value={selectedItem(listCompanies, selectedToContact)}
+                  onValueChange={(item) => {
+                    setSelectedToContact(item.id);
+                  }}
+                />
               ) : (
                 <Text>Не найдено</Text>
               )}
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {state.documentTypes && state.documentTypes.length !== 0 ? (
-              state.documentTypes.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[localeStyles.margin, selectedDocType === item.id ? { backgroundColor: colors.primary } : {}]}
-                  onPress={() => setSelectedDocType(item.id)}
-                  selected={selectedDocType === item.id}
-                  selectedColor={selectedDocType === item.id ? colors.card : colors.text}
-                >
-                  {item.name}
-                </Chip>
-              ))
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </ScrollView>
-        </View>
+            <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
+            <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+              {state.documentTypes && state.documentTypes.length !== 0 ? (
+                state.documentTypes.map((item, idx) => (
+                  <Chip
+                    key={idx}
+                    mode="outlined"
+                    style={[
+                      localeStyles.margin,
+                      selectedDocType === item.id ? { backgroundColor: colors.primary } : {},
+                    ]}
+                    onPress={() => setSelectedDocType(item.id)}
+                    selected={selectedDocType === item.id}
+                    selectedColor={selectedDocType === item.id ? colors.card : colors.text}
+                  >
+                    {item.name}
+                  </Chip>
+                ))
+              ) : (
+                <Text>Не найдено</Text>
+              )}
+            </ScrollView>
+          </View>
 
           {isDatePickerVisible &&
             (Platform.OS !== 'ios' ? (
@@ -279,20 +308,12 @@ const localeStyles = StyleSheet.create({
     padding: 5,
   },
   areaPicker: {
+    backgroundColor: 'white',
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
     margin: 0,
     padding: 0,
-    backgroundColor: 'white',
-  },
-  pickerView: {
-    margin: 1,
-    paddingHorizontal: 0,
-    color: 'black',
-    fontSize: 12,
-    height: 35,
-    borderWidth: 1,
   },
   button: {
     flex: 1,
@@ -324,38 +345,46 @@ const localeStyles = StyleSheet.create({
     margin: 10,
     paddingVertical: 10,
   },
+  filter: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 5,
+  },
   margin: {
     margin: 2,
   },
   marginRight: {
     marginRight: 10,
   },
+  pickerView: {
+    borderWidth: 1,
+    color: 'black',
+    fontSize: 12,
+    height: 35,
+    margin: 1,
+    paddingHorizontal: 0,
+  },
   scroll: {
     maxHeight: 150,
-  },
-  scrollOut: {
-    maxHeight: 400,
   },
   scrollContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  scrollOut: {
+    maxHeight: 400,
+  },
   subdivisionText: {
+    flex: 1,
     marginBottom: 5,
     textAlign: 'left',
-    flex: 1,
   },
   textDate: {
     flex: 1,
     flexGrow: 4,
     fontSize: 20,
     textAlign: 'center',
-  },
-  filter: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 5,
   },
   textInput: {
     fontSize: 14,

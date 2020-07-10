@@ -5,8 +5,8 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text } from 'react-native-paper';
 
 import { IDocument, IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
-import { timeout } from '../../../helpers/utils';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
@@ -19,6 +19,12 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
+  const fromContact = state.contacts
+    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)
+    : undefined;
+  const expeditor = state.contacts
+    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.expeditorId)
+    : undefined;
 
   return (
     <TouchableOpacity
@@ -40,11 +46,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение:{' '}
-            {state.contacts?.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)?.name}
+            Подразделение: {fromContact ? fromContact.name : ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {state.contacts?.find((contact) => contact.id === (item.head as ISellHead)?.expeditorId).name}
+            Экспедитор: {expeditor ? expeditor.name : ''}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
             {state.contacts?.find((contact) => contact.id === item.head?.tocontactId).name}
@@ -68,7 +73,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   const sendUpdateRequest = async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
-    
+
     timeout(
       5000,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
