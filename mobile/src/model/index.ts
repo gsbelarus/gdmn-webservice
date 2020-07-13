@@ -1,9 +1,9 @@
-import { IDocument, IRemain, IGood, IDocumentType, IContact, IReference, IBaseUrl, IInventoryDocumentType } from '../../../common';
-import { ISellDocument } from './sell';
-export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara} from './sell';
+import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '../../../common';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
+import { ISellDocument } from './sell';
+export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara } from './sell';
 
 export interface IServiceContextProps {
   state: IServiceState;
@@ -65,6 +65,6 @@ export interface IAppState {
   settings?: IAppSettings;
   remains?: IRemain[];
   goods?: IGood[];
-  documentTypes?: (IDocumentType | IInventoryDocumentType)[];
+  documentTypes?: IDocumentType[];
   contacts?: IContact[];
 }

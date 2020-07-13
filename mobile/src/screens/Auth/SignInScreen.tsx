@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials, IUser } from '../../../../common';
+import { IResponse, IUserCredentials } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
@@ -29,6 +29,8 @@ const SignInScreen = () => {
     isError: false,
     status: undefined,
   });
+
+  const { actions: authActions } = useAuthStore();
 
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
@@ -76,26 +78,57 @@ const SignInScreen = () => {
     if (!loginState.isLoading) {
       return;
     }
-    timeout(5000, apiService.auth.login(credential))
-      .then((data: IResponse<IUser>) => {
-        data.result
-          ? actions.setUserStatus({
-              userID: data.data.id,
-            }) /* Сделать как в AuthNav а лучше 1 вариант на 2 запроса*/
-          : setLoginState({
-              isLoading: false,
-              status: data.error,
-              isError: true,
-            });
-      })
-      .catch((err: Error) =>
+
+    const LoginUser = async () => {
+      try {
+        const device = await apiService.auth.getDeviceByUser(credential.userName);
+
+        if (device.error === 'устройство не найдено') {
+          // Устройство не найдено. Перенаправляем на ввод кода активации
+          authActions.setUserStatus({ userID: null });
+          authActions.setDeviceStatus(false);
+          return;
+        }
+
+        if (!device.result) {
+          setLoginState({
+            isLoading: false,
+            status: device.error,
+            isError: true,
+          });
+          return;
+        }
+      } catch (err) {
         setLoginState({
           isLoading: false,
           status: err.message,
           isError: true,
-        }),
-      );
-  }, [actions, apiService.auth, credential, credential.userName, loginState.isLoading]);
+        });
+        return;
+      }
+
+      try {
+        const res = await timeout<IResponse<string>>(5000, apiService.auth.login(credential));
+
+        res.result
+          ? actions.setUserStatus({
+              userID: res.data,
+            })
+          : setLoginState({
+              isLoading: false,
+              status: res.error,
+              isError: true,
+            });
+      } catch (err) {
+        setLoginState({
+          isLoading: false,
+          status: err.message,
+          isError: true,
+        });
+      }
+    };
+    LoginUser();
+  }, [actions, apiService.auth, authActions, credential, credential.userName, loginState.isLoading]);
 
   return (
     <>

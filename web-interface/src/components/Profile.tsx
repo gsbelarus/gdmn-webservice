@@ -1,24 +1,28 @@
 import React from 'react';
 import { Stack } from 'office-ui-fabric-react';
-import { IUser, IUserCompany, IDevice } from '../types';
+import { IUser, IUserCompany } from '../types';
 import { User } from './User';
 import { CompanyList } from './CompanyList';
 import { DeviceList } from './DeviceList';
+import { IDeviceInfo } from '../../../common';
 
 export interface IProfileProps {
   user: IUser;
   companies?: IUserCompany[];
-  devices?: IDevice[];
+  devices?: IDeviceInfo[];
   isEditOK?: boolean;
   onClearEditOK?: () => void;
   onEditProfile: (user: IUser) => void;
   onClearError: () => void;
-  onRemoveDevices?: (uIds: string[]) => void;
-  onBlockDevices?:  (uIds: string[], isUnBlock: boolean) => void;
+  onRemoveDevices: (uIds: string[]) => void;
+  onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
+  onGetCode: (deviceId: string) => void;
   isCanEditUser?: boolean;
+  isCanEditDevices?: boolean;
 }
 
-export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices, isCanEditUser, onRemoveDevices, onBlockDevices }: IProfileProps) => {
+export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK, devices,
+  isCanEditUser, onRemoveDevices, onBlockDevices, onGetCode, isCanEditDevices }: IProfileProps) => {
   return (
     <Stack horizontalAlign='center'>
       <User
@@ -42,7 +46,9 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
             devices={devices}
             onBlockDevices={onBlockDevices}
             onRemoveDevices={onRemoveDevices}
+            onGetCode={onGetCode}
             onClearError={onClearError}
+            isCanEditDevices={isCanEditDevices}
           />
         }
       </Stack>

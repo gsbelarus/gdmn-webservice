@@ -12,7 +12,7 @@ export const CompanyList = ({ companies }: ICompaniesListProps) => {
   const companyColumns: IColumn[] = [{
     key: 'companyName',
     name: 'Организации пользователя',
-    minWidth: 300,
+    minWidth: 200,
     fieldName: 'name',
   }];
 

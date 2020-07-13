@@ -1,22 +1,26 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 
+import { HeaderRight } from '../components/HeaderRight';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
 import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
-import { AppStoreProvider } from '../store';
-import TabsNavigator from './TabsNavigator';
-import { HeaderRight } from '../components/HeaderRight';
-import { SellProductDetailScreen, CreateSellDocumentScreen, SellProductsListScreen } from '../screens/App/SellDocuments';
+/*import { HeaderRight } from '../components/HeaderRight';*/
+import {
+  SellProductDetailScreen,
+  CreateSellDocumentScreen,
+  SellProductsListScreen,
+} from '../screens/App/SellDocuments';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
-
+import { AppStoreProvider } from '../store';
+import TabsNavigator from './TabsNavigator';
 export type RootStackParamList = {
   BottomTabs: undefined;
   ProductDetail: { prodId: number; docId: number; modeCor: boolean };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
-  SellProductDetail: {lineId: number; prodId: number; docId: number; modeCor: boolean };
+  SellProductDetail: { lineId: number; prodId: number; docId: number; modeCor: boolean };
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
 };
@@ -65,13 +69,23 @@ const AppNavigator = () => {
           initialParams={{ prodId: 0 }}
           options={({ route, navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              prodRef.current?.done();
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  prodRef.current?.done();
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -80,12 +94,22 @@ const AppNavigator = () => {
           component={CreateDocumentComponent}
           options={({ navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('DocumentsListScreen');
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              docRef.current?.done();
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('DocumentsListScreen');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  docRef.current?.done();
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -94,9 +118,14 @@ const AppNavigator = () => {
           component={ProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -106,13 +135,23 @@ const AppNavigator = () => {
           initialParams={{ lineId: 0, prodId: 0 }}
           options={({ route, navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              prodSellRef.current?.done();
-              navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  prodSellRef.current?.done();
+                  navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -121,12 +160,22 @@ const AppNavigator = () => {
           component={CreateSellDocumentComponent}
           options={({ navigation }) => ({
             title: '',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('SellDocumentsListScreen');
-            }} />,
-            headerRight: () => <HeaderRight text="Готово" onPress={() => {
-              docSellRef.current?.done();
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('SellDocumentsListScreen');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  docSellRef.current?.done();
+                }}
+              />
+            ),
           })}
         />
         <Stack.Screen
@@ -135,9 +184,14 @@ const AppNavigator = () => {
           component={SellProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerLeft: () => <HeaderRight text="Отмена" onPress={() => {
-              navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-            }} />,
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
           })}
         />
       </Stack.Navigator>

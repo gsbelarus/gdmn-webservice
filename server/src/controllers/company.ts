@@ -1,171 +1,134 @@
-import { readFile, writeFile } from '../utils/workWithFile';
-import { PATH_LOCAL_DB_COMPANIES, PATH_LOCAL_DB_USERS } from '../server';
 import { ParameterizedContext } from 'koa';
-import { makeUser, addCompanyToUser } from './user';
 import log from '../utils/logger';
-import { ICompany, IResponse, IUser, IMakeUser } from '../../../common';
+import { ICompany, IResponse, IUserProfile } from '../../../common';
+import { companyService } from '../services';
 
-/**
- * Добавление новой организации
- * @param {string} title - наименование организации
- * @return title, наименование организации
- * */
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { title } = ctx.request.body;
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  ctx.type = 'application/json';
+
+  const { id: userId } = ctx.state.user;
 
   if (!title) {
-    const res: IResponse<string> = { result: false, error: 'not such all parameters' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+    ctx.throw(400, 'не указано название организации');
   }
 
-  if (allCompanies?.some(el => el.title === title)) {
-    log.warn(`a company (${title}) already exists`);
-    const res: IResponse<string> = { result: false, error: `a company (${title}) already exists` };
-    ctx.status = 409;
-    ctx.body = JSON.stringify(res);
-    return;
-  }
+  const company: ICompany = { id: title, title, admin: userId };
 
-  const newCompany: ICompany = { id: title, title, admin: ctx.state.user.id };
+  try {
+    const companyId = await companyService.addOne({ ...company, admin: userId });
 
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(allCompanies ? [...allCompanies, newCompany] : [newCompany]));
+    const result: IResponse<string> = { result: true, data: companyId };
 
-  /* Добавлям к пользователю gdmn создаваемую организацию */
-  const resGdmn = await addCompanyToUser('gdmn', [title]);
-  /* Добавлям к текущему пользователю создаваемую организацию */
-  const res = await addCompanyToUser(ctx.state.user.id, [title]);
-  // const res1 = await editCompanies('gdmn', [title]);
-  if (res) {
-    const result: IResponse<ICompany> = { result: true, data: newCompany };
-    log.info('new company added successfully');
     ctx.status = 201;
-    ctx.body = JSON.stringify(result);
-  } else {
-    log.warn(`a user (${ctx.state.user.id}) already exists`);
-    const res: IResponse<string> = { result: false, error: `a user (${ctx.state.user.id}) already exists` };
-    ctx.status = 409;
-    ctx.body = JSON.stringify(res);
+    ctx.body = result;
+
+    log.info(`addCompany: OK`);
+  } catch (err) {
+    ctx.throw(400, err.message);
   }
 };
 
-const getCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const companyId: string = ctx.params.id;
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  const result = allCompanies && allCompanies.find(company => company.id === companyId);
-  ctx.type = 'application/json';
+const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: companyId } = ctx.params;
 
-  if (!result) {
-    log.warn('no such company');
-    const res: IResponse<string> = { result: false, error: 'no such company' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!companyId) {
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  log.info('get profile company successfully');
-  const res: IResponse<ICompany> = { result: true, data: result };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
+  try {
+    const company = await companyService.findOne(companyId);
+
+    const result: IResponse<ICompany> = { result: true, data: company };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`getCompany: ok`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 };
 
-const editCompanyProfile = async (ctx: ParameterizedContext): Promise<void> => {
-  const companyId: string = ctx.params.id;
-  const editPart = ctx.request.body;
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  const idx = allCompanies && allCompanies.findIndex(company => company.id === companyId);
-  ctx.type = 'application/json';
+const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: companyId } = ctx.params;
+  const company = ctx.request.body as ICompany;
 
-  if (!editPart.title) {
-    const res: IResponse<string> = { result: false, error: 'not such all parameters' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!companyId) {
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  if (!allCompanies || idx === undefined || idx < 0) {
-    log.warn('no such company');
-    const res: IResponse<string> = { result: false, error: 'no such company' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!company) {
+    ctx.throw(400, 'не указана информация об организации');
   }
 
-  const company: ICompany = { ...editPart, id: allCompanies[idx].id, admin: allCompanies[idx].admin };
+  try {
+    const id = await companyService.updateOne({ ...company, id: companyId });
+    const result: IResponse<string> = { result: true, data: id };
 
-  await writeFile(
-    PATH_LOCAL_DB_COMPANIES,
-    JSON.stringify([...allCompanies.slice(0, idx), company, ...allCompanies.slice(idx + 1)]),
-  );
-  log.info('a company edited successfully');
-  const res: IResponse<ICompany> = { result: true, data: company };
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('updateCompany: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const companyId: string = ctx.params.id;
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  ctx.type = 'application/json';
-  log.info('get users by company successfully');
-  const res: IResponse<IMakeUser[]> = {
-    result: true,
-    data: !allUsers
-      ? []
-      : allUsers
-          .filter(user => user.companies && user.companies.length && user.companies.find(org => org === companyId))
-          .map(makeUser),
-  };
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(res);
+  const { id: companyId } = ctx.params;
+
+  if (!companyId) {
+    ctx.throw(400, 'не указан идентификатор организации');
+  }
+
+  try {
+    const userList = await companyService.findUsers(companyId);
+
+    const result: IResponse<IUserProfile[]> = { result: true, data: userList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsersByCompany: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  const result: IResponse<ICompany[]> = {
-    result: true,
-    data: !allCompanies || !allCompanies.length ? [] : allCompanies,
-  };
-  log.info('get companies successfully');
-  ctx.type = 'application/json';
-  ctx.status = 200;
-  ctx.body = JSON.stringify(result);
+  try {
+    const companyList = await companyService.findAll();
+
+    const result: IResponse<ICompany[]> = { result: true, data: companyList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getCompanies: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
 };
 
 const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
-  const allCompanies: ICompany[] | undefined = await readFile(PATH_LOCAL_DB_COMPANIES);
-  const newCompanies = allCompanies?.filter(el => id !== el.id);
-  ctx.type = 'application/json';
+  const { id: companyId } = ctx.params;
 
-  if (allCompanies?.length === newCompanies?.length) {
-    log.warn('no such company');
-    const res: IResponse<string> = { result: false, error: 'no such company' };
-    ctx.status = 422;
-    ctx.body = JSON.stringify(res);
-    return;
+  if (!companyId) {
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
-  const allUsers: IUser[] | undefined = await readFile(PATH_LOCAL_DB_USERS);
-  if (allUsers?.some(user => user.companies?.some(comapny => comapny === id))) {
-    await writeFile(
-      PATH_LOCAL_DB_USERS,
-      JSON.stringify(
-        allUsers.map(user => {
-          return { ...user, companies: user.companies?.filter(company => company !== id) };
-        }),
-      ),
-    );
+  try {
+    await companyService.deleteOne(companyId);
+
+    const result: IResponse<void> = { result: true };
+
+    ctx.status = 200;
+    ctx.body = result; //TODO передавать только код 204 без body
+
+    log.info('deleteCompany: OK');
+  } catch (err) {
+    ctx.throw(400, err);
   }
-
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(newCompanies ?? []));
-
-  log.info('company removed successfully');
-  ctx.status = 204;
 };
 
-export { addCompany, editCompanyProfile, getCompanyProfile, getUsersByCompany, getCompanies, deleteCompany };
+export { addCompany, updateCompany, getCompany, getUsersByCompany, getCompanies, deleteCompany };

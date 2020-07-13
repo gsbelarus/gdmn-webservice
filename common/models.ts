@@ -1,6 +1,6 @@
-import { IDocument } from './inventory';
+import { IDocument } from './base';
 
-export interface IMakeUser {
+export interface IUserProfile {
   id?: string;
   userName: string;
   companies?: string[];
@@ -29,15 +29,11 @@ export interface IBaseUrl {
   apiPath: string;
 }
 
-export interface IUserCredentials {
-  userName: string;
-  password: string;
-}
-
 export interface IActivationCode {
+  id?: string;
   code: string;
   date: string;
-  user: string;
+  deviceId: string;
 }
 
 export interface ICompany {
@@ -46,10 +42,23 @@ export interface ICompany {
   admin: string;
 }
 
+export type DeviceState  = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED'
+
 export interface IDevice {
+  id?: string;
+  name: string;  
+  userId: string;  
   uid: string;
-  user: string;
-  isBlock: boolean;
+  state: DeviceState;  
+}
+
+export interface IDeviceInfo {
+  id: string;
+  deviceId: string;
+  deviceName: string;  
+  userId: string;
+  userName: string;  
+  state: DeviceState;
 }
 
 export interface IMessageInfo {
@@ -58,8 +67,11 @@ export interface IMessageInfo {
 }
 
 export interface IMessage {
+  id?: string;
   head: {
     id: string;
+    appSystem: string;    
+    companyid: string;
     producer: string;
     consumer: string;
     dateTime: string;
@@ -71,4 +83,9 @@ export interface IMessage {
       params: IDocument[] | string[];
     };
   };
+}
+
+export interface IUserCredentials {
+  userName: string;
+  password: string;
 }

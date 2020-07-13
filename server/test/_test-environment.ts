@@ -5,13 +5,13 @@ import { IActivationCode } from '../../common';
 import run from '../src';
 import { writeFile } from '../src/utils/workWithFile';
 
-import {
+/* import {
   PATH_LOCAL_DB_USERS,
   PATH_LOCAL_DB_DEVICES,
   PATH_LOCAL_DB_COMPANIES,
   PATH_LOCAL_DB_ACTIVATION_CODES,
   PATH_LOCAL_DB_MESSAGES,
-} from '../src/server';
+} from '../src/server'; */
 
 let app: Koa<Koa.DefaultState, Koa.DefaultContext> | null = null;
 
@@ -41,10 +41,10 @@ export async function initEnvironment(): Promise<void> {
     { id: '2', userName: '2', password: '2', creatorId: 'admin', companies: ['com'] },
   ];
   const devices = [
-    { uid: '123', user: 'admin', isBlock: false },
-    { uid: '123', user: '1', isBlock: false },
-    { uid: 'asd', user: '1', isBlock: false },
-    { uid: 'qwe', user: 'admin', isBlock: true },
+    { uid: '123', user: 'admin', blocked: false },
+    { uid: '123', user: '1', blocked: false },
+    { uid: 'asd', user: '1', blocked: false },
+    { uid: 'qwe', user: 'admin', blocked: true },
   ];
   const companies = [
     { id: 'com', title: 'com', admin: 'admin' },
@@ -52,8 +52,16 @@ export async function initEnvironment(): Promise<void> {
     { id: 'fir', title: 'fir', admin: '1' },
   ];
   const activationCodes: IActivationCode[] = [
-    { code: '123qwe', user: 'admin', date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString() },
-    { code: 'asd456', user: 'admin', date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString() },
+    {
+      code: '123qwe',
+      deviceId: '',
+      date: new Date(today.setDate(today.getDate() - 1)).toLocaleDateString(),
+    },
+    {
+      code: 'asd456',
+      deviceId: '',
+      date: new Date(today.setDate(today.getDate() - 10)).toLocaleDateString(),
+    },
   ];
   const messages4Com = {
     head: {
@@ -136,18 +144,18 @@ export async function initEnvironment(): Promise<void> {
     },
   };
 
-  await writeFile(PATH_LOCAL_DB_USERS, JSON.stringify(users));
-  await writeFile(PATH_LOCAL_DB_DEVICES, JSON.stringify(devices));
-  await writeFile(PATH_LOCAL_DB_COMPANIES, JSON.stringify(companies));
-  await writeFile(PATH_LOCAL_DB_ACTIVATION_CODES, JSON.stringify(activationCodes));
-  await writeFile(
-    `${PATH_LOCAL_DB_MESSAGES}\\com\\4945c0bf-0436-46ad-a9c2-669cc33330a9.json`,
-    JSON.stringify(messages4Com),
-  );
-  await writeFile(
-    `${PATH_LOCAL_DB_MESSAGES}\\org\\88895370-5ebf-47de-858d-2d8ef3933328.json`,
-    JSON.stringify(messages4org),
-  );
+  /* await writeFile({ filename: PATH_LOCAL_DB_USERS, data: JSON.stringify(users) });
+  await writeFile({ filename: PATH_LOCAL_DB_DEVICES, data: JSON.stringify(devices) });
+  await writeFile({ filename: PATH_LOCAL_DB_COMPANIES, data: JSON.stringify(companies) });
+  await writeFile({ filename: PATH_LOCAL_DB_ACTIVATION_CODES, data: JSON.stringify(activationCodes) });
+  await writeFile({
+    filename: `${PATH_LOCAL_DB_MESSAGES}\\com\\4945c0bf-0436-46ad-a9c2-669cc33330a9.json`,
+    data: JSON.stringify(messages4Com),
+  });
+  await writeFile({
+    filename: `${PATH_LOCAL_DB_MESSAGES}\\org\\88895370-5ebf-47de-858d-2d8ef3933328.json`,
+    data: JSON.stringify(messages4org),
+  }); */
 }
 
 export function getApp(): Koa<Koa.DefaultState, Koa.DefaultContext> {

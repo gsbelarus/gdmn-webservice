@@ -25,8 +25,8 @@ describe('testing /api/devices/', () => {
       expect(typeof response.body.data.uid).toBe('string');
       expect(response.body.data).toHaveProperty('user');
       expect(typeof response.body.data.user).toBe('string');
-      expect(response.body.data).toHaveProperty('isBlock');
-      expect(typeof response.body.data.isBlock).toBe('boolean');
+      expect(response.body.data).toHaveProperty('blocked');
+      expect(typeof response.body.data.blocked).toBe('boolean');
     });
 
     test('ERROR: the device is not assigned to the user', async () => {
@@ -56,8 +56,8 @@ describe('testing /api/devices/', () => {
       expect(typeof response.body.data.uid).toBe('string');
       expect(response.body.data).toHaveProperty('user');
       expect(typeof response.body.data.user).toBe('string');
-      expect(response.body.data).toHaveProperty('isBlock');
-      expect(typeof response.body.data.isBlock).toBe('boolean');
+      expect(response.body.data).toHaveProperty('blocked');
+      expect(typeof response.body.data.blocked).toBe('boolean');
     });
 
     test('ERROR: device does not exist', async () => {
@@ -96,8 +96,8 @@ describe('testing /api/devices/', () => {
       expect(typeof response.body.data.uid).toBe('string');
       expect(response.body.data).toHaveProperty('user');
       expect(typeof response.body.data.user).toBe('string');
-      expect(response.body.data).toHaveProperty('isBlock');
-      expect(typeof response.body.data.isBlock).toBe('boolean');
+      expect(response.body.data).toHaveProperty('blocked');
+      expect(typeof response.body.data.blocked).toBe('boolean');
     });
 
     test('ERROR: device does not exist', async () => {
@@ -147,8 +147,8 @@ describe('testing /api/devices/', () => {
       expect(typeof response.body.data.uid).toBe('string');
       expect(response.body.data).toHaveProperty('user');
       expect(typeof response.body.data.user).toBe('string');
-      expect(response.body.data).toHaveProperty('isBlock');
-      expect(typeof response.body.data.isBlock).toBe('boolean');
+      expect(response.body.data).toHaveProperty('blocked');
+      expect(typeof response.body.data.blocked).toBe('boolean');
     });
 
     test('ERROR: the device is assigned to the user', async () => {
@@ -175,7 +175,7 @@ describe('testing /api/devices/', () => {
         .query('deviceId=123')
         .set('Cookie', setCookies)
         .send({
-          isBlock: true,
+          blocked: true,
         });
       expect(response.status).toEqual(200);
       expect(response.body.result).toBeTruthy();
@@ -187,7 +187,7 @@ describe('testing /api/devices/', () => {
         .query('deviceId=123')
         .set('Cookie', setCookies)
         .send({
-          isBlock: true,
+          blocked: true,
         });
       expect(response.status).toEqual(422);
       expect(response.body.result).toBeFalsy();

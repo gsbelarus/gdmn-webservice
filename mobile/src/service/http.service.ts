@@ -1,5 +1,3 @@
-// import { baseUrl } from '../helpers/utils';
-
 export async function get<T>(baseUrl: string, path: string): Promise<T> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
@@ -7,6 +5,7 @@ export async function get<T>(baseUrl: string, path: string): Promise<T> {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
+
     return response.json();
   } catch (err) {
     if (err.response) {
@@ -50,7 +49,7 @@ export async function put<T>(baseUrl: string, path: string, body: string): Promi
   }
 }
 
-export async function remove<T>(baseUrl: string, path: string): Promise<T> {
+export async function remove<T>(baseUrl: string, path: string): Promise<T | null> {
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'DELETE',

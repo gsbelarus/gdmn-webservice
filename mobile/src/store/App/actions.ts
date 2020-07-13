@@ -1,6 +1,5 @@
-import { ISellHead, ISellDocument, ISellLine } from '../../model';
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
-import { IAppSettings } from '../../model';
+import { ISellHead, ISellDocument, ISellLine, IAppSettings } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {

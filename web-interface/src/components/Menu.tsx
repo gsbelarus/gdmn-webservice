@@ -3,7 +3,6 @@ import React from "react";
 
 export interface IMenuProps {
   isAdmin?: boolean;
-  userName: string;
   querying: boolean;
   errorMessage?: string;
   onEditProfile: () => void;
@@ -13,10 +12,10 @@ export interface IMenuProps {
   onCreateCompany: () => void;
   onCreateUser?: () => void;
   onAddUserFromSystem?: () => void;
-  onCreateCode?: () => void;
+  onCreateDevice?: () => void;
 }
 
-export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies, onCreateUser, onCreateCode, onAddUserFromSystem }: IMenuProps) => {
+export const Menu = ({ onEditProfile, onLogOut, querying, errorMessage, onClearError, onCreateCompany, isAdmin, onGetCompanies, onCreateUser, onCreateDevice, onAddUserFromSystem }: IMenuProps) => {
 
   const _items: ICommandBarItemProps[] = [
     {
@@ -55,12 +54,12 @@ export const Menu = ({ userName, onEditProfile, onLogOut, querying, errorMessage
           },
           {
             key: 'createUser',
-            text: 'Создать код',
-            disabled: !isAdmin || !onCreateCode,
+            text: 'Добавить устройство',
+            disabled: !isAdmin || !onCreateDevice,
             iconProps: { iconName: 'Devices3' },
             onClick: () => {
               onClearError();
-              onCreateCode && onCreateCode();
+              onCreateDevice  && onCreateDevice();
             }
           }
         ]
