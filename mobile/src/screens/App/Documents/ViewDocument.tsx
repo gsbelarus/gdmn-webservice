@@ -125,6 +125,14 @@ const ViewDocumentScreen = ({ route, navigation }) => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <ItemSeparator />
+      <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+        <Text style={localStyles.fontWeightBold}>Итого:</Text>
+        <Text style={localStyles.fontWeightBold}>
+          {document.lines.reduce((total, line) => line.quantity + total, 0)}
+        </Text>
+      </View>
+      <ItemSeparator />
       <View
         style={[
           localStyles.flexDirectionRow,
@@ -271,6 +279,9 @@ const localStyles = StyleSheet.create({
   flexDirectionRow: {
     flexDirection: 'row',
   },
+  fontWeightBold: {
+    fontWeight: 'bold',
+  },
   goDetailsHeader: {
     flex: 1,
     justifyContent: 'center',
@@ -296,6 +307,10 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
+  },
+  lineTotal: {
+    justifyContent: 'space-between',
+    padding: 10,
   },
   marginRight: {
     marginRight: 15,
