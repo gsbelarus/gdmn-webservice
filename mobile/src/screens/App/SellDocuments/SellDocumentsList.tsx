@@ -22,6 +22,9 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
   const fromContact = state.contacts
     ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)
     : undefined;
+  const toContact = state.contacts
+    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.tocontactId)
+    : undefined;
   const expeditor = state.contacts
     ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.expeditorId)
     : undefined;
@@ -52,7 +55,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
             Экспедитор: {expeditor ? expeditor.name : ''}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {state.contacts?.find((contact) => contact.id === item.head?.tocontactId).name}
+            {toContact ? toContact.name : ''}
           </Text>
         </View>
       </View>
