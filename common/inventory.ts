@@ -6,6 +6,7 @@ export interface IInventoryDocument extends IDocument {
   lines: IInventoryLine[];
 }
 
+
 export interface IInventoryHead extends IHead {
 }
 

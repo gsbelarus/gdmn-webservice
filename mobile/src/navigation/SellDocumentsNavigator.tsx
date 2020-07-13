@@ -3,11 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import {
-  SellDocumentsListScreen,
-  ViewSellDocumentScreen,
-  HeadSellDocumentScreen,
-} from '../screens/App/SellDocuments';
+import { SellDocumentsListScreen, ViewSellDocumentScreen, HeadSellDocumentScreen } from '../screens/App/SellDocuments';
 
 export type DocumentStackParamList = {
   SellDocumentsListScreen: undefined;

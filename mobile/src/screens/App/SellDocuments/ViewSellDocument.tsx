@@ -4,12 +4,12 @@ import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import ItemSeparator from '../../../components/ItemSeparator';
-import styles from '../../../styles/global';
 import { IDocument, IContact, IGood } from '../../../../../common';
+import ItemSeparator from '../../../components/ItemSeparator';
 import { ISellDocument, ISellLine, ISellHead } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
+import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
   const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
@@ -87,8 +87,10 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
 const ViewSellDocumentScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-  const notFound = { id: -1, name: ''};
-  const document: IDocument | ISellDocument | undefined = state.documents.find((item) => item.id === route.params.docId);
+  const notFound = { id: -1, name: '' };
+  const document: IDocument | ISellDocument | undefined = state.documents.find(
+    (item) => item.id === route.params.docId,
+  );
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const ref = React.useRef<FlatList<ISellLine>>(null);
 
@@ -121,8 +123,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={localStyles.listContainer}>
-        <View style={localStyles.avatarRow}>
-        </View>
+        <View style={localStyles.avatarRow} />
         <View style={localStyles.goodInfo}>
           <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
         </View>
@@ -133,7 +134,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
           <Text style={localStyles.productBarcodeView}>Кол-во</Text>
         </View>
         <View style={localStyles.remainsInfo}>
-          <Text style={localStyles.productBarcodeView}></Text>
+          <Text style={localStyles.productBarcodeView} />
         </View>
       </View>
       <FlatList
@@ -265,8 +266,8 @@ const localStyles = StyleSheet.create({
     width: 36,
   },
   avatarRow: {
-    width: 36,
     marginLeft: 5,
+    width: 36,
   },
   buttonDelete: {
     alignItems: 'flex-end',
@@ -299,6 +300,11 @@ const localStyles = StyleSheet.create({
     marginRight: 15,
   },
 
+  goodInfo: {
+    flexBasis: 150,
+    flexGrow: 5,
+    marginLeft: 15,
+  },
   header: {
     alignItems: 'center',
     flexDirection: 'column',
@@ -332,13 +338,8 @@ const localStyles = StyleSheet.create({
   },
   remainsInfo: {
     alignItems: 'flex-end',
-    flexGrow: 1,
     flexBasis: 45,
+    flexGrow: 1,
     marginRight: 5,
-  },
-  goodInfo: {
-    marginLeft: 15,
-    flexGrow: 5,
-    flexBasis: 150,
   },
 });

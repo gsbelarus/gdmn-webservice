@@ -2,8 +2,8 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import config from '../config';
-import DocumentsNavigator from './DocumentsNavigator';
+/* import config from '../config';
+import DocumentsNavigator from './DocumentsNavigator'; */
 import ReferencesNavigator from './ReferencesNavigator';
 import SellDocumentsNavigator from './SellDocumentsNavigator';
 import SettingsNavigator from './SettingsNavigator';
@@ -30,7 +30,7 @@ const TabsNavigator = () => {
           tabBarColor: '#CEE7E3',
         }}
       />
-      <TabsStack.Screen
+      {/* <TabsStack.Screen
         name="Documents"
         component={config.system[0].component === 'DocumentsNavigator' ? DocumentsNavigator : undefined}
         options={{
@@ -39,7 +39,7 @@ const TabsNavigator = () => {
           tabBarIcon: config.system[0].options.tabBarIcon,
           tabBarColor: config.system[0].options.tabBarColor,
         }}
-      />
+      /> */}
       <TabsStack.Screen
         name="References"
         component={ReferencesNavigator}

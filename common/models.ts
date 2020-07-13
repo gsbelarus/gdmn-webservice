@@ -1,4 +1,4 @@
-import { IDocument } from './inventory';
+import { IDocument } from './base';
 
 export interface IUserProfile {
   id?: string;

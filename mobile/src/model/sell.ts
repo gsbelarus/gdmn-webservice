@@ -24,8 +24,8 @@ export interface ISellLine extends ILine {
 export interface ITara {
   id: number;
   name: string;
-	goodkey?: number;
-	weight?: number;
+  goodkey?: number;
+  weight?: number;
 }
 
 /*export interface IUser {
