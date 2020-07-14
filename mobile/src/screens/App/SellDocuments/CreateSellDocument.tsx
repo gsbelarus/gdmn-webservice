@@ -40,11 +40,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IItem;
     });
-  const people: IContact[] = state.contacts.filter((item) => item.type == 2);
+  const people: IContact[] = state.contacts.filter((item) => item.type === 2);
   const listPeople = getListItems(people);
-  const companies: IContact[] = state.contacts.filter((item) => item.type == 3);
+  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type == 4);
+  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
   const listDepartments = getListItems(departments);
 
   const today = new Date();

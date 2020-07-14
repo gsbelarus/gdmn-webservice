@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -74,7 +74,7 @@ const DocumentsListScreen = ({ navigation }) => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Отправлено!', '', [
+          Alert.alert('Запрос отправлен!', '', [
             {
               text: 'Закрыть',
               onPress: () => {
@@ -124,7 +124,21 @@ const DocumentsListScreen = ({ navigation }) => {
           ]}
           onPress={sendUpdateRequest}
         >
-          <AntDesign size={30} color={colors.card} name="sync" />
+          {/* <AntDesign size={30} color={colors.card} name="sync" /> */}
+          <Entypo size={30} color={colors.card} name="arrow-with-circle-down" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            localStyles.button,
+            {
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={sendUpdateRequest}
+        >
+          <Entypo size={30} color={colors.card} name="arrow-with-circle-up" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[

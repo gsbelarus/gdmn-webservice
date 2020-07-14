@@ -47,7 +47,7 @@ const TabsNavigator = () => {
           tabBarLabel: 'Справочники',
           tabBarIcon: 'view-list',
           tabBarColor: '#9FD5C9',
-          tabBarBadge: true,
+          // tabBarBadge: true,
           title: 'Test',
         }}
       />
