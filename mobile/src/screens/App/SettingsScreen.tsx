@@ -9,6 +9,9 @@ import config from '../../config';
 import { timeout } from '../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
+import referencesRef from '../../mockData/Otves/References.json';
+import documentsRef from '../../mockData/Otves/Document.json';
+
 const SettingsScreen = () => {
   const { colors /* , dark */ } = useTheme();
   const { apiService } = useServiceStore();
@@ -67,9 +70,14 @@ const SettingsScreen = () => {
 
     const getMessages = async () => {
       if (config.debug.useMockup) {
-        const mockRef = (await import('../../mockData/References.json')) as IReference[];
+        const mockRef = referencesRef as IReference[];
         const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
         appActions.setContacts(mockContacts);
+        const mockDocumentsType = mockRef.find((itm) => itm.type === 'documentTypes')?.data as IDocumentType[];
+        appActions.setDocumentTypes(mockDocumentsType);
+        const mockGoods = mockRef.find((itm) => itm.type === 'goods')?.data as IGood[];
+        appActions.setGoods(mockGoods);
+        appActions.setDocuments(documentsRef);
       } else {
         try {
           const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
