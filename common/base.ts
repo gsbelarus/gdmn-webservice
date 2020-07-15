@@ -28,7 +28,7 @@ export interface IRemain {
 export interface IContact {
   id: number;
   name: string;
-  type?: number;
+  type?: string;
   [fieldName: string]: unknown;
 }
 

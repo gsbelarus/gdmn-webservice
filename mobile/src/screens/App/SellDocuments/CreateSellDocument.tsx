@@ -1,12 +1,12 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
+import { Route, StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
-import DropdownList from '../../../components/dropDown';
+import DropdownList from '../../../components/DropdownList/DropdownList';
 import { ISellHead } from '../../../model';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -21,8 +21,8 @@ export interface ICreateSellDocumentRef {
 }
 
 interface MyInputProps {
-  route: any;
-  navigation: any;
+  route: Route;
+  navigation: unknown;
 }
 
 const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps>(({ route }, ref) => {
@@ -40,11 +40,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IItem;
     });
-  const people: IContact[] = state.contacts.filter((item) => item.type === 2);
-  const listPeople = getListItems(people);
-  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
+  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === '2'), [state.contacts]);
+  const listPeople = useMemo(() => getListItems(people), [people]);
+  const companies: IContact[] = state.contacts.filter((item) => item.type === '3');
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
+  const departments: IContact[] = state.contacts.filter((item) => item.type === '4');
   const listDepartments = getListItems(departments);
 
   const today = new Date();
@@ -124,6 +124,10 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
     }
   }, [route.params, state.documents]);
 
+  /*   const onSelectedItemsChange = (selectedItems) => {
+    this.setState({ selectedItems });
+  }; */
+
   return (
     <>
       <ScrollView>
@@ -141,7 +145,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
             <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
             <TextInput
               style={[
@@ -164,7 +168,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
               autoCorrect={false}
             />
           </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
             <View key={11}>
               <DropdownList
@@ -176,39 +180,31 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
               />
             </View>
           </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
-            <Text style={localeStyles.subdivisionText}>Подразделение: </Text>
-            <View key={12}>
-              {departments && departments.length !== 0 ? (
-                <DropdownList
-                  list={listDepartments}
-                  value={selectedItem(listDepartments, selectedFromContact)}
-                  onValueChange={(item) => {
-                    setSelectedFromContact(item.id);
-                  }}
-                />
-              ) : (
-                <Text>Не найдено</Text>
-              )}
-            </View>
-          </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-            <Text style={localeStyles.subdivisionText}>Организация: </Text>
+            <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
             <View key={13}>
-              {companies && companies.length !== 0 ? (
-                <DropdownList
-                  list={listCompanies}
-                  value={selectedItem(listCompanies, selectedToContact)}
-                  onValueChange={(item) => {
-                    setSelectedToContact(item.id);
-                  }}
-                />
-              ) : (
-                <Text>Не найдено</Text>
-              )}
+              <DropdownList
+                list={listDepartments}
+                value={selectedItem(listDepartments, selectedFromContact)}
+                onValueChange={(item) => {
+                  setSelectedFromContact(item.id);
+                }}
+              />
             </View>
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
+            <Text style={localeStyles.subdivisionText}>Организация:</Text>
+            <View key={14}>
+              <DropdownList
+                list={listCompanies}
+                value={selectedItem(listCompanies, selectedToContact)}
+                onValueChange={(item) => {
+                  setSelectedToContact(item.id);
+                }}
+              />
+            </View>
+          </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
             <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
             <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
               {state.documentTypes && state.documentTypes.length !== 0 ? (
@@ -232,7 +228,6 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps
               )}
             </ScrollView>
           </View>
-
           {isDatePickerVisible &&
             (Platform.OS !== 'ios' ? (
               <DateTimePicker
