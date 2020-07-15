@@ -1,5 +1,5 @@
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
-import { ISellHead, ISellDocument, ISellLine, IAppSettings } from '../../model';
+import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
 import { createActionPayload, ActionsUnion } from '../utils';
 
 export enum ActionAppTypes {
@@ -17,6 +17,8 @@ export enum ActionAppTypes {
   SET_DOCUMENTTYPES = 'SET_DOCUMENTTYPES',
   SET_CONTACTS = 'SET_CONTACTS',
   SET_REMAINS = 'SET_REMAINS',
+  SET_BOXINGS = 'SET_BOXINGS',
+  SET_BOXINGS_LINE = 'SET_BOXINGS_LINE',
 }
 
 export const AppActions = {
@@ -46,6 +48,11 @@ export const AppActions = {
   ),
   setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
   setContacts: createActionPayload<ActionAppTypes.SET_CONTACTS, IContact[]>(ActionAppTypes.SET_CONTACTS),
+  setBoxings: createActionPayload<ActionAppTypes.SET_BOXINGS, ITara[]>(ActionAppTypes.SET_BOXINGS),
+  setBoxingsLine: createActionPayload<
+    ActionAppTypes.SET_BOXINGS_LINE,
+    { docId: number; lineDoc: string; lineBoxings: ILineTara[] }[]
+  >(ActionAppTypes.SET_BOXINGS_LINE),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

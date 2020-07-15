@@ -18,6 +18,8 @@ export const initialState: IAppState = {
   goods: undefined,
   contacts: undefined,
   documentTypes: undefined,
+  boxings: undefined,
+  boxingsLine: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -138,6 +140,11 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, contacts: action.payload };
     case ActionAppTypes.SET_GOODS:
       return { ...state, goods: action.payload };
+    case ActionAppTypes.SET_BOXINGS:
+      return { ...state, boxings: action.payload };
+    case ActionAppTypes.SET_BOXINGS_LINE: {
+      return { ...state, boxingsLine: action.payload };
+    }
     default:
       return state;
   }

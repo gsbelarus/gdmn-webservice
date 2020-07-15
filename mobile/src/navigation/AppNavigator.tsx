@@ -10,7 +10,9 @@ import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
   SellProductsListScreen,
+  BoxingDetailScreen,
 } from '../screens/App/SellDocuments';
+import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { AppStoreProvider } from '../store';
@@ -23,6 +25,7 @@ export type RootStackParamList = {
   SellProductDetail: { lineId: number; prodId: number; docId: number; modeCor: boolean };
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
+  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -41,6 +44,7 @@ const AppNavigator = () => {
 
   const prodSellRef = useRef<ISellProductDetailsRef>(null);
   const docSellRef = useRef<ICreateSellDocumentRef>(null);
+  const boxingSellRef = useRef<IBoxingDetailsRef>(null);
 
   const SellProductDetailsComponent = (props) => {
     return <SellProductDetailScreen {...props} ref={prodSellRef} />;
@@ -48,6 +52,10 @@ const AppNavigator = () => {
 
   const CreateSellDocumentComponent = (props) => {
     return <CreateSellDocumentScreen {...props} ref={docSellRef} />;
+  };
+
+  const BoxingDetailsComponent = (props) => {
+    return <BoxingDetailScreen {...props} ref={boxingSellRef} />;
   };
 
   return (
@@ -189,6 +197,39 @@ const AppNavigator = () => {
                 text="Отмена"
                 onPress={() => {
                   navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+                }}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          key="BoxingDetail"
+          name="BoxingDetail"
+          component={BoxingDetailsComponent}
+          options={({ route, navigation }) => ({
+            title: '',
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('SellProductDetail', {
+                    prodId: route.params.prodId,
+                    docId: route.params.docId,
+                    modeCor: route.params.modeCor,
+                  });
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  boxingSellRef.current?.done();
+                  navigation.navigate('SellProductDetail', {
+                    prodId: route.params.prodId,
+                    docId: route.params.docId,
+                    modeCor: route.params.modeCor,
+                  });
                 }}
               />
             ),

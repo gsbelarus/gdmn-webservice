@@ -7,10 +7,10 @@ import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemai
 import SettingsItem from '../../components/SettingsItem';
 import config from '../../config';
 import { timeout } from '../../helpers/utils';
-import { useAuthStore, useAppStore, useServiceStore } from '../../store';
-
-import referencesRef from '../../mockData/Otves/References.json';
 import documentsRef from '../../mockData/Otves/Document.json';
+import referencesRef from '../../mockData/Otves/References.json';
+import { ITara } from '../../model';
+import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
 const SettingsScreen = () => {
   const { colors /* , dark */ } = useTheme();
@@ -42,11 +42,11 @@ const SettingsScreen = () => {
           {
             text: 'Да',
             onPress: () => {
+              appActions.setDocuments([]);
               appActions.setContacts([]);
               appActions.setDocumentTypes([]);
               appActions.setGoods([]);
               appActions.setRemains([]);
-              appActions.setDocuments([]);
             },
           },
           {
@@ -78,6 +78,8 @@ const SettingsScreen = () => {
         const mockGoods = mockRef.find((itm) => itm.type === 'goods')?.data as IGood[];
         appActions.setGoods(mockGoods);
         appActions.setDocuments(documentsRef);
+        const boxingsRef = (mockRef.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
+        appActions.setBoxings(boxingsRef);
       } else {
         try {
           const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));

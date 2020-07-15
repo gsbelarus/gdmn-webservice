@@ -62,14 +62,14 @@ const ReferenceListScreen = () => {
         type: 'goods',
         data: AppState.goods,
       },
-      /*{
+      {
         id: 3,
-        name: 'Остатки',
-        type: 'remains',
-        data: AppState.remains,
-      }, */
+        name: 'Тары',
+        type: 'boxings',
+        data: AppState.boxings,
+      },
     ],
-    [AppState.contacts, AppState.documentTypes, AppState.goods],
+    [AppState.contacts, AppState.documentTypes, AppState.goods, AppState.boxings],
   );
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
@@ -81,7 +81,7 @@ const ReferenceListScreen = () => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings'],
         },
       }),
     )

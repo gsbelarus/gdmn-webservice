@@ -1,43 +1,13 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { Text, TextInput } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, TextInput, Chip, List } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
-import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { ISellLine, ISellDocument, ITara } from '../../../model';
+import { ISellLine, ISellDocument, ITara, ILineTara } from '../../../model';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-
-const TaraItem = React.memo(({ item, line }: { item: ITara; line: ISellLine }) => {
-  const [taraStatus, setTaraStatus] = useState(true);
-  const { colors } = useTheme();
-
-  return taraStatus ? (
-    <TouchableOpacity
-      style={[localeStyles.listContainer, { backgroundColor: colors.border }]}
-      onPress={() => {
-        setTaraStatus(false);
-      }}
-    >
-      <View style={localeStyles.taraContanerView}>
-        <Text style={[localeStyles.fontSize16, { opacity: 0.7 }]}>{item.name}</Text>
-        <Text style={[localeStyles.fontSize16, { opacity: 0.7 }]}>вес ед.: {item.weight ?? 0}</Text>
-        <Text style={[localeStyles.fontSize16, { opacity: 0.7 }]}>
-          количество: {line?.tara ? line.tara.find((t) => t.tarakey === item.id)?.quantity : 0}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  ) : (
-    <View style={localeStyles.taraContanerView}>
-      <Text style={localeStyles.fontSize16}>{item.name}</Text>
-      <Text style={localeStyles.fontSize16}>
-        количество: {line?.tara ? line.tara.find((t) => t.tarakey === item.id)?.quantity : 0}
-      </Text>
-    </View>
-  );
-});
 
 export interface ISellProductDetailsRef {
   done(): void;
@@ -47,6 +17,44 @@ interface MyInputProps {
   route: any;
   navigation: any;
 }
+
+const ListChips = ({
+  data,
+  onPress,
+  selected,
+}: {
+  data: ITara[];
+  onPress: (item: ITara) => void;
+  selected: ILineTara[];
+}) => {
+  const { colors } = useTheme();
+  return (
+    <View style={localeStyles.scrollContainer}>
+      {data.map((item, idx) => {
+        const selectedBoxing = selected.find((box) => box.tarakey === item.id);
+        return (
+          <Chip
+            key={idx}
+            mode="outlined"
+            style={[localeStyles.margin, selectedBoxing ? { backgroundColor: colors.primary } : {}]}
+            onPress={() => onPress(item)}
+            selected={selectedBoxing !== undefined}
+            selectedColor={selectedBoxing ? colors.card : colors.text}
+          >
+            <>
+              <Text>{item.name}</Text>
+              {selectedBoxing ? (
+                <Text>
+                  шт. {selectedBoxing.quantity ?? '-'} / вес {selectedBoxing.weight ?? 0}
+                </Text>
+              ) : undefined}
+            </>
+          </Chip>
+        );
+      })}
+    </View>
+  );
+};
 
 const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
@@ -58,17 +66,16 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     document instanceof Object && (document as IDocument)
       ? (document as IDocument).lines
       : (document as ISellDocument).lines;
-  const lineDocument = lineDocuments.find((line) => line.id === route.params.lineID);
-  // const taraList = state.references.find((ref) => ref.type === 'taraTypes').data  as ITara[];
+  const lineDocument = lineDocuments.find((line) => line.id === route.params.lineId);
   const [line, setLine] = useState<ISellLine>(undefined);
   const [value, setValue] = useState('1');
   const orderQ = (lineDocument as ISellLine)?.orderQuantity ?? 0;
-  //const [tara, setTara] = useState<ILineTara[]>(undefined)
-
-  /* const ref = React.useRef<FlatList<ITara>>(null);
-  useScrollToTop(ref);*/
-
-  const renderItem = ({ item }: { item: ITara }) => <TaraItem item={item} line={line} />;
+  const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(
+    state.boxingsLine
+      ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
+          .lineBoxings
+      : [],
+  );
 
   useEffect(() => {
     if (route.params.modeCor) {
@@ -76,9 +83,17 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
         setValue(lineDocument.quantity.toString());
       }
       setLine(lineDocument);
-      //  setTara((lineDocument as ISellLine).tara ?? undefined);
     }
-  }, [document.lines, route.params.modeCor, route.params.lineID]);
+  }, [document.lines, route.params.modeCor, route.params.lineId, lineDocument]);
+
+  useEffect(() => {
+    setBoxingsLine(
+      state.boxingsLine
+        ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
+            .lineBoxings
+        : [],
+    );
+  }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
@@ -89,14 +104,59 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           value: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
         });
       } else {
+        const boxings = state.boxingsLine
+          ? state.boxingsLine.find((box) => box.docId === route.params.docId && box.lineDoc === route.params.lineId)
+          : undefined;
         actions.addLine({
           docId: route.params.docId,
-          line: { id: '0', goodId: product.id, quantity: Number.parseFloat(value) },
+          line: {
+            id: '0',
+            goodId: product.id,
+            quantity: Number.parseFloat(value),
+            tara: boxings ? boxings.lineBoxings : undefined,
+          },
         });
       }
       navigation.navigate('ViewSellDocument', { docId: route.params.docId });
     },
   }));
+
+  const onPress = (item: ITara) => {
+    if (boxingsLine.some((box) => box.tarakey === item.id)) {
+      const idx = state.boxingsLine
+        ? state.boxingsLine.findIndex(
+            (bLine) => bLine.docId === route.params.docId && bLine.lineDoc === route.params.lineId,
+          )
+        : -1;
+      const idxl = idx > -1 ? state.boxingsLine[idx].lineBoxings.findIndex((bLine) => bLine.tarakey === item.id) : -1;
+      const updateBoxings =
+        idxl > -1
+          ? [...state.boxingsLine[idx].lineBoxings.slice(0, idx), ...state.boxingsLine[idx].lineBoxings.slice(idx + 1)]
+          : state.boxingsLine
+          ? [...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : [])]
+          : [];
+      const newBoxingsLine = {
+        docId: route.params.docId,
+        lineDoc: route.params.lineId,
+        lineBoxings: updateBoxings,
+      };
+      const updateBoxingsLine =
+        idx === -1
+          ? state.boxingsLine
+            ? [...state.boxingsLine, newBoxingsLine]
+            : [newBoxingsLine]
+          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
+      actions.setBoxingsLine(updateBoxingsLine);
+    } else {
+      navigation.navigate('BoxingDetail', {
+        boxingId: item.id,
+        lineId: route.params.lineId,
+        prodId: route.params.prodId,
+        docId: route.params.docId,
+        modeCor: route.params.modeCor,
+      });
+    }
+  };
 
   return (
     <View
@@ -137,16 +197,31 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
         }}
       />
 
-      <View style={localeStyles.flatContaner}>
-        <FlatList
-          //ref={ref}
-          data={[]}
-          // data={taraList ?? []}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
-          ItemSeparatorComponent={ItemSeparator}
-          horizontal={true}
-        />
+      <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+        <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
+        <List.AccordionGroup>
+          <List.Accordion title="Ящики" id="1">
+            <ListChips
+              data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
+              onPress={onPress}
+              selected={boxingsLine}
+            />
+          </List.Accordion>
+          <List.Accordion title="Бумага" id="2">
+            <ListChips
+              data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
+              onPress={onPress}
+              selected={boxingsLine}
+            />
+          </List.Accordion>
+          <List.Accordion title="Поддоны" id="3">
+            <ListChips
+              data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
+              onPress={onPress}
+              selected={boxingsLine}
+            />
+          </List.Accordion>
+        </List.AccordionGroup>
       </View>
     </View>
   );
@@ -155,6 +230,12 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
 export { SellProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
+  areaChips: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    padding: 10,
+  },
   button: {
     alignItems: 'center',
     height: 35,
@@ -188,6 +269,9 @@ const localeStyles = StyleSheet.create({
     marginLeft: 0.5,
     marginTop: 10,
   },
+  margin: {
+    margin: 2,
+  },
   productName: {
     alignItems: 'center',
     color: '#000000',
@@ -216,6 +300,15 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 15,
     marginTop: 15,
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  subdivisionText: {
+    fontSize: 11,
+    marginBottom: 5,
+    textAlign: 'left',
   },
   taraContanerView: {
     backgroundColor: '#fff',

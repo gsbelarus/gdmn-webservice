@@ -5,8 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
 
-import ItemSeparator from '../../../components/ItemSeparator';
 import { IGood } from '../../../../../common';
+import ItemSeparator from '../../../components/ItemSeparator';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -20,7 +20,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('SellProductDetail', { prodId: item.id, docId: docId, modeCor: false });
+        navigation.navigate('SellProductDetail', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>

@@ -2,7 +2,7 @@ import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '..
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
-import { ISellDocument } from './sell';
+import { ISellDocument, ITara, ILineTara } from './sell';
 export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara } from './sell';
 
 export interface IServiceContextProps {
@@ -67,4 +67,10 @@ export interface IAppState {
   goods?: IGood[];
   documentTypes?: IDocumentType[];
   contacts?: IContact[];
+  boxings?: ITara[];
+  boxingsLine?: {
+    docId: number;
+    lineDoc: string;
+    lineBoxings: ILineTara[];
+  }[];
 }

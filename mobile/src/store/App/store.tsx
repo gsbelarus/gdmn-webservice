@@ -21,6 +21,7 @@ const sections = {
   GOODS: 'GOODS',
   DOCUMENTS: 'DOCUMENTS',
   REMAINS: 'REMAINS',
+  BOXINGS: 'BOXINGS',
 };
 
 const createStoreContext = () => {
@@ -56,6 +57,9 @@ const createStoreContext = () => {
         // контакты
         const contacts = await appStorage.getItem(`${storagePath}/${sections.CONTACTS}`);
         actions.setContacts(contacts || []);
+        // тары
+        const boxings = await appStorage.getItem(`${storagePath}/${sections.BOXINGS}`);
+        actions.setBoxings(boxings || []);
         setLoading(false);
       };
 
@@ -121,6 +125,17 @@ const createStoreContext = () => {
         saveSettings();
       }
     }, [state.documents, storagePath]);
+
+    /*  Сохранение тар в storage при их изменении */
+    useEffect(() => {
+      const saveSettings = async () => {
+        await appStorage.setItem(`${storagePath}/${sections.BOXINGS}`, state.boxings);
+      };
+
+      if (state.boxings && storagePath && !isLoading) {
+        saveSettings();
+      }
+    }, [state.boxings, storagePath]);
 
     useEffect(() => {
       if (!!state.settings?.autodeletingDocument && !isLoading) {
