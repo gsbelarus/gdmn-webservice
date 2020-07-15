@@ -1,6 +1,6 @@
-import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -74,6 +74,44 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
 
+  const sendDocumentRequest = useCallback(() => {
+    timeout(
+      5000,
+      apiService.data.sendMessages(state.companyID, 'gdmn', {
+        type: 'cmd',
+        payload: {
+          name: 'get_documents',
+          params: ['SellDocument'],
+        },
+      }),
+    )
+      .then((response: IResponse<IMessageInfo>) => {
+        if (response.result) {
+          Alert.alert('Запрос отправлен!', '', [
+            {
+              text: 'Закрыть',
+              onPress: () => ({}),
+            },
+          ]);
+        } else {
+          Alert.alert('Запрос не был отправлен', '', [
+            {
+              text: 'Закрыть',
+              onPress: () => ({}),
+            },
+          ]);
+        }
+      })
+      .catch((err: Error) =>
+        Alert.alert('Ошибка!', err.message, [
+          {
+            text: 'Закрыть',
+            onPress: () => ({}),
+          },
+        ]),
+      );
+  }, [apiService.data, state.companyID]);
+
   const sendUpdateRequest = async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
 
@@ -89,9 +127,9 @@ const SellDocumentsListScreen = ({ navigation }) => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Успех!', '', [
+          Alert.alert('Запрос отправлен!', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => {
                 documents.forEach((item) => {
                   actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
@@ -102,7 +140,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
         } else {
           Alert.alert('Запрос не был отправлен', '', [
             {
-              text: 'OK',
+              text: 'Закрыть',
               onPress: () => ({}),
             },
           ]);
@@ -111,7 +149,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
       .catch((err: Error) =>
         Alert.alert('Ошибка!', err.message, [
           {
-            text: 'OK',
+            text: 'Закрыть',
             onPress: () => ({}),
           },
         ]),
@@ -139,7 +177,20 @@ const SellDocumentsListScreen = ({ navigation }) => {
           ]}
           onPress={sendUpdateRequest}
         >
-          <AntDesign size={30} color={colors.card} name="sync" />
+          <Entypo size={30} color={colors.card} name="arrow-up" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            localStyles.button,
+            {
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={sendDocumentRequest}
+        >
+          <Entypo size={30} color={colors.card} name="arrow-down" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -152,7 +203,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
           ]}
           onPress={() => navigation.navigate('CreateSellDocument')}
         >
-          <MaterialIcons size={30} color={colors.card} name="add" />
+          <MaterialIcons size={30} color={colors.card} name="note-add" />
         </TouchableOpacity>
       </View>
     </View>
