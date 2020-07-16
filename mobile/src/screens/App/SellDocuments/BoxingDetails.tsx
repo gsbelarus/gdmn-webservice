@@ -41,7 +41,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
               { tarakey: boxing.id, weight: Number.parseFloat(weight), quantity: Number(quantity) },
               ...state.boxingsLine[idx].lineBoxings.slice(idx + 1),
             ]
-          : state.boxingsLine
+          : state.boxingsLine && idx > -1
           ? [
               ...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : []),
               { tarakey: boxing.id, weight: Number.parseFloat(weight), quantity: Number(quantity) },

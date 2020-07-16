@@ -42,8 +42,10 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
       if (line !== undefined) {
         actions.editLine({
           docId: route.params.docId,
-          lineId: line.id,
-          value: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
+          line: {
+            ...line,
+            quantity: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
+          },
         });
       } else {
         actions.addLine({

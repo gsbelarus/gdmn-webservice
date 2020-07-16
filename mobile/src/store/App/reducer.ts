@@ -108,7 +108,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DOCUMENT_EDIT_LINE: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
       const document = state.documents[idx];
-      const idxl = document.lines.findIndex((line) => line.id === action.payload.lineId);
+      const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
       return {
         ...state,
         documents: [
@@ -118,8 +118,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
             lines: [
               ...document.lines.slice(0, idxl),
               {
-                ...document.lines.find((line) => line.id === action.payload.lineId),
-                quantity: action.payload.value,
+                ...action.payload.line,
               },
               ...document.lines.slice(idxl + 1),
             ],

@@ -67,13 +67,15 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
 
 const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status: number; docId: number }) => {
   const navigation = useNavigation();
+  const { actions } = useAppStore();
 
   return status === 0 ? (
     <TouchableOpacity
       style={localStyles.listContainer}
-      onPress={() =>
-        navigation.navigate('SellProductDetail', { lineID: item.id, prodId: item.goodId, docId, modeCor: true })
-      }
+      onPress={() => {
+        actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
+        navigation.navigate('SellProductDetail', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
+      }}
     >
       <ContentItem item={item} status={status} />
     </TouchableOpacity>

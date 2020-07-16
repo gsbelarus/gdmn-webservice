@@ -67,15 +67,13 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       ? (document as IDocument).lines
       : (document as ISellDocument).lines;
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineId);
-  const [line, setLine] = useState<ISellLine>(undefined);
+  const [line, setLine] = useState<ISellLine>(lineDocument);
   const [value, setValue] = useState('1');
   const orderQ = (lineDocument as ISellLine)?.orderQuantity ?? 0;
-  const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(
-    state.boxingsLine
-      ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
-          .lineBoxings
-      : [],
-  );
+  const findBoxingsLine = state.boxingsLine
+    ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
+    : undefined;
+  const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
   useEffect(() => {
     if (route.params.modeCor) {
@@ -87,26 +85,29 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   }, [document.lines, route.params.modeCor, route.params.lineId, lineDocument]);
 
   useEffect(() => {
-    setBoxingsLine(
-      state.boxingsLine
-        ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
-            .lineBoxings
-        : [],
-    );
+    const findBoxingsLineHock = state.boxingsLine
+      ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
+      : undefined;
+    setBoxingsLine(findBoxingsLineHock ? findBoxingsLineHock.lineBoxings : []);
   }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
-      if (line !== undefined) {
+      console.log(route.params.lineId);
+      const findBoxingsLineHock = state.boxingsLine
+        ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
+        : undefined;
+      const boxings = findBoxingsLineHock ? findBoxingsLineHock : undefined;
+      if (line) {
         actions.editLine({
           docId: route.params.docId,
-          lineId: line.id,
-          value: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
+          line: {
+            ...line,
+            quantity: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
+            tara: boxings ? boxings.lineBoxings : undefined,
+          },
         });
       } else {
-        const boxings = state.boxingsLine
-          ? state.boxingsLine.find((box) => box.docId === route.params.docId && box.lineDoc === route.params.lineId)
-          : undefined;
         actions.addLine({
           docId: route.params.docId,
           line: {

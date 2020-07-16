@@ -36,7 +36,7 @@ export const AppActions = {
   deleteLine: createActionPayload<ActionAppTypes.DOCUMENT_DELETE_LINE, { docId: number; lineId: string }>(
     ActionAppTypes.DOCUMENT_DELETE_LINE,
   ),
-  editLine: createActionPayload<ActionAppTypes.DOCUMENT_EDIT_LINE, { docId: number; lineId: string; value: number }>(
+  editLine: createActionPayload<ActionAppTypes.DOCUMENT_EDIT_LINE, { docId: number; line: ILine | ISellLine }>(
     ActionAppTypes.DOCUMENT_EDIT_LINE,
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
