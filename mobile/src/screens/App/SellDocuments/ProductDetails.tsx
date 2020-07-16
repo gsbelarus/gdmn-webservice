@@ -36,7 +36,7 @@ const ListChips = ({
           <Chip
             key={idx}
             mode="outlined"
-            style={[localeStyles.margin, selectedBoxing ? { backgroundColor: colors.primary } : {}]}
+            style={[localeStyles.margin, localeStyles.chip, selectedBoxing ? { backgroundColor: colors.primary } : {}]}
             onPress={() => onPress(item)}
             selected={selectedBoxing !== undefined}
             selectedColor={selectedBoxing ? colors.card : colors.text}
@@ -200,21 +200,21 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
         <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
         <List.AccordionGroup>
-          <List.Accordion title="Ящики" id="1">
+          <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
             <ListChips
               data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
               onPress={onPress}
               selected={boxingsLine}
             />
           </List.Accordion>
-          <List.Accordion title="Бумага" id="2">
+          <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
             <ListChips
               data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
               onPress={onPress}
               selected={boxingsLine}
             />
           </List.Accordion>
-          <List.Accordion title="Поддоны" id="3">
+          <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
             <ListChips
               data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
               onPress={onPress}
@@ -234,12 +234,16 @@ const localeStyles = StyleSheet.create({
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
-    padding: 10,
   },
   button: {
     alignItems: 'center',
     height: 35,
     marginHorizontal: '25%',
+  },
+  chip: {
+    fontSize: 18,
+    height: 50,
+    justifyContent: 'center',
   },
   container: {
     justifyContent: 'flex-start',
@@ -307,7 +311,8 @@ const localeStyles = StyleSheet.create({
   },
   subdivisionText: {
     fontSize: 11,
-    marginBottom: 5,
+    //marginBottom: 5,
+    margin: 10,
     textAlign: 'left',
   },
   taraContanerView: {
