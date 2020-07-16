@@ -12,6 +12,10 @@ import referencesRef from '../../mockData/Otves/References.json';
 import { ITara } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
+const isMessage = (obj: unknown): obj is IMessage =>
+  obj instanceof isMessage && 'id' in obj && 'head' in obj && 'body' in obj && obj.id !== undefined;
+const isMessagesArray = (obj: unknown): obj is IMessage[] => Array.isArray(obj) && obj.every(isMessage);
+
 const SettingsScreen = () => {
   const { colors /* , dark */ } = useTheme();
   const { apiService } = useServiceStore();

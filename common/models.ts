@@ -80,7 +80,7 @@ export interface IMessage {
     type: string;
     payload: {
       name: string;
-      params: IDocument[] | string[];
+      params: IDocument[] | string[] | any;
     };
   };
 }

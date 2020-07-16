@@ -80,8 +80,12 @@ const SellDocumentsListScreen = ({ navigation }) => {
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
-          name: 'get_documents',
-          params: ['SellDocument'],
+          name: 'get_SellDocuments',
+          params: [
+            {
+              date: new Date().toLocaleDateString(),
+            },
+          ],
         },
       }),
     )
@@ -118,9 +122,9 @@ const SellDocumentsListScreen = ({ navigation }) => {
     timeout(
       5000,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
-        type: 'cmd',
+        type: 'data',
         payload: {
-          name: 'post_documents',
+          name: 'SellDocument',
           params: documents,
         },
       }),
