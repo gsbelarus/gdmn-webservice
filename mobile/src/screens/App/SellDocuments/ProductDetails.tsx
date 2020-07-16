@@ -93,7 +93,6 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
 
   useImperativeHandle(ref, () => ({
     done: () => {
-      console.log(route.params.lineId);
       const findBoxingsLineHock = state.boxingsLine
         ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
         : undefined;
