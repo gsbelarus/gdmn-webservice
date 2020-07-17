@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native';
 
+import { IMessage } from '../../../common';
 import config from '../config';
 
 export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
@@ -56,3 +57,13 @@ export const appStorage = {
     await AsyncStorage.removeItem(key);
   },
 };
+
+export const isMessage = (obj: unknown): obj is IMessage =>
+  obj instanceof isMessage &&
+  'id' in obj &&
+  'head' in obj &&
+  'body' in obj &&
+  (obj as IMessage).id !== undefined &&
+  (obj as IMessage).head !== undefined &&
+  (obj as IMessage).body !== undefined;
+export const isMessagesArray = (obj: unknown): obj is IMessage[] => Array.isArray(obj) && obj.every(isMessage);

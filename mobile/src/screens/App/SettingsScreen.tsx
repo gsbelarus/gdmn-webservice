@@ -6,15 +6,11 @@ import { Divider, Avatar, Button } from 'react-native-paper';
 import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemain } from '../../../../common';
 import SettingsItem from '../../components/SettingsItem';
 import config from '../../config';
-import { timeout } from '../../helpers/utils';
+import { timeout, isMessagesArray } from '../../helpers/utils';
 import documentsRef from '../../mockData/Otves/Document.json';
 import referencesRef from '../../mockData/Otves/References.json';
 import { ITara } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
-
-const isMessage = (obj: unknown): obj is IMessage =>
-  obj instanceof isMessage && 'id' in obj && 'head' in obj && 'body' in obj && obj.id !== undefined;
-const isMessagesArray = (obj: unknown): obj is IMessage[] => Array.isArray(obj) && obj.every(isMessage);
 
 const SettingsScreen = () => {
   const { colors /* , dark */ } = useTheme();
@@ -89,6 +85,10 @@ const SettingsScreen = () => {
           const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
           if (!response.result) {
             Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+            return;
+          }
+          if (!isMessagesArray(response.data)) {
+            Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
             return;
           }
           const messages = response.data.filter((message) => message.body.type === 'data');
