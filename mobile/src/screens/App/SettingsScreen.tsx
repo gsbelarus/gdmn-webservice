@@ -47,6 +47,7 @@ const SettingsScreen = () => {
               appActions.setDocumentTypes([]);
               appActions.setGoods([]);
               appActions.setRemains([]);
+              appActions.setBoxings([]);
             },
           },
           {
@@ -96,14 +97,16 @@ const SettingsScreen = () => {
             messages.forEach((message) => {
               /* Обработка данных по справочникам */
               const ref = (message.body.payload as unknown) as IReference[];
-              const contacts = ref.find((itm) => itm.name === 'contacts')?.data as IContact[];
+              const contacts = ref.find((itm) => itm.type === 'contacts')?.data as IContact[];
               appActions.setContacts(contacts);
-              const documentTypes = ref.find((itm) => itm.name === 'documenttypes')?.data as IDocumentType[];
+              const documentTypes = ref.find((itm) => itm.type === 'documenttypes')?.data as IDocumentType[];
               appActions.setDocumentTypes(documentTypes);
-              const goods = ref.find((itm) => itm.name === 'goods')?.data as IGood[];
+              const goods = ref.find((itm) => itm.type === 'goods')?.data as IGood[];
               appActions.setGoods(goods);
-              const remains = (ref.find((itm) => itm.name === 'remains')?.data as unknown) as IRemain[];
+              const remains = (ref.find((itm) => itm.type === 'remains')?.data as unknown) as IRemain[];
               appActions.setRemains(remains);
+              const boxings = (ref.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
+              appActions.setBoxings(boxings);
 
               apiService.data.deleteMessage(companyID, message.head.id);
               // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
