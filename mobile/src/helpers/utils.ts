@@ -59,7 +59,7 @@ export const appStorage = {
 };
 
 export const isMessage = (obj: unknown): obj is IMessage =>
-  obj instanceof isMessage &&
+  obj instanceof Object &&
   'id' in obj &&
   'head' in obj &&
   'body' in obj &&
