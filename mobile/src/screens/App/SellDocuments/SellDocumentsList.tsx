@@ -125,7 +125,10 @@ const SellDocumentsListScreen = ({ navigation }) => {
         type: 'data',
         payload: {
           name: 'SellDocument',
-          params: documents,
+          params:  {
+            documents,
+            boxings: appState.boxings
+          },
         },
       }),
     )
