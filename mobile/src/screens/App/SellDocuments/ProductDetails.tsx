@@ -122,40 +122,13 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   }));
 
   const onPress = (item: ITara) => {
-    if (boxingsLine.some((box) => box.tarakey === item.id)) {
-      const idx = state.boxingsLine
-        ? state.boxingsLine.findIndex(
-            (bLine) => bLine.docId === route.params.docId && bLine.lineDoc === route.params.lineId,
-          )
-        : -1;
-      const idxl = idx > -1 ? state.boxingsLine[idx].lineBoxings.findIndex((bLine) => bLine.tarakey === item.id) : -1;
-      const updateBoxings =
-        idxl > -1
-          ? [...state.boxingsLine[idx].lineBoxings.slice(0, idx), ...state.boxingsLine[idx].lineBoxings.slice(idx + 1)]
-          : state.boxingsLine
-          ? [...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : [])]
-          : [];
-      const newBoxingsLine = {
-        docId: route.params.docId,
-        lineDoc: route.params.lineId,
-        lineBoxings: updateBoxings,
-      };
-      const updateBoxingsLine =
-        idx === -1
-          ? state.boxingsLine
-            ? [...state.boxingsLine, newBoxingsLine]
-            : [newBoxingsLine]
-          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
-      actions.setBoxingsLine(updateBoxingsLine);
-    } else {
-      navigation.navigate('BoxingDetail', {
-        boxingId: item.id,
-        lineId: route.params.lineId,
-        prodId: route.params.prodId,
-        docId: route.params.docId,
-        modeCor: route.params.modeCor,
-      });
-    }
+    navigation.navigate('BoxingDetail', {
+      boxingId: item.id,
+      lineId: route.params.lineId,
+      prodId: route.params.prodId,
+      docId: route.params.docId,
+      modeCor: route.params.modeCor,
+    });
   };
 
   return (
@@ -173,7 +146,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
         <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
         <TextInput
           mode={'flat'}
-          label={'Кол-во по заявке'}
+          label={'Количество по заявке'}
           editable={false}
           value={orderQ.toString()}
           theme={{
@@ -192,15 +165,20 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           keyboardType="decimal-pad"
           onChangeText={setValue}
           // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={true}
+          //autoFocus={true}
           value={value}
+          theme={{
+            colors: {
+              placeholder: colors.primary,
+            },
+          }}
           style={{
             backgroundColor: colors.card,
           }}
         />
 
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-          <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
+          <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тара:</Text>
           <List.AccordionGroup>
             <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
               <ListChips
