@@ -3,7 +3,17 @@ import React, { useCallback } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button } from 'react-native-paper';
 
-import { IResponse, IMessage, IReference, IContact, IDocumentType, IGood, IRemain } from '../../../../common';
+import {
+  IResponse,
+  IMessage,
+  IReference,
+  IContact,
+  IDocumentType,
+  IGood,
+  IRemain,
+  IDocument,
+} from '../../../../common';
+import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import config from '../../config';
 import { timeout, isMessagesArray } from '../../helpers/utils';
@@ -92,29 +102,57 @@ const SettingsScreen = () => {
             Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
             return;
           }
-          const messages = response.data.filter((message) => message.body.type === 'data');
-          if (messages.length !== 0) {
-            messages.forEach((message) => {
-              /* Обработка данных по справочникам */
-              const ref = (message.body.payload as unknown) as IReference[];
-              const contacts = ref.find((itm) => itm.type === 'contacts')?.data as IContact[];
-              appActions.setContacts(contacts);
-              const documentTypes = ref.find((itm) => itm.type === 'documenttypes')?.data as IDocumentType[];
-              appActions.setDocumentTypes(documentTypes);
-              const goods = ref.find((itm) => itm.type === 'goods')?.data as IGood[];
-              appActions.setGoods(goods);
-              const remains = (ref.find((itm) => itm.type === 'remains')?.data as unknown) as IRemain[];
-              appActions.setRemains(remains);
-              const boxings = (ref.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
-              appActions.setBoxings(boxings);
 
+          response.data?.forEach((message) => {
+            if (message.body.type === 'data') {
+              // Сообщение содержит данные
+              ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+                switch (dataSet.type) {
+                  case 'get_SellDocuments': {
+                    const newDocuments = dataSet.data as IDocument[];
+                    appActions.setDocuments([...documents, ...newDocuments]);
+                    break;
+                  }
+                  case 'documenttypes': {
+                    const documentTypes = dataSet.data as IDocumentType[];
+                    appActions.setDocumentTypes(documentTypes);
+                    break;
+                  }
+                  case 'contacts': {
+                    const contacts = dataSet.data as IContact[];
+                    appActions.setContacts(contacts);
+                    break;
+                  }
+                  case 'goods': {
+                    const goods = dataSet.data as IGood[];
+                    appActions.setGoods(goods);
+                    break;
+                  }
+                  case 'remains': {
+                    const remains = dataSet.data as IRemain[];
+                    appActions.setRemains(remains);
+                    break;
+                  }
+                  case 'boxings': {
+                    const boxings = dataSet.data as ITara[];
+                    appActions.setBoxings(boxings);
+                    break;
+                  }
+                  default:
+                    break;
+                }
+              });
               apiService.data.deleteMessage(companyID, message.head.id);
-              // appActions.setReferences((sortMessages[0].body.payload as unknown) as IReference[]);
-            });
-          }
+            }
+            if (message.body.type === 'cmd') {
+              // Сообщение содержит команду
+              apiService.data.deleteMessage(companyID, message.head.id);
+            }
+          });
+
           /* Обработка сообщений, которые связаны с документами */
           const messagesForDocuments = response.data.filter(
-            (message) => message.body.type === 'response' && message.body.payload.name === 'post_documents',
+            (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
           );
           if (messagesForDocuments.length > 0) {
             messagesForDocuments.forEach((message) => {

@@ -57,3 +57,8 @@ export interface IReference {
     [fieldName: string]: unknown;
   }[];
 }
+
+export interface IDocumentMessage {
+  name: string;
+  data: IDocument[];
+}

@@ -67,7 +67,9 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         },
       ]}
     >
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
+        {product?.name || 'товар не найден'}
+      </SubTitle>
       <TextInput
         mode={'flat'}
         label={'Цена'}

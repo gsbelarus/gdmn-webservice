@@ -19,15 +19,18 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
+
+  const docHead = item.head as ISellHead;
+
   const fromContact = state.contacts
-    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.fromcontactId)
+    ? state.contacts.find((contact) => contact.id === docHead?.fromcontactId)
     : undefined;
-  const toContact = state.contacts
-    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.tocontactId)
-    : undefined;
-  const expeditor = state.contacts
-    ? state.contacts.find((contact) => contact.id === (item.head as ISellHead)?.expeditorId)
-    : undefined;
+
+  const toContact = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.tocontactId) : undefined;
+
+  const expeditor = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.expeditorId) : undefined;
+
+  const docDate = new Date(item.head?.date).toLocaleDateString();
 
   return (
     <TouchableOpacity
@@ -41,9 +44,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
-            <Text style={[localStyles.name, { color: colors.text }]}>
-              {(item.head as ISellHead).docnumber} от {new Date(item.head.date).toLocaleDateString()}
-            </Text>
+            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead.docnumber} от ${docDate}`}</Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
               {Statuses.find((type) => type.id === item.head.status).name}
             </Text>

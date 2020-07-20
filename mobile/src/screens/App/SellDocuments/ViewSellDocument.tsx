@@ -26,7 +26,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
       </View>
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
-          {good.name}
+          {good?.name || 'товар не найден'}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
