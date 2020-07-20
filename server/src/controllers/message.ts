@@ -61,6 +61,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
     const userId = ctx.state.user.id;
     const messageList = await messageService.FindMany({ appSystem, companyId: company.id, userId });
 
+    console.log(companyName);
+    console.log(appSystem);
+    console.log(messageList);
     const result: IResponse<IMessage[]> = { result: true, data: messageList };
     ctx.status = 200;
     ctx.body = result;

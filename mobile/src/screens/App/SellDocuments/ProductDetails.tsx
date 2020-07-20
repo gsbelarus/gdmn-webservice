@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Text, TextInput, Chip, List } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
@@ -159,71 +159,76 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        localeStyles.container,
-        {
-          backgroundColor: colors.card,
-        },
-      ]}
-    >
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
-      <TextInput
-        mode={'flat'}
-        label={'Кол-во по заявке'}
-        editable={false}
-        value={orderQ.toString()}
-        theme={{
-          colors: {
-            placeholder: colors.primary,
-          },
-        }}
-        style={{
-          backgroundColor: colors.card,
-        }}
-      />
-      <TextInput
-        mode={'flat'}
-        label={'Количество'}
-        editable={true}
-        keyboardType="decimal-pad"
-        onChangeText={setValue}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={true}
-        value={value}
-        style={{
-          backgroundColor: colors.card,
-        }}
-      />
+    <SafeAreaView>
+      <ScrollView>
+        <View
+          style={[
+            styles.container,
+            localeStyles.container,
+            {
+              backgroundColor: colors.card,
+            },
+          ]}
+        >
+        <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{product.name}</SubTitle>
+        <TextInput
+          mode={'flat'}
+          label={'Кол-во по заявке'}
+          editable={false}
+          value={orderQ.toString()}
+          theme={{
+            colors: {
+              placeholder: colors.primary,
+            },
+          }}
+          style={{
+            backgroundColor: colors.card,
+          }}
+        />
+        <TextInput
+          mode={'flat'}
+          label={'Количество'}
+          editable={true}
+          keyboardType="decimal-pad"
+          onChangeText={setValue}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={true}
+          value={value}
+          style={{
+            backgroundColor: colors.card,
+          }}
+        />
 
-      <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-        <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
-        <List.AccordionGroup>
-          <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-          <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-          <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-        </List.AccordionGroup>
-      </View>
-    </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+          <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
+          <List.AccordionGroup>
+            <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
+              <ListChips
+                data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
+                onPress={onPress}
+                selected={boxingsLine}
+              />
+            </List.Accordion>
+            <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
+              <ListChips
+                data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
+                onPress={onPress}
+                selected={boxingsLine}
+              />
+            </List.Accordion>
+            <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
+              <ListChips
+                data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
+                onPress={onPress}
+                selected={boxingsLine}
+              />
+            </List.Accordion>
+          </List.AccordionGroup>
+        </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+
   );
 });
 
