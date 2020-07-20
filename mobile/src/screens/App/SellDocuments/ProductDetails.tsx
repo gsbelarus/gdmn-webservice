@@ -75,7 +75,13 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     : undefined;
   const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
+  console.log(route.params.quantity);
+
   useEffect(() => {
+    if (route.params.quantity) {
+      setValue(route.params.quantity);
+      return;
+    };
     if (route.params.modeCor) {
       if (lineDocument) {
         setValue(lineDocument.quantity.toString());
@@ -128,6 +134,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       prodId: route.params.prodId,
       docId: route.params.docId,
       modeCor: route.params.modeCor,
+      quantity: value,
     });
   };
 

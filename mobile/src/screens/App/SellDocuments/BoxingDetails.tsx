@@ -64,12 +64,6 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
             : [newBoxingsLine]
           : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
       actions.setBoxingsLine(boxingsLine);
-      navigation.navigate('SellProductDetail', {
-        lineId: route.params.lineId,
-        prodId: route.params.prodId,
-        docId: route.params.docId,
-        modeCor: route.params.modeCor,
-      });
     },
   }));
 
@@ -154,6 +148,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
                   prodId: route.params.prodId,
                   docId: route.params.docId,
                   modeCor: route.params.modeCor,
+                  quantity: route.params.quantity,
                 });
               },
             },
