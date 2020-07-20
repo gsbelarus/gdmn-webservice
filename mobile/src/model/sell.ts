@@ -13,6 +13,7 @@ export interface ISellHead extends IHead {
 
 export interface ILineTara {
   tarakey: number;
+  type: TTypeTara;
   quantity?: number;
   weight?: number;
 }

@@ -19,13 +19,13 @@ import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
 export type RootStackParamList = {
   BottomTabs: undefined;
-  ProductDetail: { prodId: number; docId: number; modeCor: boolean };
+  ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
   SellProductDetail: { lineId: number; prodId: number; docId: number; modeCor: boolean };
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
-  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean };
+  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean; quantity: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -216,6 +216,7 @@ const AppNavigator = () => {
                     prodId: route.params.prodId,
                     docId: route.params.docId,
                     modeCor: route.params.modeCor,
+                    quantity: route.params.quantity,
                   });
                 }}
               />
@@ -229,6 +230,7 @@ const AppNavigator = () => {
                     prodId: route.params.prodId,
                     docId: route.params.docId,
                     modeCor: route.params.modeCor,
+                    quantity: route.params.quantity,
                   });
                 }}
               />

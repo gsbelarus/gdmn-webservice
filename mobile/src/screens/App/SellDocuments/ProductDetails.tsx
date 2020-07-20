@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Text, TextInput, Chip, List } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
@@ -75,7 +75,13 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     : undefined;
   const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
+  console.log(route.params.quantity);
+
   useEffect(() => {
+    if (route.params.quantity) {
+      setValue(route.params.quantity);
+      return;
+    }
     if (route.params.modeCor) {
       if (lineDocument) {
         setValue(lineDocument.quantity.toString());
@@ -122,110 +128,93 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   }));
 
   const onPress = (item: ITara) => {
-    if (boxingsLine.some((box) => box.tarakey === item.id)) {
-      const idx = state.boxingsLine
-        ? state.boxingsLine.findIndex(
-            (bLine) => bLine.docId === route.params.docId && bLine.lineDoc === route.params.lineId,
-          )
-        : -1;
-      const idxl = idx > -1 ? state.boxingsLine[idx].lineBoxings.findIndex((bLine) => bLine.tarakey === item.id) : -1;
-      const updateBoxings =
-        idxl > -1
-          ? [...state.boxingsLine[idx].lineBoxings.slice(0, idx), ...state.boxingsLine[idx].lineBoxings.slice(idx + 1)]
-          : state.boxingsLine
-          ? [...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : [])]
-          : [];
-      const newBoxingsLine = {
-        docId: route.params.docId,
-        lineDoc: route.params.lineId,
-        lineBoxings: updateBoxings,
-      };
-      const updateBoxingsLine =
-        idx === -1
-          ? state.boxingsLine
-            ? [...state.boxingsLine, newBoxingsLine]
-            : [newBoxingsLine]
-          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
-      actions.setBoxingsLine(updateBoxingsLine);
-    } else {
-      navigation.navigate('BoxingDetail', {
-        boxingId: item.id,
-        lineId: route.params.lineId,
-        prodId: route.params.prodId,
-        docId: route.params.docId,
-        modeCor: route.params.modeCor,
-      });
-    }
+    navigation.navigate('BoxingDetail', {
+      boxingId: item.id,
+      lineId: route.params.lineId,
+      prodId: route.params.prodId,
+      docId: route.params.docId,
+      modeCor: route.params.modeCor,
+      quantity: value,
+    });
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        localeStyles.container,
-        {
-          backgroundColor: colors.card,
-        },
-      ]}
-    >
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
-        {product?.name || 'товар не найден'}
-      </SubTitle>
-      <TextInput
-        mode={'flat'}
-        label={'Кол-во по заявке'}
-        editable={false}
-        value={orderQ.toString()}
-        theme={{
-          colors: {
-            placeholder: colors.primary,
-          },
-        }}
-        style={{
-          backgroundColor: colors.card,
-        }}
-      />
-      <TextInput
-        mode={'flat'}
-        label={'Количество'}
-        editable={true}
-        keyboardType="decimal-pad"
-        onChangeText={setValue}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={true}
-        value={value}
-        style={{
-          backgroundColor: colors.card,
-        }}
-      />
+    <SafeAreaView>
+      <ScrollView>
+        <View
+          style={[
+            styles.container,
+            localeStyles.container,
+            {
+              backgroundColor: colors.card,
+            },
+          ]}
+        >
+          <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
+            {product?.name || 'товар не найден'}
+          </SubTitle>
+          <TextInput
+            mode={'flat'}
+            label={'Количество по заявке'}
+            editable={false}
+            value={orderQ.toString()}
+            theme={{
+              colors: {
+                placeholder: colors.primary,
+              },
+            }}
+            style={{
+              backgroundColor: colors.card,
+            }}
+          />
+          <TextInput
+            mode={'flat'}
+            label={'Количество'}
+            editable={true}
+            keyboardType="decimal-pad"
+            onChangeText={setValue}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            //autoFocus={true}
+            value={value}
+            theme={{
+              colors: {
+                placeholder: colors.primary,
+              },
+            }}
+            style={{
+              backgroundColor: colors.card,
+            }}
+          />
 
-      <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-        <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тары: </Text>
-        <List.AccordionGroup>
-          <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-          <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-          <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
-            <ListChips
-              data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
-              onPress={onPress}
-              selected={boxingsLine}
-            />
-          </List.Accordion>
-        </List.AccordionGroup>
-      </View>
-    </View>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+            <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тара:</Text>
+            <List.AccordionGroup>
+              <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
+                <ListChips
+                  data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
+                  onPress={onPress}
+                  selected={boxingsLine}
+                />
+              </List.Accordion>
+              <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
+                <ListChips
+                  data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
+                  onPress={onPress}
+                  selected={boxingsLine}
+                />
+              </List.Accordion>
+              <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
+                <ListChips
+                  data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
+                  onPress={onPress}
+                  selected={boxingsLine}
+                />
+              </List.Accordion>
+            </List.AccordionGroup>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 });
 
