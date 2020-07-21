@@ -69,6 +69,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineId);
   const [line, setLine] = useState<ISellLine>(lineDocument);
   const [value, setValue] = useState('1');
+  const [batchNumber, setBatchNumber] = useState(line.numreceive ?? '');
   const orderQ = (lineDocument as ISellLine)?.orderQuantity ?? 0;
   const findBoxingsLine = state.boxingsLine
     ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
@@ -108,6 +109,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           docId: route.params.docId,
           line: {
             ...line,
+            numreceive: batchNumber,
             quantity: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
             tara: boxings ? boxings.lineBoxings : undefined,
           },
@@ -118,6 +120,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           line: {
             id: '0',
             goodId: product.id,
+            numreceive: batchNumber,
             quantity: Number.parseFloat(value),
             tara: boxings ? boxings.lineBoxings : undefined,
           },
@@ -153,6 +156,21 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
             {product?.name || 'товар не найден'}
           </SubTitle>
+          <TextInput
+            mode={'flat'}
+            label={'Номер партии'}
+            editable={true}
+            onChangeText={setBatchNumber}
+            value={batchNumber}
+            theme={{
+              colors: {
+                placeholder: colors.primary,
+              },
+            }}
+            style={{
+              backgroundColor: colors.card,
+            }}
+          />
           <TextInput
             mode={'flat'}
             label={'Количество по заявке'}

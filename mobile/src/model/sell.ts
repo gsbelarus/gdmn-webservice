@@ -20,6 +20,7 @@ export interface ILineTara {
 
 export interface ISellLine extends ILine {
   orderQuantity?: number;
+  numreceive?: string;
   tara?: ILineTara[];
 }
 
