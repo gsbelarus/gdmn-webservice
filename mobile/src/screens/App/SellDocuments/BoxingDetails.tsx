@@ -25,7 +25,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
   const boxing: ITara | undefined = state.boxings?.find((item) => item.id === route.params.boxingId);
   const boxingsLine = state.boxingsLine.find(box => box.docId === route.params.docId && box.lineDoc === route.params.lineId);
   const boxingLine = boxingsLine ? boxingsLine.lineBoxings.find(box => box.tarakey === route.params.boxingId) : undefined;
-  const [quantity, setQuantity] = useState(boxingLine ? boxingLine.quantity.toString() : '1');
+  const [quantity, setQuantity] = useState(boxingLine && !Number.isNaN(boxingLine.quantity) ? boxingLine.quantity.toString() : '1');
   const [weight, setWeight] = useState((boxing.weight ?? 0).toString());
 
   useEffect(() => {

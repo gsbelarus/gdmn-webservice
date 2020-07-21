@@ -83,7 +83,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     }
     if (route.params.modeCor) {
       if (lineDocument) {
-        setValue(lineDocument.quantity.toString());
+        setValue(!Number.isNaN(lineDocument.quantity) ? lineDocument.quantity.toString() : '1');
       }
       setLine(lineDocument);
     }
