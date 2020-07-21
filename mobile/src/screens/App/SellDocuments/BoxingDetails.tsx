@@ -112,54 +112,56 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
           backgroundColor: colors.card,
         }}
       />
-      <TouchableOpacity
-        style={[
-          styles.circularButton,
-          localeStyles.buttons,
-          {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-          },
-        ]}
-        onPress={async () => {
-          Alert.alert('Вы уверены, что хотите удалить?', '', [
+      <View style={localeStyles.buttons}>
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            localeStyles.buttons,
             {
-              text: 'OK',
-              onPress: async () => {
-                const idx = state.boxingsLine
-                  ? state.boxingsLine.findIndex(
-                      (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
-                    )
-                  : -1;
-                const boxingsLine =
-                  idx > -1 ?
-                  [
-                    ...state.boxingsLine.slice(0, idx),
-                      {
-                        ...state.boxingsLine[idx],
-                        lineBoxings: state.boxingsLine[idx].lineBoxings.filter(box => box.tarakey !== route.params.boxingId)
-                      },
-                    ...state.boxingsLine.slice(idx + 1)
-                  ] :
-                  state.boxingsLine;
-                actions.setBoxingsLine(boxingsLine);
-                navigation.navigate('SellProductDetail', {
-                  lineId: route.params.lineId,
-                  prodId: route.params.prodId,
-                  docId: route.params.docId,
-                  modeCor: route.params.modeCor,
-                  quantity: route.params.quantity,
-                });
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
+          ]}
+          onPress={async () => {
+            Alert.alert('Вы уверены, что хотите удалить?', '', [
+              {
+                text: 'OK',
+                onPress: async () => {
+                  const idx = state.boxingsLine
+                    ? state.boxingsLine.findIndex(
+                        (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
+                      )
+                    : -1;
+                  const boxingsLine =
+                    idx > -1 ?
+                    [
+                      ...state.boxingsLine.slice(0, idx),
+                        {
+                          ...state.boxingsLine[idx],
+                          lineBoxings: state.boxingsLine[idx].lineBoxings.filter(box => box.tarakey !== route.params.boxingId)
+                        },
+                      ...state.boxingsLine.slice(idx + 1)
+                    ] :
+                    state.boxingsLine;
+                  actions.setBoxingsLine(boxingsLine);
+                  navigation.navigate('SellProductDetail', {
+                    lineId: route.params.lineId,
+                    prodId: route.params.prodId,
+                    docId: route.params.docId,
+                    modeCor: route.params.modeCor,
+                    quantity: route.params.quantity,
+                  });
+                },
               },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
-        }}
-      >
-        <MaterialIcons size={30} color={colors.card} name="delete" />
-      </TouchableOpacity>
+              {
+                text: 'Отмена',
+              },
+            ]);
+          }}
+        >
+          <MaterialIcons size={30} color={colors.card} name="delete" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 });
