@@ -28,6 +28,20 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
         </Text>
+          {
+            item.tara ?
+            <View>
+              {
+                item.tara.map(boxing => {
+                  const findBoxing = state.boxings?.find(box => boxing.tarakey === box.id);
+                  return <Text style={localStyles.boxingText} key={boxing.tarakey}>
+                      {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity}, `}
+                    </Text>
+                  })
+              }
+            </View>
+            : undefined
+          }
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
@@ -278,6 +292,9 @@ const localStyles = StyleSheet.create({
   avatarRow: {
     marginLeft: 5,
     width: 36,
+  },
+  boxingText: {
+    fontSize: 11,
   },
   buttonDelete: {
     alignItems: 'flex-end',
