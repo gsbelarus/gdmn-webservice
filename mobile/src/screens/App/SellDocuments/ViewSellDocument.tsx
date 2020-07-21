@@ -110,7 +110,8 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const ref = React.useRef<FlatList<ISellLine>>(null);
 
-  const boxings = (document.lines as ISellLine[]).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]);
+  const documentLines = document?.lines as ISellLine[];
+  const boxings = (documentLines ?? []).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]);
 
   useScrollToTop(ref);
 
@@ -157,7 +158,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       </View>
       <FlatList
         ref={ref}
-        data={document.lines}
+        data={document.lines ?? []}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -166,7 +167,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
         <Text style={localStyles.fontWeightBold}>Итого:</Text>
         <Text style={localStyles.fontWeightBold}>
-          общий {(document.lines as ISellLine[]).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
+          общий {(documentLines ?? []).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
           кол-во {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0)} /
           вес {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)}
         </Text>
