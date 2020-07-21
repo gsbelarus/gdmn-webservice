@@ -336,7 +336,6 @@ const localStyles = StyleSheet.create({
   },
   goodInfo: {
     flexBasis: 150,
-    flexGrow: 5,
     marginLeft: 15,
   },
   header: {

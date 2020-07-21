@@ -324,7 +324,6 @@ const localeStyles = StyleSheet.create({
   },
   subdivisionText: {
     fontSize: 11,
-    //marginBottom: 5,
     margin: 10,
     textAlign: 'left',
   },
