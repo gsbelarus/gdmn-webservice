@@ -37,16 +37,16 @@ const HeadSellDocumentScreen = ({ route }) => {
   const ref = React.useRef<FlatList<TField>>(null);
   const { state } = useAppStore();
   const document: ISellDocument | IDocument = state.documents.find((item) => item.id === route.params.docId);
-  const contactTo: IContact = state.contacts.find((item) => item.id === document.head.tocontactId);
-  const contactFrom: IContact = state.contacts.find((item) => item.id === document.head.fromcontactId);
-  const expeditor: IContact = state.contacts.find((item) => item.id === (document.head as ISellHead).expeditorId);
-  const status: string = statuses.find((item) => item.id === document.head.status).name;
+  const contactTo: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId);
+  const contactFrom: IContact = state.contacts.find((item) => item.id === document?.head.fromcontactId);
+  const expeditor: IContact = state.contacts.find((item) => item.id === (document?.head as ISellHead).expeditorId);
+  const status: string = statuses.find((item) => item.id === document?.head.status)?.name;
   const { colors } = useTheme();
 
   const field: TField[] = [
-    { title: 'Идентификатор', value: document.id },
-    { title: 'Номер', value: (document.head as ISellHead).docnumber },
-    { title: 'Дата', value: new Date(document.head.date).toLocaleDateString() },
+    { title: 'Идентификатор', value: document?.id },
+    { title: 'Номер', value: (document?.head as ISellHead)?.docnumber },
+    { title: 'Дата', value: new Date(document?.head?.date).toLocaleDateString() },
     { title: 'Экспедитор', value: expeditor ? expeditor.name : '' },
     { title: 'Подразделение', value: contactFrom ? contactFrom.name : '' },
     { title: 'Организация', value: contactTo ? contactTo.name : '' },
