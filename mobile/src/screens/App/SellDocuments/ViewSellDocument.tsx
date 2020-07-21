@@ -167,9 +167,9 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
         <Text style={localStyles.fontWeightBold}>Итого:</Text>
         <Text style={localStyles.fontWeightBold}>
-          общий {(documentLines ?? []).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
-          кол-во {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0)} /
-          вес {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)}
+        общий {(documentLines ?? []).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
+          кол-во {boxings.length !== 0 ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0) : 0} /
+          вес {boxings.length !== 0 ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0) : 0}
         </Text>
       </View>
       <ItemSeparator />

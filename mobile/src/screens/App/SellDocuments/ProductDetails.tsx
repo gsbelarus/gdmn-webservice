@@ -69,7 +69,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineId);
   const [line, setLine] = useState<ISellLine>(lineDocument);
   const [value, setValue] = useState('1');
-  const [batchNumber, setBatchNumber] = useState(line.numreceive ?? '');
+  const [batchNumber, setBatchNumber] = useState('');
   const orderQ = (lineDocument as ISellLine)?.orderQuantity ?? 0;
   const findBoxingsLine = state.boxingsLine
     ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
@@ -95,6 +95,12 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       : undefined;
     setBoxingsLine(findBoxingsLineHock ? findBoxingsLineHock.lineBoxings : []);
   }, [route.params.docId, route.params.lineId, state.boxingsLine]);
+
+  useEffect(() => {
+    if (line) {
+      setBatchNumber(line.numreceive ?? '');
+    }
+  }, [line])
 
   useImperativeHandle(ref, () => ({
     done: () => {
