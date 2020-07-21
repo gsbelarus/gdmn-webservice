@@ -28,20 +28,25 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
         </Text>
-          {
-            item.tara ?
-            <View>
-              {
-                item.tara.map(boxing => {
-                  const findBoxing = state.boxings?.find(box => boxing.tarakey === box.id);
-                  return <Text style={localStyles.boxingText} key={boxing.tarakey}>
-                      {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0}, `}
-                    </Text>
-                  })
-              }
-            </View>
-            : undefined
-          }
+        {
+          item.numreceive
+          ? <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
+          : undefined
+        }
+        {
+          item.tara ?
+          <View>
+            {
+              item.tara.map(boxing => {
+                const findBoxing = state.boxings?.find(box => boxing.tarakey === box.id);
+                return <Text style={localStyles.boxingText} key={boxing.tarakey}>
+                    {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0}, `}
+                  </Text>
+                })
+            }
+          </View>
+          : undefined
+        }
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>

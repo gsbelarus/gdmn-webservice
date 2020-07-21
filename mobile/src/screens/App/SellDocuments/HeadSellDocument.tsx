@@ -47,9 +47,9 @@ const HeadSellDocumentScreen = ({ route }) => {
     { title: 'Идентификатор', value: document.id },
     { title: 'Номер', value: (document.head as ISellHead).docnumber },
     { title: 'Дата', value: new Date(document.head.date).toLocaleDateString() },
-    { title: 'Экспедитор', value: expeditor.name },
-    { title: 'Подразделение', value: contactFrom.name },
-    { title: 'Организация', value: contactTo.name },
+    { title: 'Экспедитор', value: expeditor ? expeditor.name : '' },
+    { title: 'Подразделение', value: contactFrom ? contactFrom.name : '' },
+    { title: 'Организация', value: contactTo ? contactTo.name : '' },
     { title: 'Статус', value: status },
   ];
 
