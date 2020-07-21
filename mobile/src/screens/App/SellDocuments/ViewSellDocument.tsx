@@ -6,7 +6,7 @@ import { Text } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { ISellDocument, ISellLine, ISellHead } from '../../../model';
+import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -35,7 +35,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
                 item.tara.map(boxing => {
                   const findBoxing = state.boxings?.find(box => boxing.tarakey === box.id);
                   return <Text style={localStyles.boxingText} key={boxing.tarakey}>
-                      {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity}, `}
+                      {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0}, `}
                     </Text>
                   })
               }
@@ -110,6 +110,8 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const ref = React.useRef<FlatList<ISellLine>>(null);
 
+  const boxings = (document.lines as ISellLine[]).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]);
+
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: ISellLine }) => (
@@ -164,7 +166,9 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
         <Text style={localStyles.fontWeightBold}>Итого:</Text>
         <Text style={localStyles.fontWeightBold}>
-          {(document.lines as ISellLine[]).reduce((total, line) => line.quantity + total, 0)}
+          общий {(document.lines as ISellLine[]).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
+          кол-во {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0)} /
+          вес {boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)}
         </Text>
       </View>
       <ItemSeparator />
