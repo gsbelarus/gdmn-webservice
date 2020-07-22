@@ -84,6 +84,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
           label={'Количество'}
           editable={boxing.type !== 'pan'}
           keyboardType="decimal-pad"
+          autoFocus={true}
           value={quantity}
           onChangeText={setQuantity}
           theme={{
@@ -101,6 +102,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
         label={'Общий вес'}
         editable={boxing.type !== 'box'}
         keyboardType="decimal-pad"
+        autoFocus={boxing.type !== 'box'}
         onChangeText={setWeight}
         value={weight}
         theme={{

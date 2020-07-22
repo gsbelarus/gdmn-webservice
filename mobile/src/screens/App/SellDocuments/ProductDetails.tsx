@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { Text, TextInput, Chip, List } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
@@ -76,6 +76,19 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     : undefined;
   const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (route.params.quantity) {
       setValue(route.params.quantity);
@@ -135,6 +148,9 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
   }));
 
   const onPress = (item: ITara) => {
+    if (isKeyboardVisible) {
+      return;
+    }
     navigation.navigate('BoxingDetail', {
       boxingId: item.id,
       lineId: route.params.lineId,
@@ -196,7 +212,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
             keyboardType="decimal-pad"
             onChangeText={setValue}
             // eslint-disable-next-line jsx-a11y/no-autofocus
-            //autoFocus={true}
+            autoFocus={true}
             value={value}
             theme={{
               colors: {
