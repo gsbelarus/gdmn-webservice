@@ -126,6 +126,7 @@ const AppNavigator = () => {
           component={ProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
+            headerTitleStyle: {alignSelf: 'center'},
             headerLeft: () => (
               <HeaderRight
                 text="Отмена"
@@ -192,6 +193,7 @@ const AppNavigator = () => {
           component={SellProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
+            headerTitleStyle: {alignSelf: 'center'},
             headerLeft: () => (
               <HeaderRight
                 text="Отмена"
