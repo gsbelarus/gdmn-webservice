@@ -31,7 +31,6 @@ const CompaniesScreen = () => {
 
   useEffect(() => {
     const getCompanyId = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const savedCompany = await appStorage.getItem(`${userID}/companyId`);
 
       /*
@@ -43,9 +42,9 @@ const CompaniesScreen = () => {
         TODO Если хотим сменить то происходит снова автоматический вход
       */
 
-      // !!savedCompany && companies.some((company) => company === savedCompany)
-      //   ? actions.setCompanyID(savedCompany)
-      //   : undefined;
+      !!savedCompany && companies.some((company) => company === savedCompany)
+        ? actions.setCompanyID(savedCompany)
+        : undefined;
     };
 
     if (userID !== null && companies) {
