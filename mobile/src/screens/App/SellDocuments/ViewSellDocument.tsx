@@ -28,25 +28,23 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
         </Text>
-        {
-          item.numreceive
-          ? <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
-          : undefined
-        }
-        {
-          item.tara ?
+        {item.numreceive ? (
+          <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
+        ) : undefined}
+        {item.tara ? (
           <View>
-            {
-              item.tara.map(boxing => {
-                const findBoxing = state.boxings?.find(box => boxing.tarakey === box.id);
-                return <Text style={localStyles.boxingText} key={boxing.tarakey}>
-                    {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0}, `}
-                  </Text>
-                })
-            }
+            {item.tara.map((boxing) => {
+              const findBoxing = state.boxings?.find((box) => boxing.tarakey === box.id);
+              return (
+                <Text style={localStyles.boxingText} key={boxing.tarakey}>
+                  {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${
+                    boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0
+                  }`}
+                </Text>
+              );
+            })}
           </View>
-          : undefined
-        }
+        ) : undefined}
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
@@ -116,7 +114,10 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
   const ref = React.useRef<FlatList<ISellLine>>(null);
 
   const documentLines = document?.lines as ISellLine[];
-  const boxings = (documentLines ?? []).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]);
+  const boxings = (documentLines ?? []).reduce(
+    (totalLine, line) => [...totalLine, ...(line.tara ?? [])],
+    [] as ILineTara[],
+  );
 
   useScrollToTop(ref);
 
@@ -172,9 +173,19 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
         <Text style={localStyles.fontWeightBold}>Итого:</Text>
         <Text style={localStyles.fontWeightBold}>
-        общий {(documentLines ?? []).reduce((total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)), 0)} /
-          кол-во {boxings.length !== 0 ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0) : 0} /
-          вес {boxings.length !== 0 ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0) : 0}
+          общий{' '}
+          {(documentLines ?? []).reduce(
+            (total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)),
+            0,
+          )}{' '}
+          / кол-во{' '}
+          {boxings.length !== 0
+            ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0)
+            : 0}{' '}
+          / вес{' '}
+          {boxings.length !== 0
+            ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
+            : 0}
         </Text>
       </View>
       <ItemSeparator />
@@ -340,7 +351,7 @@ const localStyles = StyleSheet.create({
     marginRight: 15,
   },
   goodInfo: {
-    flexBasis: 150,
+    flexBasis: '30%',
     marginLeft: 15,
   },
   header: {

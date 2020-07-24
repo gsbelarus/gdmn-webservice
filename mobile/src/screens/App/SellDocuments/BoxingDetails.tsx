@@ -1,8 +1,8 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
 
 import SubTitle from '../../../components/SubTitle';
 import { ITara } from '../../../model';
@@ -23,16 +23,20 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
   const { state, actions } = useAppStore();
 
   const boxing: ITara | undefined = state.boxings?.find((item) => item.id === route.params.boxingId);
-  const boxingsLine = state.boxingsLine.find(box => box.docId === route.params.docId && box.lineDoc === route.params.lineId);
-  const boxingLine = boxingsLine ? boxingsLine.lineBoxings.find(box => box.tarakey === route.params.boxingId) : undefined;
-  const [quantity, setQuantity] = useState(boxingLine && !Number.isNaN(boxingLine.quantity) ? boxingLine.quantity.toString() : '1');
+  const boxingsLine = state.boxingsLine?.find(
+    (box) => box.docId === route.params.docId && box.lineDoc === route.params.lineId,
+  );
+  const boxingLine = boxingsLine?.lineBoxings?.find((box) => box.tarakey === route.params.boxingId);
+  const [quantity, setQuantity] = useState(
+    boxingLine && !Number.isNaN(boxingLine.quantity) ? boxingLine.quantity.toString() : '1',
+  );
   const [weight, setWeight] = useState((boxing.weight ?? 0).toString());
 
   useEffect(() => {
     if (boxing.type === 'box') {
-      setWeight(((boxing.weight ?? 0) * Number(quantity)).toFixed(3).toString())
+      setWeight(((boxing.weight ?? 0) * Number(quantity)).toFixed(3).toString());
     }
-  }, [quantity])
+  }, [boxing.type, boxing.weight, quantity]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
@@ -135,16 +139,18 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
                       )
                     : -1;
                   const boxingsLine =
-                    idx > -1 ?
-                    [
-                      ...state.boxingsLine.slice(0, idx),
-                        {
-                          ...state.boxingsLine[idx],
-                          lineBoxings: state.boxingsLine[idx].lineBoxings.filter(box => box.tarakey !== route.params.boxingId)
-                        },
-                      ...state.boxingsLine.slice(idx + 1)
-                    ] :
-                    state.boxingsLine;
+                    idx > -1
+                      ? [
+                          ...state.boxingsLine.slice(0, idx),
+                          {
+                            ...state.boxingsLine[idx],
+                            lineBoxings: state.boxingsLine[idx].lineBoxings.filter(
+                              (box) => box.tarakey !== route.params.boxingId,
+                            ),
+                          },
+                          ...state.boxingsLine.slice(idx + 1),
+                        ]
+                      : state.boxingsLine;
                   actions.setBoxingsLine(boxingsLine);
                   navigation.navigate('SellProductDetail', {
                     lineId: route.params.lineId,

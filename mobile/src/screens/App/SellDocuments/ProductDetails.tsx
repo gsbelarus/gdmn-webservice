@@ -100,7 +100,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       }
       setLine(lineDocument);
     }
-  }, [document.lines, route.params.modeCor, route.params.lineId, lineDocument]);
+  }, [document.lines, route.params.modeCor, route.params.lineId, lineDocument, route.params.quantity]);
 
   useEffect(() => {
     const findBoxingsLineHock = state.boxingsLine
@@ -113,7 +113,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     if (line) {
       setBatchNumber(line.numreceive ?? '');
     }
-  }, [line])
+  }, [line]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
@@ -211,6 +211,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
             editable={true}
             keyboardType="decimal-pad"
             onChangeText={setValue}
+            returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={true}
             value={value}
