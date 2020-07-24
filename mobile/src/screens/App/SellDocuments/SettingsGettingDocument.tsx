@@ -6,7 +6,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import SubTitle from '../../../components/SubTitle';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
-import styles from '../../../styles/global';
 import { IResponse, IMessageInfo, IContact } from '../../../../../common';
 import { timeout } from '../../../helpers/utils';
 import { Button, Portal, Modal, Text } from 'react-native-paper';
