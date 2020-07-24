@@ -75,48 +75,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
 
-  const sendDocumentRequest = useCallback(() => {
-    timeout(
-      5000,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
-        type: 'cmd',
-        payload: {
-          name: 'get_SellDocuments',
-          params: [
-            {
-              date: new Date().toLocaleDateString(),
-            },
-          ],
-        },
-      }),
-    )
-      .then((response: IResponse<IMessageInfo>) => {
-        if (response.result) {
-          Alert.alert('Запрос отправлен!', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => ({}),
-            },
-          ]);
-        } else {
-          Alert.alert('Запрос не был отправлен', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => ({}),
-            },
-          ]);
-        }
-      })
-      .catch((err: Error) =>
-        Alert.alert('Ошибка!', err.message, [
-          {
-            text: 'Закрыть',
-            onPress: () => ({}),
-          },
-        ]),
-      );
-  }, [apiService.data, state.companyID]);
-
   const sendUpdateRequest = async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
 
@@ -193,7 +151,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
               borderColor: colors.primary,
             },
           ]}
-          onPress={sendDocumentRequest}
+          onPress={() => navigation.navigate('SettingsGettingDocument')}
         >
           <Entypo size={30} color={colors.card} name="arrow-down" />
         </TouchableOpacity>

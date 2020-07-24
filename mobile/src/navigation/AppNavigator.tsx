@@ -11,12 +11,14 @@ import {
   CreateSellDocumentScreen,
   SellProductsListScreen,
   BoxingDetailScreen,
+  SettingsGettingDocumentScreen,
 } from '../screens/App/SellDocuments';
 import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
+import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 export type RootStackParamList = {
   BottomTabs: undefined;
   ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string };
@@ -26,6 +28,7 @@ export type RootStackParamList = {
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
   BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean; quantity: string };
+  SettingsGettingDocument: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -45,6 +48,7 @@ const AppNavigator = () => {
   const prodSellRef = useRef<ISellProductDetailsRef>(null);
   const docSellRef = useRef<ICreateSellDocumentRef>(null);
   const boxingSellRef = useRef<IBoxingDetailsRef>(null);
+  const settingsGettingDocumentRef = useRef<ISettingsGettingDocumentRef>(null);
 
   const SellProductDetailsComponent = (props) => {
     return <SellProductDetailScreen {...props} ref={prodSellRef} />;
@@ -56,6 +60,10 @@ const AppNavigator = () => {
 
   const BoxingDetailsComponent = (props) => {
     return <BoxingDetailScreen {...props} ref={boxingSellRef} />;
+  };
+
+  const SettingsGettingDocumentComponent = (props) => {
+    return <SettingsGettingDocumentScreen {...props} ref={settingsGettingDocumentRef} />;
   };
 
   return (
@@ -234,6 +242,31 @@ const AppNavigator = () => {
                     modeCor: route.params.modeCor,
                     quantity: route.params.quantity,
                   });
+                }}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          key="SettingsGettingDocument"
+          name="SettingsGettingDocument"
+          component={SettingsGettingDocumentComponent}
+          options={({ navigation }) => ({
+            title: '',
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('SellDocuments');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  settingsGettingDocumentRef.current?.done();
+                  navigation.navigate('SellDocuments');
                 }}
               />
             ),
