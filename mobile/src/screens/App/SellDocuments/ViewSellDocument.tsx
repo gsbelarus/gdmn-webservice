@@ -173,12 +173,18 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
         <Text style={localStyles.fontWeightBold}>Итого:</Text>
         <Text style={localStyles.fontWeightBold}>
-          общий{' '}
+          вес прод.{' '}
           {(documentLines ?? []).reduce(
             (total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)),
             0,
           )}{' '}
-          / кол-во{' '}
+        </Text>
+      </View>
+      <ItemSeparator />
+      <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+        <Text style={localStyles.fontWeightBold}>Тара:</Text>
+        <Text style={localStyles.fontWeightBold}>
+          кол-во{' '}
           {boxings.length !== 0
             ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0)
             : 0}{' '}
