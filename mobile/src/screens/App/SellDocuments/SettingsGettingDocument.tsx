@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -37,7 +37,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
   const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
   const [selectedToContact, setSelectedToContact] = useState<number>();
   const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
-  const [dateEnd, setDateEnd] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
+  const [dateEnd, setDateEnd] = useState(today);
   const [oldDateBegin, setOldDateBegin] = useState(today);
   const [oldDateEnd, setOldDateEnd] = useState(today);
 
@@ -60,8 +60,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: new Date().toLocaleDateString(),
-              dateEnd: new Date().toLocaleDateString(),
+              dateBegin: dateBegin.toLocaleDateString(),
+              dateEnd: dateEnd.toLocaleDateString(),
               expiditor: selectedExpeditor,
               toContact: selectedToContact,
             },
@@ -94,11 +94,11 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
           },
         ]),
       );
-  }, [apiService.data, state.companyID]);
+  }, [apiService.data, state.companyID, selectedExpeditor, selectedToContact, dateEnd, dateBegin]);
 
   useImperativeHandle(ref, () => ({
-    done: () => {
-      sendDocumentRequest();
+    done: async () => {
+      await sendDocumentRequest();
     },
   }));
 
