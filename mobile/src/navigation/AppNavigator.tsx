@@ -21,13 +21,13 @@ import TabsNavigator from './TabsNavigator';
 import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 export type RootStackParamList = {
   BottomTabs: undefined;
-  ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string };
+  ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string; batchNumber?: string };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
   SellProductDetail: { lineId: number; prodId: number; docId: number; modeCor: boolean };
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
-  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean; quantity: string };
+  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean; quantity: string; batchNumber: string };
   SettingsGettingDocument: undefined;
 };
 
@@ -227,6 +227,7 @@ const AppNavigator = () => {
                     docId: route.params.docId,
                     modeCor: route.params.modeCor,
                     quantity: route.params.quantity,
+                    batchNumber: route.params.batchNumber,
                   });
                 }}
               />
@@ -241,6 +242,7 @@ const AppNavigator = () => {
                     docId: route.params.docId,
                     modeCor: route.params.modeCor,
                     quantity: route.params.quantity,
+                    batchNumber: route.params.batchNumber,
                   });
                 }}
               />

@@ -111,7 +111,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
 
   useEffect(() => {
     if (line) {
-      setBatchNumber(line.numreceive ?? '');
+      setBatchNumber(route.params.batchNumber ?? line.numreceive ?? '');
     }
   }, [line]);
 
@@ -158,6 +158,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       docId: route.params.docId,
       modeCor: route.params.modeCor,
       quantity: value,
+      batchNumber: batchNumber,
     });
   };
 
