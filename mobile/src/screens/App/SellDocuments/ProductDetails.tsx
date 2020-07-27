@@ -11,6 +11,7 @@ import styles from '../../../styles/global';
 
 export interface ISellProductDetailsRef {
   done(): void;
+  cancel(): void;
 }
 
 interface MyInputProps {
@@ -143,8 +144,11 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
           },
         });
       }
-      navigation.navigate('ViewSellDocument', { docId: route.params.docId });
+      actions.setBoxingsLine([]);
     },
+    cancel: () => {
+      actions.setBoxingsLine([]);
+    }
   }));
 
   const onPress = (item: ITara) => {

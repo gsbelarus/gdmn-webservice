@@ -156,6 +156,7 @@ const AppNavigator = () => {
               <HeaderRight
                 text="Отмена"
                 onPress={() => {
+                  prodSellRef.current?.cancel();
                   navigation.navigate('ViewSellDocument', { docId: route.params.docId });
                 }}
               />
