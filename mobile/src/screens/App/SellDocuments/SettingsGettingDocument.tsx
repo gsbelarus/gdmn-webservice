@@ -1,15 +1,15 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '@react-navigation/native';
 import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { MaterialIcons } from '@expo/vector-icons';
-
-import SubTitle from '../../../components/SubTitle';
-import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
-import { IResponse, IMessageInfo, IContact } from '../../../../../common';
-import { timeout } from '../../../helpers/utils';
 import { Button, Portal, Modal, Text } from 'react-native-paper';
+
+import { IResponse, IMessageInfo, IContact } from '../../../../../common';
 import DropdownList from '../../../components/DropdownList/DropdownList';
+import SubTitle from '../../../components/SubTitle';
+import { timeout } from '../../../helpers/utils';
+import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
 interface IItem {
   id?: number;
@@ -25,11 +25,11 @@ interface MyInputProps {
   navigation: any;
 }
 
-const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, MyInputProps>(({ route, navigation }, ref) => {
+const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, MyInputProps>(({}, ref) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
-  const { state: appState, actions } = useAppStore();
+  const { state: appState } = useAppStore();
 
   const today = new Date();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -108,7 +108,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
     isDateEnd ? setDateEnd(currentDate) : setDateBegin(currentDate);
   };
 
-
   return (
     <View
       style={[
@@ -122,7 +121,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
       <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
         <Text style={localeStyles.subdivisionText}>Дата документа</Text>
         <Text style={localeStyles.subdivisionText}>с: </Text>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} >
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
           <TouchableOpacity
             style={localeStyles.containerDate}
             onPress={() => {
@@ -136,7 +135,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
           </TouchableOpacity>
         </View>
         <Text style={localeStyles.subdivisionText}>по: </Text>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]}  key={1}>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
           <TouchableOpacity
             style={localeStyles.containerDate}
             onPress={() => {
@@ -227,7 +226,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, My
             setSelectedToContact(item.id);
           }}
         />
-        </View>
+      </View>
     </View>
   );
 });
@@ -236,19 +235,19 @@ export { SettingsGettingDocumentScreen };
 
 const localeStyles = StyleSheet.create({
   area: {
-    margin: 5,
-    padding: 5,
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
+    margin: 5,
     minHeight: 80,
+    padding: 5,
   },
   areaChips: {
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
-    padding: 5,
     margin: 5,
+    padding: 5,
   },
   buttonDatePicker: {
     borderBottomWidth: 1,

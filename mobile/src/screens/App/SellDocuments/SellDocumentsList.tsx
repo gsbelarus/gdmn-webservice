@@ -1,8 +1,8 @@
 import { MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, TextInput, Searchbar } from 'react-native-paper';
+import { Text, Searchbar } from 'react-native-paper';
 
 import { IDocument, IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -123,31 +123,33 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      <View style={{flexDirection: 'row'}}>
+      <View style={localStyles.flexDirectionRow}>
         <Searchbar
           placeholder="Поиск по номеру"
           onChangeText={setSearchText}
           value={searchText}
-          style={{flexGrow: 9}}
+          style={localStyles.flexGrow}
         />
-        <TouchableOpacity
-          style={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}
-        >
+        <TouchableOpacity style={localStyles.iconSettings}>
           <MaterialIcons size={25} color={colors.primary} name="settings" />
         </TouchableOpacity>
       </View>
-      {!appState.documents || !appState.documents.find(doc => (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase())) ? (
-          <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
-        ) : (
-          <FlatList
-            ref={ref}
-            data={appState.documents.filter(doc => (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase()))}
-            keyExtractor={(_, i) => String(i)}
-            renderItem={renderItem}
-            ItemSeparatorComponent={ItemSeparator}
-          />
-        )
-      }
+      {!appState.documents ||
+      !appState.documents.find((doc) =>
+        (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase()),
+      ) ? (
+        <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
+      ) : (
+        <FlatList
+          ref={ref}
+          data={appState.documents.filter((doc) =>
+            (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase()),
+          )}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+      )}
       <View style={localStyles.buttons}>
         <TouchableOpacity
           style={[
@@ -234,8 +236,16 @@ const localStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
+  flexDirectionRow: {
+    flexDirection: 'row',
+  },
   flexGrow: {
     flexGrow: 10,
+  },
+  iconSettings: {
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   item: {
     alignItems: 'center',
