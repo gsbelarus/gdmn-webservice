@@ -1,8 +1,8 @@
-import { MaterialIcons, Feather, Foundation } from '@expo/vector-icons';
+import { MaterialIcons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Menu } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -10,6 +10,120 @@ import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
+
+export interface IViewSellDocumentRef {
+  menu(): JSX.Element;
+}
+
+interface MyInputProps {
+  route: any;
+  navigation: any;
+}
+
+const MyComponent = React.memo(({ route, navigation }: MyInputProps) => {
+  const { colors } = useTheme();
+  const [visible, setVisible] = useState(false);
+  const { state, actions } = useAppStore();
+  const document: IDocument | ISellDocument | undefined = state.documents.find(
+    (item) => item.id === route.params.docId,
+  );
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+
+  const getItemsMenu = useCallback(() => {
+    return document
+      ? [
+          ...(document.head.status === 0 || document.head.status === 3
+            ? [
+                {
+                  title: 'Удалить',
+                  onPress: async () => {
+                    Alert.alert('Вы уверены, что хотите удалить?', '', [
+                      {
+                        text: 'OK',
+                        onPress: async () => {
+                          actions.deleteDocument(document.id);
+                          navigation.navigate('SellDocumentsListScreen');
+                        },
+                      },
+                      {
+                        text: 'Отмена',
+                      },
+                    ]);
+                  },
+                },
+              ]
+            : []),
+          ...(document.head.status === 0
+            ? [
+                {
+                  title: 'Изменить шапку',
+                  onPress: () => {
+                    navigation.navigate('CreateSellDocument', {
+                      docId: route.params.docId,
+                    });
+                  },
+                },
+                {
+                  title: 'Изменить статус',
+                  onPress: () => {
+                    actions.editStatusDocument({ id: document.id, status: document.head.status + 1 });
+                  },
+                },
+              ]
+            : []),
+          ...(document.head.status === 1
+            ? [
+                {
+                  title: 'Изменить статус',
+                  onPress: () => {
+                    actions.editStatusDocument({ id: document.id, status: document.head.status - 1 });
+                    //navigation.navigate('', {})
+                  },
+                },
+              ]
+            : []),
+        ]
+      : [];
+  }, [document, actions, navigation, route.params.docId]);
+
+  return (
+    <Menu
+      visible={visible}
+      onDismiss={closeMenu}
+      anchor={
+        <TouchableOpacity
+          style={[
+            styles.circularButton,
+            localStyles.buttons,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.card,
+            },
+          ]}
+          onPress={openMenu}
+        >
+          <MaterialCommunityIcons size={30} color={colors.text} name="dots-horizontal" />
+        </TouchableOpacity>
+      }
+    >
+      {getItemsMenu().map((item) => {
+        return (
+          <Menu.Item
+            key={item.title}
+            onPress={() => {
+              item.onPress();
+              closeMenu();
+            }}
+            title={item.title}
+          />
+        );
+      })}
+    </Menu>
+  );
+});
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
   const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
@@ -103,15 +217,15 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const ViewSellDocumentScreen = ({ route, navigation }) => {
+const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, MyInputProps>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
-  const { state, actions } = useAppStore();
+  const { state } = useAppStore();
   const notFound = { id: -1, name: '' };
   const document: IDocument | ISellDocument | undefined = state.documents.find(
     (item) => item.id === route.params.docId,
   );
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
-  const ref = React.useRef<FlatList<ISellLine>>(null);
+  const refList = React.useRef<FlatList<ISellLine>>(null);
 
   const documentLines = document?.lines as ISellLine[];
   const boxings = (documentLines ?? []).reduce(
@@ -119,7 +233,17 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
     [] as ILineTara[],
   );
 
-  useScrollToTop(ref);
+  useImperativeHandle(
+    ref,
+    () => ({
+      menu: () => {
+        return <MyComponent route={route} navigation={navigation} />;
+      },
+    }),
+    [navigation, route],
+  );
+
+  useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: ISellLine }) => (
     <LineItem item={item} status={document?.head.status} docId={document?.id} />
@@ -163,7 +287,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
         </View>
       </View>
       <FlatList
-        ref={ref}
+        ref={refList}
         data={document.lines ?? []}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
@@ -204,87 +328,6 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
           },
         ]}
       >
-        {document.head.status === 0 || document.head.status === 3 ? (
-          <TouchableOpacity
-            style={[
-              styles.circularButton,
-              localStyles.buttons,
-              {
-                backgroundColor: colors.primary,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={async () => {
-              Alert.alert('Вы уверены, что хотите удалить?', '', [
-                {
-                  text: 'OK',
-                  onPress: async () => {
-                    actions.deleteDocument(document.id);
-                    navigation.navigate('SellDocumentsListScreen');
-                  },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
-            }}
-          >
-            <MaterialIcons size={30} color={colors.card} name="delete" />
-          </TouchableOpacity>
-        ) : undefined}
-        {document.head.status === 0 ? (
-          <TouchableOpacity
-            style={[
-              styles.circularButton,
-              localStyles.buttons,
-              {
-                backgroundColor: colors.primary,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={() =>
-              navigation.navigate('CreateSellDocument', {
-                docId: route.params.docId,
-              })
-            }
-          >
-            <MaterialIcons size={30} color={colors.card} name="edit" />
-          </TouchableOpacity>
-        ) : undefined}
-        {document.head.status === 0 ? (
-          <TouchableOpacity
-            style={[
-              styles.circularButton,
-              localStyles.buttons,
-              {
-                backgroundColor: colors.primary,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={() => {
-              actions.editStatusDocument({ id: document.id, status: document.head.status + 1 });
-            }}
-          >
-            <MaterialIcons size={30} color={colors.card} name="check" />
-          </TouchableOpacity>
-        ) : undefined}
-        {document.head.status === 1 ? (
-          <TouchableOpacity
-            style={[
-              styles.circularButton,
-              localStyles.buttons,
-              {
-                backgroundColor: colors.primary,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={() => {
-              actions.editStatusDocument({ id: document.id, status: document.head.status - 1 });
-            }}
-          >
-            <Foundation size={30} color={colors.card} name="clipboard-pencil" />
-          </TouchableOpacity>
-        ) : undefined}
         {document.head.status === 0 ? (
           <TouchableOpacity
             style={[
@@ -303,7 +346,7 @@ const ViewSellDocumentScreen = ({ route, navigation }) => {
       </View>
     </View>
   ) : null;
-};
+});
 
 export { ViewSellDocumentScreen };
 

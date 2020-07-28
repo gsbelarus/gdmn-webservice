@@ -1,9 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { SellDocumentsListScreen, ViewSellDocumentScreen, HeadSellDocumentScreen } from '../screens/App/SellDocuments';
+import { IViewSellDocumentRef } from '../screens/App/SellDocuments/ViewSellDocument';
 
 export type DocumentStackParamList = {
   SellDocumentsListScreen: undefined;
@@ -14,6 +15,12 @@ export type DocumentStackParamList = {
 const Stack = createStackNavigator<DocumentStackParamList>();
 
 const SellDocumentsNavigator = () => {
+  const viewSellDocumentRef = useRef<IViewSellDocumentRef>(null);
+
+  const ViewSellDocumentComponent = (props) => {
+    return <ViewSellDocumentScreen {...props} ref={viewSellDocumentRef} />;
+  };
+
   return (
     <Stack.Navigator initialRouteName="SellDocumentsListScreen">
       <Stack.Screen
@@ -25,7 +32,7 @@ const SellDocumentsNavigator = () => {
       <Stack.Screen
         key="ViewSellDocument"
         name="ViewSellDocument"
-        component={ViewSellDocumentScreen}
+        component={ViewSellDocumentComponent}
         initialParams={{ docId: 0 }}
         options={({ navigation }) => ({
           title: '',
@@ -39,6 +46,7 @@ const SellDocumentsNavigator = () => {
               <Feather name="arrow-left" size={24} color="black" />
             </TouchableOpacity>
           ),
+          headerRight: () => viewSellDocumentRef.current?.menu(),
         })}
       />
       <Stack.Screen
