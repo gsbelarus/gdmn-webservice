@@ -1,11 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
 import SubTitle from '../../../components/SubTitle';
 import { ITara } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -13,12 +15,15 @@ export interface IBoxingDetailsRef {
   done(): void;
 }
 
-interface MyInputProps {
-  route: any;
-  navigation: any;
-}
+type BoxingDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
+type BoxingDetailScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
 
-const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
+type Props = {
+  route: BoxingDetailScreenRouteProp;
+  navigation: BoxingDetailScreenNavigationProp;
+};
+
+const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -61,13 +66,13 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
             ]
           : [{ tarakey: boxing.id, type: boxing.type, weight: Number.parseFloat(weight), quantity: Number(quantity) }];
       const newBoxingsLine = { docId: route.params.docId, lineDoc: route.params.lineId, lineBoxings: addBoxings };
-      const boxingsLine =
+      const updateBoxingsLine =
         idx === -1
           ? state.boxingsLine
             ? [...state.boxingsLine, newBoxingsLine]
             : [newBoxingsLine]
           : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
-      actions.setBoxingsLine(boxingsLine);
+      actions.setBoxingsLine(updateBoxingsLine);
     },
   }));
 
@@ -88,6 +93,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
           label={'Количество'}
           editable={boxing.type !== 'pan'}
           keyboardType="decimal-pad"
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={true}
           value={quantity}
           onChangeText={setQuantity}
@@ -106,6 +112,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
         label={'Общий вес'}
         editable={boxing.type !== 'box'}
         keyboardType="decimal-pad"
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={boxing.type !== 'box'}
         onChangeText={setWeight}
         value={weight}
@@ -138,7 +145,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
                         (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
                       )
                     : -1;
-                  const boxingsLine =
+                  const updateBoxingsLine =
                     idx > -1
                       ? [
                           ...state.boxingsLine.slice(0, idx),
@@ -151,7 +158,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, MyInputProps>(({ route,
                           ...state.boxingsLine.slice(idx + 1),
                         ]
                       : state.boxingsLine;
-                  actions.setBoxingsLine(boxingsLine);
+                  actions.setBoxingsLine(updateBoxingsLine);
                   navigation.navigate('SellProductDetail', {
                     lineId: route.params.lineId,
                     prodId: route.params.prodId,

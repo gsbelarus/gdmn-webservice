@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '@react-navigation/native';
-import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo } from 'react';
 import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Button, Portal, Modal, Text } from 'react-native-paper';
 
@@ -20,12 +20,7 @@ export interface ISettingsGettingDocumentRef {
   done(): void;
 }
 
-interface MyInputProps {
-  route: any;
-  navigation: any;
-}
-
-const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, MyInputProps>(({}, ref) => {
+const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, object>((_, ref) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();

@@ -1,5 +1,13 @@
 import { MaterialIcons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import {
+  useTheme,
+  useScrollToTop,
+  useNavigation,
+  useRoute,
+  RouteProp,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Menu } from 'react-native-paper';
@@ -7,6 +15,7 @@ import { Text, Menu } from 'react-native-paper';
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -15,12 +24,18 @@ export interface IViewSellDocumentRef {
   menu(): JSX.Element;
 }
 
-interface MyInputProps {
-  route: any;
-  navigation: any;
-}
+type ViewSellDocumentScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<DocumentStackParamList, 'ViewSellDocument'>,
+  StackNavigationProp<RootStackParamList>
+>;
+type ViewSellDocumentScreenRouteProp = RouteProp<DocumentStackParamList, 'ViewSellDocument'>;
 
-const MyComponent = React.memo(({ route, navigation }: MyInputProps) => {
+type Props = {
+  route: ViewSellDocumentScreenRouteProp;
+  navigation: ViewSellDocumentScreenNavigationProp;
+};
+
+const ActionsMenu = React.memo(({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const [visible, setVisible] = useState(false);
   const { state, actions } = useAppStore();
@@ -217,7 +232,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, MyInputProps>(({ route, navigation }, ref) => {
+const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state } = useAppStore();
   const notFound = { id: -1, name: '' };
@@ -237,7 +252,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, MyInputProps>(({
     ref,
     () => ({
       menu: () => {
-        return <MyComponent route={route} navigation={navigation} />;
+        return <ActionsMenu route={route} navigation={navigation} />;
       },
     }),
     [navigation, route],

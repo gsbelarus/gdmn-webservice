@@ -16,18 +16,33 @@ import {
 import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
+import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
-import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 export type RootStackParamList = {
   BottomTabs: undefined;
   ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string; batchNumber?: string };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
-  SellProductDetail: { lineId: number; prodId: number; docId: number; modeCor: boolean };
+  SellProductDetail: {
+    lineId: string;
+    prodId: number;
+    docId: number;
+    modeCor: boolean;
+    quantity?: string;
+    batchNumber?: string;
+  };
   CreateSellDocument: { docId?: number };
   SellProductsList: { docId: number };
-  BoxingDetail: { boxingId: number; lineId: number; docId: number; prodId: number; modeCor: boolean; quantity: string; batchNumber: string };
+  BoxingDetail: {
+    boxingId: number;
+    lineId: string;
+    docId: number;
+    prodId: number;
+    modeCor: boolean;
+    quantity: string;
+    batchNumber: string;
+  };
   SettingsGettingDocument: undefined;
 };
 
@@ -134,7 +149,7 @@ const AppNavigator = () => {
           component={ProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerTitleStyle: {alignSelf: 'center'},
+            headerTitleStyle: { alignSelf: 'center' },
             headerLeft: () => (
               <HeaderRight
                 text="Отмена"
@@ -149,7 +164,7 @@ const AppNavigator = () => {
           key="SellProductDetail"
           name="SellProductDetail"
           component={SellProductDetailsComponent}
-          initialParams={{ lineId: 0, prodId: 0 }}
+          initialParams={{ lineId: '0', prodId: 0 }}
           options={({ route, navigation }) => ({
             title: '',
             headerLeft: () => (
@@ -202,7 +217,7 @@ const AppNavigator = () => {
           component={SellProductsListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
-            headerTitleStyle: {alignSelf: 'center'},
+            headerTitleStyle: { alignSelf: 'center' },
             headerLeft: () => (
               <HeaderRight
                 text="Отмена"

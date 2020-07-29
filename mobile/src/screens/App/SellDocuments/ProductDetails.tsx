@@ -1,4 +1,5 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { Text, TextInput, Chip, List } from 'react-native-paper';
@@ -6,6 +7,7 @@ import { Text, TextInput, Chip, List } from 'react-native-paper';
 import { IDocument } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
 import { ISellLine, ISellDocument, ITara, ILineTara } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -14,10 +16,13 @@ export interface ISellProductDetailsRef {
   cancel(): void;
 }
 
-interface MyInputProps {
-  route: any;
-  navigation: any;
-}
+type SellProductDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SellProductDetail'>;
+type SellProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'SellProductDetail'>;
+
+type Props = {
+  route: SellProductDetailScreenRouteProp;
+  navigation: SellProductDetailScreenNavigationProp;
+};
 
 const ListChips = ({
   data,
@@ -57,7 +62,7 @@ const ListChips = ({
   );
 };
 
-const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
+const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -114,7 +119,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     if (line) {
       setBatchNumber(route.params.batchNumber ?? line.numreceive ?? '');
     }
-  }, [line]);
+  }, [line, route.params.batchNumber]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
@@ -148,7 +153,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
     },
     cancel: () => {
       actions.setBoxingsLine([]);
-    }
+    },
   }));
 
   const onPress = (item: ITara) => {
@@ -162,7 +167,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, MyInputProps>
       docId: route.params.docId,
       modeCor: route.params.modeCor,
       quantity: value,
-      batchNumber: batchNumber,
+      batchNumber,
     });
   };
 

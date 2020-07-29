@@ -58,7 +58,8 @@ const ActivationScreen = () => {
             {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
           <TextInput
-            autoFocus
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={true}
             placeholder="Введите код"
             keyboardType="number-pad"
             returnKeyType="done"
