@@ -95,7 +95,6 @@ const ActionsMenu = React.memo(({ route, navigation }: Props) => {
                   title: 'Изменить статус',
                   onPress: () => {
                     actions.editStatusDocument({ id: document.id, status: document.head.status - 1 });
-                    //navigation.navigate('', {})
                   },
                 },
               ]
@@ -297,9 +296,11 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
         <View style={localStyles.remainsInfo}>
           <Text style={localStyles.productBarcodeView}>Кол-во</Text>
         </View>
-        <View style={localStyles.remainsInfo}>
-          <Text style={localStyles.productBarcodeView} />
-        </View>
+        {document.head.status === 0 ? (
+          <View style={localStyles.remainsInfo}>
+            <Text style={localStyles.productBarcodeView} />
+          </View>
+        ) : null}
       </View>
       <FlatList
         ref={refList}
