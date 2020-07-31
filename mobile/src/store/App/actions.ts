@@ -19,6 +19,7 @@ export enum ActionAppTypes {
   SET_REMAINS = 'SET_REMAINS',
   SET_BOXINGS = 'SET_BOXINGS',
   SET_BOXINGS_LINE = 'SET_BOXINGS_LINE',
+  SET_SETTINGS_SEARCH = 'SET_SETTINGS_SEARCH',
 }
 
 export const AppActions = {
@@ -53,6 +54,9 @@ export const AppActions = {
     ActionAppTypes.SET_BOXINGS_LINE,
     { docId: number; lineDoc: string; lineBoxings: ILineTara[] }[]
   >(ActionAppTypes.SET_BOXINGS_LINE),
+  setSettingsSearch: createActionPayload<ActionAppTypes.SET_SETTINGS_SEARCH, string[]>(
+    ActionAppTypes.SET_SETTINGS_SEARCH,
+  ),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

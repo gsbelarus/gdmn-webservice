@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IDocument, IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
+import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
@@ -14,7 +14,7 @@ import styles from '../../../styles/global';
 
 const Statuses: IDocumentType[] = statuses;
 
-const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) => {
+const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
@@ -32,6 +32,8 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
 
   const docDate = new Date(item.head?.date).toLocaleDateString();
 
+  const status = Statuses.find((type) => type.id === item.head.status);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -46,7 +48,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument | ISellDocument }) 
           <View style={localStyles.directionRow}>
             <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead.docnumber} от ${docDate}`}</Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
-              {Statuses.find((type) => type.id === item.head.status).name}
+              {status ? status.name : ''}
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
@@ -74,8 +76,48 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { state: appState, actions } = useAppStore();
 
   const [searchText, setSearchText] = useState('');
+  const [data, setData] = useState(appState.documents as ISellDocument[]);
 
-  const renderItem = ({ item }: { item: IDocument | ISellDocument }) => <DocumentItem item={item} />;
+  useEffect(() => {
+    setData(
+      appState.documents
+        ? (appState.documents as ISellDocument[]).filter((item) => {
+            const docHead = item.head as ISellHead;
+
+            const fromContact = appState.contacts
+              ? appState.contacts.find((contact) => contact.id === docHead?.fromcontactId)
+              : undefined;
+
+            const toContact = appState.contacts
+              ? appState.contacts.find((contact) => contact.id === docHead?.tocontactId)
+              : undefined;
+
+            const expeditor = appState.contacts
+              ? appState.contacts.find((contact) => contact.id === docHead?.expeditorId)
+              : undefined;
+
+            const status = Statuses.find((type) => type.id === item.head.status);
+            return appState.settingsSearch
+              ? appState.settingsSearch.some((value) =>
+                  value === 'number'
+                    ? item.head.docnumber.includes(searchText)
+                    : value === 'state' && status
+                    ? status.name.includes(searchText)
+                    : value === 'toContact' && toContact
+                    ? toContact.name.includes(searchText)
+                    : value === 'fromContact' && fromContact
+                    ? fromContact.name.includes(searchText)
+                    : value === 'expeditor' && expeditor
+                    ? expeditor.name.includes(searchText)
+                    : true,
+                )
+              : true;
+          })
+        : [],
+    );
+  }, [appState.contacts, appState.documents, appState.settingsSearch, searchText]);
+
+  const renderItem = ({ item }: { item: ISellDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
@@ -130,21 +172,16 @@ const SellDocumentsListScreen = ({ navigation }) => {
           value={searchText}
           style={localStyles.flexGrow}
         />
-        <TouchableOpacity style={localStyles.iconSettings}>
+        <TouchableOpacity style={localStyles.iconSettings} onPress={() => navigation.navigate('SettingsSearchScreen')}>
           <MaterialIcons size={25} color={colors.primary} name="settings" />
         </TouchableOpacity>
       </View>
-      {!appState.documents ||
-      !appState.documents.find((doc) =>
-        (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase()),
-      ) ? (
+      {data.length === 0 ? (
         <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
       ) : (
         <FlatList
           ref={ref}
-          data={appState.documents.filter((doc) =>
-            (doc as ISellDocument).head.docnumber.toLowerCase().includes(searchText.toLowerCase()),
-          )}
+          data={data}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}

@@ -73,4 +73,5 @@ export interface IAppState {
     lineDoc: string;
     lineBoxings: ILineTara[];
   }[];
+  settingsSearch?: string[];
 }

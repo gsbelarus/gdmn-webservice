@@ -20,6 +20,7 @@ export const initialState: IAppState = {
   documentTypes: undefined,
   boxings: undefined,
   boxingsLine: undefined,
+  settingsSearch: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -143,6 +144,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, boxings: action.payload };
     case ActionAppTypes.SET_BOXINGS_LINE: {
       return { ...state, boxingsLine: action.payload };
+    }
+    case ActionAppTypes.SET_SETTINGS_SEARCH: {
+      return { ...state, settingsSearch: action.payload };
     }
     default:
       return state;

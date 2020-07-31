@@ -12,13 +12,18 @@ import {
   SellProductsListScreen,
   BoxingDetailScreen,
   SettingsGettingDocumentScreen,
+  SettingsSearchScreen,
+  SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
 import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
+import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
+import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
+
 export type RootStackParamList = {
   BottomTabs: undefined;
   ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string; batchNumber?: string };
@@ -44,6 +49,8 @@ export type RootStackParamList = {
     batchNumber: string;
   };
   SettingsGettingDocument: undefined;
+  SettingsSearchScreen: undefined;
+  SelectBoxingsScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -64,6 +71,8 @@ const AppNavigator = () => {
   const docSellRef = useRef<ICreateSellDocumentRef>(null);
   const boxingSellRef = useRef<IBoxingDetailsRef>(null);
   const settingsGettingDocumentRef = useRef<ISettingsGettingDocumentRef>(null);
+  const settingsSearchRef = useRef<ISettingsSearchRef>(null);
+  const selectBoxingsRef = useRef<ISelectBoxingsRef>(null);
 
   const SellProductDetailsComponent = (props) => {
     return <SellProductDetailScreen {...props} ref={prodSellRef} />;
@@ -79,6 +88,14 @@ const AppNavigator = () => {
 
   const SettingsGettingDocumentComponent = (props) => {
     return <SettingsGettingDocumentScreen {...props} ref={settingsGettingDocumentRef} />;
+  };
+
+  const SettingsSearchComponent = (props) => {
+    return <SettingsSearchScreen {...props} ref={settingsSearchRef} />;
+  };
+
+  const SelectBoxingsComponent = (props) => {
+    return <SelectBoxingsScreen {...props} ref={selectBoxingsRef} />;
   };
 
   return (
@@ -284,6 +301,56 @@ const AppNavigator = () => {
                 text="Готово"
                 onPress={() => {
                   settingsGettingDocumentRef.current?.done();
+                  navigation.navigate('SellDocuments');
+                }}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          key="SettingsSearchScreen"
+          name="SettingsSearchScreen"
+          component={SettingsSearchComponent}
+          options={({ navigation }) => ({
+            title: '',
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('SellDocuments');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  settingsSearchRef.current?.done();
+                  navigation.navigate('SellDocuments');
+                }}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          key="SelectBoxingsScreen"
+          name="SelectBoxingsScreen"
+          component={SelectBoxingsComponent}
+          options={({ navigation }) => ({
+            title: '',
+            headerLeft: () => (
+              <HeaderRight
+                text="Отмена"
+                onPress={() => {
+                  navigation.navigate('SellDocuments');
+                }}
+              />
+            ),
+            headerRight: () => (
+              <HeaderRight
+                text="Готово"
+                onPress={() => {
+                  selectBoxingsRef.current?.done();
                   navigation.navigate('SellDocuments');
                 }}
               />
