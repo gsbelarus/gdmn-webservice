@@ -170,7 +170,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
           placeholder="Поиск по номеру"
           onChangeText={setSearchText}
           value={searchText}
-          style={localStyles.flexGrow}
+          style={[localStyles.flexGrow, localStyles.searchBar]}
         />
         <TouchableOpacity style={localStyles.iconSettings} onPress={() => navigation.navigate('SettingsSearchScreen')}>
           <MaterialIcons size={25} color={colors.primary} name="settings" />
@@ -296,5 +296,8 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  searchBar: {
+    shadowOpacity: 0,
   },
 });
