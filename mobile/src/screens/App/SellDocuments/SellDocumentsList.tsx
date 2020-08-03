@@ -176,7 +176,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
           <MaterialIcons size={25} color={colors.primary} name="settings" />
         </TouchableOpacity>
       </View>
-      {data.length === 0 ? (
+      {data && data.length === 0 ? (
         <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
       ) : (
         <FlatList

@@ -2,6 +2,7 @@ import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, TextInput, Chip, List } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
@@ -235,9 +236,18 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
             }}
           />
 
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[localeStyles.areaChips, { borderColor: colors.border }]}
+            onPress={() => navigation.navigate('SelectBoxingsScreen')}
+          >
             <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тара:</Text>
-            <List.AccordionGroup>
+            {boxingsLine.length !== 0
+              ? boxingsLine.map((item) => {
+                  const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
+                  return <Text key={item.tarakey}>{box ? box.name : 'неизвестная тара'}</Text>;
+                })
+              : null}
+            {/*<List.AccordionGroup>
               <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
                 <ListChips
                   data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
@@ -259,8 +269,8 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
                   selected={boxingsLine}
                 />
               </List.Accordion>
-            </List.AccordionGroup>
-          </View>
+            </List.AccordionGroup>*/}
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

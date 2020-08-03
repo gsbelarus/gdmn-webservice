@@ -50,7 +50,15 @@ export type RootStackParamList = {
   };
   SettingsGettingDocument: undefined;
   SettingsSearchScreen: undefined;
-  SelectBoxingsScreen: undefined;
+  SelectBoxingsScreen: {
+    boxingId: number;
+    lineId: string;
+    docId: number;
+    prodId: number;
+    modeCor: boolean;
+    quantity: string;
+    batchNumber: string;
+  };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
