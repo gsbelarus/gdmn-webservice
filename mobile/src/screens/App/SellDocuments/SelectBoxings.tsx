@@ -83,7 +83,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
               name={boxing.id}
               title={boxing.name}
               selected={true}
-              onPress={() => navigation.navigate('BoxingDetail', route.params)}
+              onPress={() => navigation.navigate('BoxingDetail', { ...route.params, boxingId: boxing.id })}
             />
           );
         })}

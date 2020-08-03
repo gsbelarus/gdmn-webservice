@@ -238,7 +238,16 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
 
           <TouchableOpacity
             style={[localeStyles.areaChips, { borderColor: colors.border }]}
-            onPress={() => navigation.navigate('SelectBoxingsScreen')}
+            onPress={() =>
+              navigation.navigate('SelectBoxingsScreen', {
+                lineId: route.params.lineId,
+                prodId: route.params.prodId,
+                docId: route.params.docId,
+                modeCor: route.params.modeCor,
+                quantity: value,
+                batchNumber,
+              })
+            }
           >
             <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тара:</Text>
             {boxingsLine.length !== 0

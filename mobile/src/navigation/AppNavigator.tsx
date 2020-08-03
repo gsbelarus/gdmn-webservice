@@ -51,7 +51,6 @@ export type RootStackParamList = {
   SettingsGettingDocument: undefined;
   SettingsSearchScreen: undefined;
   SelectBoxingsScreen: {
-    boxingId: number;
     lineId: string;
     docId: number;
     prodId: number;
