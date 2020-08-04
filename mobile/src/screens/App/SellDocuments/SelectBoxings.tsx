@@ -1,19 +1,18 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { TextInput, Text } from 'react-native-paper';
+import { StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { ILineTara } from '../../../model';
+import { ILineTara, ITara, ISellDocument } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 export interface ISelectBoxingsRef {
-  done(): void;
+  cancel(): void;
 }
 
 type SelectBoxingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
@@ -25,18 +24,23 @@ type Props = {
 };
 
 const Line = React.memo(
-  ({ name, title, selected, onPress }: { name: number; title: string; selected: boolean; onPress: () => void }) => {
-    const { colors } = useTheme();
+  ({
+    boxing,
+    selected,
+    quantity,
+    onPress,
+  }: {
+    boxing: ITara;
+    selected: boolean;
+    quantity?: number;
+    onPress: () => void;
+  }) => {
     return (
-      <>
-        <TouchableOpacity onPress={onPress}>
-          <View key={name} style={localeStyles.line}>
-            <Text style={localeStyles.fontSize18}>{title}</Text>
-            {selected ? <MaterialIcons name="check" size={30} color={colors.primary} /> : null}
-          </View>
-        </TouchableOpacity>
-        <ItemSeparator />
-      </>
+      <TouchableOpacity onPress={onPress} style={localeStyles.line}>
+        <Text style={localeStyles.fontSize18}>
+          {boxing.name} {selected ? `- ${quantity ?? '0'}` : ''}
+        </Text>
+      </TouchableOpacity>
     );
   },
 );
@@ -50,6 +54,8 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
     : undefined;
   const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
+  const refList = React.useRef<FlatList<ITara>>(null);
+
   useEffect(() => {
     const findBoxingsLineHock = state.boxingsLine
       ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
@@ -58,51 +64,85 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
   }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
   useImperativeHandle(ref, () => ({
-    done: () => {
-      console.log('done');
+    cancel: () => {
+      const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;
+      const lines =
+        document && (document as ISellDocument)
+          ? (document as ISellDocument).lines.find((line) => line.id === route.params.lineId)
+          : undefined;
+      const idx = state.boxingsLine
+        ? state.boxingsLine.findIndex(
+            (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
+          )
+        : -1;
+      const newBoxingsLine = { docId: route.params.docId, lineDoc: route.params.lineId, lineBoxings: lines.tara };
+      const updateBoxingsLine =
+        idx === -1
+          ? state.boxingsLine
+            ? [...state.boxingsLine, newBoxingsLine]
+            : [newBoxingsLine]
+          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
+      actions.setBoxingsLine(updateBoxingsLine);
     },
   }));
 
+  const renderItem = ({ item, selected }: { item: ITara; selected: boolean }) => {
+    const boxing = boxingsLine ? boxingsLine.find((box) => box.tarakey === item.id) : undefined;
+    return (
+      <Line
+        boxing={item}
+        selected={selected}
+        quantity={boxing ? boxing.quantity : undefined}
+        onPress={() => navigation.navigate('BoxingDetail', { ...route.params, boxingId: item.id })}
+      />
+    );
+  };
+
   return (
-    <View
-      style={[
-        styles.container,
-        localeStyles.container,
-        {
-          backgroundColor: colors.card,
-        },
-      ]}
-    >
+    <ScrollView horizontal contentContainerStyle={[styles.container, localeStyles.container]}>
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Выбор тары:</SubTitle>
-      <View style={localeStyles.areaChips}>
-        {boxingsLine.map((box) => {
-          const boxing = state.boxings.find((item) => item.id === box.tarakey);
-          return (
-            <Line
-              key={boxing.id}
-              name={boxing.id}
-              title={boxing.name}
-              selected={true}
-              onPress={() => navigation.navigate('BoxingDetail', { ...route.params, boxingId: boxing.id })}
-            />
-          );
-        })}
-      </View>
-    </View>
+      <FlatList
+        key="boxingSelected"
+        style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
+        ref={refList}
+        data={
+          boxingsLine && boxingsLine.length !== 0
+            ? state.boxings.filter((box) => boxingsLine.find((item) => item.tarakey === box.id))
+            : []
+        }
+        keyExtractor={(_, i) => String(i)}
+        renderItem={({ item }) => renderItem({ item, selected: true })}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={<Text style={[localeStyles.title, localeStyles.emptyList]}>Ничего не выбрано</Text>}
+      />
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Новая тары:</SubTitle>
+      <FlatList
+        key="boxingNoSelected"
+        style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
+        ref={refList}
+        data={
+          boxingsLine && boxingsLine.length !== 0
+            ? state.boxings.filter((box) => boxingsLine.find((item) => item.tarakey !== box.id))
+            : state.boxings
+        }
+        keyExtractor={(_, i) => String(i)}
+        renderItem={({ item }) => renderItem({ item, selected: false })}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={<Text>Тар нет</Text>}
+      />
+    </ScrollView>
   );
 });
 
 export { SelectBoxingsScreen };
 
 const localeStyles = StyleSheet.create({
-  areaChips: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-  },
   container: {
     justifyContent: 'flex-start',
     padding: 0,
+  },
+  emptyList: {
+    paddingLeft: 15,
   },
   fontSize18: {
     fontSize: 18,
@@ -112,7 +152,13 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
     height: 45,
     justifyContent: 'space-between',
-    paddingHorizontal: 15,
+    padding: 15,
+  },
+  minHeight45: {
+    minHeight: 45,
+  },
+  scrollContainer: {
+    flexWrap: 'wrap',
   },
   title: {
     padding: 10,

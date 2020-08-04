@@ -3,11 +3,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Text, TextInput, Chip, List } from 'react-native-paper';
+import { Text, TextInput } from 'react-native-paper';
 
 import { IDocument } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
-import { ISellLine, ISellDocument, ITara, ILineTara } from '../../../model';
+import { ISellLine, ISellDocument, ILineTara } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -23,44 +23,6 @@ type SellProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'SellProdu
 type Props = {
   route: SellProductDetailScreenRouteProp;
   navigation: SellProductDetailScreenNavigationProp;
-};
-
-const ListChips = ({
-  data,
-  onPress,
-  selected,
-}: {
-  data: ITara[];
-  onPress: (item: ITara) => void;
-  selected: ILineTara[];
-}) => {
-  const { colors } = useTheme();
-  return (
-    <View style={localeStyles.scrollContainer}>
-      {data.map((item, idx) => {
-        const selectedBoxing = selected.find((box) => box.tarakey === item.id);
-        return (
-          <Chip
-            key={idx}
-            mode="outlined"
-            style={[localeStyles.margin, localeStyles.chip, selectedBoxing ? { backgroundColor: colors.primary } : {}]}
-            onPress={() => onPress(item)}
-            selected={selectedBoxing !== undefined}
-            selectedColor={selectedBoxing ? colors.card : colors.text}
-          >
-            <>
-              <Text>{item.name}</Text>
-              {selectedBoxing ? (
-                <Text>
-                  шт. {selectedBoxing.quantity ?? '-'} / вес {selectedBoxing.weight ?? 0}
-                </Text>
-              ) : undefined}
-            </>
-          </Chip>
-        );
-      })}
-    </View>
-  );
 };
 
 const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ route, navigation }, ref) => {
@@ -157,12 +119,11 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
     },
   }));
 
-  const onPress = (item: ITara) => {
+  const onPress = () => {
     if (isKeyboardVisible) {
       return;
     }
-    navigation.navigate('BoxingDetail', {
-      boxingId: item.id,
+    navigation.navigate('SelectBoxingsScreen', {
       lineId: route.params.lineId,
       prodId: route.params.prodId,
       docId: route.params.docId,
@@ -236,49 +197,25 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
             }}
           />
 
-          <TouchableOpacity
-            style={[localeStyles.areaChips, { borderColor: colors.border }]}
-            onPress={() =>
-              navigation.navigate('SelectBoxingsScreen', {
-                lineId: route.params.lineId,
-                prodId: route.params.prodId,
-                docId: route.params.docId,
-                modeCor: route.params.modeCor,
-                quantity: value,
-                batchNumber,
-              })
-            }
-          >
-            <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Тара:</Text>
-            {boxingsLine.length !== 0
+          <TouchableOpacity style={localeStyles.boxingsLine} onPress={onPress}>
+            <Text
+              style={[
+                // eslint-disable-next-line react-native/no-inline-styles
+                {
+                  color: colors.primary,
+                  fontSize: boxingsLine && boxingsLine.length !== 0 ? 11 : 16,
+                },
+                localeStyles.subdivisionText,
+              ]}
+            >
+              Тара
+            </Text>
+            {boxingsLine && boxingsLine.length !== 0
               ? boxingsLine.map((item) => {
                   const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
                   return <Text key={item.tarakey}>{box ? box.name : 'неизвестная тара'}</Text>;
                 })
               : null}
-            {/*<List.AccordionGroup>
-              <List.Accordion title="Ящики" id="1" style={{ backgroundColor: colors.border }}>
-                <ListChips
-                  data={state.boxings ? state.boxings.filter((item) => item.type === 'box') : []}
-                  onPress={onPress}
-                  selected={boxingsLine}
-                />
-              </List.Accordion>
-              <List.Accordion title="Бумага" id="2" style={{ backgroundColor: colors.border }}>
-                <ListChips
-                  data={state.boxings ? state.boxings.filter((item) => item.type === 'paper') : []}
-                  onPress={onPress}
-                  selected={boxingsLine}
-                />
-              </List.Accordion>
-              <List.Accordion title="Поддоны" id="3" style={{ backgroundColor: colors.border }}>
-                <ListChips
-                  data={state.boxings ? state.boxings.filter((item) => item.type === 'pan') : []}
-                  onPress={onPress}
-                  selected={boxingsLine}
-                />
-              </List.Accordion>
-            </List.AccordionGroup>*/}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -289,10 +226,9 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
 export { SellProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
-  areaChips: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
+  boxingsLine: {
+    height: 60,
+    justifyContent: 'center',
   },
   button: {
     alignItems: 'center',

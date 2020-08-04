@@ -124,6 +124,7 @@ const SellProductsListScreen = () => {
           ) ? (
             <Text style={styles.title}>Не найдено</Text>
           ) : (
+            //TODO: ListEmptyComponent - компонент для если список пустой
             <FlatList
               ref={ref}
               data={state.goods.filter(

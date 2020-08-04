@@ -18,11 +18,6 @@ export interface ISettingsSearchRef {
 type SettingsSearchScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
 type SettingsSearchScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
 
-type Props = {
-  route: SettingsSearchScreenRouteProp;
-  navigation: SettingsSearchScreenNavigationProp;
-};
-
 const Line = React.memo(
   ({ name, title, selected, onPress }: { name: string; title: string; selected: boolean; onPress: () => void }) => {
     const { colors } = useTheme();
@@ -40,7 +35,7 @@ const Line = React.memo(
   },
 );
 
-const SettingsSearchScreen = forwardRef<ISettingsSearchRef, Props>(({ route, navigation }, ref) => {
+const SettingsSearchScreen = forwardRef<ISettingsSearchRef, object>((_, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 

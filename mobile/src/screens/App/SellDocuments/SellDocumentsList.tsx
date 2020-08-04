@@ -179,6 +179,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
       {data && data.length === 0 ? (
         <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
       ) : (
+        //TODO: ListEmptyComponent - компонент для если список пустой
         <FlatList
           ref={ref}
           data={data}

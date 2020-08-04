@@ -262,13 +262,7 @@ const AppNavigator = () => {
               <HeaderRight
                 text="Отмена"
                 onPress={() => {
-                  navigation.navigate('SellProductDetail', {
-                    prodId: route.params.prodId,
-                    docId: route.params.docId,
-                    modeCor: route.params.modeCor,
-                    quantity: route.params.quantity,
-                    batchNumber: route.params.batchNumber,
-                  });
+                  navigation.navigate('SelectBoxingsScreen', route.params.prodId);
                 }}
               />
             ),
@@ -277,13 +271,7 @@ const AppNavigator = () => {
                 text="Готово"
                 onPress={() => {
                   boxingSellRef.current?.done();
-                  navigation.navigate('SellProductDetail', {
-                    prodId: route.params.prodId,
-                    docId: route.params.docId,
-                    modeCor: route.params.modeCor,
-                    quantity: route.params.quantity,
-                    batchNumber: route.params.batchNumber,
-                  });
+                  navigation.navigate('SelectBoxingsScreen', route.params.prodId);
                 }}
               />
             ),
@@ -343,13 +331,14 @@ const AppNavigator = () => {
           key="SelectBoxingsScreen"
           name="SelectBoxingsScreen"
           component={SelectBoxingsComponent}
-          options={({ navigation }) => ({
+          options={({ navigation, route }) => ({
             title: '',
             headerLeft: () => (
               <HeaderRight
                 text="Отмена"
                 onPress={() => {
-                  navigation.navigate('SellDocuments');
+                  selectBoxingsRef.current?.cancel();
+                  navigation.navigate('SellProductDetail', route.params);
                 }}
               />
             ),
@@ -357,8 +346,7 @@ const AppNavigator = () => {
               <HeaderRight
                 text="Готово"
                 onPress={() => {
-                  selectBoxingsRef.current?.done();
-                  navigation.navigate('SellDocuments');
+                  navigation.navigate('SellProductDetail', route.params);
                 }}
               />
             ),
