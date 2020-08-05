@@ -100,7 +100,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
 
   return (
     <ScrollView horizontal contentContainerStyle={[styles.container, localeStyles.container]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Выбор тары:</SubTitle>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Выбранная тара:</SubTitle>
       <FlatList
         key="boxingSelected"
         style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
@@ -115,7 +115,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={<Text style={[localeStyles.title, localeStyles.emptyList]}>Ничего не выбрано</Text>}
       />
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Новая тары:</SubTitle>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Новая тара:</SubTitle>
       <FlatList
         key="boxingNoSelected"
         style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
