@@ -1,4 +1,4 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useIsFocused } from '@react-navigation/native';
 import React, { useState, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator, IconButton, TextInput } from 'react-native-paper';
@@ -22,6 +22,7 @@ const ActivationScreen = () => {
   });
 
   const [activationCode, setActivationCode] = useState('');
+  const isFocused = useIsFocused();
 
   const sendActivationCode = useCallback(async () => {
     /* Запрос к серверу на проверку кода активации */
@@ -59,7 +60,7 @@ const ActivationScreen = () => {
           </View>
           <TextInput
             // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={true}
+            autoFocus={isFocused}
             placeholder="Введите код"
             keyboardType="number-pad"
             returnKeyType="done"

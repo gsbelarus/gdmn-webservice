@@ -1,4 +1,4 @@
-import { useTheme, RouteProp } from '@react-navigation/native';
+import { useTheme, RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
@@ -47,16 +47,21 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    if (isFocused) {
+      console.log('focused screen');
+      const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+      return () => {
+        keyboardDidHideListener.remove();
+        keyboardDidShowListener.remove();
+      };
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     if (route.params.quantity) {
@@ -185,7 +190,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
             onChangeText={setValue}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={true}
+            autoFocus={isFocused}
             value={value}
             theme={{
               colors: {

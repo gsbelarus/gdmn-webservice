@@ -1,4 +1,4 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useIsFocused } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, Route } from 'react-native';
 import { TextInput } from 'react-native-paper';
@@ -26,6 +26,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
   const document = state.documents.find((item) => item.id === route.params.docId);
   const [line, setLine] = useState<ILine>(undefined);
   const [value, setValue] = useState('1.0');
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const lineDocument = document.lines.find((item) => item.goodId === route.params.prodId);
@@ -106,7 +107,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ rout
         keyboardType="decimal-pad"
         onChangeText={(newValue) => setValue(newValue)}
         // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={true}
+        autoFocus={isFocused}
         value={value.toString()}
         style={{
           backgroundColor: colors.card,

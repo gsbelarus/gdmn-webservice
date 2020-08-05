@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme, RouteProp } from '@react-navigation/native';
+import { useTheme, RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -36,6 +36,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
     boxingLine && !Number.isNaN(boxingLine.quantity) ? boxingLine.quantity.toString() : '1',
   );
   const [weight, setWeight] = useState((boxing.weight ?? 0).toString());
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (boxing.type === 'box') {
@@ -94,7 +95,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
           editable={boxing.type !== 'pan'}
           keyboardType="decimal-pad"
           // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={true}
+          autoFocus={isFocused}
           value={quantity}
           onChangeText={setQuantity}
           theme={{
@@ -113,7 +114,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
         editable={boxing.type !== 'box'}
         keyboardType="decimal-pad"
         // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={boxing.type !== 'box'}
+        autoFocus={boxing.type !== 'box' && isFocused}
         onChangeText={setWeight}
         value={weight}
         theme={{

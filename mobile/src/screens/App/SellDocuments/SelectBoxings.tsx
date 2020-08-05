@@ -1,6 +1,6 @@
 import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useEffect, useRef } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -54,7 +54,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
     : undefined;
   const [boxingsLine, setBoxingsLine] = useState<ILineTara[]>(findBoxingsLine ? findBoxingsLine.lineBoxings : []);
 
-  const refList = React.useRef<FlatList<ITara>>(null);
+  const refList = useRef<FlatList<ITara>>(null);
 
   useEffect(() => {
     const findBoxingsLineHock = state.boxingsLine
