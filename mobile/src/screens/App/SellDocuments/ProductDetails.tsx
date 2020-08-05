@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
@@ -203,24 +204,28 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
           />
 
           <TouchableOpacity style={localeStyles.boxingsLine} onPress={onPress}>
-            <Text
-              style={[
-                // eslint-disable-next-line react-native/no-inline-styles
-                {
-                  color: colors.primary,
-                  fontSize: boxingsLine && boxingsLine.length !== 0 ? 11 : 16,
-                },
-                localeStyles.subdivisionText,
-              ]}
-            >
-              Тара
-            </Text>
-            {boxingsLine && boxingsLine.length !== 0
-              ? boxingsLine.map((item) => {
-                  const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
-                  return <Text key={item.tarakey}>{box ? box.name : 'неизвестная тара'}</Text>;
-                })
-              : null}
+            <View style={(localeStyles.paddingLeft10, { width: '80%' })}>
+              <Text
+                style={
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    color: colors.primary,
+                    fontSize: boxingsLine && boxingsLine.length !== 0 ? 11 : 16,
+                  }
+                }
+              >
+                Тара
+              </Text>
+              {boxingsLine && boxingsLine.length !== 0 ? (
+                <Text>
+                  {boxingsLine.map((item, idx) => {
+                    const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
+                    return `${box ? box.name : 'неизвестная тара'}${idx === boxingsLine.length - 1 ? '' : ', '} `;
+                  })}
+                </Text>
+              ) : null}
+            </View>
+            <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -232,98 +237,22 @@ export { SellProductDetailScreen };
 
 const localeStyles = StyleSheet.create({
   boxingsLine: {
-    height: 60,
-    justifyContent: 'center',
-  },
-  button: {
     alignItems: 'center',
-    height: 35,
-    marginHorizontal: '25%',
-  },
-  chip: {
-    fontSize: 18,
-    height: 50,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    minHeight: 60,
+    padding: 10,
   },
   container: {
     justifyContent: 'flex-start',
     padding: 0,
   },
-  editQuantityView: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    marginTop: 20,
-  },
-  flatContaner: {
-    margin: 20,
-  },
-  fontSize16: {
-    fontSize: 16,
-  },
-  fontSize20: {
-    fontSize: 20,
-  },
-  inputSpinner: {
-    marginTop: 5,
-    width: 180,
-  },
-  listContainer: {
-    borderRadius: 6,
-    flexBasis: 100,
-    marginLeft: 0.5,
-    marginTop: 10,
-  },
-  margin: {
-    margin: 2,
-  },
-  productName: {
-    alignItems: 'center',
-    color: '#000000',
-    fontSize: 19,
-    fontWeight: 'bold',
-    marginTop: 25,
-  },
-  productPrice: {
-    color: '#000000',
-    fontSize: 17,
-    marginLeft: 5,
-    textAlignVertical: 'center',
-  },
-  productPriceView: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginHorizontal: 15,
-    marginTop: 25,
-  },
-  productQuantity: {
-    color: '#000000',
-    fontSize: 17,
-    marginLeft: 15,
-  },
-  productQuantityView: {
-    flexDirection: 'row',
-    marginLeft: 15,
-    marginTop: 15,
-  },
-  scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  paddingLeft10: {
+    //paddingLeft: 10,
   },
   subdivisionText: {
     fontSize: 11,
-    margin: 10,
     textAlign: 'left',
-  },
-  taraContanerView: {
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    flexBasis: 145,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    marginHorizontal: 3,
-    marginVertical: 3,
-    minWidth: 120,
-    padding: 15,
   },
   title: {
     padding: 10,
