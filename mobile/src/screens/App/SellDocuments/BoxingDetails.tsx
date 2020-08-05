@@ -160,13 +160,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
                         ]
                       : state.boxingsLine;
                   actions.setBoxingsLine(updateBoxingsLine);
-                  navigation.navigate('SellProductDetail', {
-                    lineId: route.params.lineId,
-                    prodId: route.params.prodId,
-                    docId: route.params.docId,
-                    modeCor: route.params.modeCor,
-                    quantity: route.params.quantity,
-                  });
+                  navigation.navigate('SelectBoxingsScreen', route.params);
                 },
               },
               {
