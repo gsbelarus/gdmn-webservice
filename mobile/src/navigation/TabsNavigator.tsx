@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -26,8 +27,7 @@ const TabsNavigator = () => {
         options={{
           title: 'Отвес-накладные',
           tabBarLabel: 'Отвесы',
-          tabBarIcon: 'file-document-box',
-          tabBarColor: '#CEE7E3',
+          tabBarIcon: ({ color }) => <TabBarIcon name="file-document-box-multiple" color={color} />,
         }}
       />
       {/* <TabsStack.Screen
@@ -45,25 +45,25 @@ const TabsNavigator = () => {
         component={ReferencesNavigator}
         options={{
           tabBarLabel: 'Справочники',
-          tabBarIcon: 'view-list',
-          tabBarColor: '#9FD5C9',
+          tabBarIcon: ({ color }) => <TabBarIcon name="view-list" color={color} />,
           // tabBarBadge: true,
-          title: 'Test',
         }}
       />
       <TabsStack.Screen
         name="Settings"
         component={SettingsNavigator}
         options={{
-          title: 'Настройки',
           tabBarLabel: 'Настройки',
-          tabBarIcon: 'settings-box',
-          tabBarColor: '#FAD4D6',
+          tabBarIcon: ({ color }) => <TabBarIcon name="settings-box" color={color} />,
         }}
       />
     </TabsStack.Navigator>
   );
 };
+
+function TabBarIcon(props: { name: string; color: string }) {
+  return <MaterialCommunityIcons size={26} {...props} />;
+}
 
 const styles = StyleSheet.create({
   button: {

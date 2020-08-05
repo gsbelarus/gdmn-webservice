@@ -1,14 +1,13 @@
-import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, FAB } from 'react-native-paper';
 
 import { IReference, IMessageInfo, IResponse } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
-import styles from '../../../styles/global';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   const { colors } = useTheme();
@@ -87,29 +86,12 @@ const ReferenceListScreen = () => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Запрос отправлен!', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => ({}),
-            },
-          ]);
+          Alert.alert('Запрос отправлен!', '', [{ text: 'Закрыть' }]);
         } else {
-          Alert.alert('Запрос не был отправлен', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => ({}),
-            },
-          ]);
+          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть' }]);
         }
       })
-      .catch((err: Error) =>
-        Alert.alert('Ошибка!', err.message, [
-          {
-            text: 'Закрыть',
-            onPress: () => ({}),
-          },
-        ]),
-      );
+      .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.data, state.companyID]);
 
   return (
@@ -121,21 +103,7 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <View style={localStyles.syncButton}>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localStyles.buttons,
-            {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={sendUpdateRequest}
-        >
-          <AntDesign size={30} color={colors.card} name="sync" />
-        </TouchableOpacity>
-      </View>
+      <FAB style={[localStyles.fabSync, { backgroundColor: colors.primary }]} icon="sync" onPress={sendUpdateRequest} />
     </View>
   );
 };
@@ -161,6 +129,12 @@ const localStyles = StyleSheet.create({
   details: {
     margin: 8,
   },
+  fabSync: {
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
+  },
   fieldDesciption: {
     opacity: 0.5,
   },
@@ -175,8 +149,5 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
-  },
-  syncButton: {
-    alignItems: 'flex-end',
   },
 });

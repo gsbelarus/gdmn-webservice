@@ -1,16 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Searchbar } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-// import styles from '../../../styles/global';
 
 interface IField {
-  id: string;
+  id: number;
   name: string;
   [fieldName: string]: unknown;
 }
@@ -40,7 +39,22 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
 const ViewReferenceScreen = ({ route }) => {
   const { colors } = useTheme();
 
-  const reference: IReference = route.params.item;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredList, setFilteredList] = useState<IReference>();
+
+  useEffect(() => {
+    // console.log('params', route.params);
+    if (!route.params?.item) {
+      return;
+    }
+
+    const { item }: { item: IReference } = route.params;
+
+    setFilteredList({
+      ...item,
+      data: item.data.filter((i) => i.name.toUpperCase().includes(searchQuery.toUpperCase())),
+    });
+  }, [route.params, route.params?.item, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -49,11 +63,13 @@ const ViewReferenceScreen = ({ route }) => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{reference.name}</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
+      <ItemSeparator />
+      <Searchbar placeholder="Поиск" onChangeText={setSearchQuery} value={searchQuery} style={localStyles.searchBar} />
       <ItemSeparator />
       <FlatList
         ref={ref}
-        data={reference.data}
+        data={filteredList?.data}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -87,6 +103,10 @@ const localStyles = StyleSheet.create({
   name: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  searchBar: {
+    elevation: 0,
+    shadowOpacity: 0,
   },
   title: {
     padding: 10,

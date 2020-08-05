@@ -20,7 +20,7 @@ export const initialState: IAppState = {
   documentTypes: undefined,
   boxings: undefined,
   boxingsLine: undefined,
-  settingsSearch: undefined,
+  settingsSearch: ['number'],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -65,6 +65,11 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: state.documents.filter((document) => document.id !== action.payload),
+      };
+    case ActionAppTypes.DELETE_ALL_DOCUMENTS:
+      return {
+        ...state,
+        documents: [],
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);

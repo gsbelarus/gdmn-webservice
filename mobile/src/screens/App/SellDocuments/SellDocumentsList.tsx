@@ -1,8 +1,9 @@
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useActionSheet as useExpoActionSheet } from '@expo/react-native-action-sheet';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar, FAB, Colors } from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -10,7 +11,6 @@ import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
-import styles from '../../../styles/global';
 
 const Statuses: IDocumentType[] = statuses;
 
@@ -78,6 +78,8 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as ISellDocument[]);
 
+  const showActionSheet = useActionSheet();
+
   useEffect(() => {
     setData(
       appState.documents
@@ -119,7 +121,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   const renderItem = ({ item }: { item: ISellDocument }) => <DocumentItem item={item} />;
 
-  const sendUpdateRequest = async () => {
+  const sendUpdateRequest = useCallback(async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
 
     timeout(
@@ -134,7 +136,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Запрос отправлен!', '', [
+          Alert.alert('Документы отправлены!', '', [
             {
               text: 'Закрыть',
               onPress: () => {
@@ -145,23 +147,43 @@ const SellDocumentsListScreen = ({ navigation }) => {
             },
           ]);
         } else {
-          Alert.alert('Запрос не был отправлен', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => ({}),
-            },
-          ]);
+          Alert.alert('Документы не были отправлены', '', [{ text: 'Закрыть' }]);
         }
       })
-      .catch((err: Error) =>
-        Alert.alert('Ошибка!', err.message, [
-          {
-            text: 'Закрыть',
-            onPress: () => ({}),
-          },
-        ]),
-      );
-  };
+      .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
+  }, [actions, apiService.data, appState.documents, state.companyID]);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton
+          icon="menu"
+          size={24}
+          onPress={() =>
+            showActionSheet([
+              {
+                title: 'Загрузить',
+                onPress: () => navigation.navigate('SettingsGettingDocument'),
+              },
+              {
+                title: 'Выгрузить',
+                onPress: sendUpdateRequest,
+              },
+              {
+                title: 'Удалить документы',
+                type: 'destructive',
+                onPress: actions.deleteAllDocuments,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ])
+          }
+        />
+      ),
+    });
+  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
@@ -172,66 +194,65 @@ const SellDocumentsListScreen = ({ navigation }) => {
           value={searchText}
           style={[localStyles.flexGrow, localStyles.searchBar]}
         />
-        <TouchableOpacity style={localStyles.iconSettings} onPress={() => navigation.navigate('SettingsSearchScreen')}>
-          <MaterialIcons size={25} color={colors.primary} name="settings" />
-        </TouchableOpacity>
-      </View>
-      {data && data.length === 0 ? (
-        <Text style={[styles.title, localStyles.flexGrow]}>Не найдено</Text>
-      ) : (
-        //TODO: ListEmptyComponent - компонент для если список пустой
-        <FlatList
-          ref={ref}
-          data={data}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
-          ItemSeparatorComponent={ItemSeparator}
+        <IconButton
+          icon="settings"
+          size={24}
+          style={localStyles.iconSettings}
+          onPress={() => navigation.navigate('SettingsSearchScreen')}
         />
-      )}
-      <FAB style={localStyles.fabSync} icon="sync" onPress={() => navigation.navigate('CreateSellDocument')} />
-      <FAB style={localStyles.fabAdd} icon="plus" onPress={() => navigation.navigate('CreateSellDocument')} />
-      {/* <View style={localStyles.buttons}>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localStyles.button,
-            {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={sendUpdateRequest}
-        >
-          <Entypo size={30} color={colors.card} name="arrow-up" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localStyles.button,
-            {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={() => navigation.navigate('SettingsGettingDocument')}
-        >
-          <Entypo size={30} color={colors.card} name="arrow-down" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localStyles.button,
-            {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={() => navigation.navigate('CreateSellDocument')}
-        >
-          <MaterialIcons size={32} color={colors.card} name="add" />
-        </TouchableOpacity>
-      </View> */}
+      </View>
+      <ItemSeparator />
+      <FlatList
+        ref={ref}
+        data={data}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={() => navigation.navigate('SettingsGettingDocument')} />
+        }
+        ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+      />
+      <FAB
+        style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+        icon="plus"
+        onPress={() => navigation.navigate('CreateSellDocument')}
+      />
     </View>
+  );
+};
+
+export type ActionSheetItem = {
+  type?: 'normal' | 'destructive' | 'cancel';
+  title: string;
+  onPress?: () => void;
+};
+
+export interface ActionSheetOptions {
+  title?: string;
+  message?: string;
+  tintColor?: string;
+  anchor?: number;
+  defaultCancel?: boolean;
+}
+
+const useActionSheet = () => {
+  const { showActionSheetWithOptions } = useExpoActionSheet();
+  return useCallback(
+    (items: ActionSheetItem[], options: Partial<ActionSheetOptions> = {}) => {
+      showActionSheetWithOptions(
+        {
+          ...options,
+          options: items.map((i) => i.title).concat(options.defaultCancel ? ['Cancel'] : []),
+          cancelButtonIndex: options.defaultCancel ? items.length : items.findIndex((i) => i.type === 'cancel'),
+          destructiveButtonIndex: items.findIndex((i) => i.type === 'destructive'),
+        },
+        (i) => {
+          items[i]?.onPress?.();
+        },
+      );
+    },
+    [showActionSheetWithOptions],
   );
 };
 
@@ -270,8 +291,11 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
+  },
   fabAdd: {
-    backgroundColor: Colors.blue600,
     bottom: 0,
     margin: 20,
     position: 'absolute',
@@ -297,9 +321,7 @@ const localStyles = StyleSheet.create({
     flexGrow: 10,
   },
   iconSettings: {
-    alignItems: 'center',
-    flexGrow: 1,
-    justifyContent: 'center',
+    width: 36,
   },
   item: {
     alignItems: 'center',
@@ -314,6 +336,7 @@ const localStyles = StyleSheet.create({
     fontSize: 12,
   },
   searchBar: {
+    elevation: 0,
     shadowOpacity: 0,
   },
 });

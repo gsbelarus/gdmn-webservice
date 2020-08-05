@@ -21,7 +21,7 @@ const Line = React.memo(
         <TouchableOpacity onPress={onPress}>
           <View key={name} style={localeStyles.line}>
             <Text style={localeStyles.fontSize18}>{title}</Text>
-            {selected ? <MaterialIcons name="check" size={30} color={colors.primary} /> : null}
+            {selected && <MaterialIcons name="check" size={30} color={colors.primary} />}
           </View>
         </TouchableOpacity>
         <ItemSeparator />

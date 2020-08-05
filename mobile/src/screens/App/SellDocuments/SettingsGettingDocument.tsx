@@ -1,6 +1,6 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo } from 'react';
 import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Button, Portal, Modal, Text } from 'react-native-paper';
@@ -69,14 +69,12 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
           Alert.alert('Запрос отправлен!', '', [
             {
               text: 'Закрыть',
-              onPress: () => ({}),
             },
           ]);
         } else {
           Alert.alert('Запрос не был отправлен', '', [
             {
               text: 'Закрыть',
-              onPress: () => ({}),
             },
           ]);
         }
@@ -102,6 +100,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
     setDatePickerVisibility(Platform.OS === 'ios');
     isDateEnd ? setDateEnd(currentDate) : setDateBegin(currentDate);
   };
+
+  const navigation = useNavigation();
+  const { state: AppState } = useAppStore();
 
   return (
     <View
@@ -214,17 +215,49 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
       </View>
       <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
         <Text style={localeStyles.subdivisionText}>Организация:</Text>
-        <DropdownList
+        <ReferenceItem
+          value={selectedItem(listCompanies, selectedToContact)?.value}
+          onPress={() =>
+            navigation.navigate('Reference', {
+              item: {
+                id: 1,
+                name: 'Контакты',
+                type: 'contacts',
+                data: AppState.contacts,
+              },
+            })
+          }
+        />
+        {/*  <DropdownList
           list={listCompanies}
           value={selectedItem(listCompanies, selectedToContact)}
           onValueChange={(item) => {
             setSelectedToContact(item.id);
           }}
-        />
+        /> */}
       </View>
     </View>
   );
 });
+
+const ReferenceItem = (props: { value: string; onPress: () => void; color?: string }) => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+      <TouchableOpacity {...props}>
+        <View style={localeStyles.containerMain}>
+          <View style={localeStyles.containerLabel}>
+            <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
+          </View>
+          <View style={localeStyles.containerDropdownButton}>
+            <MaterialCommunityIcons name="menu-right" size={24} color="black" />
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 export { SettingsGettingDocumentScreen };
 
@@ -258,6 +291,17 @@ const localeStyles = StyleSheet.create({
     margin: 0,
     padding: 0,
   },
+  containerDropdownButton: {
+    flex: 0.07,
+  },
+  containerLabel: {
+    flex: 0.93,
+  },
+  containerMain: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: '100%',
+  },
   containerModalDatePicker: {
     borderRadius: 8,
     borderWidth: 1,
@@ -267,9 +311,24 @@ const localeStyles = StyleSheet.create({
   marginRight: {
     marginRight: 10,
   },
+  picker: {
+    alignSelf: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 40,
+    marginTop: 5,
+    padding: 10,
+    width: '100%',
+  },
   subdivisionText: {
     marginBottom: 5,
     textAlign: 'left',
+  },
+  text: {
+    color: '#000',
+    fontSize: 14,
+    fontStyle: 'normal',
   },
   textDate: {
     flexGrow: 4,

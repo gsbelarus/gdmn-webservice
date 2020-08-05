@@ -1,12 +1,13 @@
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
 import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
-import { createActionPayload, ActionsUnion } from '../utils';
+import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 export enum ActionAppTypes {
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',
   EDIT_STATUS_DOCUMENT = 'EDIT_STATUS_DOCUMENT',
   DELETE_DOCUMENT = 'DELETE_DOCUMENT',
+  DELETE_ALL_DOCUMENTS = 'DELETE_ALL_DOCUMENTS',
   DOCUMENT_ADD_LINE = 'DOCUMENT_ADD_LINE',
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_EDIT_LINE = 'DOCUMENT_EDIT_LINE',
@@ -31,6 +32,7 @@ export const AppActions = {
     ActionAppTypes.EDIT_STATUS_DOCUMENT,
   ),
   deleteDocument: createActionPayload<ActionAppTypes.DELETE_DOCUMENT, number>(ActionAppTypes.DELETE_DOCUMENT),
+  deleteAllDocuments: createAction<ActionAppTypes.DELETE_ALL_DOCUMENTS>(ActionAppTypes.DELETE_ALL_DOCUMENTS),
   addLine: createActionPayload<ActionAppTypes.DOCUMENT_ADD_LINE, { docId: number; line: ILine | ISellLine }>(
     ActionAppTypes.DOCUMENT_ADD_LINE,
   ),

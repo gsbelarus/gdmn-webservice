@@ -32,4 +32,5 @@ export interface ITara {
   name: string;
   goodkey?: number;
   weight?: number;
+  [fieldName: string]: unknown;
 }
