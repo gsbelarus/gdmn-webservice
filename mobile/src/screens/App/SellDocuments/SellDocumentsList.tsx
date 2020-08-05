@@ -1,8 +1,8 @@
-import { MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { Text, Searchbar, FAB, Colors } from 'react-native-paper';
 
 import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -188,7 +188,9 @@ const SellDocumentsListScreen = ({ navigation }) => {
           ItemSeparatorComponent={ItemSeparator}
         />
       )}
-      <View style={localStyles.buttons}>
+      <FAB style={localStyles.fabSync} icon="sync" onPress={() => navigation.navigate('CreateSellDocument')} />
+      <FAB style={localStyles.fabAdd} icon="plus" onPress={() => navigation.navigate('CreateSellDocument')} />
+      {/* <View style={localStyles.buttons}>
         <TouchableOpacity
           style={[
             styles.circularButton,
@@ -226,9 +228,9 @@ const SellDocumentsListScreen = ({ navigation }) => {
           ]}
           onPress={() => navigation.navigate('CreateSellDocument')}
         >
-          <MaterialIcons size={30} color={colors.card} name="note-add" />
+          <MaterialIcons size={32} color={colors.card} name="add" />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -267,6 +269,20 @@ const localStyles = StyleSheet.create({
   directionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  fabAdd: {
+    backgroundColor: Colors.blue600,
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
+  },
+  fabSync: {
+    backgroundColor: Colors.blue600,
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 80,
   },
   field: {
     opacity: 0.5,

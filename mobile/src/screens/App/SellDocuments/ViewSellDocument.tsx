@@ -10,7 +10,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Menu } from 'react-native-paper';
+import { Text, Menu, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -247,7 +247,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
     [] as ILineTara[],
   );
 
-  useImperativeHandle(
+  /*   useImperativeHandle(
     ref,
     () => ({
       menu: () => {
@@ -255,7 +255,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
       },
     }),
     [navigation, route],
-  );
+  ); */
 
   useScrollToTop(refList);
 
@@ -263,104 +263,105 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
     <LineItem item={item} status={document?.head.status} docId={document?.id} />
   );
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <IconButton icon="menu" size={26} onPress={() => {}} />,
+    });
+  }, [navigation]);
+
   return document ? (
-    <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
-      <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
-        <View style={localStyles.header}>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {(document.head as ISellHead)?.docnumber} от {new Date(document.head.date)?.toLocaleDateString()}
-          </Text>
-          <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-            {contact.name}
-          </Text>
-        </View>
-        <TouchableOpacity style={localStyles.goDetailsHeader}>
-          <MaterialIcons
-            size={30}
-            color={colors.card}
-            name="chevron-right"
-            onPress={() => {
-              navigation.navigate('HeadSellDocument', { docId: document.id });
-            }}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={localStyles.listContainer}>
-        <View style={localStyles.avatarRow} />
-        <View style={localStyles.goodInfo}>
-          <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
-        </View>
-        <View style={localStyles.remainsInfo}>
-          <Text style={localStyles.productBarcodeView}>Заявка</Text>
-        </View>
-        <View style={localStyles.remainsInfo}>
-          <Text style={localStyles.productBarcodeView}>Кол-во</Text>
-        </View>
-        {document.head.status === 0 ? (
-          <View style={localStyles.remainsInfo}>
-            <Text style={localStyles.productBarcodeView} />
+    <>
+      <ActionsMenu route={route} navigation={navigation} />
+      <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
+        <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
+          <View style={localStyles.header}>
+            <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+              {(document.head as ISellHead)?.docnumber} от {new Date(document.head.date)?.toLocaleDateString()}
+            </Text>
+            <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
+              {contact.name}
+            </Text>
           </View>
-        ) : null}
-      </View>
-      <FlatList
-        ref={refList}
-        data={document.lines ?? []}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-      />
-      <ItemSeparator />
-      <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-        <Text style={localStyles.fontWeightBold}>Итого:</Text>
-        <Text style={localStyles.fontWeightBold}>
-          вес прод.{' '}
-          {(documentLines ?? []).reduce(
-            (total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)),
-            0,
-          )}{' '}
-        </Text>
-      </View>
-      <ItemSeparator />
-      <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-        <Text style={localStyles.fontWeightBold}>Тара:</Text>
-        <Text style={localStyles.fontWeightBold}>
-          кол-во{' '}
-          {boxings.length !== 0
-            ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0)
-            : 0}{' '}
-          / вес{' '}
-          {boxings.length !== 0
-            ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
-            : 0}
-        </Text>
-      </View>
-      <ItemSeparator />
-      <View
-        style={[
-          localStyles.flexDirectionRow,
-          // eslint-disable-next-line react-native/no-inline-styles
-          {
-            justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
-          },
-        ]}
-      >
-        {document.head.status === 0 ? (
-          <TouchableOpacity
-            style={[
-              styles.circularButton,
-              localStyles.buttons,
-              {
-                backgroundColor: colors.primary,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
-          >
-            <MaterialIcons size={30} color={colors.card} name="add" />
+          <TouchableOpacity style={localStyles.goDetailsHeader}>
+            <MaterialIcons
+              size={30}
+              color={colors.card}
+              name="chevron-right"
+              onPress={() => {
+                navigation.navigate('HeadSellDocument', { docId: document.id });
+              }}
+            />
           </TouchableOpacity>
-        ) : undefined}
+        </View>
+        <View style={localStyles.listContainer}>
+          <View style={localStyles.avatarRow} />
+          <View style={localStyles.goodInfo}>
+            <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
+          </View>
+          <View style={localStyles.remainsInfo}>
+            <Text style={localStyles.productBarcodeView}>Заявка</Text>
+          </View>
+          <View style={localStyles.remainsInfo}>
+            <Text style={localStyles.productBarcodeView}>Кол-во</Text>
+          </View>
+          {document.head.status === 0 ? (
+            <View style={localStyles.remainsInfo}>
+              <Text style={localStyles.productBarcodeView} />
+            </View>
+          ) : null}
+        </View>
+        <FlatList
+          ref={refList}
+          data={document.lines ?? []}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+        <ItemSeparator />
+        <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+          <Text style={localStyles.fontWeightBold}>Итого:</Text>
+          <Text style={localStyles.fontWeightBold}>
+            вес прод.{' '}
+            {(documentLines ?? []).reduce(
+              (total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)),
+              0,
+            )}{' '}
+          </Text>
+        </View>
+        <ItemSeparator />
+        <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+          <Text style={localStyles.fontWeightBold}>Тара:</Text>
+          <Text style={localStyles.fontWeightBold}>
+            кол-во{' '}
+            {boxings.length !== 0
+              ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0)
+              : 0}{' '}
+            / вес{' '}
+            {boxings.length !== 0
+              ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
+              : 0}
+          </Text>
+        </View>
+        <ItemSeparator />
+        <View
+          style={[
+            localStyles.flexDirectionRow,
+            // eslint-disable-next-line react-native/no-inline-styles
+            {
+              justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
+            },
+          ]}
+        >
+          {document.head.status === 0 && (
+            <FAB
+              style={localStyles.fabAdd}
+              icon="plus"
+              onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    </>
   ) : null;
 });
 
@@ -403,6 +404,13 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     textAlignVertical: 'center',
+  },
+  fabAdd: {
+    backgroundColor: Colors.blue600,
+    bottom: 65,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
   },
   flexDirectionRow: {
     flexDirection: 'row',
