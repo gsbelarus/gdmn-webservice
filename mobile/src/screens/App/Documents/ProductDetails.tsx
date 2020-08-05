@@ -1,10 +1,13 @@
-import { useTheme, useIsFocused } from '@react-navigation/native';
+import { useTheme, useIsFocused, RouteProp, CompositeNavigationProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet, Route } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
 import { ILine } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -12,12 +15,18 @@ export interface IProductDetailsRef {
   done(): void;
 }
 
-interface MyInputProps {
-  route: Route;
-  navigation: any;
-}
+type ProductDetailScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<RootStackParamList, 'ProductDetail'>,
+  StackNavigationProp<DocumentStackParamList>
+>;
+type ProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetail'>;
 
-const ProductDetailScreen = forwardRef<IProductDetailsRef, MyInputProps>(({ route, navigation }, ref) => {
+type Props = {
+  route: ProductDetailScreenRouteProp;
+  navigation: ProductDetailScreenNavigationProp;
+};
+
+const ProductDetailScreen = forwardRef<IProductDetailsRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 

@@ -1,22 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 export interface ISettingsSearchRef {
   done(): void;
 }
-
-type SettingsSearchScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
-type SettingsSearchScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
 
 const Line = React.memo(
   ({ name, title, selected, onPress }: { name: string; title: string; selected: boolean; onPress: () => void }) => {

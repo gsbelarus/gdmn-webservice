@@ -1,13 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme, useNavigation, RouteProp } from '@react-navigation/native';
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
-import { Route, StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
 import DropdownList from '../../../components/DropdownList/DropdownList';
 import { ISellHead } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -20,12 +21,13 @@ export interface ICreateSellDocumentRef {
   done(): void;
 }
 
-interface MyInputProps {
-  route: Route;
-  navigation: unknown;
-}
+type CreateSellDocumentScreenRouteProp = RouteProp<RootStackParamList, 'CreateSellDocument'>;
 
-const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, MyInputProps>(({ route }, ref) => {
+type Props = {
+  route: CreateSellDocumentScreenRouteProp;
+};
+
+const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ route }, ref) => {
   const [date, setDate] = useState(new Date());
   const [oldDate, setOldDate] = useState(new Date());
   const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
