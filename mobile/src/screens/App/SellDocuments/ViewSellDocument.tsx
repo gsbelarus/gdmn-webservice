@@ -8,7 +8,7 @@ import {
   CompositeNavigationProp,
 } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
+import React, { forwardRef, useCallback, useState } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Menu, Colors, FAB, IconButton } from 'react-native-paper';
 
@@ -231,7 +231,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }, ref) => {
+const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }) => {
   const { colors } = useTheme();
   const { state } = useAppStore();
   const notFound = { id: -1, name: '' };
@@ -247,16 +247,6 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
     [] as ILineTara[],
   );
 
-  /*   useImperativeHandle(
-    ref,
-    () => ({
-      menu: () => {
-        return <ActionsMenu route={route} navigation={navigation} />;
-      },
-    }),
-    [navigation, route],
-  ); */
-
   useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: ISellLine }) => (
@@ -265,7 +255,15 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <IconButton icon="menu" size={26} onPress={() => {}} />,
+      headerRight: () => (
+        <IconButton
+          icon="menu"
+          size={26}
+          onPress={() => {
+            console.log('menu click');
+          }}
+        />
+      ),
     });
   }, [navigation]);
 

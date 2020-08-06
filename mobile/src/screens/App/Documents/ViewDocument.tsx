@@ -303,14 +303,14 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 5,
   },
+  lineTotal: {
+    justifyContent: 'space-between',
+    padding: 10,
+  },
   listContainer: {
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
-  },
-  lineTotal: {
-    justifyContent: 'space-between',
-    padding: 10,
   },
   marginRight: {
     marginRight: 15,
