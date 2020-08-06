@@ -43,7 +43,7 @@ const CompaniesScreen = () => {
       */
 
       !!savedCompany && companies.some((company) => company === savedCompany)
-        ? actions.setCompanyID(savedCompany)
+        ? actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
         : undefined;
     };
 
@@ -94,7 +94,7 @@ const CompaniesScreen = () => {
             style={[styles.rectangularButton, localeStyles.button]}
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={async () => {
-              actions.setCompanyID(selectedCompany);
+              actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
               console.log(`${userID}/companyId`);
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}

@@ -40,6 +40,9 @@ export default class Api {
 
     getUserStatus: async (): Promise<IResponse<IUser>> => get(this.getUrl(), `/auth/user?deviceId=${this.deviceId}`),
 
+    getUserProfile: async (id: string): Promise<IResponse<IUser>> =>
+      get(this.getUrl(), `/users/${id}?deviceId=${this.deviceId}`),
+
     /* Проверка устройства - есть ли в базе сервера */
     getDevice: async (): Promise<IResponse<IDevice>> => get(this.getUrl(), `/devices/${this.deviceId}`),
 

@@ -1,4 +1,3 @@
-import { useActionSheet as useExpoActionSheet } from '@expo/react-native-action-sheet';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -7,6 +6,7 @@ import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
 import { ISellDocument, ISellHead } from '../../../model';
@@ -219,40 +219,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('CreateSellDocument')}
       />
     </View>
-  );
-};
-
-export type ActionSheetItem = {
-  type?: 'normal' | 'destructive' | 'cancel';
-  title: string;
-  onPress?: () => void;
-};
-
-export interface ActionSheetOptions {
-  title?: string;
-  message?: string;
-  tintColor?: string;
-  anchor?: number;
-  defaultCancel?: boolean;
-}
-
-const useActionSheet = () => {
-  const { showActionSheetWithOptions } = useExpoActionSheet();
-  return useCallback(
-    (items: ActionSheetItem[], options: Partial<ActionSheetOptions> = {}) => {
-      showActionSheetWithOptions(
-        {
-          ...options,
-          options: items.map((i) => i.title).concat(options.defaultCancel ? ['Cancel'] : []),
-          cancelButtonIndex: options.defaultCancel ? items.length : items.findIndex((i) => i.type === 'cancel'),
-          destructiveButtonIndex: items.findIndex((i) => i.type === 'destructive'),
-        },
-        (i) => {
-          items[i]?.onPress?.();
-        },
-      );
-    },
-    [showActionSheetWithOptions],
   );
 };
 

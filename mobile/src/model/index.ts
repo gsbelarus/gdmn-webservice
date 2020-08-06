@@ -52,6 +52,10 @@ export interface IAuthState {
   deviceRegistered?: boolean;
   deviceActive?: boolean;
   deviceId?: string;
+  profile?: {
+    userName: string;
+    companyName: string;
+  };
 }
 
 export interface IAppSettings {

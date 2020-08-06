@@ -3,11 +3,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
+import { IReference } from '../../../common';
 import { SellDocumentsListScreen, ViewSellDocumentScreen, HeadSellDocumentScreen } from '../screens/App/SellDocuments';
+import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { IViewSellDocumentRef } from '../screens/App/SellDocuments/ViewSellDocument';
 
 export type DocumentStackParamList = {
   SellDocumentsListScreen: undefined;
+  SelectItemScreen: { item: IReference };
   ViewSellDocument: { docId: number };
   HeadSellDocument: { docId: number };
 };
@@ -29,6 +32,7 @@ const SellDocumentsNavigator = () => {
         component={SellDocumentsListScreen}
         options={{ title: 'Документы' }}
       />
+      <Stack.Screen key="SelectItem" name="SelectItemScreen" component={SelectItemScreen} />
       <Stack.Screen
         key="ViewSellDocument"
         name="ViewSellDocument"

@@ -1,7 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
-import { Divider, Avatar, Button } from 'react-native-paper';
+import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 
 import {
   IResponse,
@@ -16,6 +16,7 @@ import {
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import config from '../../config';
+import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray } from '../../helpers/utils';
 import documentsRef from '../../mockData/Otves/Document.json';
 import referencesRef from '../../mockData/Otves/References.json';
@@ -23,8 +24,9 @@ import { ITara } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
 const SettingsScreen = () => {
-  const { colors /* , dark */ } = useTheme();
+  const { colors } = useTheme();
   const { apiService } = useServiceStore();
+  const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
     state: { settings, documents },
@@ -33,6 +35,8 @@ const SettingsScreen = () => {
     state: { companyID },
     actions: authActions,
   } = useAuthStore();
+
+  const showActionSheet = useActionSheet();
 
   const logOut = useCallback(
     () =>
@@ -180,25 +184,48 @@ const SettingsScreen = () => {
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }}>
-      <View style={localStyles.content}>
-        <Avatar.Icon size={48} icon="face-outline" />
-        <Button icon="logout" mode="contained" onPress={logOut}>
-          Выход
-        </Button>
+      <View style={[localStyles.profileContainer, { backgroundColor: colors.primary }]}>
+        <View style={localStyles.profileIcon}>
+          <Avatar.Icon size={50} icon="account-badge" style={{ backgroundColor: colors.primary }} />
+        </View>
+        <View style={localStyles.profileInfo}>
+          <Text style={[localStyles.profileInfoTextUser, { color: colors.background }]}>
+            {AuthState.profile?.userName}
+          </Text>
+          <Text style={[localStyles.profileInfoTextCompany, { color: colors.card }]}>
+            {AuthState.profile?.companyName}
+          </Text>
+        </View>
+        <IconButton
+          icon="dots-vertical"
+          color={colors.card}
+          size={30}
+          onPress={() =>
+            showActionSheet([
+              {
+                title: 'Сменить пользователя',
+                onPress: logOut,
+              },
+              {
+                title: 'Сменить организацию',
+                onPress: () => authActions.setCompanyID({ companyId: undefined, companyName: undefined }),
+              },
+              {
+                title: 'Удалить все данные',
+                type: 'destructive',
+                onPress: deleteAllData,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ])
+          }
+        />
       </View>
       <View style={localStyles.content}>
-        <Button mode="contained" onPress={() => authActions.setCompanyID(undefined)}>
-          Сменить организацию
-        </Button>
-      </View>
-      <View style={localStyles.content}>
-        <Button mode="contained" onPress={sendGetReferencesRequest}>
+        <Button mode="text" onPress={sendGetReferencesRequest}>
           Проверить обновления
-        </Button>
-      </View>
-      <View style={localStyles.content}>
-        <Button mode="contained" onPress={deleteAllData}>
-          Удалить все данные
         </Button>
       </View>
       <Divider />
@@ -215,25 +242,33 @@ const SettingsScreen = () => {
           appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
         }
       />
-      <Divider />
-      {/* <SettingsItem
-        label="Dark theme"
-        value={settings?.dakrTheme}
-        onValueChange={() => {
-          appActions.setSettings({ ...settings, dakrTheme: !settings?.dakrTheme })
-        }}
-      />*/}
     </ScrollView>
   );
 };
 
 const localStyles = StyleSheet.create({
   content: {
-    alignItems: 'center',
+    flex: 1,
+  },
+  profileContainer: {
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    height: 60,
+  },
+  profileIcon: {
+    justifyContent: 'space-around',
+  },
+  profileInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  profileInfoTextCompany: {
+    fontSize: 14,
+    fontWeight: '300',
+  },
+  profileInfoTextUser: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

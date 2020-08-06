@@ -108,7 +108,7 @@ const AuthNavigator = () => {
         //   apiService.auth.getDevice(),
         // );
         setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
-        authActions.setUserStatus({ userID: null });
+        authActions.setUserStatus({ userID: null, userName: undefined });
         if (!response.result) {
           // устройства нет на сервере, сбросим DeviceId на сутройстве
           actions.setDeviceId(null);
@@ -131,15 +131,24 @@ const AuthNavigator = () => {
     const getUser = async () => {
       try {
         const result = await apiService.auth.getUserStatus();
-        const userStatus = { userID: isUser(result.data) ? result.data.id : null };
-        authActions.setUserStatus(userStatus);
+        if (!isUser(result.data)) {
+          authActions.setUserStatus({ userID: null, userName: undefined });
+          setState({ type: 'SET_ERROR', text: 'ошибка при получении пользователя' });
+          return;
+        }
+        const user = result.data as IUser;
+
+        authActions.setUserStatus({
+          userID: user.id,
+          userName: user.firstName ? `${user.firstName} ${user.lastName}` : user.userName,
+        });
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });
       }
     };
 
     if (deviceRegistered !== undefined) {
-      deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null });
+      deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null, userName: undefined });
     }
   }, [authActions, apiService.auth, deviceRegistered, signal]);
   // Вынести всё в store  - deviceRegistered

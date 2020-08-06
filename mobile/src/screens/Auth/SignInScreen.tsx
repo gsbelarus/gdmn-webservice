@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
 import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
-import { IResponse, IUserCredentials } from '../../../../common';
+import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { IDataFetch } from '../../model';
@@ -50,29 +50,12 @@ const SignInScreen = () => {
     };
   }, []);
 
-  // const finishLogin = async () => {
-  //   const result = await appStorage.getItems([
-  //     `${credential.userName}/SYNCHRONIZATION`,
-  //     `${credential.userName}/AUTODELETING_DOCUMENT`,
-  //   ]);
-  //   actions.setSynchonization(result?.[0][1] && JSON.parse(result[0][1]).value);
-  //   actions.setAutodeletingDocument(result?.[1][1] && JSON.parse(result[1][1]).value);
-  //   actions.setUserID(credential.userName);
-  //   actions.setUserStatus(true);
-  // };
-
-  // useEffect(() => {
-  //   if (state.loggedIn) {
-  //     // TODO: Не всегда заходит почему-то
-  //     // TODO: setUserStatus совсемстить с setUserID
-  //     actions.setUserID(credential.userName);
-  //   }
-  // }, [actions, credential.userName, state.loggedIn]);
-
   const logIn = useCallback(() => {
     Keyboard.dismiss();
     setLoginState({ isError: false, isLoading: true, status: undefined });
   }, []);
+
+  const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in obj;
 
   useEffect(() => {
     if (!loginState.isLoading) {
@@ -85,7 +68,7 @@ const SignInScreen = () => {
 
         if (device.error === 'устройство не найдено') {
           // Устройство не найдено. Перенаправляем на ввод кода активации
-          authActions.setUserStatus({ userID: null });
+          authActions.setUserStatus({ userID: null, userName: undefined });
           authActions.setDeviceStatus(false);
           return;
         }
@@ -110,15 +93,28 @@ const SignInScreen = () => {
       try {
         const res = await timeout<IResponse<string>>(5000, apiService.auth.login(credential));
 
-        res.result
-          ? actions.setUserStatus({
-              userID: res.data,
-            })
-          : setLoginState({
-              isLoading: false,
-              status: res.error,
-              isError: true,
-            });
+        if (!res.result) {
+          setLoginState({
+            isLoading: false,
+            status: res.error,
+            isError: true,
+          });
+          return;
+        }
+
+        // Получение данных пользователя
+        const result = await apiService.auth.getUserStatus();
+
+        if (!isUser(result.data)) {
+          authActions.setUserStatus({ userID: null, userName: undefined });
+          setLoginState({ isLoading: false, isError: true, status: 'ошибка при получении пользователя' });
+          return;
+        }
+        const user = result.data as IUser;
+        authActions.setUserStatus({
+          userID: user.id,
+          userName: user.firstName ? `${user.firstName} ${user.lastName}` : user.userName,
+        });
       } catch (err) {
         setLoginState({
           isLoading: false,
