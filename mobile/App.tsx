@@ -27,6 +27,7 @@ const App = () => {
         ...theme.colors,
         surface: theme.colors.card,
         primary: Colors.blue600,
+
         accent: theme.dark ? 'rgb(255, 55, 95)' : 'rgb(255, 45, 85)',
       },
     };

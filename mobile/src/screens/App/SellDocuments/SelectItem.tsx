@@ -1,65 +1,81 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useEffect, forwardRef, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
 
-import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { IField } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 
-interface IField {
+/* interface IField {
   id: number;
-  name: string;
-  [fieldName: string]: unknown;
+  value: string;
+}
+ */
+export interface ISelectItemRef {
+  cancel(): void;
 }
 
-const LineItem = React.memo(({ item }: { item: IField }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
+interface ISelectList {
+  name: string;
+  type: string;
+  data: IField[];
+}
 
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
-      }}
-    >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
-        </View>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-});
+export type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
-const SelectItemScreen = ({ route }) => {
+const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IReference>();
+  const [filteredList, setFilteredList] = useState<ISelectList>(undefined);
+  const [checkedItem, setCheckedItem] = useState<null | number>(null);
 
   useEffect(() => {
     // console.log('params', route.params);
-    if (!route.params?.item) {
+    if (!route.params?.list) {
       return;
     }
 
-    const { item }: { item: IReference } = route.params;
+    const { list, selected } = route.params;
+
+    if (selected) {
+      setCheckedItem(selected);
+    }
 
     setFilteredList({
-      ...item,
-      data: item.data.filter((i) => i.name.toUpperCase().includes(searchQuery.toUpperCase())),
+      ...list,
+      data: list.data.filter((i) => i.value.toUpperCase().includes(searchQuery.toUpperCase())),
     });
-  }, [route.params, route.params?.item, searchQuery]);
+  }, [route.params, route.params?.list, searchQuery]);
 
-  const ref = React.useRef<FlatList<IField>>(null);
-  useScrollToTop(ref);
+  const refList = React.useRef<FlatList<IField>>(null);
+  useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
+  const renderItem = useCallback(
+    ({ item }: { item: IField }) => {
+      return <LineItem item={item} checked={item.id === checkedItem} onSelect={setCheckedItem} />;
+    },
+    [checkedItem],
+  );
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton
+          icon="check-circle"
+          size={30}
+          onPress={() =>
+            navigation.navigate('SettingsGettingDocument', {
+              item: { fieldName: filteredList?.type, id: checkedItem },
+            })
+          }
+        />
+      ),
+    });
+  }, [checkedItem, filteredList?.type, navigation]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -68,7 +84,7 @@ const SelectItemScreen = ({ route }) => {
       <Searchbar placeholder="Поиск" onChangeText={setSearchQuery} value={searchQuery} style={localStyles.searchBar} />
       <ItemSeparator />
       <FlatList
-        ref={ref}
+        ref={refList}
         data={filteredList?.data}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
@@ -76,19 +92,31 @@ const SelectItemScreen = ({ route }) => {
       />
     </View>
   );
-};
+});
+
+const LineItem = React.memo(
+  ({ item, checked, onSelect }: { item: IField; checked: boolean; onSelect: (id: number) => void }) => {
+    return (
+      <TouchableOpacity onPress={() => onSelect(item.id)}>
+        <View style={localStyles.row}>
+          <Paragraph style={localStyles.details}>{item.value}</Paragraph>
+          <Checkbox status={checked ? 'checked' : 'unchecked'} />
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
 
 export { SelectItemScreen };
 
 const localStyles = StyleSheet.create({
-  avatar: {
+  /*   avatar: {
     alignItems: 'center',
-    backgroundColor: '#e91e63',
     borderRadius: 18,
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
+  }, */
   content: {
     height: '100%',
   },
@@ -96,13 +124,20 @@ const localStyles = StyleSheet.create({
     margin: 10,
   },
   item: {
-    alignItems: 'center',
+    // alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+    justifyContent: 'space-between',
   },
   name: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
   },
   searchBar: {
     elevation: 0,

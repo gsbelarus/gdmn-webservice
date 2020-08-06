@@ -79,3 +79,8 @@ export interface IAppState {
   }[];
   settingsSearch?: string[];
 }
+
+export interface IField {
+  id: number;
+  value: string;
+}

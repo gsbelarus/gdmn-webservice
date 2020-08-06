@@ -1,7 +1,8 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Button, Portal, Modal, Text } from 'react-native-paper';
 
@@ -9,6 +10,7 @@ import { IResponse, IMessageInfo, IContact } from '../../../../../common';
 import DropdownList from '../../../components/DropdownList/DropdownList';
 import SubTitle from '../../../components/SubTitle';
 import { timeout } from '../../../helpers/utils';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
 interface IItem {
@@ -20,7 +22,9 @@ export interface ISettingsGettingDocumentRef {
   done(): void;
 }
 
-const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, object>((_, ref) => {
+export type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
+
+const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Props>(({ route }, ref) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
@@ -36,15 +40,17 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
   const [oldDateBegin, setOldDateBegin] = useState(today);
   const [oldDateEnd, setOldDateEnd] = useState(today);
 
-  const selectedItem = (listItems: IItem[], id: number) => listItems.find((item) => item.id === id);
-  const getListItems = (contacts: IContact[]) =>
-    contacts.map((item) => {
-      return { id: item.id, value: item.name } as IItem;
-    });
+  const selectedItem = useCallback((listItems: IItem[], id: number) => listItems.find((item) => item.id === id), []);
+  const getListItems = useCallback(
+    (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IItem)),
+    [],
+  );
   const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
-  const listPeople = useMemo(() => getListItems(people), [people]);
-  const companies: IContact[] = appState.contacts.filter((item) => item.type === '3');
-  const listCompanies = getListItems(companies);
+  const listPeople = useMemo(() => getListItems(people), [getListItems, people]);
+  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '3'), [
+    appState.contacts,
+  ]);
+  const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
@@ -95,6 +101,35 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
     },
   }));
 
+  useEffect(() => {
+    if (!route.params?.item) {
+      return;
+    }
+
+    const { item } = route.params;
+
+    console.log('item', item);
+
+    switch (item.fieldName) {
+      case 'contacts':
+        setSelectedToContact(item.id);
+        break;
+      case 'expiditor':
+        setSelectedExpeditor(item.id);
+        break;
+      default:
+        break;
+    }
+  }, [route.params, route.params?.item]);
+
+  useEffect(() => {
+    console.log('selectedToContact', selectedToContact);
+  }, [selectedToContact]);
+
+  useEffect(() => {
+    console.log('selectedExpeditor', selectedExpeditor);
+  }, [selectedExpeditor]);
+
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
     setDatePickerVisibility(Platform.OS === 'ios');
@@ -102,7 +137,29 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
   };
 
   const navigation = useNavigation();
-  const { state: AppState } = useAppStore();
+  // const { state: AppState } = useAppStore();
+
+  const ReferenceItem = useCallback(
+    (props: { value: string; onPress: () => void; color?: string }) => {
+      // const { colors } = useTheme();
+
+      return (
+        <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+          <TouchableOpacity {...props}>
+            <View style={localeStyles.containerMain}>
+              <View style={localeStyles.containerLabel}>
+                <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
+              </View>
+              <View style={localeStyles.containerDropdownButton}>
+                <MaterialCommunityIcons name="menu-right" size={24} color="black" />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    },
+    [colors.border],
+  );
 
   return (
     <View
@@ -205,59 +262,46 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, ob
         ))}
       <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
         <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-        <DropdownList
+        <ReferenceItem
+          value={selectedItem(listPeople, selectedExpeditor)?.value}
+          onPress={() =>
+            navigation.navigate('SelectItemScreen', {
+              selected: selectedExpeditor,
+              list: {
+                name: 'Экспедитор',
+                type: 'expiditor',
+                data: listPeople,
+              },
+            })
+          }
+        />
+        {/* <DropdownList
           list={listPeople}
           value={selectedItem(listPeople, selectedExpeditor)}
           onValueChange={(item) => {
             setSelectedExpeditor(item.id);
           }}
-        />
+        /> */}
       </View>
       <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
         <Text style={localeStyles.subdivisionText}>Организация:</Text>
         <ReferenceItem
           value={selectedItem(listCompanies, selectedToContact)?.value}
           onPress={() =>
-            navigation.navigate('Reference', {
-              item: {
-                id: 1,
+            navigation.navigate('SelectItemScreen', {
+              selected: selectedToContact,
+              list: {
                 name: 'Контакты',
                 type: 'contacts',
-                data: AppState.contacts,
+                data: listCompanies,
               },
             })
           }
         />
-        {/*  <DropdownList
-          list={listCompanies}
-          value={selectedItem(listCompanies, selectedToContact)}
-          onValueChange={(item) => {
-            setSelectedToContact(item.id);
-          }}
-        /> */}
       </View>
     </View>
   );
 });
-
-const ReferenceItem = (props: { value: string; onPress: () => void; color?: string }) => {
-  const { colors } = useTheme();
-
-  return (
-    <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-      <TouchableOpacity {...props}>
-        <View style={localeStyles.containerMain}>
-          <View style={localeStyles.containerLabel}>
-            <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
-          </View>
-          <View style={localeStyles.containerDropdownButton}>
-            <MaterialCommunityIcons name="menu-right" size={24} color="black" />
-          </View>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-};
 
 export { SettingsGettingDocumentScreen };
 

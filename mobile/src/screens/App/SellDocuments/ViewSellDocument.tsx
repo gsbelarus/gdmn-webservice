@@ -231,7 +231,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }) => {
+const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }, ref) => {
   const { colors } = useTheme();
   const { state } = useAppStore();
   const notFound = { id: -1, name: '' };
