@@ -58,9 +58,11 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IItem)),
     [],
   );
-  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === 2), [appState.contacts]);
+  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
   const listPeople = useMemo(() => getListItems(people), [getListItems, people]);
-  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === 3), [appState.contacts]);
+  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '3'), [
+    appState.contacts,
+  ]);
   const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
   const [formFields, setFormFields] = useState<IFormParams>({
@@ -77,8 +79,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: formFields.dateBegin.toLocaleDateString(),
-              dateEnd: formFields.dateEnd.toLocaleDateString(),
+              dateBegin: formFields.dateBegin.toISOString(),
+              dateEnd: formFields.dateEnd.toISOString(),
               expiditor: Array.isArray(formFields.expiditor) ? formFields.expiditor[0] : formFields.expiditor,
               toContact: Array.isArray(formFields.toContact) ? formFields.toContact[0] : formFields.toContact,
             },
@@ -132,14 +134,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     }
 
     // console.log('route.params', route.params);
-
-    setFormFields((prev) => {
-      const newState = { ...prev };
-      Object.entries(route.params).forEach(([key, value]) => {
-        newState[key] = value;
-      });
-      return newState;
-    });
+    setFormFields((prev) => ({ ...prev, ...route.params }));
   }, [route.params]);
 
   const onChange = (event: unknown, selectedDate: Date) => {
@@ -277,7 +272,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
                   display="default"
                   onChange={onChange}
                   mode="date"
-                  // locale="en_GB"
+                  locale="ru_RU"
                 />
               </View>
             </Modal>

@@ -9,11 +9,6 @@ import SubTitle from '../../../components/SubTitle';
 import { IField } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 
-/* interface IField {
-  id: number;
-  value: string;
-}
- */
 export interface ISelectItemRef {
   cancel(): void;
 }
