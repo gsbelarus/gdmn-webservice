@@ -1,4 +1,4 @@
-import { useTheme, RouteProp, useFocusEffect } from '@react-navigation/native';
+import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
@@ -75,7 +75,11 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
             (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
           )
         : -1;
-      const newBoxingsLine = { docId: route.params.docId, lineDoc: route.params.lineId, lineBoxings: lines.tara };
+      const newBoxingsLine = {
+        docId: route.params.docId,
+        lineDoc: route.params.lineId,
+        lineBoxings: lines ? lines.tara : [],
+      };
       const updateBoxingsLine =
         idx === -1
           ? state.boxingsLine
