@@ -52,7 +52,6 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
 
   useEffect(() => {
     if (isFocused) {
-      console.log('focused screen');
       const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
       const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));

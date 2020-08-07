@@ -45,11 +45,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IItem)),
     [],
   );
-  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
+  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === 2), [appState.contacts]);
   const listPeople = useMemo(() => getListItems(people), [getListItems, people]);
-  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '3'), [
-    appState.contacts,
-  ]);
+  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === 3), [appState.contacts]);
   const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
   const sendDocumentRequest = useCallback(() => {

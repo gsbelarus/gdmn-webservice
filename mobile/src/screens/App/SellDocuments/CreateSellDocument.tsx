@@ -42,11 +42,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IItem;
     });
-  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === '2'), [state.contacts]);
+  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === 2), [state.contacts]);
   const listPeople = useMemo(() => getListItems(people), [people]);
-  const companies: IContact[] = state.contacts.filter((item) => item.type === '3');
+  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type === '4');
+  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
   const listDepartments = getListItems(departments);
 
   const today = new Date();
