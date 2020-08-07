@@ -1,7 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 
-import { IReference } from '../../../common';
 import { HeaderRight } from '../components/HeaderRight';
 import { IField } from '../model';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
@@ -51,9 +50,15 @@ export type RootStackParamList = {
     quantity: string;
     batchNumber: string;
   };
-  SettingsGettingDocument: { item: { fieldName: string; id?: number } };
   SettingsSearchScreen: undefined;
-  SelectItemScreen: { selected?: number; list: { name: string; type: string; data: IField[] } };
+  SettingsGettingDocument: {
+    [fieldName: string]: number[];
+  };
+  SelectItemScreen: {
+    selected: number[];
+    isMulti?: boolean;
+    list: { name: string; type: string; data: IField[] };
+  };
 
   SelectBoxingsScreen: {
     lineId: string;

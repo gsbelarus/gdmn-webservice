@@ -26,12 +26,14 @@ interface ISelectList {
 
 export type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
-const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation }, ref) => {
+const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation }, _) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<ISelectList>(undefined);
-  const [checkedItem, setCheckedItem] = useState<null | number>(null);
+  const [checkedItem, setCheckedItem] = useState<number[]>([]);
+
+  const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
 
   useEffect(() => {
     // console.log('params', route.params);
@@ -39,7 +41,9 @@ const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation 
       return;
     }
 
-    const { list, selected } = route.params;
+    const { list, selected, isMulti } = route.params;
+
+    setIsMultiSelect(isMulti || false);
 
     if (selected) {
       setCheckedItem(selected);
@@ -54,11 +58,18 @@ const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation 
   const refList = React.useRef<FlatList<IField>>(null);
   useScrollToTop(refList);
 
+  const selectItem = useCallback(
+    (id: number) => {
+      setCheckedItem(isMultiSelect ? [...checkedItem, id] : [id]);
+    },
+    [checkedItem, isMultiSelect],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IField }) => {
-      return <LineItem item={item} checked={item.id === checkedItem} onSelect={setCheckedItem} />;
+      return <LineItem item={item} checked={checkedItem.includes(item.id)} onSelect={selectItem} />;
     },
-    [checkedItem],
+    [checkedItem, selectItem],
   );
 
   React.useLayoutEffect(() => {
@@ -67,11 +78,7 @@ const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation 
         <IconButton
           icon="check-circle"
           size={30}
-          onPress={() =>
-            navigation.navigate('SettingsGettingDocument', {
-              item: { fieldName: filteredList?.type, id: checkedItem },
-            })
-          }
+          onPress={() => navigation.navigate('SettingsGettingDocument', { [filteredList?.type]: checkedItem })}
         />
       ),
     });
