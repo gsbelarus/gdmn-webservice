@@ -43,9 +43,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   yesterDay.setDate(yesterDay.getDate() - 1);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDateEnd, setIsDateEnd] = useState(false);
-  const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
-  const [selectedToContact, setSelectedToContact] = useState<number>();
-  // const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
+  // const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
+  // const [selectedToContact, setSelectedToContact] = useState<number>();
+  // // const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
   // const [dateEnd, setDateEnd] = useState(today);
   // const [oldDateBegin, setOldDateBegin] = useState(today);
   // const [oldDateEnd, setOldDateEnd] = useState(today);
@@ -81,8 +81,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             {
               dateBegin: formFields.dateBegin.toLocaleDateString(),
               dateEnd: formFields.dateEnd.toLocaleDateString(),
-              expiditor: selectedExpeditor,
-              toContact: selectedToContact,
+              expiditor: Array.isArray(formFields.expiditor) ? formFields.expiditor[0] : formFields.expiditor,
+              toContact: Array.isArray(formFields.toContact) ? formFields.toContact[0] : formFields.toContact,
             },
           ],
         },
@@ -111,7 +111,14 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           },
         ]),
       );
-  }, [apiService.data, state.companyID, selectedExpeditor, selectedToContact]);
+  }, [
+    apiService.data,
+    state.companyID,
+    formFields.dateBegin,
+    formFields.dateEnd,
+    formFields.expiditor,
+    formFields.toContact,
+  ]);
 
   useImperativeHandle(ref, () => ({
     done: async () => {
@@ -126,7 +133,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return;
     }
 
-    console.log('route.params', route.params);
+    // console.log('route.params', route.params);
 
     setFormFields((prev) => {
       const newState = { ...prev };
@@ -136,10 +143,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return newState;
     });
   }, [route.params]);
-
-  useEffect(() => {
-    console.log('formFields', formFields);
-  }, [formFields]);
 
   const onChange = (event: unknown, selectedDate: Date) => {
     // console.log('event', event);
