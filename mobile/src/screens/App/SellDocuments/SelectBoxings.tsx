@@ -1,6 +1,6 @@
 import { useTheme, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -56,12 +56,12 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
 
   const refList = useRef<FlatList<ITara>>(null);
 
-  useFocusEffect(() => {
+  useEffect(() => {
     const findBoxingsLineHock = state.boxingsLine
       ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
       : undefined;
     setBoxingsLine(findBoxingsLineHock ? findBoxingsLineHock.lineBoxings : []);
-  });
+  }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
   useImperativeHandle(ref, () => ({
     cancel: () => {
