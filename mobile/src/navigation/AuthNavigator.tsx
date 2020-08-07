@@ -1,9 +1,9 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
+import React, { useEffect, useReducer, useCallback, useMemo, useState } from 'react';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
-import { createCancellableSignal } from '../helpers/utils';
+import { createCancellableSignal, appStorage } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
@@ -74,6 +74,8 @@ const AuthNavigator = () => {
     actions: authActions,
   } = useAuthStore();
 
+  const [companies, setCompanies] = useState<string[]>([]);
+
   const {
     state: { serverUrl },
     actions,
@@ -107,8 +109,8 @@ const AuthNavigator = () => {
         //   5000,
         //   apiService.auth.getDevice(),
         // );
-        setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
-        authActions.setUserStatus({ userID: null, userName: undefined });
+        // setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
+        // authActions.setUserStatus({ userID: null, userName: undefined });
         if (!response.result) {
           // устройства нет на сервере, сбросим DeviceId на сутройстве
           actions.setDeviceId(null);
@@ -154,17 +156,40 @@ const AuthNavigator = () => {
   // Вынести всё в store  - deviceRegistered
 
   useEffect(() => {
+    const request = async () => {
+      const response = await apiService.auth.getUserStatus();
+      if (response.result) {
+        setCompanies(response.data.companies || []);
+      }
+    };
+
+    if (userID) {
+      request();
+    }
+  }, [apiService.auth, userID]);
+
+  useEffect(() => {
     if (!userID) {
       /* При обнулении userID сбрасываем состояние состояния в навигаторе */
       setState({ type: 'INIT' });
     }
   }, [userID]);
 
-  /*   useEffect(() => {
-    if (userID && companyID) {
-      actions.setStoragePath(`${userID}/${companyID}`);
+/*   useEffect(() => {
+    const getCompanyId = async () => {
+      const savedCompany = await appStorage.getItem(`${userID}/companyId`);
+      // authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+
+      !!savedCompany && companies.some((company) => company === savedCompany)
+        ? authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
+        : undefined;
+    };
+
+    // if (userID !== null && companies) {
+    if (userID) {
+      getCompanyId();
     }
-  }, [userID, companyID, actions]); */
+  }, [authActions, companies, userID]); */
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
@@ -253,7 +278,7 @@ const AuthNavigator = () => {
 
   /* Еели deviceRegistered и userId не определены то отображаем страницу подключения */
   const AuthConfig = useMemo(() => {
-    return !(deviceRegistered === undefined || userID === undefined) ? (
+    return !(deviceRegistered === undefined || userID === undefined /* || companyID === undefined */) ? (
       RegisterComponent
     ) : (
       <Stack.Screen
@@ -263,7 +288,7 @@ const AuthNavigator = () => {
         options={{ animationTypeForReplace: 'pop' }}
       />
     );
-  }, [RegisterComponent, SplashWithParams, deviceRegistered, userID]);
+  }, [RegisterComponent, SplashWithParams, companyID, deviceRegistered, userID]);
 
   return <Stack.Navigator headerMode="none">{state.showSettings ? ConfigComponent : AuthConfig}</Stack.Navigator>;
 };
