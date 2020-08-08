@@ -128,7 +128,7 @@ const AuthNavigator = () => {
     /* 2. Если устройства найдено (deviceRegistered = true)
       то делаем отправляем запрос на проверку пользователя (пользователь передаётся из куки)
     */
-   const getUser = async () => {
+    const getUser = async () => {
       try {
         const result = await apiService.auth.getUserStatus();
         if (!result.result) {
@@ -165,13 +165,16 @@ const AuthNavigator = () => {
     }
   }, [userID]);
 
-   useEffect(() => {
+  useEffect(() => {
     const getCompanyId = async () => {
       const savedCompany = await appStorage.getItem(`${userID}/companyId`);
       const response = await apiService.auth.getUserStatus();
       // authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
 
-      !!savedCompany && response.result && response.data?.companies && response.data.companies.some((company) => company === savedCompany)
+      !!savedCompany &&
+      response.result &&
+      response.data?.companies &&
+      response.data.companies.some((company) => company === savedCompany)
         ? authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
         : authActions.setCompanyID({ companyId: null, companyName: undefined });
     };
@@ -180,7 +183,7 @@ const AuthNavigator = () => {
     if (userID) {
       getCompanyId();
     }
-  }, [authActions, userID]);
+  }, [apiService.auth, authActions, userID]);
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
