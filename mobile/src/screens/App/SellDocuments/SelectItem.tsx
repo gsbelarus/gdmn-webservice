@@ -112,13 +112,6 @@ const LineItem = React.memo(
 export { SelectItemScreen };
 
 const localStyles = StyleSheet.create({
-  /*   avatar: {
-    alignItems: 'center',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  }, */
   content: {
     height: '100%',
   },

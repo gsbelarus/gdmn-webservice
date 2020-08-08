@@ -1,5 +1,4 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-// import DateTimePicker from '@react-native-community/datetimepicker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -223,8 +222,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         </View>
       </View>
       {isDatePickerVisible &&
-        (Platform.OS !== 'ios' ? (
-          <RNDateTimePicker
+        (Platform.OS !== 'ios' ? (<View></View>
+         /*  <RNDateTimePicker
             testID="dateTimePicker"
             timeZoneOffsetInMinutes={0}
             value={isDateEnd ? formFields.dateEnd : formFields.dateBegin}
@@ -235,7 +234,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             locale="ru_RU"
             maximumDate={new Date(today.getFullYear(), today.getMonth() + 1, today.getDate())}
             minimumDate={new Date(1990, 0, 1)}
-          />
+          /> */
         ) : (
           <Portal>
             <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
