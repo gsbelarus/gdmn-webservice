@@ -29,7 +29,6 @@ type Props = {
 
 const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ route }, ref) => {
   const [date, setDate] = useState(new Date());
-  const [oldDate, setOldDate] = useState(new Date());
   const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
   const [selectedToContact, setSelectedToContact] = useState<number>();
   const [selectedFromContact, setSelectedFromContact] = useState<number>();
@@ -42,18 +41,18 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IItem;
     });
-  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === 2), [state.contacts]);
+  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === '2'), [state.contacts]);
   const listPeople = useMemo(() => getListItems(people), [people]);
-  const companies: IContact[] = state.contacts.filter((item) => item.type === 3);
+  const companies: IContact[] = state.contacts.filter((item) => item.type === '3');
   const listCompanies = getListItems(companies);
-  const departments: IContact[] = state.contacts.filter((item) => item.type === 4);
+  const departments: IContact[] = state.contacts.filter((item) => item.type === '4');
   const listDepartments = getListItems(departments);
 
   const today = new Date();
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const onChange = (event, selectedDate) => {
+  const onChange = (event: unknown, selectedDate?: Date) => {
     const currentDate = selectedDate || date;
     setDatePickerVisibility(Platform.OS === 'ios');
     setDate(currentDate);
@@ -139,11 +138,12 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
             <TouchableOpacity
               style={localeStyles.containerDate}
               onPress={() => {
-                setOldDate(date);
                 setDatePickerVisibility(true);
               }}
             >
-              <Text style={[localeStyles.textDate, { color: colors.text }]}>{date.toLocaleDateString()}</Text>
+              <Text style={[localeStyles.textDate, { color: colors.text }]}>
+              {date.getDate()}.{date.getMonth() + 1}.{date.getFullYear()}
+              </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
@@ -268,7 +268,6 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                       <Button
                         onPress={() => {
                           setDatePickerVisibility(false);
-                          setDate(oldDate);
                         }}
                       >
                         Отмена
