@@ -47,8 +47,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   // const [selectedToContact, setSelectedToContact] = useState<number>();
   // // const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
   // const [dateEnd, setDateEnd] = useState(today);
-  // const [oldDateBegin, setOldDateBegin] = useState(today);
-  // const [oldDateEnd, setOldDateEnd] = useState(today);
 
   const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -69,6 +67,10 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     dateBegin: yesterDay,
     dateEnd: new Date(),
   });
+
+  useEffect(() => {
+    console.log(isDatePickerVisible);
+  }, [isDatePickerVisible]);
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
@@ -137,10 +139,14 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     setFormFields((prev) => ({ ...prev, ...route.params }));
   }, [route.params]);
 
-  const onChange = (event: unknown, selectedDate: Date) => {
+  const onChange = (event: unknown, selectedDate?: Date) => {
+    setDatePickerVisibility(Platform.OS === 'ios');
+
+    if (!selectedDate) {
+      return;
+    }
     // console.log('event', event);
     // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
-    setDatePickerVisibility(Platform.OS === 'ios');
     const newDate = isDateEnd ? { dateEnd: selectedDate } : { dateBegin: selectedDate };
     setFormFields({ ...formFields, ...newDate });
     // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
@@ -190,13 +196,12 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           <TouchableOpacity
             style={localeStyles.containerDate}
             onPress={() => {
-              // setOldDateBegin(dateBegin);
               setIsDateEnd(false);
               setDatePickerVisibility(true);
             }}
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {formFields.dateBegin.toLocaleDateString()}
+              {formFields.dateBegin.getDate()}.{formFields.dateBegin.getMonth() + 1}.{formFields.dateBegin.getFullYear()}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
@@ -206,13 +211,12 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           <TouchableOpacity
             style={localeStyles.containerDate}
             onPress={() => {
-              // setOldDateEnd(dateEnd);
               setIsDateEnd(true);
               setDatePickerVisibility(true);
             }}
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {formFields.dateEnd.toLocaleDateString()}
+            {formFields.dateEnd.getDate()}.{formFields.dateEnd.getMonth() + 1}.{formFields.dateEnd.getFullYear()}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
