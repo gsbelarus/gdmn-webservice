@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useReducer, useCallback, useMemo, useState } from 'react';
+import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';

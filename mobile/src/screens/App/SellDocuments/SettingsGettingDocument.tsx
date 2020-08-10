@@ -64,7 +64,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
 
   const [formFields, setFormFields] = useState<IFormParams>({
     dateBegin: yesterDay,
-    dateEnd: new Date(),
+    dateEnd: today,
   });
 
   useEffect(() => {
@@ -222,8 +222,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         </View>
       </View>
       {isDatePickerVisible &&
-        (Platform.OS !== 'ios' ? (<View></View>
-         /*  <RNDateTimePicker
+        (Platform.OS !== 'ios' ? (
+          <RNDateTimePicker
             testID="dateTimePicker"
             timeZoneOffsetInMinutes={0}
             value={isDateEnd ? formFields.dateEnd : formFields.dateBegin}
@@ -234,7 +234,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             locale="ru_RU"
             maximumDate={new Date(today.getFullYear(), today.getMonth() + 1, today.getDate())}
             minimumDate={new Date(1990, 0, 1)}
-          /> */
+          />
         ) : (
           <Portal>
             <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
