@@ -74,8 +74,6 @@ const AuthNavigator = () => {
     actions: authActions,
   } = useAuthStore();
 
-  const [companies, setCompanies] = useState<string[]>([]);
-
   const {
     state: { serverUrl },
     actions,
@@ -159,19 +157,6 @@ const AuthNavigator = () => {
     }
   }, [authActions, apiService.auth, deviceRegistered, signal]);
   // Вынести всё в store  - deviceRegistered
-
-  useEffect(() => {
-    const request = async () => {
-      const response = await apiService.auth.getUserStatus();
-      if (response.result) {
-        setCompanies(response.data.companies || []);
-      }
-    };
-
-    if (userID) {
-      request();
-    }
-  }, [apiService.auth, userID]);
 
   useEffect(() => {
     if (!userID) {
