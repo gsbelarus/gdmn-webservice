@@ -130,9 +130,14 @@ const AuthNavigator = () => {
     /* 2. Если устройства найдено (deviceRegistered = true)
       то делаем отправляем запрос на проверку пользователя (пользователь передаётся из куки)
     */
-    const getUser = async () => {
+   const getUser = async () => {
       try {
         const result = await apiService.auth.getUserStatus();
+        if (!result.result) {
+          authActions.setUserStatus({ userID: null, userName: undefined });
+          authActions.setCompanyID({ companyId: null, companyName: undefined });
+          return;
+        }
         if (!isUser(result.data)) {
           authActions.setUserStatus({ userID: null, userName: undefined });
           setState({ type: 'SET_ERROR', text: 'ошибка при получении пользователя' });
@@ -175,21 +180,22 @@ const AuthNavigator = () => {
     }
   }, [userID]);
 
-/*   useEffect(() => {
+   useEffect(() => {
     const getCompanyId = async () => {
       const savedCompany = await appStorage.getItem(`${userID}/companyId`);
+      const response = await apiService.auth.getUserStatus();
       // authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
 
-      !!savedCompany && companies.some((company) => company === savedCompany)
+      !!savedCompany && response.result && response.data?.companies && response.data.companies.some((company) => company === savedCompany)
         ? authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
-        : undefined;
+        : authActions.setCompanyID({ companyId: null, companyName: undefined });
     };
 
-    // if (userID !== null && companies) {
+    //if (userID && userID !== null) {
     if (userID) {
       getCompanyId();
     }
-  }, [authActions, companies, userID]); */
+  }, [authActions, userID]);
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
@@ -256,7 +262,7 @@ const AuthNavigator = () => {
 
   const LoginComponent = useMemo(() => {
     return userID ? (
-      companyID !== undefined ? (
+      companyID ? (
         <Stack.Screen key="App" name="App" component={AppNavigator} />
       ) : (
         <Stack.Screen key="SelectCompany" name="SelectCompany" component={CompanyNavigator} />
@@ -278,7 +284,7 @@ const AuthNavigator = () => {
 
   /* Еели deviceRegistered и userId не определены то отображаем страницу подключения */
   const AuthConfig = useMemo(() => {
-    return !(deviceRegistered === undefined || userID === undefined /* || companyID === undefined */) ? (
+    return !(deviceRegistered === undefined || userID === undefined || companyID === undefined) ? (
       RegisterComponent
     ) : (
       <Stack.Screen

@@ -17,7 +17,7 @@ import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import config from '../../config';
 import { useActionSheet } from '../../helpers/useActionSheet';
-import { timeout, isMessagesArray } from '../../helpers/utils';
+import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import documentsRef from '../../mockData/Otves/Document.json';
 import referencesRef from '../../mockData/Otves/References.json';
 import { ITara } from '../../model';
@@ -32,7 +32,7 @@ const SettingsScreen = () => {
     state: { settings, documents },
   } = useAppStore();
   const {
-    state: { companyID },
+    state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
 
@@ -208,7 +208,10 @@ const SettingsScreen = () => {
               },
               {
                 title: 'Сменить организацию',
-                onPress: () => authActions.setCompanyID({ companyId: undefined, companyName: undefined }),
+                onPress: async() => {
+                  await appStorage.removeItem(`${userID}/companyId`);
+                  authActions.setCompanyID({ companyId: null, companyName: undefined });
+                }
               },
               {
                 title: 'Удалить все данные',
