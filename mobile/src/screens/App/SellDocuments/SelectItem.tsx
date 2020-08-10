@@ -1,6 +1,6 @@
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, forwardRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
 
@@ -9,19 +9,15 @@ import SubTitle from '../../../components/SubTitle';
 import { IField } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 
-export interface ISelectItemRef {
-  cancel(): void;
-}
-
 interface ISelectList {
   name: string;
   type: string;
   data: IField[];
 }
 
-export type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
+type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
-const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation }, _) => {
+export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +53,7 @@ const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation 
     (id: number) => {
       setCheckedItem(isMultiSelect ? [...checkedItem, id] : [id]);
     },
-    [checkedItem, isMultiSelect],
+    [isMultiSelect],
   );
 
   const renderItem = useCallback(
@@ -94,7 +90,7 @@ const SelectItemScreen = forwardRef<ISelectItemRef, Props>(({ route, navigation 
       />
     </View>
   );
-});
+};
 
 const LineItem = React.memo(
   ({ item, checked, onSelect }: { item: IField; checked: boolean; onSelect: (id: number) => void }) => {
@@ -108,8 +104,6 @@ const LineItem = React.memo(
     );
   },
 );
-
-export { SelectItemScreen };
 
 const localStyles = StyleSheet.create({
   content: {

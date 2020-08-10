@@ -20,7 +20,7 @@ import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
-import { SelectItemScreen, ISelectItemRef } from '../screens/App/SellDocuments/SelectItem';
+import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
@@ -90,7 +90,6 @@ const AppNavigator = () => {
   const settingsGettingDocumentRef = useRef<ISettingsGettingDocumentRef>(null);
   const settingsSearchRef = useRef<ISettingsSearchRef>(null);
   const selectBoxingsRef = useRef<ISelectBoxingsRef>(null);
-  // const selectItemRef = useRef<ISelectItemRef>(null);
 
   const SellProductDetailsComponent = (props) => {
     return <SellProductDetailScreen {...props} ref={prodSellRef} />;
