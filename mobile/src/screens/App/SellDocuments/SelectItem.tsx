@@ -51,7 +51,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   const selectItem = useCallback(
     (id: number) => {
-      setCheckedItem(isMultiSelect ? [...checkedItem, id] : [id]);
+      setCheckedItem((prev) => (isMultiSelect ? [...prev, id] : [id]));
     },
     [isMultiSelect],
   );
