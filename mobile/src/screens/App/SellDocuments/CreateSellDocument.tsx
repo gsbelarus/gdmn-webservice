@@ -1,12 +1,11 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation, RouteProp } from '@react-navigation/native';
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
 import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
-import DropdownList from '../../../components/DropdownList/DropdownList';
 import { ISellHead } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
@@ -27,16 +26,34 @@ type Props = {
   route: CreateSellDocumentScreenRouteProp;
 };
 
+export interface IFormParams {
+  date: Date;
+  expiditor?: number;
+  toContact?: number;
+  fromContact?: number;
+  documentType?: number;
+  documentNumber?: string;
+}
+
 const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ route }, ref) => {
-  const [date, setDate] = useState(new Date());
-  const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
-  const [selectedToContact, setSelectedToContact] = useState<number>();
-  const [selectedFromContact, setSelectedFromContact] = useState<number>();
-  const [selectedDocType, setSelectedDocType] = useState<number>();
+  //const [date, setDate] = useState(new Date());
+  //const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
+  //const [selectedToContact, setSelectedToContact] = useState<number>();
+  //const [selectedFromContact, setSelectedFromContact] = useState<number>();
+  //const [selectedDocType, setSelectedDocType] = useState<number>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [numberText, setNumberText] = useState('');
+  //const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
-  const selectedItem = (listItems: IItem[], id: number) => listItems.find((item) => item.id === id);
+
+  const [formFields, setFormFields] = useState<IFormParams>({
+    date: new Date(),
+  });
+
+  const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
+    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+  }, []);
+
+  //const selectedItem = (listItems: IItem[], id: number) => listItems.find((item) => item.id === id);
   const getListItems = (contacts: IContact[]) =>
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IItem;
@@ -53,18 +70,29 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
   const navigation = useNavigation();
 
   const onChange = (event: unknown, selectedDate?: Date) => {
-    const currentDate = selectedDate || date;
+    const currentDate = selectedDate || formFields.date;
     setDatePickerVisibility(Platform.OS === 'ios');
-    setDate(currentDate);
+    setFormFields({ ...formFields, date: currentDate });
   };
+
+  useEffect(() => {
+    if (!route.params) {
+      // окно открыто без параметров -> считаем что инициизируется
+      // setFormFields((prev) => prev);
+      return;
+    }
+
+    // console.log('route.params', route.params);
+    setFormFields((prev) => ({ ...prev, ...route.params }));
+  }, [route.params]);
 
   useImperativeHandle(ref, () => ({
     done: () => {
       if (
-        selectedExpeditor === undefined ||
-        selectedToContact === undefined ||
-        selectedFromContact === undefined ||
-        numberText === undefined
+        formFields.expiditor === undefined ||
+        formFields.toContact === undefined ||
+        formFields.fromContact === undefined ||
+        formFields.documentNumber === undefined
       ) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [
           {
@@ -76,15 +104,15 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
       }
       if (route.params?.docId) {
         actions.editDocument({
-          id: route.params.docId,
+          id: Number(route.params.docId ?? -1),
           head: {
-            doctype: selectedDocType,
-            fromcontactId: selectedFromContact,
-            tocontactId: selectedToContact,
-            date: date.toString(),
+            doctype: formFields.documentType,
+            fromcontactId: formFields.fromContact,
+            tocontactId: formFields.toContact,
+            date: formFields.date.toString(),
             status: 0,
-            docnumber: numberText,
-            expeditorId: selectedExpeditor,
+            docnumber: formFields.documentNumber,
+            expeditorId: formFields.expiditor,
           },
         });
         navigation.navigate('ViewSellDocument', { docId: route.params.docId });
@@ -98,13 +126,13 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
         actions.newDocument({
           id,
           head: {
-            doctype: selectedDocType,
-            fromcontactId: selectedFromContact,
-            tocontactId: selectedToContact,
-            date: date.toString(),
+            doctype: formFields.documentType,
+            fromcontactId: formFields.fromContact,
+            tocontactId: formFields.toContact,
+            date: formFields.date.toString(),
             status: 0,
-            docnumber: numberText,
-            expeditorId: selectedExpeditor,
+            docnumber: formFields.documentNumber,
+            expeditorId: formFields.expiditor,
           },
           lines: [],
         });
@@ -115,19 +143,43 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
 
   useEffect(() => {
     if (route.params?.docId !== undefined) {
-      const documentItem = state.documents.find((item) => item.id === route.params.docId);
-      setSelectedExpeditor((documentItem.head as ISellHead).expeditorId);
-      setSelectedToContact(documentItem.head.tocontactId);
-      setSelectedFromContact(documentItem.head.fromcontactId);
-      setDate(new Date(documentItem.head.date));
-      setNumberText((documentItem.head as ISellHead).docnumber);
-      setSelectedDocType(documentItem.head?.doctype);
+      const documentItem = state.documents.find((item) => item.id === Number(route.params.docId));
+      setFormFields({
+        expiditor: (documentItem.head as ISellHead).expeditorId,
+        toContact: documentItem.head.tocontactId,
+        fromContact: documentItem.head.fromcontactId,
+        date: new Date(documentItem.head.date),
+        documentNumber: (documentItem.head as ISellHead).docnumber,
+        documentType: documentItem.head?.doctype,
+      });
     }
   }, [route.params, state.documents]);
 
   /*   const onSelectedItemsChange = (selectedItems) => {
     this.setState({ selectedItems });
   }; */
+
+  const ReferenceItem = useCallback(
+    (props: { value: string; onPress: () => void; color?: string }) => {
+      // const { colors } = useTheme();
+
+      return (
+        <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+          <TouchableOpacity {...props}>
+            <View style={localeStyles.containerMain}>
+              <View style={localeStyles.containerLabel}>
+                <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
+              </View>
+              <View style={localeStyles.containerDropdownButton}>
+                <MaterialCommunityIcons name="menu-right" size={24} color="black" />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    },
+    [colors.border],
+  );
 
   return (
     <>
@@ -142,7 +194,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
               }}
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {date.getDate()}.{date.getMonth() + 1}.{date.getFullYear()}
+                {formFields.date.getDate()}.{formFields.date.getMonth() + 1}.{formFields.date.getFullYear()}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -158,8 +210,8 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   color: colors.text,
                 },
               ]}
-              onChangeText={setNumberText}
-              value={numberText}
+              onChangeText={(value) => setFormFields({ ...formFields, documentNumber: value })}
+              value={formFields.documentNumber}
               placeholder="Введите номер"
               placeholderTextColor={colors.border}
               multiline={false}
@@ -172,7 +224,20 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-            <View key={11}>
+            <ReferenceItem
+              value={selectedItem(listPeople, formFields.expiditor)?.value}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  selected: formFields.expiditor,
+                  list: {
+                    name: 'Экспедитор',
+                    type: 'expiditor',
+                    data: listPeople,
+                  },
+                })
+              }
+            />
+            {/*
               <DropdownList
                 list={listPeople}
                 value={selectedItem(listPeople, selectedExpeditor)}
@@ -180,11 +245,24 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   setSelectedExpeditor(item.id);
                 }}
               />
-            </View>
+              */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
             <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
-            <View key={13}>
+            <ReferenceItem
+              value={selectedItem(listDepartments, formFields.fromContact)?.value}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  selected: formFields.fromContact,
+                  list: {
+                    name: 'Подразделение',
+                    type: 'expiditor',
+                    data: listDepartments,
+                  },
+                })
+              }
+            />
+            {/*
               <DropdownList
                 list={listDepartments}
                 value={selectedItem(listDepartments, selectedFromContact)}
@@ -192,11 +270,24 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   setSelectedFromContact(item.id);
                 }}
               />
-            </View>
+            */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
             <Text style={localeStyles.subdivisionText}>Организация:</Text>
-            <View key={14}>
+            <ReferenceItem
+              value={selectedItem(listCompanies, formFields.toContact)?.value}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  selected: formFields.toContact,
+                  list: {
+                    name: 'Организация',
+                    type: 'expiditor',
+                    data: listCompanies,
+                  },
+                })
+              }
+            />
+            {/*
               <DropdownList
                 list={listCompanies}
                 value={selectedItem(listCompanies, selectedToContact)}
@@ -204,7 +295,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   setSelectedToContact(item.id);
                 }}
               />
-            </View>
+              */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
             <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
@@ -216,11 +307,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                     mode="outlined"
                     style={[
                       localeStyles.margin,
-                      selectedDocType === item.id ? { backgroundColor: colors.primary } : {},
+                      formFields.documentType === item.id ? { backgroundColor: colors.primary } : {},
                     ]}
-                    onPress={() => setSelectedDocType(item.id)}
-                    selected={selectedDocType === item.id}
-                    selectedColor={selectedDocType === item.id ? colors.card : colors.text}
+                    onPress={() => setFormFields({ ...formFields, documentType: item.id })}
+                    selected={formFields.documentType === item.id}
+                    selectedColor={formFields.documentType === item.id ? colors.card : colors.text}
                   >
                     {item.name}
                   </Chip>
@@ -235,7 +326,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
               <DateTimePicker
                 testID="dateTimePicker"
                 timeZoneOffsetInMinutes={0}
-                value={date}
+                value={formFields.date}
                 is24Hour={true}
                 display="default"
                 onChange={onChange}
@@ -276,7 +367,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                     <DateTimePicker
                       testID="dateTimePicker"
                       timeZoneOffsetInMinutes={0}
-                      value={date}
+                      value={formFields.date}
                       is24Hour={true}
                       display="default"
                       onChange={onChange}
@@ -335,6 +426,17 @@ const localeStyles = StyleSheet.create({
     margin: 0,
     padding: 0,
   },
+  containerDropdownButton: {
+    flex: 0.07,
+  },
+  containerLabel: {
+    flex: 0.93,
+  },
+  containerMain: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: '100%',
+  },
   containerModalDatePicker: {
     borderRadius: 8,
     borderWidth: 1,
@@ -352,6 +454,16 @@ const localeStyles = StyleSheet.create({
   },
   marginRight: {
     marginRight: 10,
+  },
+  picker: {
+    alignSelf: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 40,
+    marginTop: 5,
+    padding: 10,
+    width: '100%',
   },
   pickerView: {
     borderWidth: 1,
@@ -375,6 +487,11 @@ const localeStyles = StyleSheet.create({
     flex: 1,
     marginBottom: 5,
     textAlign: 'left',
+  },
+  text: {
+    color: '#000',
+    fontSize: 14,
+    fontStyle: 'normal',
   },
   textDate: {
     flex: 1,

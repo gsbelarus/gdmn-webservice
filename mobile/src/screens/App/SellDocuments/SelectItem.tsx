@@ -69,6 +69,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
         <IconButton
           icon="check-circle"
           size={30}
+          //onPress={() => navigation.navigate('CreateSellDocument', { [filteredList?.type]: checkedItem })}
           onPress={() => navigation.navigate('SettingsGettingDocument', { [filteredList?.type]: checkedItem })}
         />
       ),

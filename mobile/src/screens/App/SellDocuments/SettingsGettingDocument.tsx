@@ -200,7 +200,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             }}
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {formFields.dateBegin.getDate()}.{formFields.dateBegin.getMonth() + 1}.{formFields.dateBegin.getFullYear()}
+              {formFields.dateBegin.getDate()}.{formFields.dateBegin.getMonth() + 1}.
+              {formFields.dateBegin.getFullYear()}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
@@ -215,7 +216,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             }}
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-            {formFields.dateEnd.getDate()}.{formFields.dateEnd.getMonth() + 1}.{formFields.dateEnd.getFullYear()}
+              {formFields.dateEnd.getDate()}.{formFields.dateEnd.getMonth() + 1}.{formFields.dateEnd.getFullYear()}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>

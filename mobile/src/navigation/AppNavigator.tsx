@@ -39,7 +39,8 @@ export type RootStackParamList = {
     quantity?: string;
     batchNumber?: string;
   };
-  CreateSellDocument: { docId?: number };
+  CreateSellDocument: { [fieldName: string]: (number|string)[];
+  };
   SellProductsList: { docId: number };
   BoxingDetail: {
     boxingId: number;
