@@ -67,10 +67,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     dateEnd: today,
   });
 
-  useEffect(() => {
-    console.log(isDatePickerVisible);
-  }, [isDatePickerVisible]);
-
   const sendDocumentRequest = useCallback(() => {
     timeout(
       5000,
