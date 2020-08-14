@@ -67,14 +67,15 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton
-          icon="check-circle"
+          icon="check"
           size={30}
+          color={colors.primary}
           //onPress={() => navigation.navigate('CreateSellDocument', { [filteredList?.type]: checkedItem })}
           onPress={() => navigation.navigate('SettingsGettingDocument', { [filteredList?.type]: checkedItem })}
         />
       ),
     });
-  }, [checkedItem, filteredList?.type, navigation]);
+  }, [checkedItem, colors.primary, filteredList?.type, navigation]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -95,11 +96,13 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
 const LineItem = React.memo(
   ({ item, checked, onSelect }: { item: IField; checked: boolean; onSelect: (id: number) => void }) => {
+    const { colors } = useTheme();
+
     return (
       <TouchableOpacity onPress={() => onSelect(item.id)}>
         <View style={localStyles.row}>
           <Paragraph style={localStyles.details}>{item.value}</Paragraph>
-          <Checkbox status={checked ? 'checked' : 'unchecked'} />
+          <Checkbox color={colors.primary} status={checked ? 'checked' : 'unchecked'} />
         </View>
       </TouchableOpacity>
     );
@@ -111,6 +114,7 @@ const localStyles = StyleSheet.create({
     height: '100%',
   },
   details: {
+    flex: 9,
     margin: 10,
   },
   item: {
