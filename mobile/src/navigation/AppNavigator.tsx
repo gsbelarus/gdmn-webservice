@@ -20,6 +20,7 @@ import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
 import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
+import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
@@ -39,8 +40,7 @@ export type RootStackParamList = {
     quantity?: string;
     batchNumber?: string;
   };
-  CreateSellDocument: { [fieldName: string]: (number|string)[];
-  };
+  CreateSellDocument: { [fieldName: string]: (number | string)[] };
   SellProductsList: { docId: number };
   BoxingDetail: {
     boxingId: number;
@@ -53,13 +53,14 @@ export type RootStackParamList = {
   };
   SettingsSearchScreen: undefined;
   SettingsGettingDocument: {
-    [fieldName: string]: number[];
+    [fieldName: string]: number[] | Date | number | string;
   };
   SelectItemScreen: {
     selected: number[];
     isMulti?: boolean;
     list: { name: string; type: string; data: IField[] };
   };
+  SelectDateScreen: { value: Date | null; fieldName: string; title: string };
 
   SelectBoxingsScreen: {
     lineId: string;
@@ -343,6 +344,7 @@ const AppNavigator = () => {
           })}
         />
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
+        <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
         <Stack.Screen
           key="SelectBoxingsScreen"
           name="SelectBoxingsScreen"

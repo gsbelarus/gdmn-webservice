@@ -27,8 +27,8 @@ export type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocumen
 export interface IFormParams {
   toContact?: number;
   expiditor?: number;
-  dateBegin: Date;
-  dateEnd: Date;
+  dateBegin?: Date;
+  dateEnd?: Date;
 }
 
 const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Props>(({ route }, ref) => {
@@ -38,8 +38,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   const { state: appState } = useAppStore();
 
   const today = new Date();
-  const yesterDay = new Date();
-  yesterDay.setDate(yesterDay.getDate() - 1);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDateEnd, setIsDateEnd] = useState(false);
   // const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
@@ -62,10 +62,10 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   ]);
   const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
-  const [formFields, setFormFields] = useState<IFormParams>({
-    dateBegin: yesterDay,
+  const [formFields, setFormFields] = useState<IFormParams>({});
+  /*     dateBegin: yesterday,
     dateEnd: today,
-  });
+  }); */
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
@@ -117,6 +117,19 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     formFields.toContact,
   ]);
 
+  useEffect(() => {
+    console.log('render');
+  }, []);
+
+  /*   useEffect(
+    () =>
+      setFormFields({
+        dateBegin: yesterday,
+        dateEnd: today,
+      }),
+    [today, yesterday],
+  ); */
+
   useImperativeHandle(ref, () => ({
     done: async () => {
       await sendDocumentRequest();
@@ -125,14 +138,21 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
 
   useEffect(() => {
     if (!route.params) {
-      // окно открыто без параметров -> считаем что инициизируется
-      // setFormFields((prev) => prev);
       return;
     }
 
-    // console.log('route.params', route.params);
-    setFormFields((prev) => ({ ...prev, ...route.params }));
+    console.log('route.params', route.params);
+
+    setFormFields((prev) => {
+      return route.params;
+      // console.log('prev', prev);
+      // return { ...prev, ...route.params };
+    });
   }, [route.params]);
+
+  /*   useEffect(() => {
+    console.log('formFields', formFields);
+  }, [formFields]); */
 
   const onChange = (event: unknown, selectedDate?: Date) => {
     setDatePickerVisibility(Platform.OS === 'ios');
@@ -140,9 +160,10 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     if (!selectedDate) {
       return;
     }
-    // console.log('event', event);
+
     // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
     const newDate = isDateEnd ? { dateEnd: selectedDate } : { dateBegin: selectedDate };
+    console.log('event', { ...formFields, ...newDate });
     setFormFields({ ...formFields, ...newDate });
     // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
     // setDatePickerVisibility(Platform.OS === 'ios');
@@ -151,38 +172,39 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
 
   const navigation = useNavigation();
   // const { state: AppState } = useAppStore();
+  const getDateString = useCallback((date: Date | undefined) => {
+    if (!date) {
+      return '-';
+    }
+    return `${date.getDate()}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
+  }, []);
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
-      // const { colors } = useTheme();
-
       return (
-        <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-          <TouchableOpacity {...props}>
+        <TouchableOpacity {...props}>
+          <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+            <Text style={[localeStyles.textDate, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
+            <MaterialCommunityIcons style={localeStyles.marginRight} name="menu-right" size={30} color="black" />
+          </View>
+          {/*   <View style={[localeStyles.picker, { borderColor: colors.border }]}>
             <View style={localeStyles.containerMain}>
               <View style={localeStyles.containerLabel}>
                 <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
               </View>
               <View style={localeStyles.containerDropdownButton}>
-                <MaterialCommunityIcons name="menu-right" size={24} color="black" />
+                <MaterialCommunityIcons name="menu-right" size={30} color="black" />
               </View>
             </View>
-          </TouchableOpacity>
-        </View>
+          </View> */}
+        </TouchableOpacity>
       );
     },
-    [colors.border],
+    [colors.border, colors.text],
   );
 
   return (
-    <View
-      style={[
-        localeStyles.container,
-        {
-          backgroundColor: colors.card,
-        },
-      ]}
-    >
+    <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Параметры</SubTitle>
       <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
         <Text style={localeStyles.subdivisionText}>Дата документа</Text>
@@ -190,14 +212,16 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
           <TouchableOpacity
             style={localeStyles.containerDate}
-            onPress={() => {
-              setIsDateEnd(false);
-              setDatePickerVisibility(true);
-            }}
+            onPress={() =>
+              navigation.navigate('SelectDateScreen', {
+                fieldName: 'dateBegin',
+                title: 'Дата начала',
+                value: (formFields?.dateBegin || yesterday).toISOString(),
+              })
+            }
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {formFields.dateBegin.getDate()}.{formFields.dateBegin.getMonth() + 1}.
-              {formFields.dateBegin.getFullYear()}
+              {getDateString(formFields?.dateBegin || yesterday)}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
@@ -206,13 +230,16 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
           <TouchableOpacity
             style={localeStyles.containerDate}
-            onPress={() => {
-              setIsDateEnd(true);
-              setDatePickerVisibility(true);
-            }}
+            onPress={() =>
+              navigation.navigate('SelectDateScreen', {
+                fieldName: 'dateEnd',
+                title: 'Дата окончания',
+                value: (formFields?.dateEnd || today).toISOString(),
+              })
+            }
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {formFields.dateEnd.getDate()}.{formFields.dateEnd.getMonth() + 1}.{formFields.dateEnd.getFullYear()}
+              {getDateString(formFields?.dateEnd || today)}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
@@ -347,16 +374,21 @@ const localeStyles = StyleSheet.create({
     padding: 0,
   },
   containerDropdownButton: {
-    flex: 0.07,
+    alignItems: 'center',
+    borderWidth: 1,
+    flex: 0.1,
+    justifyContent: 'flex-start',
   },
   containerLabel: {
-    flex: 0.93,
+    flex: 0.9,
   },
-  containerMain: {
+  /*   containerMain: {
+    borderWidth: 1,
     alignItems: 'center',
+    // justifyContent: 'center',
     flexDirection: 'row',
-    height: '100%',
-  },
+    // height: '100%',
+  }, */
   containerModalDatePicker: {
     borderRadius: 8,
     borderWidth: 1,
@@ -367,14 +399,12 @@ const localeStyles = StyleSheet.create({
     marginRight: 10,
   },
   picker: {
-    alignSelf: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 4,
+    borderStyle: 'solid',
     borderWidth: 1,
-    height: 40,
-    marginTop: 5,
-    padding: 10,
-    width: '100%',
+    flexDirection: 'row',
+    margin: 5,
+    padding: 5,
   },
   subdivisionText: {
     marginBottom: 5,
@@ -387,7 +417,7 @@ const localeStyles = StyleSheet.create({
   },
   textDate: {
     flexGrow: 4,
-    fontSize: 20,
+    fontSize: 18,
     textAlign: 'center',
   },
   title: {

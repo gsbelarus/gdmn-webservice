@@ -27,10 +27,10 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
 
   useEffect(() => {
-    // console.log('params', route.params);
     if (!route.params?.list) {
       return;
     }
+    console.log('params af', Object.keys(route.params));
 
     const { list, selected, isMulti } = route.params;
 
