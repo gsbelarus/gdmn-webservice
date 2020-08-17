@@ -256,7 +256,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   selected: formFields.fromContact,
                   list: {
                     name: 'Подразделение',
-                    type: 'expiditor',
+                    type: 'fromContact',
                     data: listDepartments,
                   },
                 })
@@ -281,7 +281,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   selected: formFields.toContact,
                   list: {
                     name: 'Организация',
-                    type: 'expiditor',
+                    type: 'toContact',
                     data: listCompanies,
                   },
                 })
