@@ -1,10 +1,9 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
-import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
-import { Button, Portal, Modal, Text } from 'react-native-paper';
+import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { Text } from 'react-native-paper';
 
 import { IResponse, IMessageInfo, IContact } from '../../../../../common';
 import SubTitle from '../../../components/SubTitle';
@@ -15,7 +14,7 @@ import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 interface IItem {
   id?: number;
   value?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ISettingsGettingDocumentRef {
@@ -40,12 +39,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  // const [isDateEnd, setIsDateEnd] = useState(false);
-  // // const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
-  // const [selectedToContact, setSelectedToContact] = useState<number>();
-  // // const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
-  // const [dateEnd, setDateEnd] = useState(today);
 
   const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -160,52 +153,53 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   return (
     <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Параметры</SubTitle>
-      <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-        <Text style={localeStyles.subdivisionText}>Дата документа</Text>
-        <Text style={localeStyles.subdivisionText}>с: </Text>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-          <TouchableOpacity
-            style={localeStyles.containerDate}
-            /*onPress={() => {
+      <ScrollView>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
+          <Text style={localeStyles.subdivisionText}>Дата документа</Text>
+          <Text style={localeStyles.subdivisionText}>с: </Text>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+            <TouchableOpacity
+              style={localeStyles.containerDate}
+              /*onPress={() => {
               setIsDateEnd(false);
               setDatePickerVisibility(true);
             }} */
-            onPress={() =>
-              navigation.navigate('SelectDateScreen', {
-                parentScreen: 'SettingsGettingDocument',
-                fieldName: 'dateBegin',
-                title: 'Дата начала',
-                value: formFields?.dateBegin || yesterday.toISOString().slice(0, 10),
-              })
-            }
-          >
-            <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {getDateString(formFields?.dateBegin || yesterday.toISOString())}
-            </Text>
-            <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-          </TouchableOpacity>
+              onPress={() =>
+                navigation.navigate('SelectDateScreen', {
+                  parentScreen: 'SettingsGettingDocument',
+                  fieldName: 'dateBegin',
+                  title: 'Дата начала',
+                  value: formFields?.dateBegin || yesterday.toISOString().slice(0, 10),
+                })
+              }
+            >
+              <Text style={[localeStyles.textDate, { color: colors.text }]}>
+                {getDateString(formFields?.dateBegin || yesterday.toISOString())}
+              </Text>
+              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+            </TouchableOpacity>
+          </View>
+          <Text style={localeStyles.subdivisionText}>по: </Text>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+            <TouchableOpacity
+              style={localeStyles.containerDate}
+              onPress={() =>
+                navigation.navigate('SelectDateScreen', {
+                  parentScreen: 'SettingsGettingDocument',
+                  fieldName: 'dateEnd',
+                  title: 'Дата окончания',
+                  value: formFields?.dateEnd || today.toISOString().slice(0, 10),
+                })
+              }
+            >
+              <Text style={[localeStyles.textDate, { color: colors.text }]}>
+                {getDateString(formFields?.dateEnd || today.toUTCString())}
+              </Text>
+              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text style={localeStyles.subdivisionText}>по: </Text>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <TouchableOpacity
-            style={localeStyles.containerDate}
-            onPress={() =>
-              navigation.navigate('SelectDateScreen', {
-                parentScreen: 'SettingsGettingDocument',
-                fieldName: 'dateEnd',
-                title: 'Дата окончания',
-                value: formFields?.dateEnd || today.toISOString().slice(0, 10),
-              })
-            }
-          >
-            <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {getDateString(formFields?.dateEnd || today.toUTCString())}
-            </Text>
-            <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-          </TouchableOpacity>
-        </View>
-      </View>
-      {/*      {isDatePickerVisible &&
+        {/*      {isDatePickerVisible &&
         (Platform.OS !== 'ios' ? (
           <RNDateTimePicker
             testID="dateTimePicker"
@@ -265,40 +259,41 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             </Modal>
           </Portal>
         ))} */}
-      <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
-        <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-        <ReferenceItem
-          value={selectedItem(listPeople, formFields?.expiditor)?.value}
-          onPress={() =>
-            navigation.navigate('SelectItemScreen', {
-              parentScreen: 'SettingsGettingDocument',
-              selected: formFields?.expiditor,
-              list: {
-                name: 'Экспедитор',
-                type: 'expiditor',
-                data: listPeople,
-              },
-            })
-          }
-        />
-      </View>
-      <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
-        <Text style={localeStyles.subdivisionText}>Организация:</Text>
-        <ReferenceItem
-          value={selectedItem(listCompanies, formFields?.toContact)?.value}
-          onPress={() =>
-            navigation.navigate('SelectItemScreen', {
-              parentScreen: 'SettingsGettingDocument',
-              selected: formFields?.toContact,
-              list: {
-                name: 'Контакты',
-                type: 'toContact',
-                data: listCompanies,
-              },
-            })
-          }
-        />
-      </View>
+        <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
+          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+          <ReferenceItem
+            value={selectedItem(listPeople, formFields?.expiditor)?.value}
+            onPress={() =>
+              navigation.navigate('SelectItemScreen', {
+                parentScreen: 'SettingsGettingDocument',
+                selected: formFields?.expiditor,
+                list: {
+                  name: 'Экспедитор',
+                  type: 'expiditor',
+                  data: listPeople,
+                },
+              })
+            }
+          />
+        </View>
+        <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
+          <Text style={localeStyles.subdivisionText}>Организация:</Text>
+          <ReferenceItem
+            value={selectedItem(listCompanies, formFields?.toContact)?.value}
+            onPress={() =>
+              navigation.navigate('SelectItemScreen', {
+                parentScreen: 'SettingsGettingDocument',
+                selected: formFields?.toContact,
+                list: {
+                  name: 'Контакты',
+                  type: 'toContact',
+                  data: listCompanies,
+                },
+              })
+            }
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 });

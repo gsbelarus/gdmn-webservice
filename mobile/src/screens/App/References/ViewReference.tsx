@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
@@ -10,7 +10,7 @@ import SubTitle from '../../../components/SubTitle';
 
 interface IField {
   id: number;
-  name: string;
+  name?: string;
   [fieldName: string]: unknown;
 }
 
@@ -62,19 +62,26 @@ const ViewReferenceScreen = ({ route }) => {
   const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
 
   return (
-    <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
-      <ItemSeparator />
-      <Searchbar placeholder="Поиск" onChangeText={setSearchQuery} value={searchQuery} style={localStyles.searchBar} />
-      <ItemSeparator />
-      <FlatList
-        ref={ref}
-        data={filteredList?.data}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-      />
-    </View>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={[localStyles.content, { backgroundColor: colors.card }]}>
+        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
+        <ItemSeparator />
+        <Searchbar
+          placeholder="Поиск"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={localStyles.searchBar}
+        />
+        <ItemSeparator />
+        <FlatList
+          ref={ref}
+          data={filteredList?.data}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
