@@ -23,16 +23,18 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<ISelectList>(undefined);
   const [checkedItem, setCheckedItem] = useState<number[]>([]);
-
+  const [parentScreen, setParentScreen] = useState('');
   const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
 
   useEffect(() => {
     if (!route.params?.list) {
       return;
     }
-    console.log('params af', Object.keys(route.params));
+    // console.log('params af', Object.keys(route.params));
 
-    const { list, selected, isMulti } = route.params;
+    const { list, selected, isMulti, parentScreen: newParentScreen } = route.params;
+
+    setParentScreen(newParentScreen);
 
     setIsMultiSelect(isMulti || false);
 
@@ -71,11 +73,15 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
           size={30}
           color={colors.primary}
           //onPress={() => navigation.navigate('CreateSellDocument', { [filteredList?.type]: checkedItem })}
-          onPress={() => navigation.navigate('SettingsGettingDocument', { [filteredList?.type]: checkedItem })}
+          onPress={() =>
+            parentScreen
+              ? navigation.navigate(parentScreen as keyof RootStackParamList, { [filteredList?.type]: checkedItem })
+              : null
+          }
         />
       ),
     });
-  }, [checkedItem, colors.primary, filteredList?.type, navigation]);
+  }, [checkedItem, colors.primary, filteredList?.type, navigation, parentScreen]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

@@ -27,8 +27,8 @@ export type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocumen
 export interface IFormParams {
   toContact?: number;
   expiditor?: number;
-  dateBegin?: Date;
-  dateEnd?: Date;
+  dateBegin?: string;
+  dateEnd?: string;
 }
 
 const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Props>(({ route }, ref) => {
@@ -40,9 +40,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isDateEnd, setIsDateEnd] = useState(false);
-  // const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
+  // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  // const [isDateEnd, setIsDateEnd] = useState(false);
+  // // const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
   // const [selectedToContact, setSelectedToContact] = useState<number>();
   // // const [dateBegin, setDateBegin] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1));
   // const [dateEnd, setDateEnd] = useState(today);
@@ -63,9 +63,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
   const [formFields, setFormFields] = useState<IFormParams>({});
-  /*     dateBegin: yesterday,
-    dateEnd: today,
-  }); */
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
@@ -76,8 +73,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: formFields.dateBegin.toISOString(),
-              dateEnd: formFields.dateEnd.toISOString(),
+              dateBegin: formFields.dateBegin ? new Date(formFields.dateBegin).toISOString() : yesterday.toISOString(),
+              dateEnd: formFields.dateBegin ? new Date(formFields.dateEnd).toISOString() : today.toISOString(),
               expiditor: Array.isArray(formFields.expiditor) ? formFields.expiditor[0] : formFields.expiditor,
               toContact: Array.isArray(formFields.toContact) ? formFields.toContact[0] : formFields.toContact,
             },
@@ -115,20 +112,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     formFields.dateEnd,
     formFields.expiditor,
     formFields.toContact,
+    yesterday,
+    today,
   ]);
-
-  useEffect(() => {
-    console.log('render');
-  }, []);
-
-  /*   useEffect(
-    () =>
-      setFormFields({
-        dateBegin: yesterday,
-        dateEnd: today,
-      }),
-    [today, yesterday],
-  ); */
 
   useImperativeHandle(ref, () => ({
     done: async () => {
@@ -141,33 +127,19 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return;
     }
 
-    // console.log('route.params', route.params);
+    console.log('route.params', route.params);
 
     setFormFields((prev) => {
       return route.params;
-      // console.log('prev', prev);
-      // return { ...prev, ...route.params };
     });
   }, [route.params]);
 
-  const onChange = (event: unknown, selectedDate?: Date) => {
-    setDatePickerVisibility(Platform.OS === 'ios');
-
-    if (!selectedDate) {
-      return;
-    }
-
-    const newDate = isDateEnd ? { dateEnd: selectedDate } : { dateBegin: selectedDate };
-    console.log('event', { ...formFields, ...newDate });
-    setFormFields({ ...formFields, ...newDate });
-  };
-
   const navigation = useNavigation();
-  // const { state: AppState } = useAppStore();
-  const getDateString = useCallback((date: Date | undefined) => {
-    if (!date) {
+  const getDateString = useCallback((_date: string) => {
+    if (!_date) {
       return '-';
     }
+    const date = new Date(_date);
     return `${date.getDate()}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
   }, []);
 
@@ -194,20 +166,21 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
           <TouchableOpacity
             style={localeStyles.containerDate}
-            onPress={() => {
+            /*onPress={() => {
               setIsDateEnd(false);
               setDatePickerVisibility(true);
-            }}
-            /* onPress={() =>
+            }} */
+            onPress={() =>
               navigation.navigate('SelectDateScreen', {
+                parentScreen: 'SettingsGettingDocument',
                 fieldName: 'dateBegin',
                 title: 'Дата начала',
-                value: (formFields?.dateBegin || yesterday).toISOString(),
+                value: formFields?.dateBegin || yesterday.toISOString().slice(0, 10),
               })
-            } */
+            }
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {getDateString(formFields?.dateBegin || yesterday)}
+              {getDateString(formFields?.dateBegin || yesterday.toISOString())}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
@@ -218,20 +191,21 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             style={localeStyles.containerDate}
             onPress={() =>
               navigation.navigate('SelectDateScreen', {
+                parentScreen: 'SettingsGettingDocument',
                 fieldName: 'dateEnd',
                 title: 'Дата окончания',
-                value: (formFields?.dateEnd || today).toISOString(),
+                value: formFields?.dateEnd || today.toISOString().slice(0, 10),
               })
             }
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
-              {getDateString(formFields?.dateEnd || today)}
+              {getDateString(formFields?.dateEnd || today.toUTCString())}
             </Text>
             <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
           </TouchableOpacity>
         </View>
       </View>
-      {isDatePickerVisible &&
+      {/*      {isDatePickerVisible &&
         (Platform.OS !== 'ios' ? (
           <RNDateTimePicker
             testID="dateTimePicker"
@@ -290,13 +264,14 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
               </View>
             </Modal>
           </Portal>
-        ))}
+        ))} */}
       <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
         <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
         <ReferenceItem
           value={selectedItem(listPeople, formFields?.expiditor)?.value}
           onPress={() =>
             navigation.navigate('SelectItemScreen', {
+              parentScreen: 'SettingsGettingDocument',
               selected: formFields?.expiditor,
               list: {
                 name: 'Экспедитор',
@@ -313,6 +288,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           value={selectedItem(listCompanies, formFields?.toContact)?.value}
           onPress={() =>
             navigation.navigate('SelectItemScreen', {
+              parentScreen: 'SettingsGettingDocument',
               selected: formFields?.toContact,
               list: {
                 name: 'Контакты',

@@ -3,7 +3,7 @@ import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
-import { createCancellableSignal, appStorage } from '../helpers/utils';
+import { createCancellableSignal, appStorage, timeoutWithСancellation, timeout } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
@@ -101,13 +101,14 @@ const AuthNavigator = () => {
     */
     const getDeviceStatus = async () => {
       try {
-        const response = await apiService.auth.getDevice();
+        // const response = await apiService.auth.getDevice();
+        const response = await timeout<IResponse<IDevice>>(500, apiService.auth.getDevice());
         // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
         //   signal,
         //   5000,
         //   apiService.auth.getDevice(),
         // );
-        // setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
+        // // setState({ type: 'SET_RESPONSE', result: response.result, data: response.data });
         // authActions.setUserStatus({ userID: null, userName: undefined });
         if (!response.result) {
           // устройства нет на сервере, сбросим DeviceId на сутройстве
@@ -153,9 +154,10 @@ const AuthNavigator = () => {
     };
 
     if (deviceRegistered !== undefined) {
+      console.log('deviceRegistered:', deviceRegistered);
       deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null, userName: undefined });
     }
-  }, [authActions, apiService.auth, deviceRegistered, signal]);
+  }, [authActions, apiService.auth, deviceRegistered]);
   // Вынести всё в store  - deviceRegistered
 
   useEffect(() => {
@@ -179,9 +181,8 @@ const AuthNavigator = () => {
         : authActions.setCompanyID({ companyId: null, companyName: undefined });
     };
 
-    //if (userID && userID !== null) {
-    if (userID) {
-      getCompanyId();
+    if (userID !== undefined) {
+      userID ? getCompanyId() : authActions.setCompanyID({ companyId: null, companyName: '' });
     }
   }, [apiService.auth, authActions, userID]);
 

@@ -56,11 +56,12 @@ export type RootStackParamList = {
     [fieldName: string]: number[] | Date | number | string;
   };
   SelectItemScreen: {
+    parentScreen: string;
     selected: number[];
     isMulti?: boolean;
     list: { name: string; type: string; data: IField[] };
   };
-  SelectDateScreen: { value: Date | null; fieldName: string; title: string };
+  SelectDateScreen: { parentScreen: keyof RootStackParamList; value: string; fieldName: string; title: string };
 
   SelectBoxingsScreen: {
     lineId: string;

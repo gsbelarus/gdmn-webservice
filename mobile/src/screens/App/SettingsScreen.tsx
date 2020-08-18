@@ -208,10 +208,10 @@ const SettingsScreen = () => {
               },
               {
                 title: 'Сменить организацию',
-                onPress: async() => {
+                onPress: async () => {
                   await appStorage.removeItem(`${userID}/companyId`);
                   authActions.setCompanyID({ companyId: null, companyName: undefined });
-                }
+                },
               },
               {
                 title: 'Удалить все данные',
