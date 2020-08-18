@@ -141,7 +141,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return;
     }
 
-    console.log('route.params', route.params);
+    // console.log('route.params', route.params);
 
     setFormFields((prev) => {
       return route.params;
@@ -150,10 +150,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     });
   }, [route.params]);
 
-  /*   useEffect(() => {
-    console.log('formFields', formFields);
-  }, [formFields]); */
-
   const onChange = (event: unknown, selectedDate?: Date) => {
     setDatePickerVisibility(Platform.OS === 'ios');
 
@@ -161,13 +157,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return;
     }
 
-    // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
     const newDate = isDateEnd ? { dateEnd: selectedDate } : { dateBegin: selectedDate };
     console.log('event', { ...formFields, ...newDate });
     setFormFields({ ...formFields, ...newDate });
-    // const currentDate = selectedDate || (isDateEnd ? dateEnd : dateBegin);
-    // setDatePickerVisibility(Platform.OS === 'ios');
-    // isDateEnd ? setDateEnd(currentDate) : setDateBegin(currentDate);
   };
 
   const navigation = useNavigation();
@@ -187,16 +179,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             <Text style={[localeStyles.textDate, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
             <MaterialCommunityIcons style={localeStyles.marginRight} name="menu-right" size={30} color="black" />
           </View>
-          {/*   <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-            <View style={localeStyles.containerMain}>
-              <View style={localeStyles.containerLabel}>
-                <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
-              </View>
-              <View style={localeStyles.containerDropdownButton}>
-                <MaterialCommunityIcons name="menu-right" size={30} color="black" />
-              </View>
-            </View>
-          </View> */}
         </TouchableOpacity>
       );
     },
@@ -212,13 +194,17 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
           <TouchableOpacity
             style={localeStyles.containerDate}
-            onPress={() =>
+            onPress={() => {
+              setIsDateEnd(false);
+              setDatePickerVisibility(true);
+            }}
+            /* onPress={() =>
               navigation.navigate('SelectDateScreen', {
                 fieldName: 'dateBegin',
                 title: 'Дата начала',
                 value: (formFields?.dateBegin || yesterday).toISOString(),
               })
-            }
+            } */
           >
             <Text style={[localeStyles.textDate, { color: colors.text }]}>
               {getDateString(formFields?.dateBegin || yesterday)}
@@ -250,7 +236,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           <RNDateTimePicker
             testID="dateTimePicker"
             timeZoneOffsetInMinutes={0}
-            value={isDateEnd ? formFields.dateEnd : formFields.dateBegin}
+            value={isDateEnd ? formFields?.dateEnd || today : formFields?.dateBegin || yesterday}
             is24Hour={true}
             // display="default"
             onChange={onChange}
@@ -294,7 +280,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
                 <RNDateTimePicker
                   testID="dateTimePicker"
                   timeZoneOffsetInMinutes={0}
-                  value={isDateEnd ? formFields.dateEnd : formFields.dateBegin}
+                  value={isDateEnd ? formFields?.dateEnd || today : formFields?.dateBegin || yesterday}
                   is24Hour={true}
                   display="default"
                   onChange={onChange}

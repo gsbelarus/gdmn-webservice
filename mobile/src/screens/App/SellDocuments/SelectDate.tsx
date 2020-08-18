@@ -3,6 +3,7 @@ import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import { IconButton } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -52,16 +53,22 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
       {date ? (
         <>
           <ItemSeparator />
-          <RNDateTimePicker
+          <Calendar
+            testID="dateTimePicker"
+            current={date}
+            hideExtraDays
+            onDayPress={(day) => setDate(new Date(day.dateString))}
+          />
+          {/* <RNDateTimePicker
             testID="dateTimePicker"
             timeZoneOffsetInMinutes={0}
             value={date}
             is24Hour={true}
-            display="default"
+            display="calendar"
             onChange={(_, newDate) => setDate(newDate)}
             mode="date"
             locale="ru_RU"
-          />
+          /> */}
         </>
       ) : null}
     </View>
