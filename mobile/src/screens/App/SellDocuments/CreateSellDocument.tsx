@@ -7,6 +7,7 @@ import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper
 
 import { IContact } from '../../../../../common';
 import { ISellHead } from '../../../model';
+import { IDocumentParams } from '../../../model/sell';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -26,15 +27,6 @@ type Props = {
   route: CreateSellDocumentScreenRouteProp;
 };
 
-export interface IFormParams {
-  date?: string;
-  expiditor?: number;
-  toContact?: number;
-  fromContact?: number;
-  documentType?: number;
-  documentNumber?: string;
-}
-
 const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ route }, ref) => {
   //const [date, setDate] = useState(new Date());
   //const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
@@ -45,7 +37,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
   //const [numberText, setNumberText] = useState('');
   const { state, actions } = useAppStore();
 
-  const [formFields, setFormFields] = useState<IFormParams>({});
+  const [formFields, setFormFields] = useState<IDocumentParams>({});
 
   const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -83,7 +75,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
   useEffect(() => {
     if (route.params?.docId !== undefined) {
       const documentItem = state.documents.find((item) => item.id === Number(route.params.docId));
-      setFormFields({ 
+      setFormFields({
         expiditor: (documentItem.head as ISellHead).expeditorId,
         toContact: documentItem.head.tocontactId,
         fromContact: documentItem.head.fromcontactId,
@@ -122,7 +114,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
         return;
       }
       if (route.params?.docId) {
-       // console.log('route.params', route.params);
+        // console.log('route.params', route.params);
         actions.editDocument({
           id: Number(route.params.docId ?? -1),
           head: {
@@ -161,8 +153,6 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
     },
   }));
 
- 
-
   /*   const onSelectedItemsChange = (selectedItems) => {
     this.setState({ selectedItems });
   }; */
@@ -197,7 +187,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
             <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
             <TouchableOpacity
               style={localeStyles.containerDate}
-             /* onPress={() => {
+              /* onPress={() => {
                 setDatePickerVisibility(true);
               }}*/
               onPress={() =>
@@ -210,7 +200,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                 {getDateString(formFields?.date || today.toISOString())}
+                {getDateString(formFields?.date || today.toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>

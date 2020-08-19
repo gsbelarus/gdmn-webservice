@@ -34,3 +34,19 @@ export interface ITara {
   weight?: number;
   [fieldName: string]: unknown;
 }
+
+export interface IFormParams {
+  toContact?: number[];
+  expiditor?: number[];
+  dateBegin?: string;
+  dateEnd?: string;
+}
+
+export interface IDocumentParams {
+  date?: string;
+  expiditor?: number;
+  toContact?: number;
+  fromContact?: number;
+  documentType?: number;
+  documentNumber?: string;
+}

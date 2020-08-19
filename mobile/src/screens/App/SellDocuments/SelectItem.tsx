@@ -6,49 +6,65 @@ import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
 
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { IField } from '../../../model';
+// import { IField } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-
-interface ISelectList {
-  name: string;
-  type: string;
-  data: IField[];
-}
+import { useAppStore } from '../../../store';
+import { IListItem } from './SettingsGettingDocument';
 
 type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
+  const { state: appState, actions: appActions } = useAppStore();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<ISelectList>(undefined);
+  const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
   const [checkedItem, setCheckedItem] = useState<number[]>([]);
+
   const [parentScreen, setParentScreen] = useState('');
+  const [title, setTitle] = useState('');
+  const [fieldName, setFieldName] = useState('');
   const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
+  const [list, setList] = useState<IListItem[]>(undefined);
 
   useEffect(() => {
     if (!route.params?.list) {
       return;
     }
-    // console.log('params af', Object.keys(route.params));
 
-    const { list, selected, isMulti, parentScreen: newParentScreen } = route.params;
+    const {
+      list: newList,
+      isMulti,
+      parentScreen: newParentScreen,
+      fieldName: newFieldName,
+      title: newTitle,
+    } = route.params;
 
+    setTitle(newTitle);
+    setFieldName(newFieldName);
     setParentScreen(newParentScreen);
-
     setIsMultiSelect(isMulti || false);
 
-    if (selected) {
-      setCheckedItem(selected);
-    }
-
-    setFilteredList({
-      ...list,
-      data: list.data.filter((i) => i.value.toUpperCase().includes(searchQuery.toUpperCase())),
-    });
+    setList(newList);
   }, [route.params, route.params?.list, searchQuery]);
 
-  const refList = React.useRef<FlatList<IField>>(null);
+  useEffect(() => {
+    if (!fieldName) {
+      return;
+    }
+
+    setCheckedItem(appState.formParams[fieldName]);
+  }, [appState.formParams, fieldName]);
+
+  useEffect(() => {
+    if (!list) {
+      return;
+    }
+    setFilteredList(list.filter((i) => i.value.toUpperCase().includes(searchQuery.toUpperCase())));
+  }, [list, searchQuery]);
+
+  const refList = React.useRef<FlatList<IListItem>>(null);
   useScrollToTop(refList);
 
   const selectItem = useCallback(
@@ -59,8 +75,8 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: IField }) => {
-      return <LineItem item={item} checked={checkedItem.includes(item.id)} onSelect={selectItem} />;
+    ({ item }: { item: IListItem }) => {
+      return <LineItem item={item} checked={checkedItem?.includes(item.id)} onSelect={selectItem} />;
     },
     [checkedItem, selectItem],
   );
@@ -69,29 +85,27 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton
-          icon="check"
+          icon="check-circle"
           size={30}
           color={colors.primary}
-          //onPress={() => navigation.navigate('CreateSellDocument', { [filteredList?.type]: checkedItem })}
-          onPress={() =>
-            parentScreen
-              ? navigation.navigate(parentScreen as keyof RootStackParamList, { [filteredList?.type]: checkedItem })
-              : null
-          }
+          onPress={() => {
+            appActions.setFormParams({ [fieldName]: checkedItem });
+            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList) : null;
+          }}
         />
       ),
     });
-  }, [checkedItem, colors.primary, filteredList?.type, navigation, parentScreen]);
+  }, [appActions, checkedItem, colors.primary, fieldName, navigation, parentScreen, selectItem]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{title}</SubTitle>
       <ItemSeparator />
       <Searchbar placeholder="Поиск" onChangeText={setSearchQuery} value={searchQuery} style={localStyles.searchBar} />
       <ItemSeparator />
       <FlatList
         ref={refList}
-        data={filteredList?.data}
+        data={filteredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -101,7 +115,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 };
 
 const LineItem = React.memo(
-  ({ item, checked, onSelect }: { item: IField; checked: boolean; onSelect: (id: number) => void }) => {
+  ({ item, checked, onSelect }: { item: IListItem; checked: boolean; onSelect: (id: number) => void }) => {
     const { colors } = useTheme();
 
     return (

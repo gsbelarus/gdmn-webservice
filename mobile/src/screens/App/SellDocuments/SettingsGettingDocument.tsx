@@ -1,7 +1,7 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
+import React, { forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -11,7 +11,7 @@ import { timeout } from '../../../helpers/utils';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
-interface IItem {
+export interface IListItem {
   id?: number;
   value?: string;
   [key: string]: unknown;
@@ -23,29 +23,32 @@ export interface ISettingsGettingDocumentRef {
 
 export type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
 
-export interface IFormParams {
-  toContact?: number;
-  expiditor?: number;
-  dateBegin?: string;
-  dateEnd?: string;
-}
-
 const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Props>(({ route }, ref) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
-  const { state: appState } = useAppStore();
+  const { state: appState, actions: appActions } = useAppStore();
 
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
-  const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
+  useEffect(() => {
+    if (!appState.formParams) {
+      // Инициализируем параметры
+      appActions.setFormParams({
+        dateBegin: yesterday.toISOString().slice(0, 10),
+        dateEnd: today.toISOString().slice(0, 10),
+      });
+    }
+  }, [appActions, appState.formParams, today, yesterday]);
+
+  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
   const getListItems = useCallback(
-    (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IItem)),
+    (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IListItem)),
     [],
   );
   const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
@@ -53,9 +56,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '3'), [
     appState.contacts,
   ]);
-  const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
-  const [formFields, setFormFields] = useState<IFormParams>({});
+  const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
@@ -66,10 +68,18 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: formFields.dateBegin ? new Date(formFields.dateBegin).toISOString() : yesterday.toISOString(),
-              dateEnd: formFields.dateBegin ? new Date(formFields.dateEnd).toISOString() : today.toISOString(),
-              expiditor: Array.isArray(formFields.expiditor) ? formFields.expiditor[0] : formFields.expiditor,
-              toContact: Array.isArray(formFields.toContact) ? formFields.toContact[0] : formFields.toContact,
+              dateBegin: appState.formParams?.dateBegin
+                ? new Date(appState.formParams?.dateBegin).toISOString()
+                : yesterday.toISOString(),
+              dateEnd: appState.formParams?.dateBegin
+                ? new Date(appState.formParams?.dateEnd).toISOString()
+                : today.toISOString(),
+              expiditor: Array.isArray(appState.formParams?.expiditor)
+                ? appState.formParams?.expiditor[0]
+                : appState.formParams?.expiditor,
+              toContact: Array.isArray(appState.formParams?.toContact)
+                ? appState.formParams?.toContact[0]
+                : appState.formParams?.toContact,
             },
           ],
         },
@@ -101,10 +111,10 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
   }, [
     apiService.data,
     state.companyID,
-    formFields.dateBegin,
-    formFields.dateEnd,
-    formFields.expiditor,
-    formFields.toContact,
+    appState.formParams?.dateBegin,
+    appState.formParams?.dateEnd,
+    appState.formParams?.expiditor,
+    appState.formParams?.toContact,
     yesterday,
     today,
   ]);
@@ -115,7 +125,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     },
   }));
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!route.params) {
       return;
     }
@@ -125,7 +135,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     setFormFields((prev) => {
       return route.params;
     });
-  }, [route.params]);
+  }, [route.params]); */
 
   const navigation = useNavigation();
   const getDateString = useCallback((_date: string) => {
@@ -133,7 +143,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return '-';
     }
     const date = new Date(_date);
-    return `${date.getDate()}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
+    return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
   }, []);
 
   const ReferenceItem = useCallback(
@@ -141,8 +151,8 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       return (
         <TouchableOpacity {...props}>
           <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-            <Text style={[localeStyles.textDate, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
-            <MaterialCommunityIcons style={localeStyles.marginRight} name="menu-right" size={30} color="black" />
+            <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
+            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
           </View>
         </TouchableOpacity>
       );
@@ -169,12 +179,11 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
-                  value: formFields?.dateBegin || yesterday.toISOString().slice(0, 10),
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(formFields?.dateBegin || yesterday.toISOString())}
+                {getDateString(appState?.formParams?.dateBegin || yesterday.toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -188,12 +197,11 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
-                  value: formFields?.dateEnd || today.toISOString().slice(0, 10),
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(formFields?.dateEnd || today.toUTCString())}
+                {getDateString(appState?.formParams?.dateEnd || today.toUTCString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -262,16 +270,13 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
           <ReferenceItem
-            value={selectedItem(listPeople, formFields?.expiditor)?.value}
+            value={selectedItem(listPeople, appState.formParams?.expiditor)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
-                selected: formFields?.expiditor,
-                list: {
-                  name: 'Экспедитор',
-                  type: 'expiditor',
-                  data: listPeople,
-                },
+                fieldName: 'expiditor',
+                title: 'Экспедитор',
+                list: listPeople,
               })
             }
           />
@@ -279,16 +284,13 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
           <Text style={localeStyles.subdivisionText}>Организация:</Text>
           <ReferenceItem
-            value={selectedItem(listCompanies, formFields?.toContact)?.value}
+            value={selectedItem(listCompanies, appState.formParams?.toContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
-                selected: formFields?.toContact,
-                list: {
-                  name: 'Контакты',
-                  type: 'toContact',
-                  data: listCompanies,
-                },
+                fieldName: 'toContact',
+                title: 'Организация',
+                list: listCompanies,
               })
             }
           />
@@ -363,6 +365,16 @@ const localeStyles = StyleSheet.create({
     margin: 5,
     padding: 5,
   },
+  pickerButton: {
+    flex: 1,
+    marginRight: 10,
+    textAlign: 'right',
+  },
+  pickerText: {
+    alignSelf: 'center',
+    flex: 10,
+    fontSize: 16,
+  },
   subdivisionText: {
     marginBottom: 5,
     textAlign: 'left',
@@ -373,6 +385,7 @@ const localeStyles = StyleSheet.create({
     fontStyle: 'normal',
   },
   textDate: {
+    flex: 0.95,
     flexGrow: 4,
     fontSize: 18,
     textAlign: 'center',

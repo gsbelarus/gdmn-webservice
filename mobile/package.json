@@ -23,6 +23,8 @@
     "expo": "^38.0.9",
     "expo-barcode-scanner": "~8.2.1",
     "expo-device": "~2.2.1",
+    "global": "^4.4.0",
+    "npm-check-updates": "^7.1.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",

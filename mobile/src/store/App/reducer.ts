@@ -154,6 +154,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.SET_SETTINGS_SEARCH: {
       return { ...state, settingsSearch: action.payload };
     }
+    case ActionAppTypes.SET_FORM_PARAMS: {
+      return { ...state, formParams: { ...state.formParams, ...action.payload } };
+    }
     default:
       return state;
   }

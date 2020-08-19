@@ -22,7 +22,7 @@ import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDeta
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
-import { ISettingsGettingDocumentRef } from '../screens/App/SellDocuments/SettingsGettingDocument';
+import { ISettingsGettingDocumentRef, IListItem } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
@@ -55,13 +55,20 @@ export type RootStackParamList = {
   SettingsGettingDocument: {
     [fieldName: string]: number[] | Date | number | string;
   };
-  SelectItemScreen: {
+  /*   SelectItemScreen: {
     parentScreen: string;
     selected: number[];
     isMulti?: boolean;
     list: { name: string; type: string; data: IField[] };
+  }; */
+  SelectItemScreen: {
+    parentScreen: keyof RootStackParamList;
+    fieldName: string;
+    title: string;
+    isMulti?: boolean;
+    list: IListItem[];
   };
-  SelectDateScreen: { parentScreen: keyof RootStackParamList; value: string; fieldName: string; title: string };
+  SelectDateScreen: { parentScreen: keyof RootStackParamList; fieldName: string; title: string };
 
   SelectBoxingsScreen: {
     lineId: string;

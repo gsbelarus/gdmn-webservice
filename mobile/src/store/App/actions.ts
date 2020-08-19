@@ -1,5 +1,6 @@
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
 import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
+import { IFormParams } from '../../model/sell';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 export enum ActionAppTypes {
@@ -21,6 +22,7 @@ export enum ActionAppTypes {
   SET_BOXINGS = 'SET_BOXINGS',
   SET_BOXINGS_LINE = 'SET_BOXINGS_LINE',
   SET_SETTINGS_SEARCH = 'SET_SETTINGS_SEARCH',
+  SET_FORM_PARAMS = 'SET_FORM_PARAMS',
 }
 
 export const AppActions = {
@@ -59,6 +61,7 @@ export const AppActions = {
   setSettingsSearch: createActionPayload<ActionAppTypes.SET_SETTINGS_SEARCH, string[]>(
     ActionAppTypes.SET_SETTINGS_SEARCH,
   ),
+  setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams>(ActionAppTypes.SET_FORM_PARAMS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;
