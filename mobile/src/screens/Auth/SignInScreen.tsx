@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 
 import { IResponse, IUserCredentials, IUser } from '../../../../common';
@@ -128,46 +128,48 @@ const SignInScreen = () => {
 
   return (
     <>
-      <KeyboardAvoidingView
-        style={[styles.container, isKeyboardVisible && localStyles.contentWidthKbd]}
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-      >
-        <View>
-          <SubTitle>Вход пользователя</SubTitle>
-          <TextInput
-            returnKeyType="done"
-            autoCorrect={false}
-            underlineColorAndroid="transparent"
-            placeholder="Имя пользователя"
-            value={credential.userName}
-            onChangeText={(val) => setCredentials({ ...credential, userName: val })}
-            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          />
-          <TextInput
-            returnKeyType="done"
-            autoCorrect={false}
-            underlineColorAndroid="transparent"
-            placeholder="Пароль"
-            secureTextEntry
-            value={credential.password}
-            onChangeText={(val) => setCredentials({ ...credential, password: val })}
-            style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
-          />
-          <Button
-            mode="contained"
-            disabled={loginState.isLoading}
-            icon={'login'}
-            onPress={logIn}
-            style={styles.rectangularButton}
-          >
-            Войти
-          </Button>
-        </View>
-        <View style={localStyles.statusBox}>
-          {loginState.isError && <Text style={localStyles.errorText}>Ошибка: {loginState.status}</Text>}
-          {loginState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
-        </View>
-      </KeyboardAvoidingView>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <KeyboardAvoidingView
+          style={[styles.container, isKeyboardVisible && localStyles.contentWidthKbd]}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+        >
+          <View>
+            <SubTitle>Вход пользователя</SubTitle>
+            <TextInput
+              returnKeyType="done"
+              autoCorrect={false}
+              underlineColorAndroid="transparent"
+              placeholder="Имя пользователя"
+              value={credential.userName}
+              onChangeText={(val) => setCredentials({ ...credential, userName: val })}
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            />
+            <TextInput
+              returnKeyType="done"
+              autoCorrect={false}
+              underlineColorAndroid="transparent"
+              placeholder="Пароль"
+              secureTextEntry
+              value={credential.password}
+              onChangeText={(val) => setCredentials({ ...credential, password: val })}
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+            />
+            <Button
+              mode="contained"
+              disabled={loginState.isLoading}
+              icon={'login'}
+              onPress={logIn}
+              style={styles.rectangularButton}
+            >
+              Войти
+            </Button>
+          </View>
+          <View style={localStyles.statusBox}>
+            {loginState.isError && <Text style={localStyles.errorText}>Ошибка: {loginState.status}</Text>}
+            {loginState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
       <View style={styles.bottomButtons}>
         <IconButton
           icon="server"
@@ -190,10 +192,12 @@ const localStyles = StyleSheet.create({
     width: '100%',
   },
   container: {
+    flex: 1,
     justifyContent: 'center',
   },
   contentWidthKbd: {
     justifyContent: 'flex-start',
+    paddingTop: 60,
   },
   errorText: {
     color: '#cc5933',
@@ -201,7 +205,8 @@ const localStyles = StyleSheet.create({
   },
   statusBox: {
     alignItems: 'center',
-    height: 100,
+    // height: 100,
+    // flex: 1,
   },
   title: {
     textAlign: 'center',
