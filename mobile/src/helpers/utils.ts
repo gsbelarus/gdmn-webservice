@@ -66,4 +66,16 @@ export const isMessage = (obj: unknown): obj is IMessage =>
   (obj as IMessage).id !== undefined &&
   (obj as IMessage).head !== undefined &&
   (obj as IMessage).body !== undefined;
+
 export const isMessagesArray = (obj: unknown): obj is IMessage[] => Array.isArray(obj) && obj.every(isMessage);
+
+export const getDateString = (_date: string) => {
+  if (!_date) {
+    return '-';
+  }
+  const date = new Date(_date);
+  return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
+    -2,
+    3,
+  )}.${date.getFullYear()}`;
+};

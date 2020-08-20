@@ -1,6 +1,6 @@
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
 import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
-import { IFormParams } from '../../model/sell';
+import { IFormParams, IDocumentParams } from '../../model/sell';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 export enum ActionAppTypes {
@@ -24,6 +24,8 @@ export enum ActionAppTypes {
   SET_SETTINGS_SEARCH = 'SET_SETTINGS_SEARCH',
   SET_FORM_PARAMS = 'SET_FORM_PARAMS',
   CLEAR_FORM_PARAMS = 'CLEAR_FORM_PARAMS',
+  SET_DOCUMENT_PARAMS = 'SET_DOCUMENT_PARAMS',
+  CLEAR_DOCUMENT_PARAMS = 'CLEAR_DOCUMENT_PARAMS',
 }
 
 export const AppActions = {
@@ -64,6 +66,10 @@ export const AppActions = {
   ),
   setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams>(ActionAppTypes.SET_FORM_PARAMS),
   clearFormParams: createAction<ActionAppTypes.CLEAR_FORM_PARAMS>(ActionAppTypes.CLEAR_FORM_PARAMS),
+  setDocumentParams: createActionPayload<ActionAppTypes.SET_DOCUMENT_PARAMS, IDocumentParams>(
+    ActionAppTypes.SET_DOCUMENT_PARAMS,
+  ),
+  clearDocumentParams: createAction<ActionAppTypes.CLEAR_DOCUMENT_PARAMS>(ActionAppTypes.CLEAR_DOCUMENT_PARAMS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

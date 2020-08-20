@@ -3,7 +3,7 @@ import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
-import { createCancellableSignal, appStorage, timeoutWithСancellation, timeout } from '../helpers/utils';
+import { createCancellableSignal, appStorage, timeout } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
@@ -154,7 +154,6 @@ const AuthNavigator = () => {
     };
 
     if (deviceRegistered !== undefined) {
-      console.log('deviceRegistered:', deviceRegistered);
       deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null, userName: undefined });
     }
   }, [authActions, apiService.auth, deviceRegistered]);

@@ -92,7 +92,7 @@ const updateOne = async (company: ICompany): Promise<string> => {
   }
 
   // Удаляем поля которые нельзя перезаписывать
-  delete company.admin;
+  company.admin = '';
 
   await companies.update({ ...oldCompany, ...company });
 

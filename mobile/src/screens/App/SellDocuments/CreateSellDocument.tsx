@@ -1,80 +1,156 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useTheme, useNavigation, RouteProp } from '@react-navigation/native';
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
-import { Text, Button, Modal, Portal, TextInput, Chip } from 'react-native-paper';
+import { useTheme, useNavigation } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Text, TextInput, Chip } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
-import { ISellHead } from '../../../model';
-import { IDocumentParams } from '../../../model/sell';
+import { HeaderRight } from '../../../components/HeaderRight';
+import { getDateString } from '../../../helpers/utils';
+import { IListItem } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-interface IItem {
-  id?: number;
-  value?: string;
-}
+type Props = StackScreenProps<RootStackParamList, 'CreateSellDocument'>;
 
-export interface ICreateSellDocumentRef {
-  done(): void;
-}
-
-type CreateSellDocumentScreenRouteProp = RouteProp<RootStackParamList, 'CreateSellDocument'>;
-
-type Props = {
-  route: CreateSellDocumentScreenRouteProp;
-};
-
-const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ route }, ref) => {
-  //const [date, setDate] = useState(new Date());
-  //const [selectedExpeditor, setSelectedExpeditor] = useState<number>();
-  //const [selectedToContact, setSelectedToContact] = useState<number>();
-  //const [selectedFromContact, setSelectedFromContact] = useState<number>();
-  //const [selectedDocType, setSelectedDocType] = useState<number>();
-  //const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  //const [numberText, setNumberText] = useState('');
-  const { state, actions } = useAppStore();
-
-  const [formFields, setFormFields] = useState<IDocumentParams>({});
-
-  const selectedItem = useCallback((listItems: IItem[], id: number | number[]) => {
-    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
-  }, []);
-
-  //const selectedItem = (listItems: IItem[], id: number) => listItems.find((item) => item.id === id);
-  const getListItems = (contacts: IContact[]) =>
-    contacts.map((item) => {
-      return { id: item.id, value: item.name } as IItem;
-    });
-  const people: IContact[] = useMemo(() => state.contacts.filter((item) => item.type === '2'), [state.contacts]);
-  const listPeople = useMemo(() => getListItems(people), [people]);
-  const companies: IContact[] = state.contacts.filter((item) => item.type === '3');
-  const listCompanies = useMemo(() => getListItems(companies), [companies]);
-  const departments: IContact[] = state.contacts.filter((item) => item.type === '4');
-  const listDepartments = useMemo(() => getListItems(departments), [departments]);
-
+const CreateSellDocumentScreen = ({ route }: Props) => {
   const today = new Date();
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const getDateString = useCallback((_date: string) => {
-    if (!_date) {
-      return '-';
-    }
-    const date = new Date(_date);
-    return `${date.getDate()}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
+  const { state: appState, actions: appActions } = useAppStore();
+
+  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
+    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  /*const onChange = (event: unknown, selectedDate?: Date) => {
-    const currentDate = selectedDate || formFields.date;
-    setDatePickerVisibility(Platform.OS === 'ios');
-    setFormFields({ ...formFields, date: currentDate });
-  };*/
+  const getListItems = (contacts: IContact[]) =>
+    contacts.map((item) => {
+      return { id: item.id, value: item.name } as IListItem;
+    });
+  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
+  const listPeople = useMemo(() => getListItems(people), [people]);
+  const companies: IContact[] = appState.contacts.filter((item) => item.type === '3');
+  const listCompanies = useMemo(() => getListItems(companies), [companies]);
+  const departments: IContact[] = appState.contacts.filter((item) => item.type === '4');
+  const listDepartments = useMemo(() => getListItems(departments), [departments]);
+
+  const checkDocument = useCallback(() => {
+    const res =
+      appState.documentParams?.date &&
+      appState.documentParams?.documentNumber &&
+      appState.documentParams?.expiditor &&
+      appState.documentParams?.toContact &&
+      appState.documentParams?.fromContact &&
+      appState.documentParams?.documentType;
+
+    if (!res) {
+      Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
+    }
+    return res;
+  }, [
+    appState.documentParams?.date,
+    appState.documentParams?.documentNumber,
+    appState.documentParams?.documentType,
+    appState.documentParams?.expiditor,
+    appState.documentParams?.fromContact,
+    appState.documentParams?.toContact,
+  ]);
+
+  const addDocument = useCallback(() => {
+    if (!checkDocument()) {
+      return;
+    }
+
+    const id =
+      appState.documents
+        .map((item) => item.id)
+        .reduce((newId, currId) => {
+          return newId > currId ? newId : currId;
+        }, -1) + 1;
+
+    appActions.newDocument({
+      id,
+      head: {
+        doctype: appState.documentParams?.documentType,
+        fromcontactId: appState.documentParams?.fromContact[0],
+        tocontactId: appState.documentParams?.toContact[0],
+        date: appState.documentParams?.date,
+        status: 0,
+        docnumber: appState.documentParams?.documentNumber,
+        expeditorId: appState.documentParams?.expiditor[0],
+      },
+      lines: [],
+    });
+    return id;
+  }, [
+    appActions,
+    appState.documentParams?.date,
+    appState.documentParams?.documentNumber,
+    appState.documentParams?.documentType,
+    appState.documentParams?.expiditor,
+    appState.documentParams?.fromContact,
+    appState.documentParams?.toContact,
+    appState.documents,
+    checkDocument,
+  ]);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            appActions.clearDocumentParams();
+            navigation.navigate('SellDocumentsListScreen');
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            const id = addDocument();
+            if (!id) {
+              return;
+            }
+            appActions.clearDocumentParams();
+            navigation.navigate('ViewSellDocument', { docId: id });
+          }}
+        />
+      ),
+    });
+  }, [addDocument, appActions, navigation]);
 
   useEffect(() => {
+    if (!appState.documentParams) {
+      // Инициализируем параметры
+      appActions.setDocumentParams({
+        date: today.toISOString().slice(0, 10),
+      });
+    }
+  }, [appActions, appState.documentParams, today]);
+
+  useEffect(() => {
+    if (!route.params) {
+      return;
+    }
+    const { docId } = route.params;
+    if (docId) {
+      // Переход из конкретного документа
+      // const document = ;
+      // appActions.setDocumentParams(appState.documents.find((i) => i.id === docId).head);
+      return;
+    }
+    // Переход из окна параметра для создания нового документа
+    appActions.setDocumentParams(route.params);
+  }, [route.params, appActions]);
+
+  /*   useEffect(() => {
     if (route.params?.docId !== undefined) {
-      const documentItem = state.documents.find((item) => item.id === Number(route.params.docId));
+      const documentItem = appState.documents.find((item) => item.id === Number(route.params.docId));
       setFormFields({
         expiditor: (documentItem.head as ISellHead).expeditorId,
         toContact: documentItem.head.tocontactId,
@@ -84,9 +160,9 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
         documentType: documentItem.head?.doctype,
       });
     }
-  }, [route.params, state.documents]);
+  }, [route.params, appState.documents]); */
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!route.params) {
       // окно открыто без параметров -> считаем что инициизируется
       // setFormFields((prev) => prev);
@@ -95,15 +171,15 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
 
     // console.log('route.params', route.params);
     setFormFields((prev) => ({ ...prev, ...route.params }));
-  }, [route.params]);
+  }, [route.params]) */
 
-  useImperativeHandle(ref, () => ({
+  /*   useImperativeHandle(ref, () => ({
     done: () => {
       if (
-        formFields.expiditor === undefined ||
-        formFields.toContact === undefined ||
-        formFields.fromContact === undefined ||
-        formFields.documentNumber === undefined
+        !appState.documentParams?.expiditor ||
+        !appState.documentParams?.toContact ||
+        appState.documentParams?.fromContact ||
+        appState.documentParams?.documentNumber
       ) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [
           {
@@ -115,7 +191,7 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
       }
       if (route.params?.docId) {
         // console.log('route.params', route.params);
-        actions.editDocument({
+        appActions.editDocument({
           id: Number(route.params.docId ?? -1),
           head: {
             doctype: formFields.documentType,
@@ -130,12 +206,12 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
         navigation.navigate('ViewSellDocument', { docId: route.params.docId });
       } else {
         const id =
-          state.documents
+          appState.documents
             .map((item) => item.id)
             .reduce((newId, currId) => {
               return newId > currId ? newId : currId;
             }, -1) + 1;
-        actions.newDocument({
+        appActions.newDocument({
           id,
           head: {
             doctype: formFields.documentType,
@@ -151,16 +227,10 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
         navigation.navigate('ViewSellDocument', { docId: id });
       }
     },
-  }));
-
-  /*   const onSelectedItemsChange = (selectedItems) => {
-    this.setState({ selectedItems });
-  }; */
+  })); */
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
-      // const { colors } = useTheme();
-
       return (
         <View style={[localeStyles.picker, { borderColor: colors.border }]}>
           <TouchableOpacity {...props}>
@@ -187,20 +257,17 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
             <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
             <TouchableOpacity
               style={localeStyles.containerDate}
-              /* onPress={() => {
-                setDatePickerVisibility(true);
-              }}*/
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
                   parentScreen: 'CreateSellDocument',
                   fieldName: 'date',
                   title: 'Дата документа:',
-                  value: formFields?.date || today.toISOString().slice(0, 10),
+                  value: appState.documentParams?.date,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(formFields?.date || today.toISOString())}
+                {getDateString(appState.documentParams?.date || today.toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -216,8 +283,8 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
                   color: colors.text,
                 },
               ]}
-              onChangeText={(value) => setFormFields({ ...formFields, documentNumber: value })}
-              value={formFields.documentNumber}
+              onChangeText={(text) => appActions.setDocumentParams({ documentNumber: text })}
+              value={appState.documentParams?.documentNumber || ''}
               placeholder="Введите номер"
               placeholderTextColor={colors.border}
               multiline={false}
@@ -231,96 +298,63 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
             <ReferenceItem
-              value={selectedItem(listPeople, formFields.expiditor)?.value}
+              value={selectedItem(listPeople, appState.documentParams?.expiditor)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
-                  selected: formFields.expiditor,
-                  list: {
-                    name: 'Экспедитор',
-                    type: 'expiditor',
-                    data: listPeople,
-                  },
+                  fieldName: 'expiditor',
+                  title: 'Экспедитор',
+                  list: listPeople,
+                  value: appState.documentParams?.expiditor,
                 })
               }
             />
-            {/*
-              <DropdownList
-                list={listPeople}
-                value={selectedItem(listPeople, selectedExpeditor)}
-                onValueChange={(item) => {
-                  setSelectedExpeditor(item.id);
-                }}
-              />
-              */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
             <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, formFields.fromContact)?.value}
+              value={selectedItem(listDepartments, appState.documentParams?.fromContact)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
-                  selected: formFields.fromContact,
-                  list: {
-                    name: 'Подразделение',
-                    type: 'fromContact',
-                    data: listDepartments,
-                  },
+                  title: 'Подразделение',
+                  fieldName: 'fromContact',
+                  list: listDepartments,
+                  value: appState.documentParams?.fromContact,
                 })
               }
             />
-            {/*
-              <DropdownList
-                list={listDepartments}
-                value={selectedItem(listDepartments, selectedFromContact)}
-                onValueChange={(item) => {
-                  setSelectedFromContact(item.id);
-                }}
-              />
-            */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
             <Text style={localeStyles.subdivisionText}>Организация:</Text>
             <ReferenceItem
-              value={selectedItem(listCompanies, formFields.toContact)?.value}
+              value={selectedItem(listCompanies, appState.documentParams?.toContact)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
-                  selected: formFields.toContact,
-                  list: {
-                    name: 'Организация',
-                    type: 'toContact',
-                    data: listCompanies,
-                  },
+                  title: 'Организация',
+                  fieldName: 'toContact',
+                  list: listCompanies,
+                  value: appState.documentParams?.toContact,
                 })
               }
             />
-            {/*
-              <DropdownList
-                list={listCompanies}
-                value={selectedItem(listCompanies, selectedToContact)}
-                onValueChange={(item) => {
-                  setSelectedToContact(item.id);
-                }}
-              />
-              */}
           </View>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
             <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
             <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-              {state.documentTypes && state.documentTypes.length !== 0 ? (
-                state.documentTypes.map((item, idx) => (
+              {appState.documentTypes && appState.documentTypes.length !== 0 ? (
+                appState.documentTypes.map((item, idx) => (
                   <Chip
                     key={idx}
                     mode="outlined"
                     style={[
                       localeStyles.margin,
-                      formFields.documentType === item.id ? { backgroundColor: colors.primary } : {},
+                      appState.documentParams?.documentType === item.id ? { backgroundColor: colors.primary } : {},
                     ]}
-                    onPress={() => setFormFields({ ...formFields, documentType: item.id })}
-                    selected={formFields.documentType === item.id}
-                    selectedColor={formFields.documentType === item.id ? colors.card : colors.text}
+                    onPress={() => appActions.setDocumentParams({ documentType: item.id })}
+                    selected={appState.documentParams?.documentType === item.id}
+                    selectedColor={appState.documentParams?.documentType === item.id ? colors.card : colors.text}
                   >
                     {item.name}
                   </Chip>
@@ -330,68 +364,11 @@ const CreateSellDocumentScreen = forwardRef<ICreateSellDocumentRef, Props>(({ ro
               )}
             </ScrollView>
           </View>
-          {/*isDatePickerVisible &&
-            (Platform.OS !== 'ios' ? (
-              <DateTimePicker
-                testID="dateTimePicker"
-                timeZoneOffsetInMinutes={0}
-                //value={formFields.date}
-                is24Hour={true}
-                display="default"
-                onChange={onChange}
-                mode="date"
-                locale="en_GB"
-                maximumDate={new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())}
-                minimumDate={new Date(1990, 0, 1)}
-              />
-            ) : (
-              <Portal>
-                <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
-                  <View
-                    style={[
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                      },
-                      localeStyles.containerModalDatePicker,
-                    ]}
-                  >
-                    <View
-                      style={[
-                        localeStyles.buttonDatePicker,
-                        {
-                          borderBottomColor: colors.border,
-                        },
-                      ]}
-                    >
-                      <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
-                      <Button
-                        onPress={() => {
-                          setDatePickerVisibility(false);
-                        }}
-                      >
-                        Отмена
-                      </Button>
-                    </View>
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      timeZoneOffsetInMinutes={0}
-                      value={formFields.date}
-                      is24Hour={true}
-                      display="default"
-                      onChange={onChange}
-                      mode="date"
-                      locale="en_GB"
-                    />
-                  </View>
-                </Modal>
-              </Portal>
-            ))*/}
         </View>
       </ScrollView>
     </>
   );
-});
+};
 
 export { CreateSellDocumentScreen };
 

@@ -86,8 +86,10 @@ const updateOne = async (device: IDevice) => {
   }
 
   // Удаляем поля которые нельзя перезаписывать
-  delete device.userId;
-  delete device.id;
+  // delete device.userId;
+  // delete device.id;
+  device.userId = '';
+  device.id = undefined;
 
   await devices.update({ ...oldDevice, ...device });
 

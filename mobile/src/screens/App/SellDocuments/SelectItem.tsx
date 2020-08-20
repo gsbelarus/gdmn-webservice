@@ -7,16 +7,16 @@ import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 // import { IField } from '../../../model';
+import { IListItem } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { useAppStore } from '../../../store';
-import { IListItem } from './SettingsGettingDocument';
+// import { useAppStore } from '../../../store';
 
 type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
-  const { state: appState, actions: appActions } = useAppStore();
+  // const { state: appState, actions: appActions } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
@@ -39,23 +39,16 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
       parentScreen: newParentScreen,
       fieldName: newFieldName,
       title: newTitle,
+      value: newValue,
     } = route.params;
 
     setTitle(newTitle);
     setFieldName(newFieldName);
     setParentScreen(newParentScreen);
     setIsMultiSelect(isMulti || false);
-
     setList(newList);
+    setCheckedItem(newValue);
   }, [route.params, route.params?.list, searchQuery]);
-
-  useEffect(() => {
-    if (!fieldName) {
-      return;
-    }
-
-    setCheckedItem(appState.formParams[fieldName]);
-  }, [appState.formParams, fieldName]);
 
   useEffect(() => {
     if (!list) {
@@ -89,13 +82,14 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
           size={30}
           color={colors.primary}
           onPress={() => {
-            appActions.setFormParams({ [fieldName]: checkedItem });
-            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList) : null;
+            parentScreen
+              ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: checkedItem })
+              : null;
           }}
         />
       ),
     });
-  }, [appActions, checkedItem, colors.primary, fieldName, navigation, parentScreen, selectItem]);
+  }, [checkedItem, colors.primary, fieldName, navigation, parentScreen]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

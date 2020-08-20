@@ -1,5 +1,6 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -7,16 +8,14 @@ import { Text } from 'react-native-paper';
 import { IResponse, IMessageInfo, IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
-import { timeout } from '../../../helpers/utils';
+import { timeout, getDateString } from '../../../helpers/utils';
+import { IListItem } from '../../../model';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
-export interface IListItem {
-  id?: number;
-  value?: string;
-  [key: string]: unknown;
-}
+type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
 
-const SettingsGettingDocumentScreen = () => {
+const SettingsGettingDocumentScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
@@ -36,6 +35,13 @@ const SettingsGettingDocumentScreen = () => {
       });
     }
   }, [appActions, appState.formParams, today, yesterday]);
+
+  useEffect(() => {
+    if (!route?.params) {
+      return;
+    }
+    appActions.setFormParams(route.params);
+  }, [appActions, route]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -141,17 +147,6 @@ const SettingsGettingDocumentScreen = () => {
     });
   }, [appActions, navigation, sendDocumentRequest]);
 
-  const getDateString = useCallback((_date: string) => {
-    if (!_date) {
-      return '-';
-    }
-    const date = new Date(_date);
-    return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
-      -2,
-      3,
-    )}.${date.getFullYear()}`;
-  }, []);
-
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
       return (
@@ -181,6 +176,7 @@ const SettingsGettingDocumentScreen = () => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
+                  value: appState.formParams?.dateBegin,
                 })
               }
             >
@@ -199,6 +195,7 @@ const SettingsGettingDocumentScreen = () => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
+                  value: appState.formParams?.dateEnd,
                 })
               }
             >
@@ -219,6 +216,7 @@ const SettingsGettingDocumentScreen = () => {
                 fieldName: 'expiditor',
                 title: 'Экспедитор',
                 list: listPeople,
+                value: appState.formParams?.expiditor,
               })
             }
           />
@@ -233,6 +231,7 @@ const SettingsGettingDocumentScreen = () => {
                 fieldName: 'toContact',
                 title: 'Организация',
                 list: listCompanies,
+                value: appState.formParams?.toContact,
               })
             }
           />

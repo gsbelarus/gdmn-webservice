@@ -1,10 +1,7 @@
-import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useRef } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
 
 import { SellDocumentsListScreen, ViewSellDocumentScreen, HeadSellDocumentScreen } from '../screens/App/SellDocuments';
-import { IViewSellDocumentRef } from '../screens/App/SellDocuments/ViewSellDocument';
 
 export type DocumentStackParamList = {
   SellDocumentsListScreen: undefined;
@@ -15,12 +12,6 @@ export type DocumentStackParamList = {
 const Stack = createStackNavigator<DocumentStackParamList>();
 
 const SellDocumentsNavigator = () => {
-  const viewSellDocumentRef = useRef<IViewSellDocumentRef>(null);
-
-  const ViewSellDocumentComponent = (props) => {
-    return <ViewSellDocumentScreen {...props} ref={viewSellDocumentRef} />;
-  };
-
   return (
     <Stack.Navigator initialRouteName="SellDocumentsListScreen">
       <Stack.Screen
@@ -32,22 +23,9 @@ const SellDocumentsNavigator = () => {
       <Stack.Screen
         key="ViewSellDocument"
         name="ViewSellDocument"
-        component={ViewSellDocumentComponent}
+        component={ViewSellDocumentScreen}
         initialParams={{ docId: 0 }}
-        options={({ navigation }) => ({
-          title: '',
-          headerLeft: () => (
-            <TouchableOpacity
-              style={localeStyles.marginLeft}
-              onPress={() => {
-                navigation.navigate('SellDocumentsListScreen');
-              }}
-            >
-              <Feather name="arrow-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-          headerRight: () => viewSellDocumentRef.current?.menu(),
-        })}
+        options={{ title: '' }}
       />
       <Stack.Screen
         key="HeadSellDocument"
@@ -60,9 +38,3 @@ const SellDocumentsNavigator = () => {
 };
 
 export default SellDocumentsNavigator;
-
-const localeStyles = StyleSheet.create({
-  marginLeft: {
-    marginLeft: 15,
-  },
-});

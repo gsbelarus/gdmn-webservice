@@ -99,10 +99,11 @@ const SellDocumentsListScreen = ({ navigation }) => {
               : undefined;
 
             const status = Statuses.find((type) => type.id === item.head.status);
+
             return appState.settingsSearch
               ? appState.settingsSearch.some((value) =>
                   value === 'number'
-                    ? item.head.docnumber.includes(searchText)
+                    ? item.head.docnumber?.includes(searchText)
                     : value === 'state' && status
                     ? status.name.includes(searchText)
                     : value === 'toContact' && toContact

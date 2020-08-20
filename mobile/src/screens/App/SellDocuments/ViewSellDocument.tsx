@@ -1,143 +1,19 @@
-import { MaterialIcons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  useTheme,
-  useScrollToTop,
-  useNavigation,
-  useRoute,
-  RouteProp,
-  CompositeNavigationProp,
-} from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import React, { forwardRef, useCallback, useState } from 'react';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Menu, Colors, FAB, IconButton } from 'react-native-paper';
+import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { useActionSheet } from '../../../helpers/useActionSheet';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-export interface IViewSellDocumentRef {
-  menu(): JSX.Element;
-}
-
-type ViewSellDocumentScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<DocumentStackParamList, 'ViewSellDocument'>,
-  StackNavigationProp<RootStackParamList>
->;
-type ViewSellDocumentScreenRouteProp = RouteProp<DocumentStackParamList, 'ViewSellDocument'>;
-
-type Props = {
-  route: ViewSellDocumentScreenRouteProp;
-  navigation: ViewSellDocumentScreenNavigationProp;
-};
-
-const ActionsMenu = React.memo(({ route, navigation }: Props) => {
-  const { colors } = useTheme();
-  const [visible, setVisible] = useState(false);
-  const { state, actions } = useAppStore();
-  const document: IDocument | ISellDocument | undefined = state.documents.find(
-    (item) => item.id === route.params.docId,
-  );
-
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-
-  const getItemsMenu = useCallback(() => {
-    return document
-      ? [
-          ...(document.head.status === 0 || document.head.status === 3
-            ? [
-                {
-                  title: 'Удалить',
-                  onPress: async () => {
-                    Alert.alert('Вы уверены, что хотите удалить?', '', [
-                      {
-                        text: 'OK',
-                        onPress: async () => {
-                          actions.deleteDocument(document.id);
-                          navigation.navigate('SellDocumentsListScreen');
-                        },
-                      },
-                      {
-                        text: 'Отмена',
-                      },
-                    ]);
-                  },
-                },
-              ]
-            : []),
-          ...(document.head.status === 0
-            ? [
-                {
-                  title: 'Изменить шапку',
-                  onPress: () => {
-                    navigation.navigate('CreateSellDocument', {
-                      docId: route.params.docId,
-                    });
-                  },
-                },
-                {
-                  title: 'Изменить статус',
-                  onPress: () => {
-                    actions.editStatusDocument({ id: document.id, status: document.head.status + 1 });
-                  },
-                },
-              ]
-            : []),
-          ...(document.head.status === 1
-            ? [
-                {
-                  title: 'Изменить статус',
-                  onPress: () => {
-                    actions.editStatusDocument({ id: document.id, status: document.head.status - 1 });
-                  },
-                },
-              ]
-            : []),
-        ]
-      : [];
-  }, [document, actions, navigation, route.params.docId]);
-
-  return (
-    <Menu
-      visible={visible}
-      onDismiss={closeMenu}
-      anchor={
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localStyles.buttons,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.card,
-            },
-          ]}
-          onPress={openMenu}
-        >
-          <MaterialCommunityIcons size={30} color={colors.text} name="dots-horizontal" />
-        </TouchableOpacity>
-      }
-    >
-      {getItemsMenu().map((item) => {
-        return (
-          <Menu.Item
-            key={item.title}
-            onPress={() => {
-              item.onPress();
-              closeMenu();
-            }}
-            title={item.title}
-          />
-        );
-      })}
-    </Menu>
-  );
-});
+const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
   const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
@@ -189,7 +65,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
           <TouchableOpacity
             style={localStyles.buttonDelete}
             onPress={async () => {
-              Alert.alert('Вы уверены, что хотите удалить?', '', [
+              Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
                 {
                   text: 'OK',
                   onPress: () => {
@@ -231,13 +107,29 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route, navigation }, ref) => {
+type Props = StackScreenProps<DocumentStackParamList, 'ViewSellDocument'>;
+
+const notFound = { id: -1, name: '' };
+
+const ViewSellDocumentScreen = ({ route }: Props) => {
   const { colors } = useTheme();
-  const { state } = useAppStore();
-  const notFound = { id: -1, name: '' };
-  const document: IDocument | ISellDocument | undefined = state.documents.find(
-    (item) => item.id === route.params.docId,
-  );
+  const { state, actions } = useAppStore();
+  const showActionSheet = useActionSheet();
+  const navigation = useNavigation();
+  const [docId, setDocId] = useState<number>(undefined);
+
+  useEffect(() => {
+    if (!route.params?.docId) {
+      return;
+    }
+
+    setDocId(route.params.docId);
+  }, [route.params.docId]);
+
+  const document: IDocument | ISellDocument | undefined = useMemo(() => {
+    return state.documents.find((item) => item.id === docId);
+  }, [docId, state.documents]);
+
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const refList = React.useRef<FlatList<ISellLine>>(null);
 
@@ -258,23 +150,62 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
       headerRight: () => (
         <IconButton
           icon="menu"
-          size={26}
+          size={24}
           onPress={() => {
-            console.log('menu click');
+            showActionSheet([
+              {
+                title: 'Изменить шапку',
+                onPress: () => navigation.navigate('CreateSellDocument', { docId }),
+              },
+              {
+                title: document?.head?.status === 0 ? "В статус 'Готово' " : "В статус 'Черновик'",
+                onPress: () =>
+                  actions.editStatusDocument({
+                    id: docId,
+                    status: document?.head?.status + (document?.head?.status === 0 ? 1 : -1),
+                  }),
+              },
+              {
+                title: 'Удалить',
+                type: 'destructive',
+                onPress: () => {
+                  Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                    {
+                      text: 'OK',
+                      onPress: async () => {
+                        actions.deleteDocument(docId);
+                        navigation.navigate('SellDocumentsListScreen');
+                      },
+                    },
+                    {
+                      text: 'Отмена',
+                    },
+                  ]);
+                },
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]);
           }}
         />
       ),
     });
-  }, [navigation]);
+  }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
 
   return document ? (
     <>
-      <ActionsMenu route={route} navigation={navigation} />
       <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.documentHeader, { backgroundColor: colors.primary }]}>
+        <View
+          style={[
+            localStyles.documentHeader,
+            { backgroundColor: document.head.status === 0 ? colors.primary : statusColors[1] },
+          ]}
+        >
           <View style={localStyles.header}>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {(document.head as ISellHead)?.docnumber} от {new Date(document.head.date)?.toLocaleDateString()}
+              {(document?.head as ISellHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()}
             </Text>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
               {contact.name}
@@ -286,7 +217,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
               color={colors.card}
               name="chevron-right"
               onPress={() => {
-                navigation.navigate('HeadSellDocument', { docId: document.id });
+                navigation.navigate('HeadSellDocument', { docId });
               }}
             />
           </TouchableOpacity>
@@ -302,7 +233,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
           <View style={localStyles.remainsInfo}>
             <Text style={localStyles.productBarcodeView}>Кол-во</Text>
           </View>
-          {document.head.status === 0 ? (
+          {document?.head?.status === 0 ? (
             <View style={localStyles.remainsInfo}>
               <Text style={localStyles.productBarcodeView} />
             </View>
@@ -346,11 +277,11 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
             localStyles.flexDirectionRow,
             // eslint-disable-next-line react-native/no-inline-styles
             {
-              justifyContent: document.head.status !== 0 ? 'flex-start' : 'space-evenly',
+              justifyContent: document?.head?.status !== 0 ? 'flex-start' : 'space-evenly',
             },
           ]}
         >
-          {document.head.status === 0 && (
+          {document?.head?.status === 0 && (
             <FAB
               style={localStyles.fabAdd}
               icon="plus"
@@ -361,7 +292,7 @@ const ViewSellDocumentScreen = forwardRef<IViewSellDocumentRef, Props>(({ route,
       </View>
     </>
   ) : null;
-});
+};
 
 export { ViewSellDocumentScreen };
 
@@ -395,7 +326,7 @@ const localStyles = StyleSheet.create({
   },
   documentHeader: {
     flexDirection: 'row',
-    height: 60,
+    height: 50,
   },
   documentHeaderText: {
     flex: 1,
@@ -430,7 +361,7 @@ const localStyles = StyleSheet.create({
     flexDirection: 'column',
     flex: 15,
     justifyContent: 'center',
-    padding: 8,
+    padding: 7,
   },
   item: {
     alignItems: 'center',

@@ -35,7 +35,7 @@ const updateOne = async (user: IUser) => {
   }
 
   // Удаляем поля которые нельзя перезаписывать
-  delete user.password;
+  user.password = '';
 
   await users.update({ ...oldUser, ...user });
 

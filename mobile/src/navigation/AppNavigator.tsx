@@ -2,10 +2,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 
 import { HeaderRight } from '../components/HeaderRight';
+import { IListItem } from '../model';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
 import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
-/*import { HeaderRight } from '../components/HeaderRight';*/
 import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
@@ -16,12 +16,10 @@ import {
   SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
 import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
-import { ICreateSellDocumentRef } from '../screens/App/SellDocuments/CreateSellDocument';
 import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
-import { IListItem } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
@@ -54,20 +52,15 @@ export type RootStackParamList = {
   SettingsGettingDocument: {
     [fieldName: string]: number[] | Date | number | string;
   };
-  /*   SelectItemScreen: {
-    parentScreen: string;
-    selected: number[];
-    isMulti?: boolean;
-    list: { name: string; type: string; data: IField[] };
-  }; */
   SelectItemScreen: {
     parentScreen: keyof RootStackParamList;
     fieldName: string;
     title: string;
     isMulti?: boolean;
     list: IListItem[];
+    value: number[];
   };
-  SelectDateScreen: { parentScreen: keyof RootStackParamList; fieldName: string; title: string };
+  SelectDateScreen: { parentScreen: keyof RootStackParamList; fieldName: string; title: string; value: string };
 
   SelectBoxingsScreen: {
     lineId: string;
@@ -94,7 +87,7 @@ const AppNavigator = () => {
   };
 
   const prodSellRef = useRef<ISellProductDetailsRef>(null);
-  const docSellRef = useRef<ICreateSellDocumentRef>(null);
+  // const docSellRef = useRef<ICreateSellDocumentRef>(null);
   const boxingSellRef = useRef<IBoxingDetailsRef>(null);
 
   const settingsSearchRef = useRef<ISettingsSearchRef>(null);
@@ -104,9 +97,9 @@ const AppNavigator = () => {
     return <SellProductDetailScreen {...props} ref={prodSellRef} />;
   };
 
-  const CreateSellDocumentComponent = (props) => {
+  /*   const CreateSellDocumentComponent = (props) => {
     return <CreateSellDocumentScreen {...props} ref={docSellRef} />;
-  };
+  }; */
 
   const BoxingDetailsComponent = (props) => {
     return <BoxingDetailScreen {...props} ref={boxingSellRef} />;
@@ -237,8 +230,9 @@ const AppNavigator = () => {
         <Stack.Screen
           key="CreateSellDocument"
           name="CreateSellDocument"
-          component={CreateSellDocumentComponent}
-          options={({ navigation }) => ({
+          component={CreateSellDocumentScreen}
+          options={{ title: '' }}
+          /* options={({ navigation }) => ({
             title: '',
             headerLeft: () => (
               <HeaderRight
@@ -256,7 +250,7 @@ const AppNavigator = () => {
                 }}
               />
             ),
-          })}
+          })} */
         />
         <Stack.Screen
           key="SellProductsList"

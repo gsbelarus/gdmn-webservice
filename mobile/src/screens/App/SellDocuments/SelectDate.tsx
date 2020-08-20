@@ -8,7 +8,6 @@ import { IconButton } from 'react-native-paper';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { useAppStore } from '../../../store';
 
 LocaleConfig.locales.ru = {
   monthNames: [
@@ -36,9 +35,7 @@ type Props = StackScreenProps<RootStackParamList, 'SelectDateScreen'>;
 export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
-  const { state: appState, actions: appActions } = useAppStore();
-
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
   const [fieldName, setFieldName] = useState('');
   const [parentScreen, setParentScreen] = useState('');
@@ -47,24 +44,13 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
     if (!route.params?.fieldName) {
       return;
     }
-    const { fieldName: newFieldName, title: newTitle, parentScreen: newParentScreen } = route.params;
+    const { fieldName: newFieldName, title: newTitle, parentScreen: newParentScreen, value: newValue } = route.params;
 
     setTitle(newTitle);
     setFieldName(newFieldName);
     setParentScreen(newParentScreen);
+    setDate(newValue);
   }, [route.params]);
-
-  useEffect(() => {
-    if (!fieldName) {
-      return;
-    }
-
-    if (!appState.formParams) {
-      return;
-    }
-
-    setDate(appState.formParams[fieldName]);
-  }, [appState.formParams, fieldName]);
 
   const dayPressHandle = (day: DateObject) => {
     setDate(day.dateString);
@@ -78,13 +64,13 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
           size={30}
           color={colors.primary}
           onPress={() => {
-            appActions.setFormParams({ [fieldName]: date });
-            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList) : null;
+            // appActions.setFormParams({ [fieldName]: date });
+            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: date }) : null;
           }}
         />
       ),
     });
-  }, [appActions, appState.formParams, colors.primary, date, fieldName, navigation, parentScreen]);
+  }, [colors.primary, date, fieldName, navigation, parentScreen]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
