@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useRef } from 'react';
 
 import { HeaderRight } from '../components/HeaderRight';
-import { IField } from '../model';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
 import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
@@ -22,7 +21,7 @@ import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDeta
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
-import { ISettingsGettingDocumentRef, IListItem } from '../screens/App/SellDocuments/SettingsGettingDocument';
+import { IListItem } from '../screens/App/SellDocuments/SettingsGettingDocument';
 import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
@@ -97,7 +96,7 @@ const AppNavigator = () => {
   const prodSellRef = useRef<ISellProductDetailsRef>(null);
   const docSellRef = useRef<ICreateSellDocumentRef>(null);
   const boxingSellRef = useRef<IBoxingDetailsRef>(null);
-  const settingsGettingDocumentRef = useRef<ISettingsGettingDocumentRef>(null);
+
   const settingsSearchRef = useRef<ISettingsSearchRef>(null);
   const selectBoxingsRef = useRef<ISelectBoxingsRef>(null);
 
@@ -113,9 +112,9 @@ const AppNavigator = () => {
     return <BoxingDetailScreen {...props} ref={boxingSellRef} />;
   };
 
-  const SettingsGettingDocumentComponent = (props) => {
-    return <SettingsGettingDocumentScreen {...props} ref={settingsGettingDocumentRef} />;
-  };
+  // const SettingsGettingDocumentComponent = (props) => {
+  //   return <SettingsGettingDocumentScreen {...props} ref={settingsGettingDocumentRef} />;
+  // };
 
   const SettingsSearchComponent = (props) => {
     return <SettingsSearchScreen {...props} ref={settingsSearchRef} />;
@@ -304,27 +303,28 @@ const AppNavigator = () => {
         <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"
-          component={SettingsGettingDocumentComponent}
-          options={({ navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('SellDocuments');
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  settingsGettingDocumentRef.current?.done();
-                  navigation.navigate('SellDocuments');
-                }}
-              />
-            ),
-          })}
+          component={SettingsGettingDocumentScreen}
+          options={{ title: '' }}
+          // options={({ navigation }) => ({
+          //   title: '',
+          //   headerLeft: () => (
+          //     <HeaderRight
+          //       text="Отмена"
+          //       onPress={() => {
+          //         navigation.navigate('SellDocuments');
+          //       }}
+          //     />
+          //   ),
+          //   headerRight: () => (
+          //     <HeaderRight
+          //       text="Готово"
+          //       onPress={() => {
+          //         settingsGettingDocumentRef.current?.done();
+          //         navigation.navigate('SellDocuments');
+          //       }}
+          //     />
+          //   ),
+          // })}
         />
         <Stack.Screen
           key="SettingsSearchScreen"

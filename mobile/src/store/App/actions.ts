@@ -23,6 +23,7 @@ export enum ActionAppTypes {
   SET_BOXINGS_LINE = 'SET_BOXINGS_LINE',
   SET_SETTINGS_SEARCH = 'SET_SETTINGS_SEARCH',
   SET_FORM_PARAMS = 'SET_FORM_PARAMS',
+  CLEAR_FORM_PARAMS = 'CLEAR_FORM_PARAMS',
 }
 
 export const AppActions = {
@@ -62,6 +63,7 @@ export const AppActions = {
     ActionAppTypes.SET_SETTINGS_SEARCH,
   ),
   setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams>(ActionAppTypes.SET_FORM_PARAMS),
+  clearFormParams: createAction<ActionAppTypes.CLEAR_FORM_PARAMS>(ActionAppTypes.CLEAR_FORM_PARAMS),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

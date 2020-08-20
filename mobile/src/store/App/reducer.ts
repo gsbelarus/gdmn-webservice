@@ -157,6 +157,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.SET_FORM_PARAMS: {
       return { ...state, formParams: { ...state.formParams, ...action.payload } };
     }
+    case ActionAppTypes.CLEAR_FORM_PARAMS: {
+      return { ...state, formParams: undefined };
+    }
     default:
       return state;
   }

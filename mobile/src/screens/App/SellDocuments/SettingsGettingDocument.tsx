@@ -1,14 +1,13 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import { StackScreenProps } from '@react-navigation/stack';
-import React, { forwardRef, useImperativeHandle, useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { IResponse, IMessageInfo, IContact } from '../../../../../common';
+import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { timeout } from '../../../helpers/utils';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
 export interface IListItem {
@@ -17,17 +16,12 @@ export interface IListItem {
   [key: string]: unknown;
 }
 
-export interface ISettingsGettingDocumentRef {
-  done(): void;
-}
-
-export type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
-
-const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Props>(({ route }, ref) => {
+const SettingsGettingDocumentScreen = () => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
+  const navigation = useNavigation();
 
   const today = new Date();
   const yesterday = new Date();
@@ -90,6 +84,9 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           Alert.alert('Запрос отправлен!', '', [
             {
               text: 'Закрыть',
+              onPress: () => {
+                appActions.clearFormParams();
+              },
             },
           ]);
         } else {
@@ -117,33 +114,42 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
     appState.formParams?.toContact,
     yesterday,
     today,
+    appActions,
   ]);
 
-  useImperativeHandle(ref, () => ({
-    done: async () => {
-      await sendDocumentRequest();
-    },
-  }));
-
-  /*   useEffect(() => {
-    if (!route.params) {
-      return;
-    }
-
-    console.log('route.params', route.params);
-
-    setFormFields((prev) => {
-      return route.params;
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            appActions.clearFormParams();
+            navigation.navigate('SellDocuments');
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            sendDocumentRequest();
+            navigation.navigate('SellDocuments');
+          }}
+        />
+      ),
     });
-  }, [route.params]); */
+  }, [appActions, navigation, sendDocumentRequest]);
 
-  const navigation = useNavigation();
   const getDateString = useCallback((_date: string) => {
     if (!_date) {
       return '-';
     }
     const date = new Date(_date);
-    return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(-2, 3)}.${date.getFullYear()}`;
+    return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
+      -2,
+      3,
+    )}.${date.getFullYear()}`;
   }, []);
 
   const ReferenceItem = useCallback(
@@ -170,10 +176,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
             <TouchableOpacity
               style={localeStyles.containerDate}
-              /*onPress={() => {
-              setIsDateEnd(false);
-              setDatePickerVisibility(true);
-            }} */
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
                   parentScreen: 'SettingsGettingDocument',
@@ -207,66 +209,6 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
             </TouchableOpacity>
           </View>
         </View>
-        {/*      {isDatePickerVisible &&
-        (Platform.OS !== 'ios' ? (
-          <RNDateTimePicker
-            testID="dateTimePicker"
-            timeZoneOffsetInMinutes={0}
-            value={isDateEnd ? formFields?.dateEnd || today : formFields?.dateBegin || yesterday}
-            is24Hour={true}
-            // display="default"
-            onChange={onChange}
-            mode="date"
-            locale="ru_RU"
-            maximumDate={new Date(today.getFullYear(), today.getMonth() + 1, today.getDate())}
-            minimumDate={new Date(1990, 0, 1)}
-          />
-        ) : (
-          <Portal>
-            <Modal visible={isDatePickerVisible} onDismiss={() => setDatePickerVisibility(false)}>
-              <View
-                style={[
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                  },
-                  localeStyles.containerModalDatePicker,
-                ]}
-              >
-                <View
-                  style={[
-                    localeStyles.buttonDatePicker,
-                    {
-                      borderBottomColor: colors.border,
-                    },
-                  ]}
-                >
-                  <Button onPress={() => setDatePickerVisibility(false)}>Готово</Button>
-                  <Button
-                    onPress={() => {
-                      setDatePickerVisibility(false);
-                      // const newDate = isDateEnd ? { dateEnd: selectedDate } : { dateBegin: selectedDate };
-                      // setFormFields({ ...formFields, ...newDate });
-                      // isDateEnd ? setDateEnd(oldDateEnd) : setDateBegin(oldDateBegin);
-                    }}
-                  >
-                    Отмена
-                  </Button>
-                </View>
-                <RNDateTimePicker
-                  testID="dateTimePicker"
-                  timeZoneOffsetInMinutes={0}
-                  value={isDateEnd ? formFields?.dateEnd || today : formFields?.dateBegin || yesterday}
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChange}
-                  mode="date"
-                  locale="ru_RU"
-                />
-              </View>
-            </Modal>
-          </Portal>
-        ))} */}
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
           <ReferenceItem
@@ -298,7 +240,7 @@ const SettingsGettingDocumentScreen = forwardRef<ISettingsGettingDocumentRef, Pr
       </ScrollView>
     </View>
   );
-});
+};
 
 export { SettingsGettingDocumentScreen };
 
