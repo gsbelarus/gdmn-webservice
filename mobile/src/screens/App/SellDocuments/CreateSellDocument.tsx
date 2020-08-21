@@ -91,7 +91,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         .map((item) => item.id)
         .reduce((newId, currId) => {
           return newId > currId ? newId : currId;
-        }, -1) + 1;
+        }, 0) + 1;
 
     appActions.newDocument({
       id,
