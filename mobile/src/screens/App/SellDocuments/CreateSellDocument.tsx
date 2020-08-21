@@ -9,6 +9,7 @@ import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import { getDateString } from '../../../helpers/utils';
 import { IListItem } from '../../../model';
+import { IDocumentParams } from '../../../model/sell';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -29,6 +30,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IListItem;
     });
+
   const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
   const listPeople = useMemo(() => getListItems(people), [people]);
   const companies: IContact[] = appState.contacts.filter((item) => item.type === '3');
@@ -39,11 +41,11 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   const checkDocument = useCallback(() => {
     const res =
       appState.documentParams?.date &&
-      appState.documentParams?.documentNumber &&
-      appState.documentParams?.expiditor &&
-      appState.documentParams?.toContact &&
-      appState.documentParams?.fromContact &&
-      appState.documentParams?.documentType;
+      appState.documentParams?.docnumber &&
+      appState.documentParams?.expeditorId &&
+      appState.documentParams?.tocontactId &&
+      appState.documentParams?.fromcontactId &&
+      appState.documentParams?.doctype;
 
     if (!res) {
       Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
@@ -51,18 +53,39 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return res;
   }, [
     appState.documentParams?.date,
-    appState.documentParams?.documentNumber,
-    appState.documentParams?.documentType,
-    appState.documentParams?.expiditor,
-    appState.documentParams?.fromContact,
-    appState.documentParams?.toContact,
+    appState.documentParams?.docnumber,
+    appState.documentParams?.expeditorId,
+    appState.documentParams?.tocontactId,
+    appState.documentParams?.fromcontactId,
+    appState.documentParams?.doctype,
+  ]);
+
+  const updateDocument = useCallback(() => {
+    appActions.editDocument({
+      id: route.params?.docId,
+      head: {
+        doctype: appState.documentParams?.doctype,
+        fromcontactId: appState.documentParams?.fromcontactId,
+        tocontactId: appState.documentParams?.tocontactId,
+        date: appState.documentParams?.date,
+        status: 0,
+        docnumber: appState.documentParams?.docnumber,
+        expeditorId: appState.documentParams?.expeditorId,
+      },
+    });
+    return route.params?.docId;
+  }, [
+    appActions,
+    route.params?.docId,
+    appState.documentParams?.doctype,
+    appState.documentParams?.fromcontactId,
+    appState.documentParams?.tocontactId,
+    appState.documentParams?.date,
+    appState.documentParams?.docnumber,
+    appState.documentParams?.expeditorId,
   ]);
 
   const addDocument = useCallback(() => {
-    if (!checkDocument()) {
-      return;
-    }
-
     const id =
       appState.documents
         .map((item) => item.id)
@@ -73,13 +96,13 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     appActions.newDocument({
       id,
       head: {
-        doctype: appState.documentParams?.documentType,
-        fromcontactId: appState.documentParams?.fromContact[0],
-        tocontactId: appState.documentParams?.toContact[0],
+        doctype: appState.documentParams?.doctype,
+        fromcontactId: appState.documentParams?.fromcontactId[0],
+        tocontactId: appState.documentParams?.tocontactId[0],
         date: appState.documentParams?.date,
         status: 0,
-        docnumber: appState.documentParams?.documentNumber,
-        expeditorId: appState.documentParams?.expiditor[0],
+        docnumber: appState.documentParams?.docnumber,
+        expeditorId: appState.documentParams?.expeditorId[0],
       },
       lines: [],
     });
@@ -87,13 +110,12 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   }, [
     appActions,
     appState.documentParams?.date,
-    appState.documentParams?.documentNumber,
-    appState.documentParams?.documentType,
-    appState.documentParams?.expiditor,
-    appState.documentParams?.fromContact,
-    appState.documentParams?.toContact,
+    appState.documentParams?.docnumber,
+    appState.documentParams?.doctype,
+    appState.documentParams?.expeditorId,
+    appState.documentParams?.fromcontactId,
+    appState.documentParams?.tocontactId,
     appState.documents,
-    checkDocument,
   ]);
 
   React.useLayoutEffect(() => {
@@ -104,7 +126,10 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           text="Отмена"
           onPress={() => {
             appActions.clearDocumentParams();
-            navigation.navigate('SellDocumentsListScreen');
+            const { docId } = route.params;
+            // При нажатии 'отмена' если редактирование документа
+            // то возвращаемся к документу, иначе к списку документов
+            docId ? navigation.navigate('ViewSellDocument', { docId }) : navigation.navigate('SellDocumentsListScreen');
           }}
         />
       ),
@@ -112,122 +137,41 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            const id = addDocument();
+            if (!checkDocument()) {
+              return;
+            }
+
+            const id = route.params?.docId ? updateDocument() : addDocument();
+
             if (!id) {
               return;
             }
+
             appActions.clearDocumentParams();
             navigation.navigate('ViewSellDocument', { docId: id });
           }}
         />
       ),
     });
-  }, [addDocument, appActions, navigation]);
+  }, [addDocument, appActions, navigation, route.params, checkDocument, updateDocument]);
 
   useEffect(() => {
-    if (!appState.documentParams) {
+    if (!appState.documentParams && !route.params?.docId) {
       // Инициализируем параметры
       appActions.setDocumentParams({
         date: today.toISOString().slice(0, 10),
       });
     }
-  }, [appActions, appState.documentParams, today]);
+  }, [appActions, appState.documentParams, route.params?.docId, today]);
 
   useEffect(() => {
     if (!route.params) {
       return;
     }
-    const { docId } = route.params;
-    if (docId) {
-      // Переход из конкретного документа
-      // const document = ;
-      // appActions.setDocumentParams(appState.documents.find((i) => i.id === docId).head);
-      return;
-    }
-    // Переход из окна параметра для создания нового документа
-    appActions.setDocumentParams(route.params);
-  }, [route.params, appActions]);
-
-  /*   useEffect(() => {
-    if (route.params?.docId !== undefined) {
-      const documentItem = appState.documents.find((item) => item.id === Number(route.params.docId));
-      setFormFields({
-        expiditor: (documentItem.head as ISellHead).expeditorId,
-        toContact: documentItem.head.tocontactId,
-        fromContact: documentItem.head.fromcontactId,
-        date: documentItem.head.date,
-        documentNumber: (documentItem.head as ISellHead).docnumber,
-        documentType: documentItem.head?.doctype,
-      });
-    }
-  }, [route.params, appState.documents]); */
-
-  /*   useEffect(() => {
-    if (!route.params) {
-      // окно открыто без параметров -> считаем что инициизируется
-      // setFormFields((prev) => prev);
-      return;
-    }
-
-    // console.log('route.params', route.params);
-    setFormFields((prev) => ({ ...prev, ...route.params }));
-  }, [route.params]) */
-
-  /*   useImperativeHandle(ref, () => ({
-    done: () => {
-      if (
-        !appState.documentParams?.expiditor ||
-        !appState.documentParams?.toContact ||
-        appState.documentParams?.fromContact ||
-        appState.documentParams?.documentNumber
-      ) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [
-          {
-            text: 'OK',
-            onPress: () => ({}),
-          },
-        ]);
-        return;
-      }
-      if (route.params?.docId) {
-        // console.log('route.params', route.params);
-        appActions.editDocument({
-          id: Number(route.params.docId ?? -1),
-          head: {
-            doctype: formFields.documentType,
-            fromcontactId: formFields.fromContact,
-            tocontactId: formFields.toContact,
-            date: formFields.date,
-            status: 0,
-            docnumber: formFields.documentNumber,
-            expeditorId: formFields.expiditor,
-          },
-        });
-        navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-      } else {
-        const id =
-          appState.documents
-            .map((item) => item.id)
-            .reduce((newId, currId) => {
-              return newId > currId ? newId : currId;
-            }, -1) + 1;
-        appActions.newDocument({
-          id,
-          head: {
-            doctype: formFields.documentType,
-            fromcontactId: formFields.fromContact,
-            tocontactId: formFields.toContact,
-            date: formFields.date,
-            status: 0,
-            docnumber: formFields.documentNumber,
-            expeditorId: formFields.expiditor,
-          },
-          lines: [],
-        });
-        navigation.navigate('ViewSellDocument', { docId: id });
-      }
-    },
-  })); */
+    route.params.docId && !appState.documentParams
+      ? appActions.setDocumentParams(appState.documents.find((i) => i.id === route.params.docId).head)
+      : appActions.setDocumentParams(route.params as IDocumentParams);
+  }, [route.params, appActions, appState.documents]);
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
@@ -283,8 +227,8 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                   color: colors.text,
                 },
               ]}
-              onChangeText={(text) => appActions.setDocumentParams({ documentNumber: text })}
-              value={appState.documentParams?.documentNumber || ''}
+              onChangeText={(text) => appActions.setDocumentParams({ docnumber: text })}
+              value={appState.documentParams?.docnumber || ' '}
               placeholder="Введите номер"
               placeholderTextColor={colors.border}
               multiline={false}
@@ -298,14 +242,14 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
             <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
             <ReferenceItem
-              value={selectedItem(listPeople, appState.documentParams?.expiditor)?.value}
+              value={selectedItem(listPeople, appState.documentParams?.expeditorId)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
-                  fieldName: 'expiditor',
+                  fieldName: 'expeditorId',
                   title: 'Экспедитор',
                   list: listPeople,
-                  value: appState.documentParams?.expiditor,
+                  value: appState.documentParams?.expeditorId,
                 })
               }
             />
@@ -313,14 +257,14 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
             <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, appState.documentParams?.fromContact)?.value}
+              value={selectedItem(listDepartments, appState.documentParams?.fromcontactId)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
                   title: 'Подразделение',
-                  fieldName: 'fromContact',
+                  fieldName: 'fromcontactId',
                   list: listDepartments,
-                  value: appState.documentParams?.fromContact,
+                  value: appState.documentParams?.fromcontactId,
                 })
               }
             />
@@ -328,14 +272,14 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
             <Text style={localeStyles.subdivisionText}>Организация:</Text>
             <ReferenceItem
-              value={selectedItem(listCompanies, appState.documentParams?.toContact)?.value}
+              value={selectedItem(listCompanies, appState.documentParams?.tocontactId)?.value}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
                   parentScreen: 'CreateSellDocument',
                   title: 'Организация',
-                  fieldName: 'toContact',
+                  fieldName: 'tocontactId',
                   list: listCompanies,
-                  value: appState.documentParams?.toContact,
+                  value: appState.documentParams?.tocontactId,
                 })
               }
             />
@@ -350,11 +294,11 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                     mode="outlined"
                     style={[
                       localeStyles.margin,
-                      appState.documentParams?.documentType === item.id ? { backgroundColor: colors.primary } : {},
+                      appState.documentParams?.doctype === item.id ? { backgroundColor: colors.primary } : {},
                     ]}
-                    onPress={() => appActions.setDocumentParams({ documentType: item.id })}
-                    selected={appState.documentParams?.documentType === item.id}
-                    selectedColor={appState.documentParams?.documentType === item.id ? colors.card : colors.text}
+                    onPress={() => appActions.setDocumentParams({ doctype: item.id })}
+                    selected={appState.documentParams?.doctype === item.id}
+                    selectedColor={appState.documentParams?.doctype === item.id ? colors.card : colors.text}
                   >
                     {item.name}
                   </Chip>

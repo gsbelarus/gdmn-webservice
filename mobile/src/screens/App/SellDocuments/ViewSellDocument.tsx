@@ -155,7 +155,17 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
             showActionSheet([
               {
                 title: 'Изменить шапку',
-                onPress: () => navigation.navigate('CreateSellDocument', { docId }),
+                onPress: () => {
+                  if (document?.head?.status === 0)  {
+                    navigation.navigate('CreateSellDocument', { docId });
+                    return;
+                  }
+                  Alert.alert('Изменения доступны только для черновика', '', [
+                    {
+                      text: 'OK',
+                    },
+                  ]);
+                },
               },
               {
                 title: document?.head?.status === 0 ? "В статус 'Готово' " : "В статус 'Черновик'",

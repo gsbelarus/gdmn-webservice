@@ -44,9 +44,9 @@ export interface IFormParams {
 
 export interface IDocumentParams {
   date?: string;
-  expiditor?: number;
-  toContact?: number;
-  fromContact?: number;
-  documentType?: number;
-  documentNumber?: string;
+  expeditorId?: number;
+  tocontactId?: number;
+  fromcontactId?: number;
+  doctype?: number;
+  docnumber?: string;
 }
