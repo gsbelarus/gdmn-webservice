@@ -34,7 +34,8 @@
     "react-native-paper": "^4.0.1",
     "react-native-safe-area-context": "~3.0.7",
     "react-native-screens": "~2.9.0",
-    "react-navigation": "^4.4.0"
+    "react-navigation": "^4.4.0",
+    "reactotron-react-native": "^5.0.0"
   },
   "devDependencies": {
     "@react-native-community/eslint-config": "^2.0.0",

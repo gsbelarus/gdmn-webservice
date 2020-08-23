@@ -6,6 +6,8 @@ import { Reducer } from 'react';
 // import goods from '../../mockData/Goods.json';
 // import references from '../../mockData/References.json';
 // import remains from '../../mockData/Remains.json';
+import Reactotron from 'reactotron-react-native';
+
 import { IDocument } from '../../../../common';
 import { IAppState } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
@@ -25,6 +27,8 @@ export const initialState: IAppState = {
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
   console.log('App action: ', JSON.stringify(action));
+  Reactotron.send('appStore', action);
+  Reactotron.log('appStore', action);
 
   switch (action.type) {
     case ActionAppTypes.NEW_DOCUMENT: {
