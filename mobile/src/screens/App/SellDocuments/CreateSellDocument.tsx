@@ -126,6 +126,10 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           text="Отмена"
           onPress={() => {
             appActions.clearDocumentParams();
+            if (!route.params) {
+              navigation.navigate('SellDocumentsListScreen');
+              return;
+            }
             const { docId } = route.params;
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов

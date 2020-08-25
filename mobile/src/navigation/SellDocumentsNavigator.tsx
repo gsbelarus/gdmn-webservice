@@ -25,7 +25,7 @@ const SellDocumentsNavigator = () => {
         name="ViewSellDocument"
         component={ViewSellDocumentScreen}
         initialParams={{ docId: 0 }}
-        options={{ title: '' }}
+        options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen
         key="HeadSellDocument"

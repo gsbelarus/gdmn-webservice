@@ -156,7 +156,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               {
                 title: 'Изменить шапку',
                 onPress: () => {
-                  if (document?.head?.status === 0)  {
+                  if (document?.head?.status === 0) {
                     navigation.navigate('CreateSellDocument', { docId });
                     return;
                   }

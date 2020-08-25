@@ -1,11 +1,4 @@
 import { Reducer } from 'react';
-
-// import contacts from '../../mockData//GD_Contact.json';
-// import documents from '../../mockData/Document.json';
-// import documentTypes from '../../mockData/GD_DocumentType.json';
-// import goods from '../../mockData/Goods.json';
-// import references from '../../mockData/References.json';
-// import remains from '../../mockData/Remains.json';
 import Reactotron from 'reactotron-react-native';
 
 import { IDocument } from '../../../../common';
@@ -27,7 +20,6 @@ export const initialState: IAppState = {
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
   console.log('App action: ', JSON.stringify(action));
-  Reactotron.send('appStore', action);
   Reactotron.log('appStore', action);
 
   switch (action.type) {
