@@ -83,13 +83,18 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
     throw new Error('код не найден');
   }
 
-  const date = new Date(rec.date);
+  const date: Date = new Date(rec.date);
 
   log.info(date);
   date.setDate(date.getDate() + 7);
   log.info(date);
 
-  if (date.getDate() - new Date().getDate() < 0) {
+  // const dateDiff = date.getDate() - new Date().getDate();
+
+  const diffTime = Math.abs(date.getTime() - new Date().getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
     // await codes.delete(i => i.code === code);
     throw new Error('срок действия кода истёк');
   }
