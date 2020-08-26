@@ -9,7 +9,6 @@ export const initialState: IAppState = {
   settings: undefined,
   documents: undefined,
   remains: undefined,
-  // references: undefined,
   goods: undefined,
   contacts: undefined,
   documentTypes: undefined,
@@ -19,8 +18,10 @@ export const initialState: IAppState = {
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
-  console.log('App action: ', JSON.stringify(action));
-  Reactotron.log('appStore', action);
+  if (__DEV__) {
+    console.log('App action: ', JSON.stringify(action));
+    Reactotron.log('appStore', action);
+  }
 
   switch (action.type) {
     case ActionAppTypes.NEW_DOCUMENT: {

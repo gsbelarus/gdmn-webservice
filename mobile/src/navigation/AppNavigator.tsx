@@ -236,25 +236,6 @@ const AppNavigator = () => {
           name="CreateSellDocument"
           component={CreateSellDocumentScreen}
           options={{ title: '' }}
-          /* options={({ navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('SellDocumentsListScreen');
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  docSellRef.current?.done();
-                }}
-              />
-            ),
-          })} */
         />
         <Stack.Screen
           key="SellProductsList"
@@ -303,26 +284,6 @@ const AppNavigator = () => {
           name="SettingsGettingDocument"
           component={SettingsGettingDocumentScreen}
           options={{ title: '' }}
-          // options={({ navigation }) => ({
-          //   title: '',
-          //   headerLeft: () => (
-          //     <HeaderRight
-          //       text="Отмена"
-          //       onPress={() => {
-          //         navigation.navigate('SellDocuments');
-          //       }}
-          //     />
-          //   ),
-          //   headerRight: () => (
-          //     <HeaderRight
-          //       text="Готово"
-          //       onPress={() => {
-          //         settingsGettingDocumentRef.current?.done();
-          //         navigation.navigate('SellDocuments');
-          //       }}
-          //     />
-          //   ),
-          // })}
         />
         <Stack.Screen
           key="SettingsSearchScreen"

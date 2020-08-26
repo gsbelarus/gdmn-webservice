@@ -11,7 +11,10 @@ export const initialState: IServiceState = {
 };
 
 export const reducer: Reducer<IServiceState, TServiceActions> = (state = initialState, action): IServiceState => {
-  console.log('Service action: ', JSON.stringify(action));
+  if (__DEV__) {
+    console.log('Service action: ', JSON.stringify(action));
+  }
+
   switch (action.type) {
     case ActionServiceTypes.SET_LOADING:
       return { ...state, isLoading: action.payload };

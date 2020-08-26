@@ -11,7 +11,10 @@ export const initialState: IAuthState = {
 };
 
 export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState, action): IAuthState => {
-  console.log('Auth action: ', JSON.stringify(action));
+  if (__DEV__) {
+    console.log('Auth action: ', JSON.stringify(action));
+  }
+
   switch (action.type) {
     case ActionAuthTypes.DISCONNECT:
       return initialState;

@@ -27,9 +27,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
         <Feather name="box" size={20} color={'#FFF'} />
       </View>
       <View style={localStyles.details}>
-        <Text numberOfLines={5} style={[localStyles.name, { color: colors.text }]}>
-          {item.name}
-        </Text>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}</Text>
         <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
       </View>
@@ -60,9 +58,9 @@ const SellProductsListScreen = () => {
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
-    Alert.alert('Подтвердить выбор?', data, [
+    Alert.alert('Сохранить результат?', data, [
       {
-        text: 'Принять',
+        text: 'Да',
         onPress: () => {
           setDoScanned(false);
           onChangeText(data);
@@ -70,7 +68,12 @@ const SellProductsListScreen = () => {
         },
       },
       {
-        text: 'Отмена',
+        text: 'Нет',
+        onPress: () => {
+          // setDoScanned(false);
+          // onChangeText(data);
+          setScanned(false);
+        },
       },
     ]);
   };
@@ -88,11 +91,18 @@ const SellProductsListScreen = () => {
             onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
             style={StyleSheet.absoluteFillObject}
           />
-          {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
+          <Button
+            onPress={() => {
+              setScanned(false);
+              setDoScanned(false);
+            }}
+          >
+            Назад
+          </Button>
         </>
       ) : (
         <>
-          <View style={localStyles.filter}>
+          <View style={[localStyles.filter, { borderColor: colors.border }]}>
             <TextInput
               style={[
                 styles.input,
@@ -104,16 +114,19 @@ const SellProductsListScreen = () => {
               ]}
               onChangeText={onChangeText}
               value={text}
+              clearButtonMode={'always'}
               placeholder="Введите шрих-код или название"
               placeholderTextColor={colors.border}
-              multiline={false}
               autoCapitalize="sentences"
               underlineColorAndroid="transparent"
               selectionColor={'black'}
               returnKeyType="done"
               autoCorrect={false}
             />
-            <TouchableOpacity onPress={() => setDoScanned(true)}>
+            <TouchableOpacity onPress={() => onChangeText('')} style={localStyles.barcodeButton}>
+              <MaterialCommunityIcons name="eraser" size={35} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setDoScanned(true)} style={localStyles.barcodeButton}>
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
             </TouchableOpacity>
           </View>
@@ -154,38 +167,49 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
+  barcodeButton: {
+    alignItems: 'flex-end',
+    flex: 1,
+  },
   content: {
     height: '100%',
   },
   details: {
-    margin: 8,
+    // borderWidth: 1,
+    flexDirection: 'column',
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 3,
   },
   fieldDesciption: {
     opacity: 0.5,
   },
   filter: {
-    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderRadius: 4,
+    borderStyle: 'solid',
+    // borderWidth: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    margin: 15,
+    margin: 5,
+    padding: 5,
   },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+    paddingLeft: 8,
   },
   name: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   number: {
+    alignSelf: 'flex-end',
     fontSize: 12,
   },
   textInput: {
+    flex: 6,
     fontSize: 14,
-    height: 30,
-    marginRight: 15,
+    height: 35,
     marginTop: 0,
-    paddingTop: 0,
   },
 });

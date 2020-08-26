@@ -68,6 +68,7 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
       setValue(route.params.quantity);
       return;
     }
+
     if (route.params.modeCor) {
       if (lineDocument) {
         setValue(!Number.isNaN(lineDocument.quantity) ? lineDocument.quantity.toString() : '1');
@@ -94,8 +95,12 @@ const SellProductDetailScreen = forwardRef<ISellProductDetailsRef, Props>(({ rou
       const findBoxingsLineHock = state.boxingsLine
         ? state.boxingsLine.find((item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId)
         : undefined;
+
       const boxings = findBoxingsLineHock ? findBoxingsLineHock : undefined;
-      if (line) {
+
+      console.log(line);
+
+      if (line?.id && route?.params?.modeCor) {
         actions.editLine({
           docId: route.params.docId,
           line: {

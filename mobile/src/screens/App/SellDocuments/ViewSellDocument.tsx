@@ -215,13 +215,13 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         >
           <View style={localStyles.header}>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {(document?.head as ISellHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()}
+              №{(document?.head as ISellHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()} г.
             </Text>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
               {contact.name}
             </Text>
           </View>
-          <TouchableOpacity style={localStyles.goDetailsHeader}>
+         {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
             <MaterialIcons
               size={30}
               color={colors.card}
@@ -230,7 +230,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                 navigation.navigate('HeadSellDocument', { docId });
               }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={localStyles.listContainer}>
           <View style={localStyles.avatarRow} />

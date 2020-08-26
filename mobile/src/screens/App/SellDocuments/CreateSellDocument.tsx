@@ -4,9 +4,11 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Chip } from 'react-native-paper';
+import { grey100 } from 'react-native-paper/lib/typescript/src/styles/colors';
 
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
+import SubTitle from '../../../components/SubTitle';
 import { getDateString } from '../../../helpers/utils';
 import { IListItem } from '../../../model';
 import { IDocumentParams } from '../../../model/sell';
@@ -172,37 +174,36 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     if (!route.params) {
       return;
     }
+
     route.params.docId && !appState.documentParams
       ? appActions.setDocumentParams(appState.documents.find((i) => i.id === route.params.docId).head)
       : appActions.setDocumentParams(route.params as IDocumentParams);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params, appActions, appState.documents]);
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
       return (
-        <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-          <TouchableOpacity {...props}>
-            <View style={localeStyles.containerMain}>
-              <View style={localeStyles.containerLabel}>
-                <Text style={localeStyles.text}>{props.value || 'Выберите из списка'}</Text>
-              </View>
-              <View style={localeStyles.containerDropdownButton}>
-                <MaterialCommunityIcons name="menu-right" size={24} color="black" />
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity {...props}>
+          <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+            <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
+            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
+          </View>
+        </TouchableOpacity>
       );
     },
-    [colors.border],
+    [colors.border, colors.text],
   );
 
   return (
-    <>
+    <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
+        {route.params?.docId ? 'Редактирование Документа' : 'Создание документа'}
+      </SubTitle>
       <ScrollView>
-        <View style={localeStyles.container}>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-            <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
+          <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
+          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
             <TouchableOpacity
               style={localeStyles.containerDate}
               onPress={() =>
@@ -220,112 +221,121 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-            <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
-            <TextInput
-              style={[
-                styles.input,
-                localeStyles.textNumberInput,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
-              ]}
-              onChangeText={(text) => appActions.setDocumentParams({ docnumber: text })}
-              value={appState.documentParams?.docnumber || ' '}
-              placeholder="Введите номер"
-              placeholderTextColor={colors.border}
-              multiline={false}
-              autoCapitalize="sentences"
-              underlineColorAndroid="transparent"
-              selectionColor={'black'}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
-            <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-            <ReferenceItem
-              value={selectedItem(listPeople, appState.documentParams?.expeditorId)?.value}
-              onPress={() =>
-                navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
-                  fieldName: 'expeditorId',
-                  title: 'Экспедитор',
-                  list: listPeople,
-                  value: appState.documentParams?.expeditorId,
-                })
-              }
-            />
-          </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-            <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
-            <ReferenceItem
-              value={selectedItem(listDepartments, appState.documentParams?.fromcontactId)?.value}
-              onPress={() =>
-                navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
-                  title: 'Подразделение',
-                  fieldName: 'fromcontactId',
-                  list: listDepartments,
-                  value: appState.documentParams?.fromcontactId,
-                })
-              }
-            />
-          </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
-            <Text style={localeStyles.subdivisionText}>Организация:</Text>
-            <ReferenceItem
-              value={selectedItem(listCompanies, appState.documentParams?.tocontactId)?.value}
-              onPress={() =>
-                navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
-                  title: 'Организация',
-                  fieldName: 'tocontactId',
-                  list: listCompanies,
-                  value: appState.documentParams?.tocontactId,
-                })
-              }
-            />
-          </View>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
-            <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-            <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-              {appState.documentTypes && appState.documentTypes.length !== 0 ? (
-                appState.documentTypes.map((item, idx) => (
-                  <Chip
-                    key={idx}
-                    mode="outlined"
-                    style={[
-                      localeStyles.margin,
-                      appState.documentParams?.doctype === item.id ? { backgroundColor: colors.primary } : {},
-                    ]}
-                    onPress={() => appActions.setDocumentParams({ doctype: item.id })}
-                    selected={appState.documentParams?.doctype === item.id}
-                    selectedColor={appState.documentParams?.doctype === item.id ? colors.card : colors.text}
-                  >
-                    {item.name}
-                  </Chip>
-                ))
-              ) : (
-                <Text>Не найдено</Text>
-              )}
-            </ScrollView>
-          </View>
         </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+          <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
+          <TextInput
+            style={[
+              styles.input,
+              localeStyles.textNumberInput,
+              {
+                backgroundColor: colors.background,
+                color: colors.text,
+              },
+            ]}
+            onChangeText={(text) => appActions.setDocumentParams({ docnumber: text.trim() })}
+            value={appState.documentParams?.docnumber || ' '}
+            placeholder="Введите номер"
+            placeholderTextColor={colors.border}
+            multiline={false}
+            autoCapitalize="sentences"
+            underlineColorAndroid="transparent"
+            selectionColor={'black'}
+            returnKeyType="done"
+            autoCorrect={false}
+          />
+        </View>
+        <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
+          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+          <ReferenceItem
+            value={selectedItem(listPeople, appState.documentParams?.expeditorId)?.value}
+            onPress={() =>
+              navigation.navigate('SelectItemScreen', {
+                parentScreen: 'CreateSellDocument',
+                fieldName: 'expeditorId',
+                title: 'Экспедитор',
+                list: listPeople,
+                value: appState.documentParams?.expeditorId,
+              })
+            }
+          />
+        </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
+          <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
+          <ReferenceItem
+            value={selectedItem(listDepartments, appState.documentParams?.fromcontactId)?.value}
+            onPress={() =>
+              navigation.navigate('SelectItemScreen', {
+                parentScreen: 'CreateSellDocument',
+                title: 'Подразделение',
+                fieldName: 'fromcontactId',
+                list: listDepartments,
+                value: appState.documentParams?.fromcontactId,
+              })
+            }
+          />
+        </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
+          <Text style={localeStyles.subdivisionText}>Организация:</Text>
+          <ReferenceItem
+            value={selectedItem(listCompanies, appState.documentParams?.tocontactId)?.value}
+            onPress={() =>
+              navigation.navigate('SelectItemScreen', {
+                parentScreen: 'CreateSellDocument',
+                title: 'Организация',
+                fieldName: 'tocontactId',
+                list: listCompanies,
+                value: appState.documentParams?.tocontactId,
+              })
+            }
+          />
+        </View>
+        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
+          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
+          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+            {appState.documentTypes && appState.documentTypes.length !== 0 ? (
+              appState.documentTypes.map((item, idx) => (
+                <Chip
+                  key={idx}
+                  mode="outlined"
+                  style={[
+                    localeStyles.margin,
+                    appState.documentParams?.doctype === item.id ? { backgroundColor: colors.primary } : {},
+                  ]}
+                  onPress={() => appActions.setDocumentParams({ doctype: item.id })}
+                  selected={appState.documentParams?.doctype === item.id}
+                  selectedColor={appState.documentParams?.doctype === item.id ? colors.card : colors.text}
+                >
+                  {item.name}
+                </Chip>
+              ))
+            ) : (
+              <Text>Не найдено</Text>
+            )}
+          </ScrollView>
+        </View>
+        {/* </View> */}
       </ScrollView>
-    </>
+    </View>
   );
 };
 
 export { CreateSellDocumentScreen };
 
 const localeStyles = StyleSheet.create({
+  area: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    margin: 5,
+    minHeight: 80,
+    padding: 5,
+  },
   areaChips: {
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
-    marginBottom: 10,
+    margin: 5,
     padding: 5,
   },
   areaPicker: {
@@ -351,31 +361,13 @@ const localeStyles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   container: {
-    margin: 10,
-    // padding: 0,
+    flex: 1,
   },
   containerDate: {
     alignItems: 'center',
     flexDirection: 'row',
     margin: 0,
     padding: 0,
-  },
-  containerDropdownButton: {
-    flex: 0.07,
-  },
-  containerLabel: {
-    flex: 0.93,
-  },
-  containerMain: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: '100%',
-  },
-  containerModalDatePicker: {
-    borderRadius: 8,
-    borderWidth: 1,
-    margin: 10,
-    paddingVertical: 10,
   },
   filter: {
     alignItems: 'center',
@@ -390,14 +382,22 @@ const localeStyles = StyleSheet.create({
     marginRight: 10,
   },
   picker: {
-    alignSelf: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 4,
+    borderStyle: 'solid',
     borderWidth: 1,
-    height: 40,
-    marginTop: 5,
-    padding: 10,
-    width: '100%',
+    flexDirection: 'row',
+    margin: 5,
+    padding: 5,
+  },
+  pickerButton: {
+    flex: 1,
+    marginRight: 10,
+    textAlign: 'right',
+  },
+  pickerText: {
+    alignSelf: 'center',
+    flex: 10,
+    fontSize: 16,
   },
   pickerView: {
     borderWidth: 1,
@@ -441,5 +441,8 @@ const localeStyles = StyleSheet.create({
   textNumberInput: {
     fontSize: 16,
     height: 40,
+  },
+  title: {
+    padding: 10,
   },
 });

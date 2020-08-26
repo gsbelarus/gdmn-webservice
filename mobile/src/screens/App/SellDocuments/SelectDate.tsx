@@ -5,6 +5,7 @@ import { View, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
 import { IconButton } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
@@ -58,6 +59,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
       headerRight: () => (
         <IconButton
           icon="check-circle"

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 // import { IField } from '../../../model';
@@ -76,6 +77,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
       headerRight: () => (
         <IconButton
           icon="check-circle"

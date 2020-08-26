@@ -15,4 +15,4 @@ Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either com
   .useReactNative() // add all built-in react native plugins
   .connect(); // let's connect!
 
-Reactotron.onCustomCommand('appStore', () => console.log('test'));
+// Reactotron.onCustomCommand('appStore', () => console.log('test'));

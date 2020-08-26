@@ -13,9 +13,9 @@ import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
 // import { rc } from './src/service/ReactotronConfig';
 import { AuthStoreProvider, ServiceStoreProvider } from './src/store';
 
-// if (__DEV__) {
-import('./src/service/ReactotronConfig').then(() => console.log('Reactotron Configured'));
-// }
+if (__DEV__) {
+  import('./src/service/ReactotronConfig').then(() => console.log('Reactotron Configured'));
+}
 
 const App = () => {
   const containerRef = React.useRef<NavigationContainerRef>();

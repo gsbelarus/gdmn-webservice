@@ -163,7 +163,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
 
   return (
     <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Параметры</SubTitle>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
       <ScrollView>
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
           <Text style={localeStyles.subdivisionText}>Дата документа</Text>
@@ -259,11 +259,6 @@ const localeStyles = StyleSheet.create({
     margin: 5,
     padding: 5,
   },
-  buttonDatePicker: {
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   container: {
     flex: 1,
   },
@@ -272,28 +267,6 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
     margin: 0,
     padding: 0,
-  },
-  containerDropdownButton: {
-    alignItems: 'center',
-    borderWidth: 1,
-    flex: 0.1,
-    justifyContent: 'flex-start',
-  },
-  containerLabel: {
-    flex: 0.9,
-  },
-  /*   containerMain: {
-    borderWidth: 1,
-    alignItems: 'center',
-    // justifyContent: 'center',
-    flexDirection: 'row',
-    // height: '100%',
-  }, */
-  containerModalDatePicker: {
-    borderRadius: 8,
-    borderWidth: 1,
-    margin: 10,
-    paddingVertical: 10,
   },
   marginRight: {
     marginRight: 10,

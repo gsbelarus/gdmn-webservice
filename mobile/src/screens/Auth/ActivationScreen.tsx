@@ -35,7 +35,6 @@ const ActivationScreen = () => {
         setServerReq({ isError: true, isLoading: false, status: resp.error });
         return;
       }
-      console.log(`respdata: ${resp.data}`);
 
       serviceActions.setDeviceId(resp.data);
       actions.setDeviceStatus(true); // Возможно нужно сделать перенаправление на первую страницу

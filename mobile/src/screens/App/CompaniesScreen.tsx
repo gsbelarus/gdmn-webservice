@@ -95,7 +95,6 @@ const CompaniesScreen = () => {
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={async () => {
               actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
-              console.log(`${userID}/companyId`);
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}
           >
