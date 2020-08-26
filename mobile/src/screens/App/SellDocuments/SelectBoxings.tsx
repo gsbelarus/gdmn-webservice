@@ -154,9 +154,10 @@ const localeStyles = StyleSheet.create({
   line: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 45,
+    // height: 45,
     justifyContent: 'space-between',
-    padding: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   minHeight45: {
     minHeight: 45,
