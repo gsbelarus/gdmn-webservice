@@ -3,7 +3,7 @@ import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@r
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Button, TextInput } from 'react-native-paper';
+import { Text, Button, TextInput, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -91,8 +91,18 @@ const ProductsListScreen = () => {
         </>
       ) : (
         <>
-          <View style={localStyles.filter}>
-            <TextInput
+          {/* <View style={localStyles.filter}> */}
+          <View style={localStyles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск по номеру"
+              onChangeText={onChangeText}
+              value={text}
+              style={[localStyles.flexGrow, localStyles.searchBar]}
+            />
+            <IconButton icon="settings" size={24} style={localStyles.iconSettings} onPress={() => setDoScanned(true)} />
+          </View>
+          <ItemSeparator />
+          {/* <TextInput
               style={[
                 styles.input,
                 localStyles.textInput,
@@ -114,8 +124,8 @@ const ProductsListScreen = () => {
             />
             <TouchableOpacity onPress={() => setDoScanned(true)}>
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
+            </TouchableOpacity> */}
+          {/* </View> */}
           {!state.goods.find(
             (item) =>
               item.barcode.toLowerCase().includes(text.toLowerCase()) ||
@@ -167,6 +177,15 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-around',
     margin: 15,
   },
+  flexDirectionRow: {
+    flexDirection: 'row',
+  },
+  flexGrow: {
+    flexGrow: 10,
+  },
+  iconSettings: {
+    width: 36,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -178,6 +197,10 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  searchBar: {
+    elevation: 0,
+    shadowOpacity: 0,
   },
   textInput: {
     fontSize: 14,
