@@ -102,7 +102,7 @@ const AuthNavigator = () => {
     const getDeviceStatus = async () => {
       try {
         // const response = await apiService.auth.getDevice();
-        const response = await timeout<IResponse<IDevice>>(500, apiService.auth.getDevice());
+        const response = await timeout<IResponse<IDevice>>(5000, apiService.auth.getDevice());
         // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
         //   signal,
         //   5000,
@@ -146,7 +146,7 @@ const AuthNavigator = () => {
 
         authActions.setUserStatus({
           userID: user.id,
-          userName: user.firstName ? `${user.firstName} ${user.lastName}` : user.userName,
+          userName: (user.firstName ? `${user.firstName} ${user.lastName || ''}` : user.userName).trim(),
         });
       } catch (err) {
         setState({ type: 'SET_ERROR', text: err.message });

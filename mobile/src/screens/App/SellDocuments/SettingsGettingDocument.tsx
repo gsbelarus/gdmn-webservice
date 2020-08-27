@@ -26,6 +26,27 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
+  const sendUpdateRequest = useCallback(() => {
+    timeout(
+      5000,
+      apiService.data.sendMessages(state.companyID, 'gdmn', {
+        type: 'cmd',
+        payload: {
+          name: 'get_references',
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings'],
+        },
+      }),
+    )
+      .then((response: IResponse<IMessageInfo>) => {
+        if (response.result) {
+          // Alert.alert('Запрос отправлен!', '', [{ text: 'Закрыть' }]);
+        } else {
+          // Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть' }]);
+        }
+      })
+      .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
+  }, [apiService.data, state.companyID]);
+
   useEffect(() => {
     if (!appState.formParams) {
       // Инициализируем параметры
@@ -139,13 +160,14 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
+            sendUpdateRequest();
             sendDocumentRequest();
             navigation.navigate('SellDocuments');
           }}
         />
       ),
     });
-  }, [appActions, navigation, sendDocumentRequest]);
+  }, [appActions, navigation, sendDocumentRequest, sendUpdateRequest]);
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {

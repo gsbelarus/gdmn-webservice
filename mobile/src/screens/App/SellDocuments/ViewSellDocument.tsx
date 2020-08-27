@@ -221,7 +221,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               {contact.name}
             </Text>
           </View>
-         {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
+          {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
             <MaterialIcons
               size={30}
               color={colors.card}

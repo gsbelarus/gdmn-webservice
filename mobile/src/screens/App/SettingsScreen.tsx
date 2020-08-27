@@ -190,10 +190,10 @@ const SettingsScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={[localStyles.profileInfoTextUser, { color: colors.background }]}>
-            {AuthState.profile?.userName}
+            {AuthState.profile?.userName || ''}
           </Text>
           <Text style={[localStyles.profileInfoTextCompany, { color: colors.card }]}>
-            {AuthState.profile?.companyName}
+            {AuthState.profile?.companyName || ''}
           </Text>
         </View>
         <IconButton

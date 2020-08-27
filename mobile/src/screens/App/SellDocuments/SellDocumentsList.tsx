@@ -209,10 +209,20 @@ const SellDocumentsListScreen = ({ navigation }) => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        refreshControl={
+        /*  refreshControl={
           <RefreshControl refreshing={false} onRefresh={() => navigation.navigate('SettingsGettingDocument')} />
-        }
+        } */
         ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+      />
+      <FAB
+        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
+        icon="arrow-down-bold"
+        onPress={() => navigation.navigate('SettingsGettingDocument')}
+      />
+      <FAB
+        style={[localStyles.fabImport, { backgroundColor: colors.primary }]}
+        icon="arrow-up-bold"
+        onPress={sendUpdateRequest}
       />
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
@@ -268,12 +278,19 @@ const localStyles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  fabSync: {
-    backgroundColor: Colors.blue600,
+  fabImport: {
     bottom: 0,
     margin: 20,
     position: 'absolute',
-    right: 80,
+    right: 160,
+  },
+  fabSync: {
+    backgroundColor: Colors.blue600,
+    bottom: 0,
+    left: 0,
+    margin: 20,
+    position: 'absolute',
+    // right: 80,
   },
   field: {
     opacity: 0.5,
