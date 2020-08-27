@@ -1,9 +1,9 @@
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Button, TextInput, Searchbar, IconButton } from 'react-native-paper';
+import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
