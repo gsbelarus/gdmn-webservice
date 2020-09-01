@@ -9,7 +9,7 @@ const router = new Router({ prefix: '/messages' });
 router.post('/', compose([authMiddleware, deviceMiddleware]), newMessage);
 router.get('/:companyId/:appSystem', compose([authMiddleware, deviceMiddleware]), getMessage);
 router.delete('/:companyId/:id', compose([authMiddleware, deviceMiddleware]), removeMessage);
-router.get('/subscribe/:companyId', compose([authMiddleware, deviceMiddleware]), subscribe);
+router.get('/subscribe/:companyId/:appSystem', compose([authMiddleware, deviceMiddleware]), subscribe);
 router.post('/publish/:companyId', compose([authMiddleware, deviceMiddleware]), publish);
 
 export default router;

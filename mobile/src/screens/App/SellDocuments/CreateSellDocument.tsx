@@ -4,7 +4,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Chip } from 'react-native-paper';
-import { grey100 } from 'react-native-paper/lib/typescript/src/styles/colors';
 
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';

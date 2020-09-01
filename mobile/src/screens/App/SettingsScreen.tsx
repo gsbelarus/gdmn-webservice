@@ -96,7 +96,8 @@ const SettingsScreen = () => {
         appActions.setBoxings(boxingsRef);
       } else {
         try {
-          const response = await timeout<IResponse<IMessage[]>>(5000, apiService.data.getMessages(companyID));
+          const response = await apiService.data.subscribe(companyID);
+          console.log(response);
           if (!response.result) {
             Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
             return;
@@ -171,12 +172,12 @@ const SettingsScreen = () => {
               }
               apiService.data.deleteMessage(companyID, message.head.id);
             });
+            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
           }
         } catch (err) {
           Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
       }
-      Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
     };
 
     getMessages();

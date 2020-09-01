@@ -80,7 +80,7 @@ export default class Api {
       remove(this.getUrl(), `/messages/${companyId}/${uid}?deviceId=${this.deviceId}`),
 
     subscribe: async (companyId: string): Promise<IResponse<IMessage[]>> =>
-      get(this.getUrl(), `/messages/subscribe/${companyId}?deviceId=${this.deviceId}`),
+      get(this.getUrl(), `/messages/subscribe/${companyId}/${config.system[0].name}?deviceId=${this.deviceId}`),
 
     publich: async (companyId: string, consumer: string, body: IMessage['body']): Promise<IResponse<IMessageInfo>> =>
       post(
