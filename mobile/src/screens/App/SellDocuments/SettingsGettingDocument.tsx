@@ -5,11 +5,20 @@ import React, { useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import { IResponse, IMessageInfo, IContact } from '../../../../../common';
+import {
+  IResponse,
+  IMessageInfo,
+  IContact,
+  IRemain,
+  IGood,
+  IDocumentType,
+  IDocument,
+  IDataMessage,
+} from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
-import { timeout, getDateString } from '../../../helpers/utils';
-import { IListItem } from '../../../model';
+import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils';
+import { IListItem, ITara } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
@@ -144,6 +153,90 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
     appActions,
   ]);
 
+  const sendSubscribe = useCallback(async () => {
+    try {
+      const response = await apiService.data.subscribe(state.companyID);
+      console.log(response);
+      if (!response.result) {
+        Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+        return;
+      }
+      if (!isMessagesArray(response.data)) {
+        Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+      }
+
+      response.data?.forEach((message) => {
+        if (message.body.type === 'data') {
+          // Сообщение содержит данные
+          ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+            switch (dataSet.type) {
+              case 'get_SellDocuments': {
+                const newDocuments = dataSet.data as IDocument[];
+                appActions.setDocuments([...appState.documents, ...newDocuments]);
+                break;
+              }
+              case 'documenttypes': {
+                const documentTypes = dataSet.data as IDocumentType[];
+                appActions.setDocumentTypes(documentTypes);
+                break;
+              }
+              case 'contacts': {
+                const contacts = dataSet.data as IContact[];
+                appActions.setContacts(contacts);
+                break;
+              }
+              case 'goods': {
+                const goods = dataSet.data as IGood[];
+                appActions.setGoods(goods);
+                break;
+              }
+              case 'remains': {
+                const remains = dataSet.data as IRemain[];
+                appActions.setRemains(remains);
+                break;
+              }
+              case 'boxings': {
+                const boxings = dataSet.data as ITara[];
+                appActions.setBoxings(boxings);
+                break;
+              }
+              default:
+                break;
+            }
+          });
+          apiService.data.deleteMessage(state.companyID, message.head.id);
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+        }
+        if (message.body.type === 'cmd') {
+          // Сообщение содержит команду
+          apiService.data.deleteMessage(state.companyID, message.head.id);
+        }
+      });
+
+      const messagesForDocuments = response.data.filter(
+        (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
+      );
+      if (messagesForDocuments.length > 0) {
+        messagesForDocuments.forEach((message) => {
+          if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
+            message.body.payload.params.forEach((paramDoc) => {
+              if (paramDoc.result) {
+                const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
+                if (document && document.head.status === 2) {
+                  appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
+                }
+              }
+            });
+          }
+          apiService.data.deleteMessage(state.companyID, message.head.id);
+        });
+        Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+      }
+    } catch (err) {
+      Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+    }
+  }, [apiService.data, appActions, appState.documents, state.companyID]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
@@ -162,12 +255,13 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           onPress={() => {
             sendUpdateRequest();
             sendDocumentRequest();
+            sendSubscribe();
             navigation.navigate('SellDocuments');
           }}
         />
       ),
     });
-  }, [appActions, navigation, sendDocumentRequest, sendUpdateRequest]);
+  }, [appActions, navigation, sendDocumentRequest, sendSubscribe, sendUpdateRequest]);
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
