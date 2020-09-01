@@ -4,9 +4,20 @@ import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, FAB } from 'react-native-paper';
 
-import { IReference, IMessageInfo, IResponse } from '../../../../../common';
+import {
+  IReference,
+  IMessageInfo,
+  IResponse,
+  IDataMessage,
+  IDocument,
+  IDocumentType,
+  IContact,
+  IGood,
+  IRemain,
+} from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { timeout } from '../../../helpers/utils';
+import { timeout, isMessagesArray } from '../../../helpers/utils';
+import { ITara } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -35,7 +46,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
-  const { state: AppState } = useAppStore();
+  const { state: AppState, actions: appActions } = useAppStore();
   const { apiService } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);
@@ -94,6 +105,70 @@ const ReferenceListScreen = () => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.data, state.companyID]);
 
+  const sendSubscribe = useCallback(async () => {
+    try {
+      const response = await apiService.data.subscribe(state.companyID);
+      console.log(response);
+      if (!response.result) {
+        Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+        return;
+      }
+      if (!isMessagesArray(response.data)) {
+        Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+      }
+
+      response.data?.forEach((message) => {
+        if (message.body.type === 'data') {
+          // Сообщение содержит данные
+          ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+            switch (dataSet.type) {
+              case 'get_SellDocuments': {
+                const newDocuments = dataSet.data as IDocument[];
+                appActions.setDocuments([...AppState.documents, ...newDocuments]);
+                break;
+              }
+              case 'documenttypes': {
+                const documentTypes = dataSet.data as IDocumentType[];
+                appActions.setDocumentTypes(documentTypes);
+                break;
+              }
+              case 'contacts': {
+                const contacts = dataSet.data as IContact[];
+                appActions.setContacts(contacts);
+                break;
+              }
+              case 'goods': {
+                const goods = dataSet.data as IGood[];
+                appActions.setGoods(goods);
+                break;
+              }
+              case 'remains': {
+                const remains = dataSet.data as IRemain[];
+                appActions.setRemains(remains);
+                break;
+              }
+              case 'boxings': {
+                const boxings = dataSet.data as ITara[];
+                appActions.setBoxings(boxings);
+                break;
+              }
+              default:
+                break;
+            }
+          });
+          apiService.data.deleteMessage(state.companyID, message.head.id);
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+        }
+        if (message.body.type === 'cmd') {
+          // Сообщение содержит команду
+          apiService.data.deleteMessage(state.companyID, message.head.id);
+        }
+      });
+    } catch (err) {
+      Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+    }
+  }, [apiService.data, appActions, AppState.documents, state.companyID]);
+
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <FlatList
@@ -103,7 +178,14 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <FAB style={[localStyles.fabSync, { backgroundColor: colors.primary }]} icon="sync" onPress={sendUpdateRequest} />
+      <FAB
+        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
+        icon="sync"
+        onPress={() => {
+          sendUpdateRequest();
+          sendSubscribe();
+        }}
+      />
     </View>
   );
 };
