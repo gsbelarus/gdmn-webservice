@@ -36,6 +36,16 @@ export interface ITara {
   [fieldName: string]: unknown;
 }
 
+export interface IWeighedGoods {
+  id: number;
+  goodkey: number;
+  weight: number;
+  grassweight: number;
+  manufacturingDate: string;
+  timework?: string;
+  numreceive: string;
+}
+
 export interface IFormParams {
   toContact?: number[];
   expiditor?: number[];

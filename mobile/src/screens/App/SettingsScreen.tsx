@@ -21,6 +21,7 @@ import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import documentsRef from '../../mockData/Otves/Document.json';
 import referencesRef from '../../mockData/Otves/References.json';
 import { ITara } from '../../model';
+import { IWeighedGoods } from '../../model/sell';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
 const SettingsScreen = () => {
@@ -143,7 +144,7 @@ const SettingsScreen = () => {
                     break;
                   }
                   case 'weighedGoods': {
-                    const weighedGoods = dataSet.data as ITara[];
+                    const weighedGoods = dataSet.data as IWeighedGoods[];
                     appActions.setWeighedGoods(weighedGoods);
                     break;
                   }

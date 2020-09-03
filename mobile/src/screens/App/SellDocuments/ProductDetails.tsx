@@ -39,6 +39,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       ? (document as IDocument).lines
       : (document as ISellDocument).lines;
   const lineDocument = lineDocuments.find((line) => line.id === route.params.lineId);
+  // TODO: избавить от ненужного кода и от line
   const [line, setLine] = useState<ISellLine>(lineDocument);
   //const [value, setValue] = useState('1');
   //const [batchNumber, setBatchNumber] = useState('');
@@ -52,7 +53,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const isFocused = useIsFocused();
-  //producParams
 
   useEffect(() => {
     if (!route.params || !route.params.docId || !route.params.prodId || !route.params.modeCor) {
@@ -189,6 +189,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     });
   }, [
     actions,
+    document.id,
     line,
     navigation,
     product.id,

@@ -1,6 +1,6 @@
 import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
 import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
-import { IFormParams, IDocumentParams } from '../../model/sell';
+import { IFormParams, IDocumentParams, IWeighedGoods } from '../../model/sell';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 export enum ActionAppTypes {
@@ -60,7 +60,9 @@ export const AppActions = {
   setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
   setContacts: createActionPayload<ActionAppTypes.SET_CONTACTS, IContact[]>(ActionAppTypes.SET_CONTACTS),
   setBoxings: createActionPayload<ActionAppTypes.SET_BOXINGS, ITara[]>(ActionAppTypes.SET_BOXINGS),
-  setWeighedGoods: createActionPayload<ActionAppTypes.SET_WEIGHED_GOODS, ITara[]>(ActionAppTypes.SET_WEIGHED_GOODS),
+  setWeighedGoods: createActionPayload<ActionAppTypes.SET_WEIGHED_GOODS, IWeighedGoods[]>(
+    ActionAppTypes.SET_WEIGHED_GOODS,
+  ),
   setBoxingsLine: createActionPayload<
     ActionAppTypes.SET_BOXINGS_LINE,
     { docId: number; lineDoc: string; lineBoxings: ILineTara[] }[]
