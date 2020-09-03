@@ -12,6 +12,7 @@ import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 export interface ISelectBoxingsRef {
+  done(): void;
   cancel(): void;
 }
 
@@ -64,6 +65,9 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
   }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
   useImperativeHandle(ref, () => ({
+    done: () => {
+      actions.setProducParams({ ...state.producParams, tara: boxingsLine });
+    },
     cancel: () => {
       const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;
       const lines =

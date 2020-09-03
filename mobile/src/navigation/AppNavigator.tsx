@@ -16,7 +16,6 @@ import {
   SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
 import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
-import { ISellProductDetailsRef } from '../screens/App/SellDocuments/ProductDetails';
 import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
@@ -90,16 +89,11 @@ const AppNavigator = () => {
     return <CreateDocumentScreen {...props} ref={docRef} />;
   };
 
-  const prodSellRef = useRef<ISellProductDetailsRef>(null);
   // const docSellRef = useRef<ICreateSellDocumentRef>(null);
   const boxingSellRef = useRef<IBoxingDetailsRef>(null);
 
   const settingsSearchRef = useRef<ISettingsSearchRef>(null);
   const selectBoxingsRef = useRef<ISelectBoxingsRef>(null);
-
-  const SellProductDetailsComponent = (props) => {
-    return <SellProductDetailScreen {...props} ref={prodSellRef} />;
-  };
 
   /*   const CreateSellDocumentComponent = (props) => {
     return <CreateSellDocumentScreen {...props} ref={docSellRef} />;
@@ -207,28 +201,10 @@ const AppNavigator = () => {
         <Stack.Screen
           key="SellProductDetail"
           name="SellProductDetail"
-          component={SellProductDetailsComponent}
+          component={SellProductDetailScreen}
           initialParams={{ lineId: '0', prodId: 0 }}
-          options={({ route, navigation }) => ({
+          options={() => ({
             title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  prodSellRef.current?.cancel();
-                  navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  prodSellRef.current?.done();
-                  navigation.navigate('ViewSellDocument', { docId: route.params.docId });
-                }}
-              />
-            ),
           })}
         />
         <Stack.Screen
@@ -331,6 +307,7 @@ const AppNavigator = () => {
               <HeaderRight
                 text="Готово"
                 onPress={() => {
+                  selectBoxingsRef.current?.done();
                   navigation.navigate('SellProductDetail', route.params);
                 }}
               />

@@ -22,6 +22,7 @@ export interface ISellLine extends ILine {
   orderQuantity?: number;
   numreceive?: string;
   tara?: ILineTara[];
+  manufacturingDate?: string;
 }
 
 export type TTypeTara = 'paper' | 'box' | 'pan';

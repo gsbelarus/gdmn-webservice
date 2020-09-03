@@ -52,7 +52,9 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
           )
         : -1;
       const idxl =
-        idx > -1 && boxing ? state.boxingsLine[idx].lineBoxings.findIndex((item) => item.tarakey === boxing.id) : -1;
+        idx > -1 && boxing && state.boxingsLine[idx].lineBoxings
+          ? state.boxingsLine[idx].lineBoxings.findIndex((item) => item.tarakey === boxing.id)
+          : -1;
       const addBoxings =
         idxl > -1
           ? [

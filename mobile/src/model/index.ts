@@ -2,7 +2,7 @@ import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '..
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
-import { ISellDocument, ITara, ILineTara, IFormParams, IDocumentParams } from './sell';
+import { ISellDocument, ITara, ILineTara, IFormParams, IDocumentParams, ISellLine } from './sell';
 export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara } from './sell';
 
 export interface IServiceContextProps {
@@ -80,6 +80,7 @@ export interface IAppState {
   }[];
   settingsSearch?: string[];
   formParams?: IFormParams;
+  producParams?: ISellLine;
   documentParams?: IDocumentParams;
 }
 
