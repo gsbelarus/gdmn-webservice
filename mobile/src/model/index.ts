@@ -72,6 +72,7 @@ export interface IAppState {
   documentTypes?: IDocumentType[];
   contacts?: IContact[];
   boxings?: ITara[];
+  weighedGoods?: IGood[];
   boxingsLine?: {
     docId: number;
     lineDoc: string;

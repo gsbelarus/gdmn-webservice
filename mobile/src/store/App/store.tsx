@@ -21,6 +21,7 @@ const sections = {
   DOCUMENTS: 'DOCUMENTS',
   REMAINS: 'REMAINS',
   BOXINGS: 'BOXINGS',
+  WEIGHEDGOODS: 'WEIGHEDGOODS',
 };
 
 const createStoreContext = () => {
@@ -59,6 +60,9 @@ const createStoreContext = () => {
         // тары
         const boxings = await appStorage.getItem(`${storagePath}/${sections.BOXINGS}`);
         actions.setBoxings(boxings || []);
+        // взвешенные товары
+        const weighedGoods = await appStorage.getItem(`${storagePath}/${sections.WEIGHEDGOODS}`);
+        actions.setWeighedGoods(weighedGoods || []);
         setLoading(false);
       };
 

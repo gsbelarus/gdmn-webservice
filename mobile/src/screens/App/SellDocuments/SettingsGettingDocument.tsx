@@ -42,7 +42,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings', 'weighedGoods'],
         },
       }),
     )
@@ -198,6 +198,11 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
               case 'boxings': {
                 const boxings = dataSet.data as ITara[];
                 appActions.setBoxings(boxings);
+                break;
+              }
+              case 'weighedGoods': {
+                const weighedGoods = dataSet.data as ITara[];
+                appActions.setWeighedGoods(weighedGoods);
                 break;
               }
               default:

@@ -142,6 +142,11 @@ const SettingsScreen = () => {
                     appActions.setBoxings(boxings);
                     break;
                   }
+                  case 'weighedGoods': {
+                    const weighedGoods = dataSet.data as ITara[];
+                    appActions.setWeighedGoods(weighedGoods);
+                    break;
+                  }
                   default:
                     break;
                 }

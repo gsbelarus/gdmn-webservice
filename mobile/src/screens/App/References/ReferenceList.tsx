@@ -78,8 +78,14 @@ const ReferenceListScreen = () => {
         type: 'boxings',
         data: AppState.boxings,
       },
+      {
+        id: 3,
+        name: 'Взвешенные товары',
+        type: 'weighedGoods',
+        data: AppState.weighedGoods,
+      },
     ],
-    [AppState.contacts, AppState.documentTypes, AppState.goods, AppState.boxings],
+    [AppState.documentTypes, AppState.contacts, AppState.goods, AppState.boxings, AppState.weighedGoods],
   );
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
@@ -91,7 +97,7 @@ const ReferenceListScreen = () => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings', 'weighedGoods'],
         },
       }),
     )
@@ -150,6 +156,11 @@ const ReferenceListScreen = () => {
               case 'boxings': {
                 const boxings = dataSet.data as ITara[];
                 appActions.setBoxings(boxings);
+                break;
+              }
+              case 'weighedGoods': {
+                const weighedGoods = dataSet.data as ITara[];
+                appActions.setWeighedGoods(weighedGoods);
                 break;
               }
               default:

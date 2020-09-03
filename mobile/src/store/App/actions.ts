@@ -20,6 +20,7 @@ export enum ActionAppTypes {
   SET_CONTACTS = 'SET_CONTACTS',
   SET_REMAINS = 'SET_REMAINS',
   SET_BOXINGS = 'SET_BOXINGS',
+  SET_WEIGHED_GOODS = 'SET_WEIGHED_GOODS',
   SET_BOXINGS_LINE = 'SET_BOXINGS_LINE',
   SET_SETTINGS_SEARCH = 'SET_SETTINGS_SEARCH',
   SET_FORM_PARAMS = 'SET_FORM_PARAMS',
@@ -57,6 +58,7 @@ export const AppActions = {
   setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
   setContacts: createActionPayload<ActionAppTypes.SET_CONTACTS, IContact[]>(ActionAppTypes.SET_CONTACTS),
   setBoxings: createActionPayload<ActionAppTypes.SET_BOXINGS, ITara[]>(ActionAppTypes.SET_BOXINGS),
+  setWeighedGoods: createActionPayload<ActionAppTypes.SET_WEIGHED_GOODS, ITara[]>(ActionAppTypes.SET_WEIGHED_GOODS),
   setBoxingsLine: createActionPayload<
     ActionAppTypes.SET_BOXINGS_LINE,
     { docId: number; lineDoc: string; lineBoxings: ILineTara[] }[]

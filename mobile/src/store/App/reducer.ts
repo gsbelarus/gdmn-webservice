@@ -145,6 +145,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, goods: action.payload };
     case ActionAppTypes.SET_BOXINGS:
       return { ...state, boxings: action.payload };
+    case ActionAppTypes.SET_WEIGHED_GOODS:
+      return { ...state, weighedGoods: action.payload };
     case ActionAppTypes.SET_BOXINGS_LINE: {
       return { ...state, boxingsLine: action.payload };
     }
