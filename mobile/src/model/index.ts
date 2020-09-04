@@ -3,7 +3,7 @@ import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
 import { ISellDocument, ITara, IWeighedGoods, ILineTara, IFormParams, IDocumentParams, ISellLine } from './sell';
-export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara } from './sell';
+export { ISellDocument, ISellHead, ISellLine, ILineTara, ITara, IWeighedGoods } from './sell';
 
 export interface IServiceContextProps {
   state: IServiceState;
