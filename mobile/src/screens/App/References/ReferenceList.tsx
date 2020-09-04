@@ -79,9 +79,9 @@ const ReferenceListScreen = () => {
         data: AppState.boxings,
       },
       {
-        id: 3,
+        id: 4,
         name: 'Взвешенные товары',
-        type: 'weighedGoods',
+        type: 'weighedgoods',
         data: AppState.weighedGoods,
       },
     ],
@@ -158,7 +158,7 @@ const ReferenceListScreen = () => {
                 appActions.setBoxings(boxings);
                 break;
               }
-              case 'weighedGoods': {
+              case 'weighedgoods': {
                 const weighedGoods = dataSet.data as IWeighedGoods[];
                 appActions.setWeighedGoods(weighedGoods);
                 break;

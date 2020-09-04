@@ -39,11 +39,12 @@ export interface ITara {
 export interface IWeighedGoods {
   id: number;
   goodkey: number;
-  weight: number;
-  grassweight: number;
-  manufacturingDate: string;
+  weight?: number;
+  grassweight?: number;
+  manufacturingDate?: string;
   timework?: string;
-  numreceive: string;
+  numreceive?: string;
+  [fieldName: string]: unknown;
 }
 
 export interface IFormParams {

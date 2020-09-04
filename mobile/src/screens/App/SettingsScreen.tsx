@@ -144,7 +144,7 @@ const SettingsScreen = () => {
                     appActions.setBoxings(boxings);
                     break;
                   }
-                  case 'weighedGoods': {
+                  case 'weighedgoods': {
                     const weighedGoods = dataSet.data as IWeighedGoods[];
                     appActions.setWeighedGoods(weighedGoods);
                     break;
