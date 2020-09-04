@@ -63,6 +63,7 @@ const SettingsScreen = () => {
               appActions.setGoods([]);
               appActions.setRemains([]);
               appActions.setBoxings([]);
+              appActions.setWeighedGoods([]);
             },
           },
           {

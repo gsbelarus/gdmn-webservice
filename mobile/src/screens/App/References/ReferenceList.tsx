@@ -17,8 +17,7 @@ import {
 } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
-import { ITara } from '../../../model';
-import { IWeighedGoods } from '../../../model/sell';
+import { ITara, IWeighedGoods } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {

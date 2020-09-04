@@ -15,6 +15,7 @@ export const initialState: IAppState = {
   boxings: undefined,
   boxingsLine: undefined,
   settingsSearch: ['number'],
+  weighedGoods: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -160,7 +161,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, formParams: undefined };
     }
     case ActionAppTypes.SET_PRODUCT_PARAMS: {
-      return { ...state, producParams: { ...state.formParams, ...action.payload } };
+      return { ...state, producParams: { ...state.producParams, ...action.payload } };
     }
     case ActionAppTypes.CLEAR_PRODUCT_PARAMS: {
       return { ...state, producParams: undefined };
