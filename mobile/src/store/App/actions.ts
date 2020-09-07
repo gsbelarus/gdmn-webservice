@@ -73,7 +73,7 @@ export const AppActions = {
   setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams>(ActionAppTypes.SET_FORM_PARAMS),
   clearFormParams: createAction<ActionAppTypes.CLEAR_FORM_PARAMS>(ActionAppTypes.CLEAR_FORM_PARAMS),
   setProducParams: createActionPayload<ActionAppTypes.SET_PRODUCT_PARAMS, ISellLine>(ActionAppTypes.SET_PRODUCT_PARAMS),
-  clearProducParams: createAction<ActionAppTypes.CLEAR_PRODUCT_PARAMS>(ActionAppTypes.CLEAR_PRODUCT_PARAMS),
+  clearProductParams: createAction<ActionAppTypes.CLEAR_PRODUCT_PARAMS>(ActionAppTypes.CLEAR_PRODUCT_PARAMS),
   setDocumentParams: createActionPayload<ActionAppTypes.SET_DOCUMENT_PARAMS, IDocumentParams>(
     ActionAppTypes.SET_DOCUMENT_PARAMS,
   ),

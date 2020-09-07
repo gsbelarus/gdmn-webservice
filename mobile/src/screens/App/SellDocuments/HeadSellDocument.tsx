@@ -36,7 +36,9 @@ const FieldItem = React.memo(({ item }: { item: TField }) => {
 const HeadSellDocumentScreen = ({ route }) => {
   const ref = React.useRef<FlatList<TField>>(null);
   const { state } = useAppStore();
-  const document: ISellDocument | IDocument = state.documents.find((item) => item.id === Number(route.params.docId));
+  const document: ISellDocument | IDocument | undefined = state.documents.find(
+    (item) => item.id === Number(route.params.docId),
+  );
   const contactTo: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId);
   const contactFrom: IContact = state.contacts.find((item) => item.id === document?.head.fromcontactId);
   const expeditor: IContact = state.contacts.find((item) => item.id === (document?.head as ISellHead).expeditorId);

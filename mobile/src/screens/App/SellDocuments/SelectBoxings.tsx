@@ -66,7 +66,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
 
   useImperativeHandle(ref, () => ({
     done: () => {
-      actions.setProducParams({ ...state.producParams, tara: boxingsLine });
+      actions.setProducParams({ ...state.productParams, tara: boxingsLine });
     },
     cancel: () => {
       const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;

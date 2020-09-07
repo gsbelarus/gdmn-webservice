@@ -25,7 +25,13 @@ import TabsNavigator from './TabsNavigator';
 
 export type RootStackParamList = {
   BottomTabs: undefined;
-  ProductDetail: { prodId: number; docId: number; modeCor: boolean; quantity?: string; batchNumber?: string };
+  ProductDetail: {
+    prodId: number;
+    docId: number;
+    modeCor: boolean;
+    quantity?: string;
+    batchNumber?: string;
+  };
   CreateDocument: { docId?: number };
   ProductsList: { docId: number };
   SellProductDetail: {
@@ -35,6 +41,7 @@ export type RootStackParamList = {
     modeCor: boolean;
     quantity?: string;
     batchNumber?: string;
+    manufacturingDate?: string;
   };
   CreateSellDocument: {
     docId: number;

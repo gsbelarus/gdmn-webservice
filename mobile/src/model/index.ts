@@ -80,7 +80,7 @@ export interface IAppState {
   }[];
   settingsSearch?: string[];
   formParams?: IFormParams;
-  producParams?: ISellLine;
+  productParams?: ISellLine;
   documentParams?: IDocumentParams;
 }
 
