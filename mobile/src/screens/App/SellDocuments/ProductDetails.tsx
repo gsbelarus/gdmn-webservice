@@ -184,8 +184,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             mode={'flat'}
             label={'Номер партии'}
             editable={true}
-            //onChangeText={setBatchNumber}
-            //value={batchNumber}
             onChangeText={(text) => {
               actions.setProducParams({
                 ...state.productParams,
@@ -206,7 +204,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             mode={'flat'}
             label={'Количество по заявке'}
             editable={false}
-            //value={orderQ.toString()}
             value={(state.productParams?.orderQuantity ?? 0).toString()}
             theme={{
               colors: {
@@ -222,7 +219,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            //onChangeText={setValue}
             onChangeText={(text) => {
               actions.setProducParams({
                 ...state.productParams,
@@ -232,7 +228,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            //value={value}
             value={(state.productParams?.quantity ?? 1).toString()}
             theme={{
               colors: {

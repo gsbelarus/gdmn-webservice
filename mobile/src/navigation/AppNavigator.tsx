@@ -1,11 +1,9 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useRef } from 'react';
+import React from 'react';
 
 import { HeaderRight } from '../components/HeaderRight';
 import { IListItem } from '../model';
 import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
-import { ICreateDocumentRef } from '../screens/App/Documents/CreateDocument';
-import { IProductDetailsRef } from '../screens/App/Documents/ProductDetails';
 import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
@@ -15,11 +13,8 @@ import {
   SettingsSearchScreen,
   SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
-import { IBoxingDetailsRef } from '../screens/App/SellDocuments/BoxingDetails';
-import { ISelectBoxingsRef } from '../screens/App/SellDocuments/SelectBoxings';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
-import { ISettingsSearchRef } from '../screens/App/SellDocuments/SettingsSearch';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
 
@@ -71,7 +66,6 @@ export type RootStackParamList = {
     value: number[];
   };
   SelectDateScreen: { parentScreen: keyof RootStackParamList; fieldName: string; title: string; value: string };
-
   SelectBoxingsScreen: {
     lineId: string;
     docId: number;
@@ -85,47 +79,6 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
-  const prodRef = useRef<IProductDetailsRef>(null);
-  const docRef = useRef<ICreateDocumentRef>(null);
-
-  const ProductDetailsComponent = (props) => {
-    return <ProductDetailScreen {...props} ref={prodRef} />;
-  };
-
-  const CreateDocumentComponent = (props) => {
-    return <CreateDocumentScreen {...props} ref={docRef} />;
-  };
-
-  // const docSellRef = useRef<ICreateSellDocumentRef>(null);
-  const boxingSellRef = useRef<IBoxingDetailsRef>(null);
-
-  const settingsSearchRef = useRef<ISettingsSearchRef>(null);
-  const selectBoxingsRef = useRef<ISelectBoxingsRef>(null);
-
-  /*   const CreateSellDocumentComponent = (props) => {
-    return <CreateSellDocumentScreen {...props} ref={docSellRef} />;
-  }; */
-
-  const BoxingDetailsComponent = (props) => {
-    return <BoxingDetailScreen {...props} ref={boxingSellRef} />;
-  };
-
-  // const SettingsGettingDocumentComponent = (props) => {
-  //   return <SettingsGettingDocumentScreen {...props} ref={settingsGettingDocumentRef} />;
-  // };
-
-  const SettingsSearchComponent = (props) => {
-    return <SettingsSearchScreen {...props} ref={settingsSearchRef} />;
-  };
-
-  const SelectBoxingsComponent = (props) => {
-    return <SelectBoxingsScreen {...props} ref={selectBoxingsRef} />;
-  };
-
-  /*   const SelectItemComponent = (props) => {
-    return <SelectItemScreen {...props} ref={prodSellRef} />;
-  };
- */
   return (
     <AppStoreProvider>
       <Stack.Navigator>
@@ -141,53 +94,10 @@ const AppNavigator = () => {
         <Stack.Screen
           key="ProductDetail"
           name="ProductDetail"
-          component={ProductDetailsComponent}
+          component={ProductDetailScreen}
           initialParams={{ prodId: 0 }}
-          options={({ route, navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('ViewDocument', { docId: route.params.docId });
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  prodRef.current?.done();
-                  navigation.navigate('ViewDocument', { docId: route.params.docId });
-                }}
-              />
-            ),
-          })}
         />
-        <Stack.Screen
-          key="CreateDocument"
-          name="CreateDocument"
-          component={CreateDocumentComponent}
-          options={({ navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('DocumentsListScreen');
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  docRef.current?.done();
-                }}
-              />
-            ),
-          })}
-        />
+        <Stack.Screen key="CreateDocument" name="CreateDocument" component={CreateDocumentScreen} />
         <Stack.Screen
           key="ProductsList"
           name="ProductsList"
@@ -237,90 +147,17 @@ const AppNavigator = () => {
             ),
           })}
         />
-        <Stack.Screen
-          key="BoxingDetail"
-          name="BoxingDetail"
-          component={BoxingDetailsComponent}
-          options={({ route, navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('SelectBoxingsScreen', route.params.prodId);
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  boxingSellRef.current?.done();
-                  navigation.navigate('SelectBoxingsScreen', route.params.prodId);
-                }}
-              />
-            ),
-          })}
-        />
+        <Stack.Screen key="BoxingDetail" name="BoxingDetail" component={BoxingDetailScreen} />
         <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"
           component={SettingsGettingDocumentScreen}
           options={{ title: '' }}
         />
-        <Stack.Screen
-          key="SettingsSearchScreen"
-          name="SettingsSearchScreen"
-          component={SettingsSearchComponent}
-          options={({ navigation }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  navigation.navigate('SellDocuments');
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  settingsSearchRef.current?.done();
-                  navigation.navigate('SellDocuments');
-                }}
-              />
-            ),
-          })}
-        />
+        <Stack.Screen key="SettingsSearchScreen" name="SettingsSearchScreen" component={SettingsSearchScreen} />
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
         <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
-        <Stack.Screen
-          key="SelectBoxingsScreen"
-          name="SelectBoxingsScreen"
-          component={SelectBoxingsComponent}
-          options={({ navigation, route }) => ({
-            title: '',
-            headerLeft: () => (
-              <HeaderRight
-                text="Отмена"
-                onPress={() => {
-                  selectBoxingsRef.current?.cancel();
-                  navigation.navigate('SellProductDetail', route.params);
-                }}
-              />
-            ),
-            headerRight: () => (
-              <HeaderRight
-                text="Готово"
-                onPress={() => {
-                  selectBoxingsRef.current?.done();
-                  navigation.navigate('SellProductDetail', route.params);
-                }}
-              />
-            ),
-          })}
-        />
+        <Stack.Screen key="SelectBoxingsScreen" name="SelectBoxingsScreen" component={SelectBoxingsScreen} />
       </Stack.Navigator>
     </AppStoreProvider>
   );

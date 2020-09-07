@@ -9,7 +9,7 @@ import ReferencesNavigator from './ReferencesNavigator';
 import SellDocumentsNavigator from './SellDocumentsNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
-type TabsStackParams = {
+export type TabsStackParams = {
   Documents: undefined;
   References: undefined;
   Settings: undefined;

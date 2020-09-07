@@ -1,20 +1,16 @@
 import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { ILineTara, ITara, ISellDocument } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-
-export interface ISelectBoxingsRef {
-  done(): void;
-  cancel(): void;
-}
 
 type SelectBoxingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
 type SelectBoxingsScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
@@ -46,7 +42,7 @@ const Line = React.memo(
   },
 );
 
-const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navigation }, ref) => {
+const SelectBoxingsScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -64,35 +60,49 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
     setBoxingsLine(findBoxingsLineHock ? findBoxingsLineHock.lineBoxings : []);
   }, [route.params.docId, route.params.lineId, state.boxingsLine]);
 
-  useImperativeHandle(ref, () => ({
-    done: () => {
-      actions.setProducParams({ ...state.productParams, tara: boxingsLine });
-    },
-    cancel: () => {
-      const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;
-      const lines =
-        document && (document as ISellDocument)
-          ? (document as ISellDocument).lines.find((line) => line.id === route.params.lineId)
-          : undefined;
-      const idx = state.boxingsLine
-        ? state.boxingsLine.findIndex(
-            (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
-          )
-        : -1;
-      const newBoxingsLine = {
-        docId: route.params.docId,
-        lineDoc: route.params.lineId,
-        lineBoxings: lines ? lines.tara : [],
-      };
-      const updateBoxingsLine =
-        idx === -1
-          ? state.boxingsLine
-            ? [...state.boxingsLine, newBoxingsLine]
-            : [newBoxingsLine]
-          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
-      actions.setBoxingsLine(updateBoxingsLine);
-    },
-  }));
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;
+            const lines =
+              document && (document as ISellDocument)
+                ? (document as ISellDocument).lines.find((line) => line.id === route.params.lineId)
+                : undefined;
+            const idx = state.boxingsLine
+              ? state.boxingsLine.findIndex(
+                  (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
+                )
+              : -1;
+            const newBoxingsLine = {
+              docId: route.params.docId,
+              lineDoc: route.params.lineId,
+              lineBoxings: lines ? lines.tara : [],
+            };
+            const updateBoxingsLine =
+              idx === -1
+                ? state.boxingsLine
+                  ? [...state.boxingsLine, newBoxingsLine]
+                  : [newBoxingsLine]
+                : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
+            actions.setBoxingsLine(updateBoxingsLine);
+            navigation.navigate('SellProductDetail', route.params);
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            navigation.navigate('SellProductDetail', route.params);
+          }}
+        />
+      ),
+    });
+  }, [actions, navigation, route.params, route.params.docId, route.params.modeCor, state.boxingsLine, state.documents]);
 
   const renderItem = ({ item, selected }: { item: ITara; selected: boolean }) => {
     const boxing = boxingsLine ? boxingsLine.find((box) => box.tarakey === item.id) : undefined;
@@ -140,7 +150,7 @@ const SelectBoxingsScreen = forwardRef<ISelectBoxingsRef, Props>(({ route, navig
       />
     </ScrollView>
   );
-});
+};
 
 export { SelectBoxingsScreen };
 

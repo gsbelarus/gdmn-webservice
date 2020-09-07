@@ -1,16 +1,27 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import { useTheme, RouteProp, CompositeNavigationProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState, useLayoutEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { TabsStackParams } from '../../../navigation/TabsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-export interface ISettingsSearchRef {
-  done(): void;
+type SettingsSearchScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<RootStackParamList, 'BoxingDetail'>,
+  StackNavigationProp<TabsStackParams>
+>;
+type SettingsSearchScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
+
+interface Props {
+  route: SettingsSearchScreenRouteProp;
+  navigation: SettingsSearchScreenNavigationProp;
 }
 
 const Line = React.memo(
@@ -30,17 +41,34 @@ const Line = React.memo(
   },
 );
 
-const SettingsSearchScreen = forwardRef<ISettingsSearchRef, object>((_, ref) => {
+const SettingsSearchScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
   const [fieldSearch, setFieldSearch] = useState<string[]>(state.settingsSearch ?? []);
 
-  useImperativeHandle(ref, () => ({
-    done: () => {
-      actions.setSettingsSearch(fieldSearch);
-    },
-  }));
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.navigate('SellDocuments');
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            actions.setSettingsSearch(fieldSearch);
+            navigation.navigate('SellDocuments');
+          }}
+        />
+      ),
+    });
+  }, [actions, fieldSearch, navigation, route.params.docId, route.params.modeCor]);
 
   return (
     <View
@@ -105,7 +133,7 @@ const SettingsSearchScreen = forwardRef<ISettingsSearchRef, object>((_, ref) => 
       />
     </View>
   );
-});
+};
 
 export { SettingsSearchScreen };
 

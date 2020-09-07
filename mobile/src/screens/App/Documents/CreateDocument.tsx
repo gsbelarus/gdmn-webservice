@@ -1,22 +1,19 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Platform, Alert, Route } from 'react-native';
 import { Text, Button, Chip, Modal, Portal } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import { useAppStore } from '../../../store';
 
-export interface ICreateDocumentRef {
-  done(): void;
-}
-
-interface MyInputProps {
+interface Props {
   route: Route;
   navigation: unknown;
 }
 
-const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ route }, ref) => {
+const CreateDocumentScreen = ({ route }: Props) => {
   const [date, setDate] = useState(new Date());
   const [oldDate, setOldDate] = useState(new Date());
   const [selectedDocType, setSelectedDocType] = useState<number>();
@@ -34,51 +31,67 @@ const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ rou
     setDate(currentDate);
   };
 
-  useImperativeHandle(ref, () => ({
-    done: () => {
-      if (selectedDocType === undefined || selectedContact === undefined) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [
-          {
-            text: 'OK',
-            onPress: () => ({}),
-          },
-        ]);
-        return;
-      }
-      if (route.params?.docId !== undefined) {
-        actions.editDocument({
-          id: route.params.docId,
-          head: {
-            doctype: selectedDocType,
-            fromcontactId: selectedContact,
-            tocontactId: selectedContact,
-            date: date.toString(),
-            status: 0,
-          },
-        });
-        navigation.navigate('ViewDocument', { docId: route.params.docId });
-      } else {
-        const id =
-          state.documents
-            .map((item) => item.id)
-            .reduce((newId, currId) => {
-              return newId > currId ? newId : currId;
-            }, -1) + 1;
-        actions.newDocument({
-          id,
-          head: {
-            doctype: selectedDocType,
-            fromcontactId: selectedContact,
-            tocontactId: selectedContact,
-            date: date.toString(),
-            status: 0,
-          },
-          lines: [],
-        });
-        navigation.navigate('ViewDocument', { docId: id });
-      }
-    },
-  }));
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.navigate('DocumentsListScreen');
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            if (selectedDocType === undefined || selectedContact === undefined) {
+              Alert.alert('Ошибка!', 'Не все поля заполнены.', [
+                {
+                  text: 'OK',
+                  onPress: () => ({}),
+                },
+              ]);
+              return;
+            }
+            if (route.params?.docId !== undefined) {
+              actions.editDocument({
+                id: route.params.docId,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+              });
+              navigation.navigate('ViewDocument', { docId: route.params.docId });
+            } else {
+              const id =
+                state.documents
+                  .map((item) => item.id)
+                  .reduce((newId, currId) => {
+                    return newId > currId ? newId : currId;
+                  }, -1) + 1;
+              actions.newDocument({
+                id,
+                head: {
+                  doctype: selectedDocType,
+                  fromcontactId: selectedContact,
+                  tocontactId: selectedContact,
+                  date: date.toString(),
+                  status: 0,
+                },
+                lines: [],
+              });
+              navigation.navigate('ViewDocument', { docId: id });
+            }
+          }}
+        />
+      ),
+    });
+  }, [actions, date, navigation, route.params.docId, selectedContact, selectedDocType, state.documents]);
 
   useEffect(() => {
     if (route.params?.docId !== undefined) {
@@ -208,7 +221,7 @@ const CreateDocumentScreen = forwardRef<ICreateDocumentRef, MyInputProps>(({ rou
       </View>
     </>
   );
-});
+};
 
 export { CreateDocumentScreen };
 

@@ -1,19 +1,16 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
+import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { ITara } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-
-export interface IBoxingDetailsRef {
-  done(): void;
-}
 
 type BoxingDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
 type BoxingDetailScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
@@ -23,7 +20,7 @@ type Props = {
   navigation: BoxingDetailScreenNavigationProp;
 };
 
-const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, navigation }, ref) => {
+const BoxingDetailScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -44,40 +41,85 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
     }
   }, [boxing.type, boxing.weight, quantity]);
 
-  useImperativeHandle(ref, () => ({
-    done: () => {
-      const idx = state.boxingsLine
-        ? state.boxingsLine.findIndex(
-            (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
-          )
-        : -1;
-      const idxl =
-        idx > -1 && boxing && state.boxingsLine[idx].lineBoxings
-          ? state.boxingsLine[idx].lineBoxings.findIndex((item) => item.tarakey === boxing.id)
-          : -1;
-      const addBoxings =
-        idxl > -1
-          ? [
-              ...state.boxingsLine[idx].lineBoxings.slice(0, idx),
-              { tarakey: boxing.id, type: boxing.type, weight: Number.parseFloat(weight), quantity: Number(quantity) },
-              ...state.boxingsLine[idx].lineBoxings.slice(idx + 1),
-            ]
-          : state.boxingsLine && idx > -1
-          ? [
-              ...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : []),
-              { tarakey: boxing.id, type: boxing.type, weight: Number.parseFloat(weight), quantity: Number(quantity) },
-            ]
-          : [{ tarakey: boxing.id, type: boxing.type, weight: Number.parseFloat(weight), quantity: Number(quantity) }];
-      const newBoxingsLine = { docId: route.params.docId, lineDoc: route.params.lineId, lineBoxings: addBoxings };
-      const updateBoxingsLine =
-        idx === -1
-          ? state.boxingsLine
-            ? [...state.boxingsLine, newBoxingsLine]
-            : [newBoxingsLine]
-          : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
-      actions.setBoxingsLine(updateBoxingsLine);
-    },
-  }));
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.navigate('SellProductDetail', route.params);
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            const idx = state.boxingsLine
+              ? state.boxingsLine.findIndex(
+                  (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
+                )
+              : -1;
+            const idxl =
+              idx > -1 && boxing && state.boxingsLine[idx].lineBoxings
+                ? state.boxingsLine[idx].lineBoxings.findIndex((item) => item.tarakey === boxing.id)
+                : -1;
+            const addBoxings =
+              idxl > -1
+                ? [
+                    ...state.boxingsLine[idx].lineBoxings.slice(0, idx),
+                    {
+                      tarakey: boxing.id,
+                      type: boxing.type,
+                      weight: Number.parseFloat(weight),
+                      quantity: Number(quantity),
+                    },
+                    ...state.boxingsLine[idx].lineBoxings.slice(idx + 1),
+                  ]
+                : state.boxingsLine && idx > -1
+                ? [
+                    ...(state.boxingsLine ? state.boxingsLine[idx].lineBoxings : []),
+                    {
+                      tarakey: boxing.id,
+                      type: boxing.type,
+                      weight: Number.parseFloat(weight),
+                      quantity: Number(quantity),
+                    },
+                  ]
+                : [
+                    {
+                      tarakey: boxing.id,
+                      type: boxing.type,
+                      weight: Number.parseFloat(weight),
+                      quantity: Number(quantity),
+                    },
+                  ];
+            const newBoxingsLine = { docId: route.params.docId, lineDoc: route.params.lineId, lineBoxings: addBoxings };
+            const updateBoxingsLine =
+              idx === -1
+                ? state.boxingsLine
+                  ? [...state.boxingsLine, newBoxingsLine]
+                  : [newBoxingsLine]
+                : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
+            actions.setBoxingsLine(updateBoxingsLine);
+            navigation.navigate('SellProductDetail', route.params);
+          }}
+        />
+      ),
+    });
+  }, [
+    actions,
+    boxing,
+    navigation,
+    quantity,
+    route.params,
+    route.params.docId,
+    route.params.lineId,
+    route.params.modeCor,
+    state.boxingsLine,
+    weight,
+  ]);
 
   return (
     <View
@@ -176,7 +218,7 @@ const BoxingDetailScreen = forwardRef<IBoxingDetailsRef, Props>(({ route, naviga
       </View>
     </View>
   );
-});
+};
 
 export { BoxingDetailScreen };
 

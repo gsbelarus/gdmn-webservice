@@ -1,19 +1,16 @@
 import { useTheme, useIsFocused, RouteProp, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
 import { ILine } from '../../../../../common';
+import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-
-export interface IProductDetailsRef {
-  done(): void;
-}
 
 type ProductDetailScreenNavigationProp = CompositeNavigationProp<
   StackNavigationProp<RootStackParamList, 'ProductDetail'>,
@@ -26,7 +23,7 @@ type Props = {
   navigation: ProductDetailScreenNavigationProp;
 };
 
-const ProductDetailScreen = forwardRef<IProductDetailsRef, Props>(({ route, navigation }, ref) => {
+const ProductDetailScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -47,25 +44,41 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, Props>(({ route, navi
     }
   }, [document.lines, route.params.modeCor, route.params.prodId]);
 
-  useImperativeHandle(ref, () => ({
-    done: () => {
-      if (line !== undefined) {
-        actions.editLine({
-          docId: route.params.docId,
-          line: {
-            ...line,
-            quantity: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
-          },
-        });
-      } else {
-        actions.addLine({
-          docId: route.params.docId,
-          line: { id: '0', goodId: product.id, quantity: Number.parseFloat(value) },
-        });
-      }
-      navigation.navigate('ViewDocument', { docId: route.params.docId });
-    },
-  }));
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.navigate('ViewDocument', { docId: route.params.docId });
+          }}
+        />
+      ),
+      headerRight: () => (
+        <HeaderRight
+          text="Готово"
+          onPress={() => {
+            if (line !== undefined) {
+              actions.editLine({
+                docId: route.params.docId,
+                line: {
+                  ...line,
+                  quantity: Number.parseFloat(route.params.modeCor ? value : value + line.quantity),
+                },
+              });
+            } else {
+              actions.addLine({
+                docId: route.params.docId,
+                line: { id: '0', goodId: product.id, quantity: Number.parseFloat(value) },
+              });
+            }
+            navigation.navigate('ViewDocument', { docId: route.params.docId });
+          }}
+        />
+      ),
+    });
+  }, [actions, line, navigation, product.id, route.params.docId, route.params.modeCor, value]);
 
   return (
     <View
@@ -124,7 +137,7 @@ const ProductDetailScreen = forwardRef<IProductDetailsRef, Props>(({ route, navi
       />
     </View>
   );
-});
+};
 
 export { ProductDetailScreen };
 
