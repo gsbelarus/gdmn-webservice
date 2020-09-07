@@ -66,7 +66,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [document, route.params.lineId]);
 
   useEffect(() => {
-    if (!document || !product || !line) {
+    if (!document || !product) {
       return;
     }
 
@@ -78,6 +78,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
       });
     } else {
+      if (!line) {
+        return;
+      }
       route.params?.manufacturingDate
         ? actions.setProducParams({ ...line, manufacturingDate: route.params.manufacturingDate })
         : actions.setProducParams(line);
@@ -133,6 +136,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               actions.addLine({
                 docId: route.params.docId,
                 line: {
+                  goodId: route.params.prodId,
                   ...state.productParams,
                   id: '0',
                 },
@@ -145,18 +149,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
-  }, [
-    actions,
-    document,
-    line,
-    navigation,
-    product,
-    route.params.docId,
-    route.params.lineId,
-    route.params.modeCor,
-    state.boxingsLine,
-    state.productParams,
-  ]);
+  }, [actions, document, line, navigation, product, route.params, state.boxingsLine, state.productParams]);
 
   const onPress = () => {
     if (isKeyboardVisible) {
