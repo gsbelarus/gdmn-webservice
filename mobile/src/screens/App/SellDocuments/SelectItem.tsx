@@ -2,7 +2,7 @@ import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Searchbar, IconButton, Checkbox, Paragraph } from 'react-native-paper';
+import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -79,10 +79,8 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
       headerRight: () => (
-        <IconButton
-          icon="check-circle"
-          size={30}
-          color={colors.primary}
+        <HeaderRight
+          text="Готово"
           onPress={() => {
             parentScreen
               ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: checkedItem })

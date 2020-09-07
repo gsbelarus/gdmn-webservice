@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
-import { IconButton } from 'react-native-paper';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -61,10 +60,8 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
       headerRight: () => (
-        <IconButton
-          icon="check-circle"
-          size={30}
-          color={colors.primary}
+        <HeaderRight
+          text="Готово"
           onPress={() => {
             // appActions.setFormParams({ [fieldName]: date });
             parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: date }) : null;
