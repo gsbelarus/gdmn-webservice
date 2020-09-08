@@ -162,6 +162,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
         return;
       }
+
       if (!isMessagesArray(response.data)) {
         Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
       }
@@ -262,6 +263,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
             sendUpdateRequest();
             sendDocumentRequest();
             sendSubscribe();
+            appActions.clearFormParams();
             navigation.navigate('SellDocuments');
           }}
         />

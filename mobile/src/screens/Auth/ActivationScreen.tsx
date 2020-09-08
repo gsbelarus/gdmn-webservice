@@ -29,7 +29,6 @@ const ActivationScreen = () => {
     setServerReq({ isError: false, isLoading: true, status: undefined });
     try {
       const resp = await timeout<IResponse<string>>(5000, apiService.auth.verifyActivationCode(activationCode));
-
       if (!resp.result) {
         setActivationCode('');
         setServerReq({ isError: true, isLoading: false, status: resp.error });

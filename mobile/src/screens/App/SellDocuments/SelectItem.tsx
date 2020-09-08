@@ -17,6 +17,15 @@ type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
+  const {
+    list: newList,
+    isMulti,
+    parentScreen: newParentScreen,
+    fieldName: newFieldName,
+    title: newTitle,
+    value: newValue,
+  } = route.params;
+
   // const { state: appState, actions: appActions } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,18 +39,9 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   const [list, setList] = useState<IListItem[]>(undefined);
 
   useEffect(() => {
-    if (!route.params?.list) {
+    if (!newList) {
       return;
     }
-
-    const {
-      list: newList,
-      isMulti,
-      parentScreen: newParentScreen,
-      fieldName: newFieldName,
-      title: newTitle,
-      value: newValue,
-    } = route.params;
 
     setTitle(newTitle);
     setFieldName(newFieldName);
@@ -49,7 +49,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     setIsMultiSelect(isMulti || false);
     setList(newList);
     setCheckedItem(newValue);
-  }, [route.params, route.params?.list, searchQuery]);
+  }, [isMulti, newFieldName, newList, newParentScreen, newTitle, newValue, route.params, searchQuery]);
 
   useEffect(() => {
     if (!list) {
@@ -72,7 +72,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     ({ item }: { item: IListItem }) => {
       return <LineItem item={item} checked={checkedItem?.includes(item.id)} onSelect={selectItem} />;
     },
-    [checkedItem, selectItem],
+    [selectItem],
   );
 
   React.useLayoutEffect(() => {
