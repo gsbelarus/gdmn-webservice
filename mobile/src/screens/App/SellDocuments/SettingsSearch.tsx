@@ -41,7 +41,7 @@ const Line = React.memo(
   },
 );
 
-const SettingsSearchScreen = ({ route, navigation }: Props) => {
+const SettingsSearchScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -68,7 +68,7 @@ const SettingsSearchScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
-  }, [actions, fieldSearch, navigation, route.params.docId, route.params.modeCor]);
+  }, [actions, fieldSearch, navigation]);
 
   return (
     <View
