@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
