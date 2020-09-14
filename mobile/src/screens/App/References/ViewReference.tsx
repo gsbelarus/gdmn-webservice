@@ -42,19 +42,19 @@ const ViewReferenceScreen = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IReference>();
 
+  const { item: refItem }: { item: IReference } = route.params;
+
   useEffect(() => {
     // console.log('params', route.params);
-    if (!route.params?.item) {
+    if (!refItem) {
       return;
     }
 
-    const { item }: { item: IReference } = route.params;
-
     setFilteredList({
-      ...item,
-      data: item.data.filter((i) => i.name.toUpperCase().includes(searchQuery.toUpperCase())),
+      ...refItem,
+      data: refItem.data.filter((i) => i.name.toUpperCase().includes(searchQuery.toUpperCase())),
     });
-  }, [route.params, route.params?.item, searchQuery]);
+  }, [refItem, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);

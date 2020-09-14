@@ -178,7 +178,7 @@ const ReferenceListScreen = () => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
-  }, [apiService.data, appActions, AppState.documents, state.companyID]);
+  }, [apiService.data, state.companyID]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -211,10 +211,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  buttons: {
-    alignItems: 'center',
-    margin: 10,
   },
   content: {
     height: '100%',

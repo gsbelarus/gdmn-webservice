@@ -1,5 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
+import { LogBox } from 'react-native';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
 import config from '../config';
@@ -66,7 +67,7 @@ const initialState: ILoadingState = {
   showSettings: false,
 };
 
-const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in obj;
+const isUser = (obj: unknown): obj is IUser => typeof obj === 'object' && 'id' in obj;
 
 const AuthNavigator = () => {
   const {
@@ -84,8 +85,7 @@ const AuthNavigator = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { signal, cancel } = useMemo(() => createCancellableSignal(), [state.serverReq.isLoading]);
 
-  console.disableYellowBox = !config.debug.showWarnings;
-
+  // LogBox.ignoreAllLogs(!config[0].debug.showWarnings);
   /*
     Порядок работы:
       1) Проверка регистрации устройства на сервере
