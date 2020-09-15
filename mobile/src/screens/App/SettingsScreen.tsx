@@ -98,8 +98,11 @@ const SettingsScreen = () => {
         appActions.setBoxings(boxingsRef);
       } else {
         try {
-          const response = await apiService.data.subscribe(companyID);
-          console.log(response);
+          // const response = await apiService.data.subscribe(companyID);
+          const response = await apiService.data.getMessages(companyID);
+
+          // console.log(response);
+
           if (!response.result) {
             Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
             return;
@@ -159,6 +162,7 @@ const SettingsScreen = () => {
               // Сообщение содержит команду
               apiService.data.deleteMessage(companyID, message.head.id);
             }
+            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
           });
 
           /* Обработка сообщений, которые связаны с документами */

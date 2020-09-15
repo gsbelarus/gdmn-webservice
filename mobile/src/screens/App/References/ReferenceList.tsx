@@ -194,7 +194,7 @@ const ReferenceListScreen = () => {
         icon="sync"
         onPress={() => {
           sendUpdateRequest();
-          sendSubscribe();
+          // sendSubscribe();
         }}
       />
     </View>

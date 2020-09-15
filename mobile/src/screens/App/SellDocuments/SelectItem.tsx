@@ -3,6 +3,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -49,6 +50,12 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     setIsMultiSelect(isMulti || false);
     setList(newList);
     setCheckedItem(newValue);
+
+    // console.log('Params');
+    if (__DEV__) {
+      // console.log('Params: ', JSON.stringify(route.params));
+      Reactotron.log('params:', route.params);
+    }
   }, [isMulti, newFieldName, newList, newParentScreen, newTitle, newValue, route.params, searchQuery]);
 
   useEffect(() => {
@@ -72,7 +79,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     ({ item }: { item: IListItem }) => {
       return <LineItem item={item} checked={checkedItem?.includes(item.id)} onSelect={selectItem} />;
     },
-    [selectItem],
+    [checkedItem, selectItem],
   );
 
   React.useLayoutEffect(() => {

@@ -14,6 +14,7 @@ import styles from '../../../styles/global';
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+
   const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
 
   return (
