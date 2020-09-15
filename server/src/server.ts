@@ -59,7 +59,12 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   app
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(CONFIG, app))
-    .use(bodyParser())
+    .use(bodyParser({
+      formLimit: "10mb",
+      jsonLimit: "10mb",
+      textLimit: "10mb",
+      enableTypes: ['json', 'form', 'text']
+    }))
     .use(errorHandler)
     .use(passport.initialize())
     .use(passport.session())
