@@ -40,8 +40,7 @@ export interface IWeighedGoods {
   id: number;
   goodkey: number;
   weight?: number;
-  grassweight?: number;
-  manufacturingDate?: string;
+  datework?: string;
   timework?: string;
   numreceive?: string;
   [fieldName: string]: unknown;

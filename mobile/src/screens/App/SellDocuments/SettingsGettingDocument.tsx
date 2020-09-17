@@ -18,8 +18,7 @@ import {
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils';
-import { IListItem, ITara } from '../../../model';
-import { IWeighedGoods } from '../../../model/sell';
+import { IListItem, ITara, IWeighedGoods } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 

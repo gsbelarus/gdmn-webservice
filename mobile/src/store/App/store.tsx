@@ -140,6 +140,17 @@ const createStoreContext = () => {
       }
     }, [state.boxings, storagePath]);
 
+    /*  Сохранение документа взвешивания в storage при их изменении */
+    useEffect(() => {
+      const saveSettings = async () => {
+        await appStorage.setItem(`${storagePath}/${sections.WEIGHEDGOODS}`, state.weighedGoods);
+      };
+
+      if (state.weighedGoods && storagePath && !isLoading) {
+        saveSettings();
+      }
+    }, [state.weighedGoods, storagePath]);
+
     useEffect(() => {
       if (!!state.settings?.autodeletingDocument && !isLoading) {
         const deleteDocs = state.documents.filter((document) => document.head.status === 3);

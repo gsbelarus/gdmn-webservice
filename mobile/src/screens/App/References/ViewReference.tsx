@@ -29,7 +29,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -52,7 +52,7 @@ const ViewReferenceScreen = ({ route }) => {
 
     setFilteredList({
       ...refItem,
-      data: refItem.data.filter((i) => i.name.toUpperCase().includes(searchQuery.toUpperCase())),
+      data: refItem.data.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
     });
   }, [refItem, searchQuery]);
 

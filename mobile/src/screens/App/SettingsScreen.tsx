@@ -20,8 +20,7 @@ import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import documentsRef from '../../mockData/Otves/Document.json';
 import referencesRef from '../../mockData/Otves/References.json';
-import { ITara } from '../../model';
-import { IWeighedGoods } from '../../model/sell';
+import { ITara, IWeighedGoods } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
 const SettingsScreen = () => {
@@ -96,6 +95,8 @@ const SettingsScreen = () => {
         appActions.setDocuments(documentsRef);
         const boxingsRef = (mockRef.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
         appActions.setBoxings(boxingsRef);
+        const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedgoods')?.data as unknown) as IWeighedGoods[];
+        appActions.setWeighedGoods(docWeighedRef);
       } else {
         try {
           // const response = await apiService.data.subscribe(companyID);
