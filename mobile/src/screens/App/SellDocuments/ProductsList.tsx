@@ -7,6 +7,7 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { IWeighedGoods } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -36,7 +37,39 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 });
 
+const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+  const { state } = useAppStore();
+  const [nameGood, setNameGood] = useState('');
+
+  useEffect(() => {
+    const findGood = state.goods.find((good) => good.id === item.goodkey);
+    findGood ? setNameGood(findGood.name) : undefined;
+  }, [item, state]);
+
+  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
+
+  return (
+    <TouchableOpacity
+      style={[localStyles.item, { backgroundColor: colors.card }]}
+      onPress={() => {
+        navigation.navigate('SellProductDetail', { prodId: item.goodkey, docId, modeCor: false, weighedGood: item.id });
+      }}
+    >
+      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <Feather name="box" size={20} color={'#FFF'} />
+      </View>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{nameGood}</Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.id}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
 const SellProductsListScreen = () => {
+  const route = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -45,9 +78,12 @@ const SellProductsListScreen = () => {
   const { state } = useAppStore();
 
   const ref = React.useRef<FlatList<IGood>>(null);
+  const refWeighed = React.useRef<FlatList<IWeighedGoods>>(null);
   useScrollToTop(ref);
+  useScrollToTop(refWeighed);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
+  const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
@@ -146,14 +182,25 @@ const SellProductsListScreen = () => {
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
             </TouchableOpacity>
           </View> */}
-          {!state.goods.find(
-            (item) =>
-              item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-              item.name.toLowerCase().includes(text.toLowerCase()),
-          ) ? (
-            <Text style={styles.title}>Не найдено</Text>
+          {route.params.weighedGood ? (
+            <FlatList
+              ref={refWeighed}
+              data={
+                !Number.isNaN(text)
+                  ? state.weighedGoods.filter((item) =>
+                      text.length >= 12
+                        ? item.id.toString().includes(Number(text).toString().slice(0, -1)) ||
+                          item.id.toString().includes(Number(text).toString())
+                        : item.id.toString().includes(Number(text).toString()),
+                    )
+                  : state.weighedGoods
+              }
+              keyExtractor={(_, i) => String(i)}
+              renderItem={renderItemWieghed}
+              ItemSeparatorComponent={ItemSeparator}
+              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+            />
           ) : (
-            //TODO: ListEmptyComponent - компонент для если список пустой
             <FlatList
               ref={ref}
               data={state.goods.filter(
@@ -164,6 +211,7 @@ const SellProductsListScreen = () => {
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
+              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
             />
           )}
         </>
@@ -196,6 +244,10 @@ const localStyles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
     paddingVertical: 3,
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   fieldDesciption: {
     opacity: 0.5,

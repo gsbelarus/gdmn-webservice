@@ -95,7 +95,7 @@ const SettingsScreen = () => {
         appActions.setDocuments(documentsRef);
         const boxingsRef = (mockRef.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
         appActions.setBoxings(boxingsRef);
-        const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedgoods')?.data as unknown) as IWeighedGoods[];
+        const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedGoods')?.data as unknown) as IWeighedGoods[];
         appActions.setWeighedGoods(docWeighedRef);
       } else {
         try {
@@ -148,7 +148,7 @@ const SettingsScreen = () => {
                     appActions.setBoxings(boxings);
                     break;
                   }
-                  case 'weighedgoods': {
+                  case 'weighedGoods': {
                     const weighedGoods = dataSet.data as IWeighedGoods[];
                     appActions.setWeighedGoods(weighedGoods);
                     break;

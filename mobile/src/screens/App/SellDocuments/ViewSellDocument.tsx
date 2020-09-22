@@ -1,9 +1,10 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Colors, FAB, IconButton } from 'react-native-paper';
+import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -222,15 +223,15 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
             </Text>
           </View>
           {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
-            <MaterialIcons
-              size={30}
-              color={colors.card}
-              name="chevron-right"
-              onPress={() => {
-                navigation.navigate('HeadSellDocument', { docId });
-              }}
-            />
-          </TouchableOpacity> */}
+              <MaterialIcons
+                size={30}
+                color={colors.card}
+                name="chevron-right"
+                onPress={() => {
+                  navigation.navigate('HeadSellDocument', { docId });
+                }}
+              />
+            </TouchableOpacity> */}
         </View>
         <View style={localStyles.listContainer}>
           <View style={localStyles.avatarRow} />
@@ -292,11 +293,18 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ]}
         >
           {document?.head?.status === 0 && (
-            <FAB
-              style={localStyles.fabAdd}
-              icon="plus"
-              onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
-            />
+            <>
+              <FAB
+                style={localStyles.fabScan}
+                icon="barcode-scan"
+                onPress={() => navigation.navigate('SellProductsList', { docId: document.id, weighedGood: true })}
+              />
+              <FAB
+                style={localStyles.fabAdd}
+                icon="plus"
+                onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
+              />
+            </>
           )}
         </View>
       </View>
@@ -350,6 +358,13 @@ const localStyles = StyleSheet.create({
     margin: 20,
     position: 'absolute',
     right: 0,
+  },
+  fabScan: {
+    backgroundColor: Colors.blue600,
+    bottom: 65,
+    left: 0,
+    margin: 20,
+    position: 'absolute',
   },
   flexDirectionRow: {
     flexDirection: 'row',
