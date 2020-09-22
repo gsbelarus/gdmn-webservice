@@ -59,7 +59,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     if (route.params.weighedGood) {
       const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
       const date = good.datework.split('.').reverse();
-      console.log(date);
       good
         ? actions.setProducParams({
             id: route.params.lineId,
@@ -109,7 +108,16 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         ? actions.setProducParams({ ...line, manufacturingDate: route.params.manufacturingDate })
         : actions.setProducParams(line);
     }
-  }, [actions, document, line, product, route.params.lineId, route.params.manufacturingDate, route.params.prodId]);
+  }, [
+    actions,
+    document,
+    line,
+    product,
+    route.params.lineId,
+    route.params.manufacturingDate,
+    route.params.prodId,
+    route.params.weighedGood,
+  ]);
 
   useEffect(() => {
     if (state.productParams && route.params?.manufacturingDate) {

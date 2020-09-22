@@ -263,7 +263,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <Text style={localStyles.fontWeightBold}>
             вес прод.{' '}
             {(documentLines ?? []).reduce(
-              (total, line) => Number.parseFloat(((line.quantity ?? 0) + total).toFixed(3)),
+              (total, line) => Number.parseFloat(((Number(line.quantity) ?? 0) + total).toFixed(3)),
               0,
             )}{' '}
           </Text>
@@ -274,7 +274,10 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <Text style={localStyles.fontWeightBold}>
             кол-во{' '}
             {boxings.length !== 0
-              ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.quantity ?? 0)).toFixed(3)), 0.0)
+              ? boxings.reduce(
+                  (total, boxing) => Number.parseFloat((total + (Number(boxing.quantity) ?? 0)).toFixed(3)),
+                  0.0,
+                )
               : 0}{' '}
             / вес{' '}
             {boxings.length !== 0
