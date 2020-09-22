@@ -11,14 +11,16 @@ import styles from '../../styles/global';
 type Props = {
   serverName?: string;
   serverPort?: number;
+  timeout?: number;
   hideSettings: () => void;
   changeSettings: (baseUrl: IBaseUrl) => void;
 };
 
 const ConfigScreen = (props: Props) => {
-  const { serverName, serverPort, hideSettings, changeSettings } = props;
+  const { serverName, serverPort, hideSettings, changeSettings, timeout } = props;
   const [newServerName, setNewServerName] = useState(serverName);
   const [newServerPort, setNewServerPort] = useState(serverPort?.toString());
+  const [newTimeout, setNewTimeout] = useState(timeout?.toString());
   const { colors } = useTheme();
 
   const setSettings = useCallback(() => {
@@ -30,11 +32,12 @@ const ConfigScreen = (props: Props) => {
       apiPath: config.apiPath,
       protocol,
       port: parseInt(newServerPort, 10),
+      timeout: parseInt(newTimeout, 10),
       server,
     };
 
     changeSettings(url);
-  }, [changeSettings, newServerName, newServerPort]);
+  }, [changeSettings, newServerName, newServerPort, newTimeout]);
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
@@ -49,6 +52,12 @@ const ConfigScreen = (props: Props) => {
         value={newServerPort}
         onChangeText={setNewServerPort}
         placeholder="Порт"
+        style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
+      />
+      <TextInput
+        value={newTimeout}
+        onChangeText={setNewTimeout}
+        placeholder="Варемя ожидания, м\с"
         style={[styles.input, { backgroundColor: colors.card, color: colors.text }]}
       />
       <View style={localStyles.buttonsView}>

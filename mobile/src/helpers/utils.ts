@@ -3,7 +3,7 @@ import { AsyncStorage } from 'react-native';
 import { IMessage } from '../../../common';
 import config from '../config';
 
-export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
+// export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
   return new Promise<T>((resolve, reject) => {

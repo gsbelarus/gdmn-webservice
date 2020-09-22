@@ -217,11 +217,11 @@ const AuthNavigator = () => {
       deviceRegistered,
       userID,
       showSettings,
-      state?.serverReq?.isLoading,
-      state?.serverReq?.isError,
-      state?.serverReq?.status,
-      serverUrl?.server,
-      serverUrl?.port,
+      state.serverReq.isLoading,
+      state.serverReq.isError,
+      state.serverReq.status,
+      serverUrl.server,
+      serverUrl.port,
     ],
   );
 
@@ -231,9 +231,10 @@ const AuthNavigator = () => {
         {...{ hideSettings, changeSettings }}
         serverName={`${serverUrl?.protocol}${serverUrl?.server}`}
         serverPort={serverUrl?.port}
+        timeout={serverUrl?.timeout}
       />
     ),
-    [hideSettings, changeSettings, serverUrl?.protocol, serverUrl?.server, serverUrl?.port],
+    [hideSettings, changeSettings, serverUrl.protocol, serverUrl.server, serverUrl.port, serverUrl.timeout],
   );
 
   const ConfigComponent = useMemo(

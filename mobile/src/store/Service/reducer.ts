@@ -13,6 +13,7 @@ export const initialState: IServiceState = {
 export const reducer: Reducer<IServiceState, TServiceActions> = (state = initialState, action): IServiceState => {
   if (__DEV__) {
     console.log('Service action: ', JSON.stringify(action));
+    console.log('Service action: ', JSON.stringify(action));
   }
 
   switch (action.type) {
