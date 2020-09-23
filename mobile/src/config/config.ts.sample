@@ -2,8 +2,9 @@ export default {
   server: {
     protocol: 'http://',
     name: '192.168.0.63',
-    port: 3649
+    port: 3649,
   },
+  timout: 5000,
   apiPath: 'api',
   debug: {
     showWarnings: true,

@@ -138,15 +138,6 @@ const localStyles = StyleSheet.create({
     flex: 9,
     margin: 10,
   },
-  item: {
-    // alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   row: {
     alignItems: 'center',
     flexDirection: 'row',

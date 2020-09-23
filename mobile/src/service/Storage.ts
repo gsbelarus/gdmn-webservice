@@ -21,8 +21,10 @@ export default class Sync {
         protocol: config.server.protocol,
         server: config.server.name,
         port: config.server.port,
+        timeout: config.timeout,
         apiPath: config.apiPath,
       };
+      console.log(config);
       await this.setServer(pathSrv);
     }
 
