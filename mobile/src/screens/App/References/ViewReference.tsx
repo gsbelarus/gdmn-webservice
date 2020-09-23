@@ -151,7 +151,7 @@ const ViewReferenceScreen = ({ route }) => {
               data={
                 filteredList && filteredList.type === 'weighedgoods'
                   ? filteredList?.data.filter((item) =>
-                      searchQuery.length === 13 && !Number.isNaN(searchQuery)
+                      searchQuery.length >= 12 && searchQuery.length <= 13 && !Number.isNaN(searchQuery)
                         ? item.id.toString().includes(Number(searchQuery).toString().slice(0, -1)) ||
                           item.id.toString().includes(Number(searchQuery).toString())
                         : item.id.toString().includes(Number(searchQuery).toString()),

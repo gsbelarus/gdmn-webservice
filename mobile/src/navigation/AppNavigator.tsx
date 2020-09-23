@@ -17,6 +17,7 @@ import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
+import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -74,6 +75,9 @@ export type RootStackParamList = {
     modeCor: boolean;
     quantity: string;
     batchNumber: string;
+  };
+  ScanBarCodeScreen: {
+    docId: number;
   };
 };
 
@@ -159,6 +163,7 @@ const AppNavigator = () => {
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
         <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
         <Stack.Screen key="SelectBoxingsScreen" name="SelectBoxingsScreen" component={SelectBoxingsScreen} />
+        <Stack.Screen key="ScanBarCodeScreen" name="ScanBarCodeScreen" component={ScanBarCodeScreen} />
       </Stack.Navigator>
     </AppStoreProvider>
   );
