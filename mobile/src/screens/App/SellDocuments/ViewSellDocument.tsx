@@ -302,6 +302,11 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                 onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document.id, weighedGood: true })}
               />
               <FAB
+                style={localStyles.fabAddW}
+                icon="barcode"
+                onPress={() => navigation.navigate('SellProductsList', { docId: document.id, weighedGood: true })}
+              />
+              <FAB
                 style={localStyles.fabAdd}
                 icon="plus"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
@@ -360,6 +365,13 @@ const localStyles = StyleSheet.create({
     margin: 20,
     position: 'absolute',
     right: 0,
+  },
+  fabAddW: {
+    backgroundColor: Colors.blue600,
+    bottom: 65,
+    margin: 20,
+    position: 'absolute',
+    right: 75,
   },
   fabScan: {
     backgroundColor: Colors.blue600,
