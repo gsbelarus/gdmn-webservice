@@ -52,8 +52,6 @@ export type RootStackParamList = {
     docId: number;
     prodId: number;
     modeCor: boolean;
-    quantity: string;
-    batchNumber: string;
   };
   SettingsSearchScreen: undefined;
   SettingsGettingDocument: {
@@ -73,8 +71,6 @@ export type RootStackParamList = {
     docId: number;
     prodId: number;
     modeCor: boolean;
-    quantity: string;
-    batchNumber: string;
   };
   ScanBarCodeScreen: {
     docId: number;

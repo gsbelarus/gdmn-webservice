@@ -48,7 +48,7 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            navigation.navigate('SellProductDetail', route.params);
+            navigation.navigate('SelectBoxingsScreen', route.params);
           }}
         />
       ),
@@ -103,7 +103,7 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
                   : [newBoxingsLine]
                 : [...state.boxingsLine.slice(0, idx), newBoxingsLine, ...state.boxingsLine.slice(idx + 1)];
             actions.setBoxingsLine(updateBoxingsLine);
-            navigation.navigate('SellProductDetail', route.params);
+            navigation.navigate('SelectBoxingsScreen', route.params);
           }}
         />
       ),
@@ -170,52 +170,54 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
           backgroundColor: colors.card,
         }}
       />
-      <View style={localeStyles.buttons}>
-        <TouchableOpacity
-          style={[
-            styles.circularButton,
-            localeStyles.buttons,
-            {
-              backgroundColor: colors.primary,
-              borderColor: colors.primary,
-            },
-          ]}
-          onPress={async () => {
-            Alert.alert('Вы уверены, что хотите удалить?', '', [
+      {boxingLine ? (
+        <View style={localeStyles.buttons}>
+          <TouchableOpacity
+            style={[
+              styles.circularButton,
+              localeStyles.buttons,
               {
-                text: 'OK',
-                onPress: async () => {
-                  const idx = state.boxingsLine
-                    ? state.boxingsLine.findIndex(
-                        (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
-                      )
-                    : -1;
-                  const updateBoxingsLine =
-                    idx > -1
-                      ? [
-                          ...state.boxingsLine.slice(0, idx),
-                          {
-                            ...state.boxingsLine[idx],
-                            lineBoxings: state.boxingsLine[idx].lineBoxings.filter(
-                              (box) => box.tarakey !== route.params.boxingId,
-                            ),
-                          },
-                          ...state.boxingsLine.slice(idx + 1),
-                        ]
-                      : state.boxingsLine;
-                  actions.setBoxingsLine(updateBoxingsLine);
-                  navigation.navigate('SelectBoxingsScreen', route.params);
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
+            ]}
+            onPress={async () => {
+              Alert.alert('Вы уверены, что хотите удалить?', '', [
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    const idx = state.boxingsLine
+                      ? state.boxingsLine.findIndex(
+                          (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
+                        )
+                      : -1;
+                    const updateBoxingsLine =
+                      idx > -1
+                        ? [
+                            ...state.boxingsLine.slice(0, idx),
+                            {
+                              ...state.boxingsLine[idx],
+                              lineBoxings: state.boxingsLine[idx].lineBoxings.filter(
+                                (box) => box.tarakey !== route.params.boxingId,
+                              ),
+                            },
+                            ...state.boxingsLine.slice(idx + 1),
+                          ]
+                        : state.boxingsLine;
+                    actions.setBoxingsLine(updateBoxingsLine);
+                    navigation.navigate('SelectBoxingsScreen', route.params);
+                  },
                 },
-              },
-              {
-                text: 'Отмена',
-              },
-            ]);
-          }}
-        >
-          <MaterialIcons size={30} color={colors.card} name="delete" />
-        </TouchableOpacity>
-      </View>
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+          >
+            <MaterialIcons size={30} color={colors.card} name="delete" />
+          </TouchableOpacity>
+        </View>
+      ) : undefined}
     </View>
   );
 };

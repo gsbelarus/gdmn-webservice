@@ -69,6 +69,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               .slice(0, 10),
             //timeWork: good.timework,
             numreceive: good.numreceive,
+            tara: [],
           })
         : undefined;
     }
@@ -99,6 +100,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         goodId: route.params.prodId,
         quantity: 1,
         manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
+        tara: [],
       });
     } else {
       if (!line) {
@@ -187,13 +189,12 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     if (isKeyboardVisible) {
       return;
     }
+
     navigation.navigate('SelectBoxingsScreen', {
       lineId: route.params.lineId,
       prodId: route.params.prodId,
       docId: route.params.docId,
       modeCor: route.params.modeCor,
-      quantity: '0',
-      batchNumber: '0',
     });
   };
 

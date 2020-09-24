@@ -1,10 +1,9 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
+import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';

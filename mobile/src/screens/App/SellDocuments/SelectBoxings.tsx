@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { ILineTara, ITara, ISellDocument } from '../../../model';
+import { ILineTara, ITara } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -67,11 +67,6 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            const document = state.documents ? state.documents.find((doc) => doc.id === route.params.docId) : undefined;
-            const lines =
-              document && (document as ISellDocument)
-                ? (document as ISellDocument).lines.find((line) => line.id === route.params.lineId)
-                : undefined;
             const idx = state.boxingsLine
               ? state.boxingsLine.findIndex(
                   (item) => item.docId === route.params.docId && item.lineDoc === route.params.lineId,
@@ -80,7 +75,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
             const newBoxingsLine = {
               docId: route.params.docId,
               lineDoc: route.params.lineId,
-              lineBoxings: lines ? lines.tara : [],
+              lineBoxings: state.productParams.tara ?? [],
             };
             const updateBoxingsLine =
               idx === -1
@@ -97,12 +92,23 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
+            actions.setProducParams({ ...state.productParams, tara: boxingsLine });
             navigation.navigate('SellProductDetail', route.params);
           }}
         />
       ),
     });
-  }, [actions, navigation, route.params, route.params.docId, route.params.modeCor, state.boxingsLine, state.documents]);
+  }, [
+    actions,
+    boxingsLine,
+    navigation,
+    route.params,
+    route.params.docId,
+    route.params.modeCor,
+    state.boxingsLine,
+    state.documents,
+    state.productParams,
+  ]);
 
   const renderItem = ({ item, selected }: { item: ITara; selected: boolean }) => {
     const boxing = boxingsLine ? boxingsLine.find((box) => box.tarakey === item.id) : undefined;
@@ -168,16 +174,12 @@ const localeStyles = StyleSheet.create({
   line: {
     alignItems: 'center',
     flexDirection: 'row',
-    // height: 45,
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
   minHeight45: {
     minHeight: 45,
-  },
-  scrollContainer: {
-    flexWrap: 'wrap',
   },
   title: {
     padding: 10,
