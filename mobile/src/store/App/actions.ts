@@ -70,14 +70,16 @@ export const AppActions = {
   setSettingsSearch: createActionPayload<ActionAppTypes.SET_SETTINGS_SEARCH, string[]>(
     ActionAppTypes.SET_SETTINGS_SEARCH,
   ),
-  setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams>(ActionAppTypes.SET_FORM_PARAMS),
+  setFormParams: createActionPayload<ActionAppTypes.SET_FORM_PARAMS, IFormParams | ISellLine | IDocumentParams>(
+    ActionAppTypes.SET_FORM_PARAMS,
+  ),
   clearFormParams: createAction<ActionAppTypes.CLEAR_FORM_PARAMS>(ActionAppTypes.CLEAR_FORM_PARAMS),
-  setProducParams: createActionPayload<ActionAppTypes.SET_PRODUCT_PARAMS, ISellLine>(ActionAppTypes.SET_PRODUCT_PARAMS),
+  /*setProducParams: createActionPayload<ActionAppTypes.SET_PRODUCT_PARAMS, ISellLine>(ActionAppTypes.SET_PRODUCT_PARAMS),
   clearProductParams: createAction<ActionAppTypes.CLEAR_PRODUCT_PARAMS>(ActionAppTypes.CLEAR_PRODUCT_PARAMS),
   setDocumentParams: createActionPayload<ActionAppTypes.SET_DOCUMENT_PARAMS, IDocumentParams>(
     ActionAppTypes.SET_DOCUMENT_PARAMS,
   ),
-  clearDocumentParams: createAction<ActionAppTypes.CLEAR_DOCUMENT_PARAMS>(ActionAppTypes.CLEAR_DOCUMENT_PARAMS),
+  clearDocumentParams: createAction<ActionAppTypes.CLEAR_DOCUMENT_PARAMS>(ActionAppTypes.CLEAR_DOCUMENT_PARAMS),*/
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

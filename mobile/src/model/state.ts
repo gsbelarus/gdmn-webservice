@@ -61,7 +61,7 @@ export interface IAppState {
     lineBoxings: ILineTara[];
   }[];
   settingsSearch?: string[];
-  formParams?: IFormParams;
-  productParams?: ISellLine;
-  documentParams?: IDocumentParams;
+  formParams?: IFormParams | ISellLine | IDocumentParams;
+  //productParams?: ISellLine;
+  //documentParams?: IDocumentParams;
 }

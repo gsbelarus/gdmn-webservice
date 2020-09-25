@@ -60,7 +60,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
       const date = good.datework.split('.').reverse();
       good
-        ? actions.setProducParams({
+        ? actions.setFormParams({
             id: route.params.lineId,
             goodId: route.params.prodId,
             quantity: good.weight,
@@ -95,7 +95,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
 
     if (!route.params?.modeCor) {
-      actions.setProducParams({
+      actions.setFormParams({
         id: route.params.lineId,
         goodId: route.params.prodId,
         quantity: 1,
@@ -107,8 +107,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         return;
       }
       route.params?.manufacturingDate
-        ? actions.setProducParams({ ...line, manufacturingDate: route.params.manufacturingDate })
-        : actions.setProducParams(line);
+        ? actions.setFormParams({ ...line, manufacturingDate: route.params.manufacturingDate })
+        : actions.setFormParams(line);
     }
   }, [
     actions,
@@ -122,8 +122,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   ]);
 
   useEffect(() => {
-    if (state.productParams && route.params?.manufacturingDate) {
-      actions.setProducParams({ ...state.productParams, manufacturingDate: route.params.manufacturingDate });
+    if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
+      actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, document, product, route.params]);
@@ -150,7 +150,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           onPress={() => {
             actions.setBoxingsLine([]);
             navigation.navigate('ViewSellDocument', { docId: document?.id });
-            actions.clearProductParams();
+            actions.clearFormParams();
           }}
         />
       ),
@@ -163,7 +163,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                 docId: route.params.docId,
                 line: {
                   ...line,
-                  ...state.productParams,
+                  ...(state.formParams as ISellLine),
                 },
               });
             } else {
@@ -171,19 +171,19 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                 docId: route.params.docId,
                 line: {
                   goodId: route.params.prodId,
-                  ...state.productParams,
+                  ...(state.formParams as ISellLine),
                   id: '0',
                 },
               });
             }
             actions.setBoxingsLine([]);
             navigation.navigate('ViewSellDocument', { docId: document?.id });
-            actions.clearProductParams();
+            actions.clearFormParams();
           }}
         />
       ),
     });
-  }, [actions, document, line, navigation, product, route.params, state.boxingsLine, state.productParams]);
+  }, [actions, document, line, navigation, product, route.params, state.boxingsLine, state.formParams]);
 
   const onPress = () => {
     if (isKeyboardVisible) {
@@ -218,12 +218,12 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             label={'Номер партии'}
             editable={true}
             onChangeText={(text) => {
-              actions.setProducParams({
-                ...state.productParams,
+              actions.setFormParams({
+                ...(state.formParams as ISellLine),
                 numreceive: text,
               });
             }}
-            value={state.productParams?.numreceive ?? ''}
+            value={(state.formParams as ISellLine)?.numreceive ?? ''}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -237,7 +237,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             mode={'flat'}
             label={'Количество по заявке'}
             editable={false}
-            value={(state.productParams?.orderQuantity ?? 0).toString()}
+            value={((state.formParams as ISellLine)?.orderQuantity ?? 0).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -253,15 +253,15 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             editable={true}
             keyboardType="decimal-pad"
             onChangeText={(text) => {
-              actions.setProducParams({
-                ...state.productParams,
+              actions.setFormParams({
+                ...(state.formParams as ISellLine),
                 quantity: Number(!Number.isNaN(text) ? text : '1'),
               });
             }}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={(state.productParams?.quantity ?? 1).toString()}
+            value={((state.formParams as ISellLine)?.quantity ?? 1).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -284,14 +284,14 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                     parentScreen: 'SellProductDetail',
                     fieldName: 'manufacturingDate',
                     title: 'Дата производства:',
-                    value: new Date(state.productParams?.manufacturingDate ?? document?.head.date)
+                    value: new Date((state.formParams as ISellLine)?.manufacturingDate ?? document?.head.date)
                       .toISOString()
                       .slice(0, 10),
                   });
                 }}
               >
                 <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                  {getDateString(state.productParams?.manufacturingDate || document?.head.date)}
+                  {getDateString((state.formParams as ISellLine)?.manufacturingDate || document?.head.date)}
                 </Text>
                 <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
               </TouchableOpacity>
@@ -306,18 +306,21 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   // eslint-disable-next-line react-native/no-inline-styles
                   {
                     color: colors.primary,
-                    fontSize: state.productParams?.tara && state.productParams?.tara.length !== 0 ? 11 : 16,
+                    fontSize:
+                      (state.formParams as ISellLine)?.tara && (state.formParams as ISellLine)?.tara.length !== 0
+                        ? 11
+                        : 16,
                   }
                 }
               >
                 Тара
               </Text>
-              {state.productParams?.tara && state.productParams?.tara.length !== 0 ? (
+              {(state.formParams as ISellLine)?.tara && (state.formParams as ISellLine)?.tara.length !== 0 ? (
                 <Text>
-                  {state.productParams.tara.map((item, idx) => {
+                  {(state.formParams as ISellLine).tara.map((item, idx) => {
                     const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
                     return `${box ? box.name : 'неизвестная тара'}${
-                      idx === state.productParams.tara.length - 1 ? '' : ', '
+                      idx === (state.formParams as ISellLine).tara.length - 1 ? '' : ', '
                     } `;
                   })}
                 </Text>

@@ -19,6 +19,7 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils';
 import { IListItem, ITara, IWeighedGoods } from '../../../model';
+import { IFormParams } from '../../../model/sell';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
@@ -98,18 +99,18 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: appState.formParams?.dateBegin
-                ? new Date(appState.formParams?.dateBegin).toISOString()
+              dateBegin: (appState.formParams as IFormParams)?.dateBegin
+                ? new Date((appState.formParams as IFormParams)?.dateBegin).toISOString()
                 : yesterday.toISOString(),
-              dateEnd: appState.formParams?.dateBegin
-                ? new Date(appState.formParams?.dateEnd).toISOString()
+              dateEnd: (appState.formParams as IFormParams)?.dateBegin
+                ? new Date((appState.formParams as IFormParams)?.dateEnd).toISOString()
                 : today.toISOString(),
-              expiditor: Array.isArray(appState.formParams?.expiditor)
-                ? appState.formParams?.expiditor[0]
-                : appState.formParams?.expiditor,
-              toContact: Array.isArray(appState.formParams?.toContact)
-                ? appState.formParams?.toContact[0]
-                : appState.formParams?.toContact,
+              expiditor: Array.isArray((appState.formParams as IFormParams)?.expiditor)
+                ? (appState.formParams as IFormParams)?.expiditor[0]
+                : (appState.formParams as IFormParams)?.expiditor,
+              toContact: Array.isArray((appState.formParams as IFormParams)?.toContact)
+                ? (appState.formParams as IFormParams)?.toContact[0]
+                : (appState.formParams as IFormParams)?.toContact,
             },
           ],
         },
@@ -141,17 +142,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           },
         ]),
       );
-  }, [
-    apiService.data,
-    state.companyID,
-    appState.formParams?.dateBegin,
-    appState.formParams?.dateEnd,
-    appState.formParams?.expiditor,
-    appState.formParams?.toContact,
-    yesterday,
-    today,
-    appActions,
-  ]);
+  }, [apiService.data, state.companyID, appState.formParams, yesterday, today, appActions]);
 
   const sendSubscribe = useCallback(async () => {
     try {
@@ -299,12 +290,12 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
-                  value: appState.formParams?.dateBegin,
+                  value: (appState.formParams as IFormParams)?.dateBegin,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(appState?.formParams?.dateBegin || yesterday.toISOString())}
+                {getDateString((appState.formParams as IFormParams)?.dateBegin || yesterday.toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -318,12 +309,12 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
-                  value: appState.formParams?.dateEnd,
+                  value: (appState.formParams as IFormParams)?.dateEnd,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(appState?.formParams?.dateEnd || today.toUTCString())}
+                {getDateString((appState.formParams as IFormParams)?.dateEnd || today.toUTCString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -332,14 +323,14 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
           <ReferenceItem
-            value={selectedItem(listPeople, appState.formParams?.expiditor)?.value}
+            value={selectedItem(listPeople, (appState.formParams as IFormParams)?.expiditor)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
                 fieldName: 'expiditor',
                 title: 'Экспедитор',
                 list: listPeople,
-                value: appState.formParams?.expiditor,
+                value: (appState.formParams as IFormParams)?.expiditor,
               })
             }
           />
@@ -347,14 +338,14 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
           <Text style={localeStyles.subdivisionText}>Организация:</Text>
           <ReferenceItem
-            value={selectedItem(listCompanies, appState.formParams?.toContact)?.value}
+            value={selectedItem(listCompanies, (appState.formParams as IFormParams)?.toContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
                 fieldName: 'toContact',
                 title: 'Организация',
                 list: listCompanies,
-                value: appState.formParams?.toContact,
+                value: (appState.formParams as IFormParams)?.toContact,
               })
             }
           />

@@ -7,7 +7,7 @@ import { Text } from 'react-native-paper';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { ILineTara, ITara } from '../../../model';
+import { ILineTara, ITara, ISellLine } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -75,7 +75,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
             const newBoxingsLine = {
               docId: route.params.docId,
               lineDoc: route.params.lineId,
-              lineBoxings: state.productParams.tara ?? [],
+              lineBoxings: (state.formParams as ISellLine).tara ?? [],
             };
             const updateBoxingsLine =
               idx === -1
@@ -92,7 +92,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            actions.setProducParams({ ...state.productParams, tara: boxingsLine });
+            actions.setFormParams({ ...state.formParams, tara: boxingsLine });
             navigation.navigate('SellProductDetail', route.params);
           }}
         />
@@ -107,7 +107,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
     route.params.modeCor,
     state.boxingsLine,
     state.documents,
-    state.productParams,
+    state.formParams,
   ]);
 
   const renderItem = ({ item, selected }: { item: ITara; selected: boolean }) => {

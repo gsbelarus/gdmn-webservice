@@ -160,7 +160,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.CLEAR_FORM_PARAMS: {
       return { ...state, formParams: undefined };
     }
-    case ActionAppTypes.SET_PRODUCT_PARAMS: {
+    /*case ActionAppTypes.SET_PRODUCT_PARAMS: {
       return { ...state, productParams: { ...state.productParams, ...action.payload } };
     }
     case ActionAppTypes.CLEAR_PRODUCT_PARAMS: {
@@ -171,7 +171,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     }
     case ActionAppTypes.CLEAR_DOCUMENT_PARAMS: {
       return { ...state, documentParams: undefined };
-    }
+    }*/
     default:
       return state;
   }
