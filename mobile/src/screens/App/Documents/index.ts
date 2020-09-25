@@ -1,6 +1,10 @@
-export { DocumentsListScreen } from './DocumentsList';
-export { ViewDocumentScreen } from './ViewDocument';
-export { HeadDocumentScreen } from './HeadDocument';
-export { CreateDocumentScreen } from './CreateDocument';
-export { ProductsListScreen } from './ProductsList';
-export { ProductDetailScreen } from './ProductDetails';
+export { SellDocumentsListScreen } from './SellDocumentsList';
+export { ViewSellDocumentScreen } from './ViewSellDocument';
+export { HeadSellDocumentScreen } from './HeadSellDocument';
+export { CreateSellDocumentScreen } from './CreateSellDocument';
+export { SellProductsListScreen } from './ProductsList';
+export { SellProductDetailScreen } from './ProductDetails';
+export { BoxingDetailScreen } from './BoxingDetails';
+export { SettingsGettingDocumentScreen } from './SettingsGettingDocument';
+export { SettingsSearchScreen } from './SettingsSearch';
+export { SelectBoxingsScreen } from './SelectBoxings';

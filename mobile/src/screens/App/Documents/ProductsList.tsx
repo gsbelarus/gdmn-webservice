@@ -7,6 +7,7 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { IWeighedGoods } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -14,29 +15,61 @@ import styles from '../../../styles/global';
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const docId = useRoute<RouteProp<RootStackParamList, 'ProductsList'>>().params?.docId;
+
+  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
 
   return (
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('ProductDetail', { prodId: item.id, docId, modeCor: false });
+        navigation.navigate('SellProductDetail', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
         <Feather name="box" size={20} color={'#FFF'} />
       </View>
       <View style={localStyles.details}>
-        <Text numberOfLines={5} style={[localStyles.name, { color: colors.text }]}>
-          {item.name}
-        </Text>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}</Text>
         <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
       </View>
     </TouchableOpacity>
   );
 });
 
-const ProductsListScreen = () => {
+const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+  const { state } = useAppStore();
+  const [nameGood, setNameGood] = useState('');
+
+  useEffect(() => {
+    const findGood = state.goods.find((good) => good.id === item.goodkey);
+    findGood ? setNameGood(findGood.name) : undefined;
+  }, [item, state]);
+
+  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
+
+  return (
+    <TouchableOpacity
+      style={[localStyles.item, { backgroundColor: colors.card }]}
+      onPress={() => {
+        navigation.navigate('SellProductDetail', { prodId: item.goodkey, docId, modeCor: false, weighedGood: item.id });
+      }}
+    >
+      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+        <Feather name="box" size={20} color={'#FFF'} />
+      </View>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{nameGood}</Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.id}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+const SellProductsListScreen = () => {
+  const route = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -45,9 +78,12 @@ const ProductsListScreen = () => {
   const { state } = useAppStore();
 
   const ref = React.useRef<FlatList<IGood>>(null);
+  const refWeighed = React.useRef<FlatList<IWeighedGoods>>(null);
   useScrollToTop(ref);
+  useScrollToTop(refWeighed);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
+  const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
@@ -59,9 +95,9 @@ const ProductsListScreen = () => {
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
-    Alert.alert('Подтвердить выбор?', data, [
+    Alert.alert('Сохранить результат?', data, [
       {
-        text: 'Принять',
+        text: 'Да',
         onPress: () => {
           setDoScanned(false);
           onChangeText(data);
@@ -69,7 +105,12 @@ const ProductsListScreen = () => {
         },
       },
       {
-        text: 'Отмена',
+        text: 'Нет',
+        onPress: () => {
+          // setDoScanned(false);
+          // onChangeText(data);
+          setScanned(false);
+        },
       },
     ]);
   };
@@ -87,22 +128,34 @@ const ProductsListScreen = () => {
             onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
             style={StyleSheet.absoluteFillObject}
           />
-          {scanned && <Button onPress={() => setScanned(false)}>Сканировать ещё раз</Button>}
+          <Button
+            onPress={() => {
+              setScanned(false);
+              setDoScanned(false);
+            }}
+          >
+            Назад
+          </Button>
         </>
       ) : (
         <>
-          {/* <View style={localStyles.filter}> */}
           <View style={localStyles.flexDirectionRow}>
             <Searchbar
-              placeholder="Поиск по номеру"
+              placeholder="Штрих-код или название"
               onChangeText={onChangeText}
               value={text}
               style={[localStyles.flexGrow, localStyles.searchBar]}
             />
-            <IconButton icon="settings" size={24} style={localStyles.iconSettings} onPress={() => setDoScanned(true)} />
+            <IconButton
+              icon="barcode-scan"
+              size={26}
+              style={localStyles.iconSettings}
+              onPress={() => setDoScanned(true)}
+            />
           </View>
           <ItemSeparator />
-          {/* <TextInput
+          {/*  <View style={[localStyles.filter, { borderColor: colors.border }]}>
+            <TextInput
               style={[
                 styles.input,
                 localStyles.textInput,
@@ -113,25 +166,40 @@ const ProductsListScreen = () => {
               ]}
               onChangeText={onChangeText}
               value={text}
-              placeholder="Штрихкод или название товара"
+              clearButtonMode={'always'}
+              placeholder="Введите шрих-код или название"
               placeholderTextColor={colors.border}
-              multiline={false}
               autoCapitalize="sentences"
               underlineColorAndroid="transparent"
               selectionColor={'black'}
               returnKeyType="done"
               autoCorrect={false}
             />
-            <TouchableOpacity onPress={() => setDoScanned(true)}>
+            <TouchableOpacity onPress={() => onChangeText('')} style={localStyles.barcodeButton}>
+              <MaterialCommunityIcons name="eraser" size={35} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setDoScanned(true)} style={localStyles.barcodeButton}>
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
-            </TouchableOpacity> */}
-          {/* </View> */}
-          {!state.goods.find(
-            (item) =>
-              item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-              item.name.toLowerCase().includes(text.toLowerCase()),
-          ) ? (
-            <Text style={styles.title}>Не найдено</Text>
+            </TouchableOpacity>
+          </View> */}
+          {route.params.weighedGood ? (
+            <FlatList
+              ref={refWeighed}
+              data={
+                !Number.isNaN(text)
+                  ? state.weighedGoods.filter((item) =>
+                      text.length >= 12
+                        ? item.id.toString().includes(Number(text).toString().slice(0, -1)) ||
+                          item.id.toString().includes(Number(text).toString())
+                        : item.id.toString().includes(Number(text).toString()),
+                    )
+                  : state.weighedGoods
+              }
+              keyExtractor={(_, i) => String(i)}
+              renderItem={renderItemWieghed}
+              ItemSeparatorComponent={ItemSeparator}
+              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+            />
           ) : (
             <FlatList
               ref={ref}
@@ -143,6 +211,7 @@ const ProductsListScreen = () => {
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
+              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
             />
           )}
         </>
@@ -151,7 +220,7 @@ const ProductsListScreen = () => {
   );
 };
 
-export { ProductsListScreen };
+export { SellProductsListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
@@ -162,20 +231,34 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
+  barcodeButton: {
+    alignItems: 'flex-end',
+    flex: 1,
+  },
   content: {
     height: '100%',
   },
   details: {
-    margin: 8,
+    // borderWidth: 1,
+    flexDirection: 'column',
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 3,
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   fieldDesciption: {
     opacity: 0.5,
   },
   filter: {
-    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderRadius: 4,
+    borderStyle: 'solid',
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    margin: 15,
+    margin: 5,
+    padding: 5,
   },
   flexDirectionRow: {
     flexDirection: 'row',
@@ -189,13 +272,14 @@ const localStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+    paddingLeft: 8,
   },
   name: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   number: {
+    alignSelf: 'flex-end',
     fontSize: 12,
   },
   searchBar: {
@@ -203,11 +287,9 @@ const localStyles = StyleSheet.create({
     shadowOpacity: 0,
   },
   textInput: {
+    flex: 6,
     fontSize: 14,
-    height: 30,
-    marginRight: 15,
+    height: 35,
     marginTop: 0,
-    paddingTop: 0,
-    width: '90%',
   },
 });
