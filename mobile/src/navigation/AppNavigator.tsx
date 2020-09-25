@@ -159,7 +159,12 @@ const AppNavigator = () => {
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
         <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
         <Stack.Screen key="SelectBoxingsScreen" name="SelectBoxingsScreen" component={SelectBoxingsScreen} />
-        <Stack.Screen key="ScanBarCodeScreen" name="ScanBarCodeScreen" component={ScanBarCodeScreen} />
+        <Stack.Screen
+          key="ScanBarCodeScreen"
+          name="ScanBarCodeScreen"
+          options={{ title: '' }}
+          component={ScanBarCodeScreen}
+        />
       </Stack.Navigator>
     </AppStoreProvider>
   );
