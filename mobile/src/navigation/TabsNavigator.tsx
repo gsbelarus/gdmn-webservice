@@ -66,13 +66,6 @@ function TabBarIcon(props: { name: string; color: string }) {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    margin: 8,
-  },
-  buttons: {
-    flexDirection: 'row',
-    padding: 10,
-  },
   tabBar: {
     backgroundColor: 'white',
   },

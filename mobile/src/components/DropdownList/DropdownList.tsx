@@ -68,19 +68,6 @@ const DropdownList = ({
 export default DropdownList;
 
 const localeStyles = StyleSheet.create({
-  button: {
-    alignItems: 'center',
-    height: 50,
-    justifyContent: 'center',
-    width: Dimensions.get('window').width,
-  },
-  container: {
-    alignItems: 'center',
-    backgroundColor: '#00000040',
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
   containerDropdownButton: {
     flex: 0.07,
   },

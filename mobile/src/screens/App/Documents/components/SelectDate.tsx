@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
 
-import { HeaderRight } from '../../../components/HeaderRight';
-import ItemSeparator from '../../../components/ItemSeparator';
-import SubTitle from '../../../components/SubTitle';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { HeaderRight } from '../../../../components/HeaderRight';
+import ItemSeparator from '../../../../components/ItemSeparator';
+import SubTitle from '../../../../components/SubTitle';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 
 LocaleConfig.locales.ru = {
   monthNames: [

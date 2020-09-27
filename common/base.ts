@@ -5,6 +5,7 @@ export interface IDocument {
 }
 
 export interface IHead {
+  docnumber: string;
   doctype: number;
   fromcontactId: number;
   tocontactId: number;
@@ -25,19 +26,19 @@ export interface IRemain {
   contactId: number;
 }
 
-export interface IContact {
+/* export interface IContact {
   id: number;
   name: string;
   type?: string;
   [fieldName: string]: unknown;
-}
-
+} */
+/* 
 export interface IDocumentType {
   id: number;
   name: string;
   [fieldName: string]: unknown;
-}
-
+} */
+/* 
 export interface IGood {
   id: number;
   name: string;
@@ -45,7 +46,7 @@ export interface IGood {
   alias?: string;
   itemWeight?: number;
   [fieldName: string]: unknown;
-}
+} */
 
 export interface IReference {
   id: number;

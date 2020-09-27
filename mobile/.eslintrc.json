@@ -13,7 +13,6 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "plugin:jest/recommended",
     "@react-native-community"
   ],
   "parser": "@typescript-eslint/parser",

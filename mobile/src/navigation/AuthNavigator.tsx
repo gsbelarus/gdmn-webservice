@@ -102,7 +102,7 @@ const AuthNavigator = () => {
     const getDeviceStatus = async () => {
       try {
         // const response = await apiService.auth.getDevice();
-        const response = await timeout<IResponse<IDevice>>(5000, apiService.auth.getDevice());
+        const response = await timeout<IResponse<IDevice>>(apiService.baseUrl.timeout, apiService.auth.getDevice());
         // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
         //   signal,
         //   5000,
@@ -123,7 +123,7 @@ const AuthNavigator = () => {
     if (deviceRegistered === undefined && state.serverReq?.isLoading) {
       getDeviceStatus();
     }
-  }, [actions, apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
+  }, [actions, apiService.auth, apiService.baseUrl.timeout, authActions, deviceRegistered, signal, state.serverReq]);
 
   useEffect(() => {
     /* 2. Если устройства найдено (deviceRegistered = true)

@@ -1,8 +1,40 @@
-import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '../../../common';
+import { IDocument, IBaseUrl, IReference } from '../../../common';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
-import { ISellDocument, ITara, IWeighedGoods, ILineTara, IFormParams, IDocumentParams, ISellLine } from './sell';
+
+export interface IDataFetch {
+  isLoading: boolean;
+  isError: boolean;
+  status?: string;
+}
+
+export interface IField {
+  id: string;
+  value: string;
+}
+
+export interface IListItem {
+  id?: number;
+  value?: string;
+  [key: string]: unknown;
+}
+
+export interface IFormParams {
+  fromContact?: number[];
+  toContact?: number[];
+  dateBegin?: string;
+  dateEnd?: string;
+}
+
+export interface IDocumentParams {
+  date?: string;
+  expeditorId?: number;
+  tocontactId?: number;
+  fromcontactId?: number;
+  doctype?: number;
+  docnumber?: string;
+}
 
 export interface IServiceContextProps {
   state: IServiceState;
@@ -43,25 +75,26 @@ export interface IAuthState {
 export interface IAppSettings {
   synchronization?: boolean;
   autodeletingDocument?: boolean;
-  dakrTheme?: boolean;
+  darkTheme?: boolean;
+}
+
+export interface IForm {
+  name: string;
+  parent: string;
+  [name: string]: unknown;
 }
 
 export interface IAppState {
-  documents?: (IDocument | ISellDocument)[];
   settings?: IAppSettings;
-  remains?: IRemain[];
-  goods?: IGood[];
-  documentTypes?: IDocumentType[];
-  contacts?: IContact[];
-  boxings?: ITara[];
-  weighedGoods?: IWeighedGoods[];
-  boxingsLine?: {
-    docId: number;
-    lineDoc: string;
-    lineBoxings: ILineTara[];
-  }[];
-  settingsSearch?: string[];
-  formParams?: IFormParams;
-  productParams?: ISellLine;
-  documentParams?: IDocumentParams;
+  documents?: IDocument[];
+  references?: {
+    [name: string]: IReference[];
+  };
+  forms?: {
+    [name: string]: IForm[];
+  };
+}
+
+export interface IContact extends IReference {
+
 }

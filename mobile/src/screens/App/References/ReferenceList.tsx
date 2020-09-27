@@ -92,7 +92,7 @@ const ReferenceListScreen = () => {
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
-      5000,
+      apiService.baseUrl.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -109,7 +109,7 @@ const ReferenceListScreen = () => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [apiService.data, state.companyID]);
+  }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
   const sendSubscribe = useCallback(async () => {
     try {
@@ -178,7 +178,7 @@ const ReferenceListScreen = () => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
-  }, [apiService.data, state.companyID]);
+  }, [AppState.documents, apiService.data, appActions, state.companyID]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

@@ -4,31 +4,28 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
-import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
+import { IDocumentType, IResponse, IMessageInfo, IDocument, IHead } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
-import statuses from '../../../mockData/Otves/documentStatuses.json';
-import { ISellDocument, ISellHead } from '../../../model';
+import statuses from '../../../model/docStates.json';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const Statuses: IDocumentType[] = statuses;
 
-const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
+const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
 
-  const docHead = item.head as ISellHead;
+  const docHead = item.head as IHead;
 
-  const fromContact = state.contacts
-    ? state.contacts.find((contact) => contact.id === docHead?.fromcontactId)
-    : undefined;
+  const fromContact = state.references?.contacts?.find(
+    (contact: { id: number }) => contact.id === docHead?.fromcontactId,
+  );
 
-  const toContact = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.tocontactId) : undefined;
-
-  const expeditor = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.expeditorId) : undefined;
+  const toContact = state.contacts.find((contact: { id: number }) => contact.id === docHead?.tocontactId);
 
   const docDate = new Date(item.head?.date).toLocaleDateString();
 
@@ -52,10 +49,10 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение: {fromContact ? fromContact.name : ''}
+            Подразделение: {fromContact?.name || ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {expeditor ? expeditor.name : ''}
+            Экспедитор: {toContact?.name || ''}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
             {toContact ? toContact.name : ''}
@@ -68,7 +65,7 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
 
 const SellDocumentsListScreen = ({ navigation }) => {
   const { colors } = useTheme();
-  const ref = React.useRef<FlatList<ISellDocument>>(null);
+  const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
   const { apiService } = useServiceStore();
@@ -76,32 +73,26 @@ const SellDocumentsListScreen = ({ navigation }) => {
   const { state: appState, actions } = useAppStore();
 
   const [searchText, setSearchText] = useState('');
-  const [data, setData] = useState(appState.documents as ISellDocument[]);
+  const [data, setData] = useState(appState.documents as IDocument[]);
 
   const showActionSheet = useActionSheet();
 
   useEffect(() => {
     setData(
       appState.documents
-        ? (appState.documents as ISellDocument[]).filter((item) => {
-            const docHead = item.head as ISellHead;
+        ? (appState.documents as IDocument[]).filter((item) => {
+            const docHead = item.head as IHead;
 
-            const fromContact = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.fromcontactId)
-              : undefined;
+            const fromContact = appState.contacts?.find(
+              (contact: { id: number }) => contact.id === docHead?.fromcontactId,
+            );
 
-            const toContact = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.tocontactId)
-              : undefined;
-
-            const expeditor = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.expeditorId)
-              : undefined;
+            const toContact = appState.contacts?.find((contact: { id: number }) => contact.id === docHead?.tocontactId);
 
             const status = Statuses.find((type) => type.id === item.head.status);
 
             return appState.settingsSearch
-              ? appState.settingsSearch.some((value) =>
+              ? appState.settingsSearch.some((value: string) =>
                   value === 'number'
                     ? item.head.docnumber?.includes(searchText)
                     : value === 'state' && status
@@ -110,8 +101,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
                     ? toContact.name.includes(searchText)
                     : value === 'fromContact' && fromContact
                     ? fromContact.name.includes(searchText)
-                    : value === 'expeditor' && expeditor
-                    ? expeditor.name.includes(searchText)
                     : true,
                 )
               : true;
@@ -120,13 +109,13 @@ const SellDocumentsListScreen = ({ navigation }) => {
     );
   }, [appState.contacts, appState.documents, appState.settingsSearch, searchText]);
 
-  const renderItem = ({ item }: { item: ISellDocument }) => <DocumentItem item={item} />;
+  const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = useCallback(async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
 
     timeout(
-      5000,
+      apiService.baseUrl.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'data',
         payload: {
@@ -152,7 +141,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [actions, apiService.data, appState.documents, state.companyID]);
+  }, [actions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -209,9 +198,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        /*  refreshControl={
-          <RefreshControl refreshing={false} onRefresh={() => navigation.navigate('SettingsGettingDocument')} />
-        } */
         ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
       />
       <FAB
@@ -236,9 +222,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
 export { SellDocumentsListScreen };
 
 const localStyles = StyleSheet.create({
-  alignItems: {
-    alignItems: 'flex-end',
-  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -246,14 +229,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  button: {
-    alignItems: 'center',
-    margin: 10,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   company: {
     fontSize: 12,

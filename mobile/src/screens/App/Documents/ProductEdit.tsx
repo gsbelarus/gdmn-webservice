@@ -115,6 +115,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     product,
     route.params.lineId,
     route.params.manufacturingDate,
+    route.params.modeCor,
     route.params.prodId,
     route.params.weighedGood,
   ]);

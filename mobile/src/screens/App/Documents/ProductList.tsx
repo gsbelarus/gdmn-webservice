@@ -125,7 +125,7 @@ const SellProductsListScreen = () => {
       {doScanned ? (
         <>
           <BarCodeScanner
-            onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+            onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
             style={StyleSheet.absoluteFillObject}
           />
           <Button
@@ -231,15 +231,10 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
-  barcodeButton: {
-    alignItems: 'flex-end',
-    flex: 1,
-  },
   content: {
     height: '100%',
   },
   details: {
-    // borderWidth: 1,
     flexDirection: 'column',
     flex: 1,
     marginHorizontal: 8,
@@ -251,14 +246,6 @@ const localStyles = StyleSheet.create({
   },
   fieldDesciption: {
     opacity: 0.5,
-  },
-  filter: {
-    borderBottomWidth: 1,
-    borderRadius: 4,
-    borderStyle: 'solid',
-    flexDirection: 'row',
-    margin: 5,
-    padding: 5,
   },
   flexDirectionRow: {
     flexDirection: 'row',
@@ -285,11 +272,5 @@ const localStyles = StyleSheet.create({
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
-  },
-  textInput: {
-    flex: 6,
-    fontSize: 14,
-    height: 35,
-    marginTop: 0,
   },
 });

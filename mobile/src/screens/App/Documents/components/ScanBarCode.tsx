@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 
-import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
+import { useAppStore } from '../../../../store';
+import styles from '../../../../styles/global';
 
 const ScanBarCodeScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'ScanBarCodeScreen'>>();
@@ -91,7 +91,7 @@ const ScanBarCodeScreen = () => {
       ) : undefined}
       <>
         <BarCodeScanner
-          onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+          onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
           style={StyleSheet.absoluteFillObject}
         />
         <Button

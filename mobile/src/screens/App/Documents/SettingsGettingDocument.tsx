@@ -37,7 +37,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
-      5000,
+      apiService.baseUrl.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -54,7 +54,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [apiService.data, state.companyID]);
+  }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
   useEffect(() => {
     if (!appState.formParams) {
@@ -91,7 +91,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
-      5000,
+      apiService.baseUrl.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -142,12 +142,13 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         ]),
       );
   }, [
+    apiService.baseUrl.timeout,
     apiService.data,
     state.companyID,
-    appState.formParams?.dateBegin,
-    appState.formParams?.dateEnd,
-    appState.formParams?.expiditor,
-    appState.formParams?.toContact,
+    appState.formParams.dateBegin,
+    appState.formParams.dateEnd,
+    appState.formParams.expiditor,
+    appState.formParams.toContact,
     yesterday,
     today,
     appActions,
@@ -415,11 +416,6 @@ const localeStyles = StyleSheet.create({
   subdivisionText: {
     marginBottom: 5,
     textAlign: 'left',
-  },
-  text: {
-    color: '#000',
-    fontSize: 14,
-    fontStyle: 'normal',
   },
   textDate: {
     flex: 0.95,

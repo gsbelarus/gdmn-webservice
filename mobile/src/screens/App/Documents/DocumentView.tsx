@@ -6,21 +6,20 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
 
-import { IDocument, IContact, IGood } from '../../../../../common';
+import { IDocument, ILine, IHead, IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
-import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
-const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
+const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
   const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-  const good: IGood = state.goods.find((i) => i.id === item.goodId);
+  const good: IReference = state.goods.find((i: { id: number }) => i.id === item.goodId);
 
   return (
     <>
@@ -32,28 +31,6 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
-        </Text>
-        {item.numreceive ? (
-          <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
-        ) : undefined}
-        {item.tara ? (
-          <View>
-            {item.tara.map((boxing) => {
-              const findBoxing = state.boxings?.find((box) => boxing.tarakey === box.id);
-              return (
-                <Text style={localStyles.boxingText} key={boxing.tarakey}>
-                  {`${findBoxing ? findBoxing.name : 'неизвестная тара'} - ${
-                    boxing.quantity && !Number.isNaN(boxing.quantity) ? boxing.quantity : 0
-                  }`}
-                </Text>
-              );
-            })}
-          </View>
-        ) : undefined}
-      </View>
-      <View style={localStyles.remainsInfo}>
-        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.orderQuantity ?? 0}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
@@ -87,7 +64,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
   );
 });
 
-const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status: number; docId: number }) => {
+const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
   const navigation = useNavigation();
   const { actions } = useAppStore();
 
@@ -95,7 +72,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
     <TouchableOpacity
       style={localStyles.listContainer}
       onPress={() => {
-        actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
+        // actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
         navigation.navigate('SellProductDetail', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
       }}
     >
@@ -127,22 +104,19 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     setDocId(route.params.docId);
   }, [route.params.docId]);
 
-  const document: IDocument | ISellDocument | undefined = useMemo(() => {
-    return state.documents.find((item) => item.id === docId);
+  const document: IDocument | undefined = useMemo(() => {
+    return state.documents.find((item: { id: number }) => item.id === docId);
   }, [docId, state.documents]);
 
-  const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
-  const refList = React.useRef<FlatList<ISellLine>>(null);
+  const contact: IReference =
+    state.contacts?.find((item: { id: number }) => item.id === document?.head.tocontactId) ?? notFound;
+  const refList = React.useRef<FlatList<ILine>>(null);
 
-  const documentLines = document?.lines as ISellLine[];
-  const boxings = (documentLines ?? []).reduce(
-    (totalLine, line) => [...totalLine, ...(line.tara ?? [])],
-    [] as ILineTara[],
-  );
+  const documentLines = document?.lines as ILine[];
 
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: ISellLine }) => (
+  const renderItem = ({ item }: { item: ILine }) => (
     <LineItem item={item} status={document?.head.status} docId={document?.id} />
   );
 
@@ -203,7 +177,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
+  }, [actions, docId, document.head.status, navigation, showActionSheet]);
 
   return document ? (
     <>
@@ -216,7 +190,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         >
           <View style={localStyles.header}>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              №{(document?.head as ISellHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()} г.
+              №{(document?.head as IHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()} г.
             </Text>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
               {contact.name}
@@ -269,23 +243,6 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           </Text>
         </View>
         <ItemSeparator />
-        <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-          <Text style={localStyles.fontWeightBold}>Тара:</Text>
-          <Text style={localStyles.fontWeightBold}>
-            кол-во{' '}
-            {boxings.length !== 0
-              ? boxings.reduce(
-                  (total, boxing) => Number.parseFloat((total + (Number(boxing.quantity) ?? 0)).toFixed(3)),
-                  0.0,
-                )
-              : 0}{' '}
-            / вес{' '}
-            {boxings.length !== 0
-              ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
-              : 0}
-          </Text>
-        </View>
-        <ItemSeparator />
         <View
           style={[
             localStyles.flexDirectionRow,
@@ -330,17 +287,10 @@ const localStyles = StyleSheet.create({
     marginLeft: 5,
     width: 36,
   },
-  boxingText: {
-    fontSize: 11,
-  },
   buttonDelete: {
     alignItems: 'flex-end',
     flex: 1,
     justifyContent: 'center',
-  },
-  buttons: {
-    alignItems: 'center',
-    margin: 10,
   },
   container: {
     padding: 0,
@@ -375,11 +325,6 @@ const localStyles = StyleSheet.create({
   fontWeightBold: {
     fontWeight: 'bold',
   },
-  goDetailsHeader: {
-    flex: 1,
-    justifyContent: 'center',
-    marginRight: 15,
-  },
   goodInfo: {
     flexBasis: '30%',
     marginLeft: 15,
@@ -404,9 +349,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
-  },
-  marginRight: {
-    marginRight: 15,
   },
   productBarcodeView: {
     fontSize: 12,

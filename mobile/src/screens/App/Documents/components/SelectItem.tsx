@@ -5,12 +5,12 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { HeaderRight } from '../../../components/HeaderRight';
-import ItemSeparator from '../../../components/ItemSeparator';
-import SubTitle from '../../../components/SubTitle';
+import { HeaderRight } from '../../../../components/HeaderRight';
+import ItemSeparator from '../../../../components/ItemSeparator';
+import SubTitle from '../../../../components/SubTitle';
 // import { IField } from '../../../model';
-import { IListItem } from '../../../model';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { IListItem } from '../../../../model/types';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 // import { useAppStore } from '../../../store';
 
 type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;

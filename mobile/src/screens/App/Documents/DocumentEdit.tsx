@@ -5,12 +5,11 @@ import React, { useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Chip } from 'react-native-paper';
 
-import { IContact } from '../../../../../common';
+import { IReference } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { getDateString } from '../../../helpers/utils';
-import { IListItem } from '../../../model';
-import { IDocumentParams } from '../../../model/sell';
+import { IListItem } from '../../../model/types';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -27,12 +26,14 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const getListItems = (contacts: IContact[]) =>
+  const getListItems = (contacts: IReference[]) =>
     contacts.map((item) => {
       return { id: item.id, value: item.name } as IListItem;
     });
 
-  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
+  const people: IReference[] = useMemo(
+    () => appState.references.contacts.filter((item: { type: string }) => item.type === '2'),
+    [appState.references.contacts]);
   const listPeople = useMemo(() => getListItems(people), [people]);
   const companies: IContact[] = appState.contacts.filter((item) => item.type === '3');
   const listCompanies = useMemo(() => getListItems(companies), [companies]);
@@ -53,12 +54,12 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     }
     return res;
   }, [
-    appState.documentParams?.date,
-    appState.documentParams?.docnumber,
-    appState.documentParams?.expeditorId,
-    appState.documentParams?.tocontactId,
-    appState.documentParams?.fromcontactId,
-    appState.documentParams?.doctype,
+    appState.documentParams.date,
+    appState.documentParams.docnumber,
+    appState.documentParams.doctype,
+    appState.documentParams.expeditorId,
+    appState.documentParams.fromcontactId,
+    appState.documentParams.tocontactId,
   ]);
 
   const updateDocument = useCallback(() => {
@@ -77,13 +78,13 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return route.params?.docId;
   }, [
     appActions,
-    route.params?.docId,
-    appState.documentParams?.doctype,
-    appState.documentParams?.fromcontactId,
-    appState.documentParams?.tocontactId,
-    appState.documentParams?.date,
-    appState.documentParams?.docnumber,
-    appState.documentParams?.expeditorId,
+    appState.documentParams.date,
+    appState.documentParams.docnumber,
+    appState.documentParams.doctype,
+    appState.documentParams.expeditorId,
+    appState.documentParams.fromcontactId,
+    appState.documentParams.tocontactId,
+    route.params.docId,
   ]);
 
   const addDocument = useCallback(() => {
@@ -110,12 +111,12 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return id;
   }, [
     appActions,
-    appState.documentParams?.date,
-    appState.documentParams?.docnumber,
-    appState.documentParams?.doctype,
-    appState.documentParams?.expeditorId,
-    appState.documentParams?.fromcontactId,
-    appState.documentParams?.tocontactId,
+    appState.documentParams.date,
+    appState.documentParams.docnumber,
+    appState.documentParams.doctype,
+    appState.documentParams.expeditorId,
+    appState.documentParams.fromcontactId,
+    appState.documentParams.tocontactId,
     appState.documents,
   ]);
 
@@ -167,7 +168,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         date: today.toISOString().slice(0, 10),
       });
     }
-  }, [appActions, appState.documentParams, route.params?.docId, today]);
+  }, [appActions, appState.documentParams, route.params.docId, today]);
 
   useEffect(() => {
     if (!route.params) {
@@ -337,28 +338,6 @@ const localeStyles = StyleSheet.create({
     margin: 5,
     padding: 5,
   },
-  areaPicker: {
-    backgroundColor: 'white',
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    margin: 0,
-    padding: 0,
-  },
-  button: {
-    flex: 1,
-    marginLeft: 7,
-  },
-  buttonDatePicker: {
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  buttonView: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
   container: {
     flex: 1,
   },
@@ -367,12 +346,6 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
     margin: 0,
     padding: 0,
-  },
-  filter: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 5,
   },
   margin: {
     margin: 2,
@@ -398,14 +371,6 @@ const localeStyles = StyleSheet.create({
     flex: 10,
     fontSize: 16,
   },
-  pickerView: {
-    borderWidth: 1,
-    color: 'black',
-    fontSize: 12,
-    height: 35,
-    margin: 1,
-    paddingHorizontal: 0,
-  },
   scroll: {
     maxHeight: 150,
   },
@@ -413,29 +378,16 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  scrollOut: {
-    maxHeight: 400,
-  },
   subdivisionText: {
     flex: 1,
     marginBottom: 5,
     textAlign: 'left',
-  },
-  text: {
-    color: '#000',
-    fontSize: 14,
-    fontStyle: 'normal',
   },
   textDate: {
     flex: 1,
     flexGrow: 4,
     fontSize: 20,
     textAlign: 'center',
-  },
-  textInput: {
-    fontSize: 14,
-    height: 15,
-    marginTop: 5,
   },
   textNumberInput: {
     fontSize: 16,

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 // import { Ionicons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -189,31 +190,15 @@ const localeStyles = StyleSheet.create({
     justifyContent: 'space-between',
     height: Dimensions.get('window').height,
   },
-  containerHome: {
-    flex: 1,
-  },
   containerItem: {
     backgroundColor: 'white',
     width: Dimensions.get('window').width * 0.95,
-  },
-  containerMain: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: '100%',
   },
   filter: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-  },
-  header: {
-    backgroundColor: '#1F618D',
-    width: '100%',
-  },
-  icon: {
-    color: '#000',
-    fontSize: 15,
   },
   input: {
     fontSize: 14,
@@ -249,17 +234,6 @@ const localeStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     flex: 1,
-  },
-  // submitButton: {
-  //   color: '#FFFFFF',
-  //   fontSize: 14,
-  //   fontStyle: 'normal',
-  //   fontWeight: 'bold',
-  // },
-  text: {
-    color: '#000',
-    fontSize: 14,
-    fontStyle: 'normal',
   },
   textInput: {
     borderWidth: 0,
