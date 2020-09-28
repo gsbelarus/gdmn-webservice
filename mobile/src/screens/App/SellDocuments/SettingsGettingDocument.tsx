@@ -250,9 +250,9 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            sendUpdateRequest();
+            // sendUpdateRequest();
             sendDocumentRequest();
-            sendSubscribe();
+            // sendSubscribe();
             appActions.clearFormParams();
             navigation.navigate('SellDocuments');
           }}
