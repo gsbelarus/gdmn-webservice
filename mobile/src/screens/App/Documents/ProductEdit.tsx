@@ -11,9 +11,8 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { getDateString } from '../../../helpers/utils';
-import { ISellLine, ISellDocument } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -28,13 +27,13 @@ type Props = {
   navigation: SellProductDetailScreenNavigationProp;
 };
 
-const SellProductDetailScreen = ({ route, navigation }: Props) => {
+const ProductEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
-  const [line, setLine] = useState<ISellLine | ILine | undefined>();
+  const [line, setLine] = useState<ILine | ILine | undefined>();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
@@ -331,7 +330,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   );
 };
 
-export { SellProductDetailScreen };
+export { ProductEditScreen };
 
 const localeStyles = StyleSheet.create({
   areaChips: {

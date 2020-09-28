@@ -173,8 +173,8 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
-                const newDocuments = dataSet.data as IDocument[];
-                appActions.setDocuments([...appState.documents, ...newDocuments]);
+                const addDocuments = dataSet.data as IDocument[];
+                appActions.setDocuments([...appState.documents, ...addDocuments]);
                 break;
               }
               case 'documenttypes': {
@@ -230,7 +230,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
               if (paramDoc.result) {
                 const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
                 if (document && document.head.status === 2) {
-                  appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
+                  appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                 }
               }
             });

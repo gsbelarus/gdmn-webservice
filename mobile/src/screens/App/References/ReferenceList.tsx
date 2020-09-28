@@ -129,8 +129,8 @@ const ReferenceListScreen = () => {
           ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
-                const newDocuments = dataSet.data as IDocument[];
-                appActions.setDocuments([...AppState.documents, ...newDocuments]);
+                const addDocuments = dataSet.data as IDocument[];
+                appActions.setDocuments([...AppState.documents, ...addDocuments]);
                 break;
               }
               case 'documenttypes': {

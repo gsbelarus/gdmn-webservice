@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { IAuthState, IAuthContextProps } from '../../model';
+import { IAuthState, IAuthContextProps } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AuthActions } from './actions';

@@ -93,8 +93,5 @@ export interface IAppState {
   forms?: {
     [name: string]: IForm[];
   };
-}
-
-export interface IContact extends IReference {
-
+  filterParams: string[];
 }

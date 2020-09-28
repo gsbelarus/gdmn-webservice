@@ -2,20 +2,15 @@ import { Reducer } from 'react';
 import Reactotron from 'reactotron-react-native';
 
 import { IDocument } from '../../../../common';
-import { IAppState } from '../../model';
+import { IAppState } from '../../model/types';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
   settings: undefined,
   documents: undefined,
-  remains: undefined,
-  goods: undefined,
-  contacts: undefined,
-  documentTypes: undefined,
-  boxings: undefined,
-  boxingsLine: undefined,
-  settingsSearch: ['number'],
-  weighedGoods: undefined,
+  references: undefined,
+  forms: undefined,
+  filterParams: ['number'],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -25,10 +20,10 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
   }
 
   switch (action.type) {
-    case ActionAppTypes.NEW_DOCUMENT: {
+    case ActionAppTypes.ADD_DOCUMENT: {
       return { ...state, documents: [...state.documents, action.payload] };
     }
-    case ActionAppTypes.EDIT_DOCUMENT: {
+    case ActionAppTypes.UPDATE_DOCUMENT: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       return {
         ...state,
@@ -42,7 +37,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         ],
       };
     }
-    case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
+    case ActionAppTypes.UPDATE_DOCUMENT_STATUS: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       const document = state.documents[idx];
       return {
@@ -110,7 +105,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         ],
       };
     }
-    case ActionAppTypes.DOCUMENT_EDIT_LINE: {
+    case ActionAppTypes.DOCUMENT_UPDATE_LINE: {
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
       const document = state.documents[idx];
       const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
@@ -152,7 +147,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, boxingsLine: action.payload };
     }
     case ActionAppTypes.SET_SETTINGS_SEARCH: {
-      return { ...state, settingsSearch: action.payload };
+      return { ...state, filterParams: action.payload };
     }
     case ActionAppTypes.SET_FORM_PARAMS: {
       return { ...state, formParams: { ...state.formParams, ...action.payload } };

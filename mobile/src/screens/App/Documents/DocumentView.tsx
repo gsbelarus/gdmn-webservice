@@ -1,7 +1,6 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
@@ -9,14 +8,14 @@ import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
 import { IDocument, ILine, IHead, IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
-import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   const good: IReference = state.goods.find((i: { id: number }) => i.id === item.goodId);
@@ -85,11 +84,11 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
   );
 });
 
-type Props = StackScreenProps<DocumentStackParamList, 'ViewSellDocument'>;
+type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
 
 const notFound = { id: -1, name: '' };
 
-const ViewSellDocumentScreen = ({ route }: Props) => {
+const DocumentViewScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   const showActionSheet = useActionSheet();
@@ -110,6 +109,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
 
   const contact: IReference =
     state.contacts?.find((item: { id: number }) => item.id === document?.head.tocontactId) ?? notFound;
+
   const refList = React.useRef<FlatList<ILine>>(null);
 
   const documentLines = document?.lines as ILine[];
@@ -145,7 +145,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               {
                 title: document?.head?.status === 0 ? "В статус 'Готово' " : "В статус 'Черновик'",
                 onPress: () =>
-                  actions.editStatusDocument({
+                  actions.updateDocumentStatus({
                     id: docId,
                     status: document?.head?.status + (document?.head?.status === 0 ? 1 : -1),
                   }),
@@ -159,7 +159,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                       text: 'OK',
                       onPress: async () => {
                         actions.deleteDocument(docId);
-                        navigation.navigate('SellDocumentsListScreen');
+                        navigation.navigate('SellDocumentListScreen');
                       },
                     },
                     {
@@ -272,7 +272,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   ) : null;
 };
 
-export { ViewSellDocumentScreen };
+export { DocumentViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {

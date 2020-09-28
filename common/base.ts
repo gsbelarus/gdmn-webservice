@@ -33,11 +33,7 @@ export interface IRemain {
   [fieldName: string]: unknown;
 } */
 /* 
-export interface IDocumentType {
-  id: number;
-  name: string;
-  [fieldName: string]: unknown;
-} */
+
 /* 
 export interface IGood {
   id: number;
@@ -47,19 +43,39 @@ export interface IGood {
   itemWeight?: number;
   [fieldName: string]: unknown;
 } */
+export interface IDocumentStatus {
+  id: number;
+  name: string;
+}
 
-export interface IReference {
+export interface IRefData {
+  id: number;
+  name?: string;
+  [fieldName: string]: unknown;
+}
+
+export interface IReference<T = IRefData> {
   id: number;
   name: string;
   type: string;
-  data: {
-    id: number;
-    name?: string;
-    [fieldName: string]: unknown;
-  }[];
+  data: T[];
 }
 
+/* {
+  id: number;
+  name?: string;
+  [fieldName: string]: unknown;
+}[] */
 export interface IDocumentMessage {
   name: string;
   data: IDocument[];
+}
+
+export interface IContact extends IRefData {
+  contactType: number;
+}
+
+export interface IGood extends IRefData {
+  alias?: string;
+  barcode?: string; 
 }

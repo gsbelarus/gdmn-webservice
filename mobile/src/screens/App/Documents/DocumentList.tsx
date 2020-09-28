@@ -1,17 +1,17 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
-import { IDocumentType, IResponse, IMessageInfo, IDocument, IHead } from '../../../../../common';
+import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates.json';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
-const Statuses: IDocumentType[] = statuses;
+const Statuses: IDocumentStatus[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
@@ -19,22 +19,27 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
   const { state } = useAppStore();
 
-  const docHead = item.head as IHead;
-
-  const fromContact = state.references?.contacts?.find(
-    (contact: { id: number }) => contact.id === docHead?.fromcontactId,
+  const getContact = useCallback(
+    (id: number): IContact => {
+      return ((state.references?.contacts as unknown) as IContact[])?.find(
+        (contact: { id: number }) => contact.id === id,
+      );
+    },
+    [state.references.contacts],
   );
 
-  const toContact = state.contacts.find((contact: { id: number }) => contact.id === docHead?.tocontactId);
+  const docHead = useMemo(() => item.head, [item.head]);
+  const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
+  const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
   const docDate = new Date(item.head?.date).toLocaleDateString();
 
-  const status = Statuses.find((type) => type.id === item.head.status);
+  const status = useMemo(() => Statuses.find((type) => type.id === item.head.status), [item.head.status]);
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ViewSellDocument', { docId: item.id });
+        navigation.navigate('DocumentViewScreen', { docId: item.id });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -49,10 +54,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение: {fromContact?.name || ''}
+            С подразделения: {fromContact?.name || ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {toContact?.name || ''}
+            На подразделение: {toContact?.name || ''}
           </Text>
           <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
             {toContact ? toContact.name : ''}
@@ -63,7 +68,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const SellDocumentsListScreen = ({ navigation }) => {
+const DocumentListScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
@@ -77,37 +82,42 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   const showActionSheet = useActionSheet();
 
+  const getContact = useCallback(
+    (id: number): IContact => {
+      return ((appState.references?.contacts as unknown) as IContact[])?.find(
+        (contact: { id: number }) => contact.id === id,
+      );
+    },
+    [appState.references.contacts],
+  );
+
   useEffect(() => {
     setData(
-      appState.documents
-        ? (appState.documents as IDocument[]).filter((item) => {
-            const docHead = item.head as IHead;
+      appState.documents?.filter((item) => {
+        const docHead = item.head;
 
-            const fromContact = appState.contacts?.find(
-              (contact: { id: number }) => contact.id === docHead?.fromcontactId,
-            );
+        const fromContact = getContact(docHead?.fromcontactId);
 
-            const toContact = appState.contacts?.find((contact: { id: number }) => contact.id === docHead?.tocontactId);
+        const toContact = getContact(docHead?.tocontactId);
 
-            const status = Statuses.find((type) => type.id === item.head.status);
+        const status = Statuses.find((type) => type.id === item.head.status);
 
-            return appState.settingsSearch
-              ? appState.settingsSearch.some((value: string) =>
-                  value === 'number'
-                    ? item.head.docnumber?.includes(searchText)
-                    : value === 'state' && status
-                    ? status.name.includes(searchText)
-                    : value === 'toContact' && toContact
-                    ? toContact.name.includes(searchText)
-                    : value === 'fromContact' && fromContact
-                    ? fromContact.name.includes(searchText)
-                    : true,
-                )
-              : true;
-          })
-        : [],
+        return appState.filterParams
+          ? appState.filterParams.some((value: string) =>
+              value === 'number'
+                ? item.head.docnumber?.includes(searchText)
+                : value === 'state' && status
+                ? status.name.includes(searchText)
+                : value === 'toContact' && toContact
+                ? toContact.name.includes(searchText)
+                : value === 'fromContact' && fromContact
+                ? fromContact.name.includes(searchText)
+                : true,
+            )
+          : true;
+      }) || [],
     );
-  }, [appState.contacts, appState.documents, appState.settingsSearch, searchText]);
+  }, [appState.references.contacts, appState.documents, appState.filterParams, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
@@ -131,7 +141,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
               text: 'Закрыть',
               onPress: () => {
                 documents.forEach((item) => {
-                  actions.editStatusDocument({ id: item.id, status: item.head.status + 1 });
+                  actions.updateDocumentStatus({ id: item.id, status: item.head.status + 1 });
                 });
               },
             },
@@ -219,7 +229,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
   );
 };
 
-export { SellDocumentsListScreen };
+export { DocumentListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {

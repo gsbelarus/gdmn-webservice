@@ -1,64 +1,22 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { HeaderRight } from '../components/HeaderRight';
-import { IListItem } from '../model';
-import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
-import {
-  SellProductDetailScreen,
-  CreateSellDocumentScreen,
-  SellProductsListScreen,
-  BoxingDetailScreen,
+// import { HeaderRight } from '../components/HeaderRight';
+import { IListItem } from '../model/types';
+/* import {
+  DocumentListScreen,
+  DocumentEditScreen,
+  ,
   SettingsGettingDocumentScreen,
-  SettingsSearchScreen,
-  SelectBoxingsScreen,
-} from '../screens/App/SellDocuments';
-import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
-import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
-import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
+  FilterEditScreen,
+} from '../screens/App/Documents';
+ */
+import { ScanBarCodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
 import { AppStoreProvider } from '../store';
 import TabsNavigator from './TabsNavigator';
 
 export type RootStackParamList = {
   BottomTabs: undefined;
-  ProductDetail: {
-    prodId: number;
-    docId: number;
-    modeCor: boolean;
-    quantity?: string;
-    batchNumber?: string;
-  };
-  CreateDocument: { docId?: number };
-  ProductsList: { docId: number };
-  SellProductDetail: {
-    lineId: string;
-    prodId: number;
-    docId: number;
-    modeCor: boolean;
-    quantity?: string;
-    batchNumber?: string;
-    manufacturingDate?: string;
-    weighedGood?: number;
-  };
-  CreateSellDocument: {
-    docId: number;
-    // [fieldName: string]: (number | string)[] | number;
-    [fieldName: string]: unknown;
-  };
-  SellProductsList: { docId: number; weighedGood?: boolean };
-  BoxingDetail: {
-    boxingId: number;
-    lineId: string;
-    docId: number;
-    prodId: number;
-    modeCor: boolean;
-    quantity: string;
-    batchNumber: string;
-  };
-  SettingsSearchScreen: undefined;
-  SettingsGettingDocument: {
-    [fieldName: string]: number[] | Date | number | string;
-  };
   SelectItemScreen: {
     parentScreen: keyof RootStackParamList;
     fieldName: string;
@@ -68,14 +26,6 @@ export type RootStackParamList = {
     value: number[];
   };
   SelectDateScreen: { parentScreen: keyof RootStackParamList; fieldName: string; title: string; value: string };
-  SelectBoxingsScreen: {
-    lineId: string;
-    docId: number;
-    prodId: number;
-    modeCor: boolean;
-    quantity: string;
-    batchNumber: string;
-  };
   ScanBarCodeScreen: {
     docId: number;
   };
@@ -96,7 +46,7 @@ const AppNavigator = () => {
             // title: 'Mobile inventory',
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           key="ProductDetail"
           name="ProductDetail"
           component={ProductDetailScreen}
@@ -119,8 +69,8 @@ const AppNavigator = () => {
               />
             ),
           })}
-        />
-        <Stack.Screen
+        /> */}
+        {/*  <Stack.Screen
           key="SellProductDetail"
           name="SellProductDetail"
           component={SellProductDetailScreen}
@@ -134,11 +84,11 @@ const AppNavigator = () => {
           name="CreateSellDocument"
           component={CreateSellDocumentScreen}
           options={{ title: '' }}
-        />
-        <Stack.Screen
+        /> */}
+        {/* <Stack.Screen
           key="SellProductsList"
           name="SellProductsList"
-          component={SellProductsListScreen}
+          component={ProductListScreen}
           options={({ route, navigation }) => ({
             title: 'Товары',
             headerTitleStyle: { alignSelf: 'center' },
@@ -152,17 +102,16 @@ const AppNavigator = () => {
             ),
           })}
         />
-        <Stack.Screen key="BoxingDetail" name="BoxingDetail" component={BoxingDetailScreen} />
-        <Stack.Screen
+        */}
+        {/* <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"
           component={SettingsGettingDocumentScreen}
           options={{ title: '' }}
         />
-        <Stack.Screen key="SettingsSearchScreen" name="SettingsSearchScreen" component={SettingsSearchScreen} />
+         */}
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
         <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
-        <Stack.Screen key="SelectBoxingsScreen" name="SelectBoxingsScreen" component={SelectBoxingsScreen} />
         <Stack.Screen key="ScanBarCodeScreen" name="ScanBarCodeScreen" component={ScanBarCodeScreen} />
       </Stack.Navigator>
     </AppStoreProvider>

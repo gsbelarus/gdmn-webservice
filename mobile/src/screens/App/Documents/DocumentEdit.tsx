@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Chip } from 'react-native-paper';
 
-import { IReference } from '../../../../../common';
+import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { getDateString } from '../../../helpers/utils';
@@ -14,9 +14,9 @@ import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-type Props = StackScreenProps<RootStackParamList, 'CreateSellDocument'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentEdit'>;
 
-const CreateSellDocumentScreen = ({ route }: Props) => {
+const DocumentEditScreen = ({ route }: Props) => {
   const today = new Date();
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -26,18 +26,19 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const getListItems = (contacts: IReference[]) =>
-    contacts.map((item) => {
-      return { id: item.id, value: item.name } as IListItem;
-    });
+  const getListItems = (contacts: IContact[]): IListItem[] =>
+    contacts.map((item) => ({ id: item.id, value: item.name }));
 
-  const people: IReference[] = useMemo(
-    () => appState.references.contacts.filter((item: { type: string }) => item.type === '2'),
-    [appState.references.contacts]);
-  const listPeople = useMemo(() => getListItems(people), [people]);
-  const companies: IContact[] = appState.contacts.filter((item) => item.type === '3');
-  const listCompanies = useMemo(() => getListItems(companies), [companies]);
-  const departments: IContact[] = appState.contacts.filter((item) => item.type === '4');
+  // const people: IReference[] = useMemo(
+  //   () => appState.references.contacts.filter((item: { type: string }) => item.type === '2'),
+  //   [appState.references.contacts]);
+  // const listPeople = useMemo(() => getListItems(people), [people]);
+  // const companies = (appState.contacts as IContact[]).filter((item) => item.contactType === 3);
+  // const listCompanies = useMemo(() => getListItems(companies), [companies]);
+  const departments: IContact[] = useMemo(
+    () => (appState.contacts as IContact[]).filter((item) => item.contactType === 4),
+    [appState.contacts],
+  );
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
   const checkDocument = useCallback(() => {
@@ -63,7 +64,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   ]);
 
   const updateDocument = useCallback(() => {
-    appActions.editDocument({
+    appActions.updateDocument({
       id: route.params?.docId,
       head: {
         doctype: appState.documentParams?.doctype,
@@ -72,7 +73,6 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         date: appState.documentParams?.date,
         status: 0,
         docnumber: appState.documentParams?.docnumber,
-        expeditorId: appState.documentParams?.expeditorId,
       },
     });
     return route.params?.docId;
@@ -81,7 +81,6 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     appState.documentParams.date,
     appState.documentParams.docnumber,
     appState.documentParams.doctype,
-    appState.documentParams.expeditorId,
     appState.documentParams.fromcontactId,
     appState.documentParams.tocontactId,
     route.params.docId,
@@ -95,7 +94,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           return newId > currId ? newId : currId;
         }, 0) + 1;
 
-    appActions.newDocument({
+    appActions.addDocument({
       id,
       head: {
         doctype: appState.documentParams?.doctype,
@@ -129,13 +128,13 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           onPress={() => {
             appActions.clearDocumentParams();
             if (!route.params) {
-              navigation.navigate('SellDocumentsListScreen');
+              navigation.navigate('SellDocumentListScreen');
               return;
             }
             const { docId } = route.params;
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
-            docId ? navigation.navigate('ViewSellDocument', { docId }) : navigation.navigate('SellDocumentsListScreen');
+            docId ? navigation.navigate('ViewSellDocument', { docId }) : navigation.navigate('SellDocumentListScreen');
           }}
         />
       ),
@@ -320,7 +319,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   );
 };
 
-export { CreateSellDocumentScreen };
+export { DocumentEditScreen };
 
 const localeStyles = StyleSheet.create({
   area: {

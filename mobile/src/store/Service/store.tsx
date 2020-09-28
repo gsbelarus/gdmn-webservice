@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
-import { IServiceContextProps, IServiceState } from '../../model';
+import { IServiceContextProps, IServiceState } from '../../model/types';
 import Api from '../../service/Api';
 import Storage from '../../service/Storage';
 import { useTypesafeActions } from '../utils';

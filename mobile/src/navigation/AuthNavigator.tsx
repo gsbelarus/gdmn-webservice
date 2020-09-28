@@ -1,11 +1,9 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
-import { LogBox } from 'react-native';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
-import config from '../config';
 import { createCancellableSignal, appStorage, timeout } from '../helpers/utils';
-import { IDataFetch } from '../model';
+import { IDataFetch } from '../model/types';
 import AppNavigator from '../navigation/AppNavigator';
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens/Auth';
 import { useAuthStore, useServiceStore } from '../store';

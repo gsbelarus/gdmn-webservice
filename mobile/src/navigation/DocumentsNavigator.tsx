@@ -1,55 +1,37 @@
-import { Feather } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { DocumentsListScreen, ViewDocumentScreen, HeadDocumentScreen } from '../screens/App/Documents';
+import { DocumentEditScreen, FilterEditScreen, DocumentViewScreen, DocumentListScreen } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
-  DocumentsListScreen: undefined;
-  ViewDocument: { docId: number };
-  HeadDocument: { docId: number };
+  DocumentList: undefined;
+  DocumentEdit: { docId: number };
+  DocumentView: { docId: number };
+  FilterEdit: undefined;
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
 
 const DocumentsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="DocumentsListScreen">
+    <Stack.Navigator initialRouteName="DocumentList">
       <Stack.Screen
-        key="DocumentsList"
-        name="DocumentsListScreen"
-        component={DocumentsListScreen}
+        key="DocumentList"
+        name="DocumentList"
+        component={DocumentListScreen}
         options={{ title: 'Документы' }}
       />
       <Stack.Screen
-        key="ViewDocument"
-        name="ViewDocument"
-        component={ViewDocumentScreen}
+        key="DocumentView"
+        name="DocumentView"
+        component={DocumentViewScreen}
         initialParams={{ docId: 0 }}
-        options={({ navigation }) => ({
-          title: '',
-          headerLeft: () => (
-            <TouchableOpacity
-              style={localeStyles.marginLeft}
-              onPress={() => {
-                navigation.navigate('DocumentsListScreen');
-              }}
-            >
-              <Feather name="arrow-left" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={{ title: '', animationTypeForReplace: 'pop' }}
       />
-      <Stack.Screen key="HeadDocument" name="HeadDocument" component={HeadDocumentScreen} options={{ title: '' }} />
+      <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
     </Stack.Navigator>
   );
 };
 
 export default DocumentsNavigator;
-
-const localeStyles = StyleSheet.create({
-  marginLeft: {
-    marginLeft: 15,
-  },
-});

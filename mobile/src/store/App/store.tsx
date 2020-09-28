@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 
 import { appStorage } from '../../helpers/utils';
-import { IAppContextProps, IAppState, IAppSettings } from '../../model';
+import { IAppContextProps, IAppState, IAppSettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
@@ -20,8 +20,6 @@ const sections = {
   GOODS: 'GOODS',
   DOCUMENTS: 'DOCUMENTS',
   REMAINS: 'REMAINS',
-  BOXINGS: 'BOXINGS',
-  WEIGHEDGOODS: 'WEIGHEDGOODS',
 };
 
 const createStoreContext = () => {
@@ -57,12 +55,6 @@ const createStoreContext = () => {
         // контакты
         const contacts = await appStorage.getItem(`${storagePath}/${sections.CONTACTS}`);
         actions.setContacts(contacts || []);
-        // тары
-        const boxings = await appStorage.getItem(`${storagePath}/${sections.BOXINGS}`);
-        actions.setBoxings(boxings || []);
-        // взвешенные товары
-        const weighedGoods = await appStorage.getItem(`${storagePath}/${sections.WEIGHEDGOODS}`);
-        actions.setWeighedGoods(weighedGoods || []);
         setLoading(false);
       };
 
@@ -84,39 +76,40 @@ const createStoreContext = () => {
 
     /*  Сохранение контактов в storage при их изменении */
     useEffect(() => {
-      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.contacts);
-      if (state.contacts && storagePath && !isLoading) {
+      const saveData = async () =>
+        await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references.contacts);
+      if (state.references.contacts && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.contacts, storagePath]);
+    }, [state.references.contacts, storagePath]);
 
     /*  Сохранение товаров в storage при их изменении */
     useEffect(() => {
-      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.goods);
-      if (state.goods && storagePath && !isLoading) {
+      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references.goods);
+      if (state.references.goods && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.goods, storagePath]);
+    }, [state.references.goods, storagePath]);
 
     /*  Сохранение типов документов в storage при их изменении */
     useEffect(() => {
       const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.documentTypes);
-      if (state.documentTypes && storagePath && !isLoading) {
+        await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references.documentTypes);
+      if (state.references.documentTypes && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.documentTypes, storagePath]);
+    }, [state.references.documentTypes, storagePath]);
 
     /*  Сохранение остатков в storage при их изменении */
     useEffect(() => {
       const saveData = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.remains);
+        await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references.remains);
       };
 
-      if (state.remains && storagePath && !isLoading) {
+      if (state.references.remains && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.remains, storagePath]);
+    }, [state.references.remains, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {
@@ -128,28 +121,6 @@ const createStoreContext = () => {
         saveSettings();
       }
     }, [state.documents, storagePath]);
-
-    /*  Сохранение тар в storage при их изменении */
-    useEffect(() => {
-      const saveSettings = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.BOXINGS}`, state.boxings);
-      };
-
-      if (state.boxings && storagePath && !isLoading) {
-        saveSettings();
-      }
-    }, [state.boxings, storagePath]);
-
-    /*  Сохранение документа взвешивания в storage при их изменении */
-    useEffect(() => {
-      const saveSettings = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.WEIGHEDGOODS}`, state.weighedGoods);
-      };
-
-      if (state.weighedGoods && storagePath && !isLoading) {
-        saveSettings();
-      }
-    }, [state.weighedGoods, storagePath]);
 
     useEffect(() => {
       if (!!state.settings?.autodeletingDocument && !isLoading) {

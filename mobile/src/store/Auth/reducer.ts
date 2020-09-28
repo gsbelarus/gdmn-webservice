@@ -1,6 +1,6 @@
 import { Reducer } from 'react';
 
-import { IAuthState } from '../../model';
+import { IAuthState } from '../../model/types';
 import { TAuthActions, ActionAuthTypes } from './actions';
 
 export const initialState: IAuthState = {

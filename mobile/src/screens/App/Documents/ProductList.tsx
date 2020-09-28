@@ -37,7 +37,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 });
 
-const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
+/* const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { state } = useAppStore();
@@ -66,9 +66,9 @@ const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
       </View>
     </TouchableOpacity>
   );
-});
+}); */
 
-const SellProductsListScreen = () => {
+const ProductListScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
@@ -83,7 +83,7 @@ const SellProductsListScreen = () => {
   useScrollToTop(refWeighed);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
-  const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
+  // const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
@@ -182,45 +182,25 @@ const SellProductsListScreen = () => {
               <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
             </TouchableOpacity>
           </View> */}
-          {route.params.weighedGood ? (
-            <FlatList
-              ref={refWeighed}
-              data={
-                !Number.isNaN(text)
-                  ? state.weighedGoods.filter((item) =>
-                      text.length >= 12
-                        ? item.id.toString().includes(Number(text).toString().slice(0, -1)) ||
-                          item.id.toString().includes(Number(text).toString())
-                        : item.id.toString().includes(Number(text).toString()),
-                    )
-                  : state.weighedGoods
-              }
-              keyExtractor={(_, i) => String(i)}
-              renderItem={renderItemWieghed}
-              ItemSeparatorComponent={ItemSeparator}
-              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
-            />
-          ) : (
-            <FlatList
-              ref={ref}
-              data={state.goods.filter(
-                (item) =>
-                  item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                  item.name.toLowerCase().includes(text.toLowerCase()),
-              )}
-              keyExtractor={(_, i) => String(i)}
-              renderItem={renderItem}
-              ItemSeparatorComponent={ItemSeparator}
-              ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
-            />
-          )}
+          <FlatList
+            ref={ref}
+            data={state.goods.filter(
+              (item) =>
+                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                item.name.toLowerCase().includes(text.toLowerCase()),
+            )}
+            keyExtractor={(_, i) => String(i)}
+            renderItem={renderItem}
+            ItemSeparatorComponent={ItemSeparator}
+            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+          />
         </>
       )}
     </View>
   );
 };
 
-export { SellProductsListScreen };
+export { ProductListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {

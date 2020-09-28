@@ -3,10 +3,8 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-/* import config from '../config';
-import DocumentsNavigator from './DocumentsNavigator'; */
+import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
-import SellDocumentsNavigator from './SellDocumentsNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {
@@ -22,24 +20,14 @@ const TabsNavigator = () => {
   return (
     <TabsStack.Navigator barStyle={styles.tabBar}>
       <TabsStack.Screen
-        name="SellDocuments"
-        component={SellDocumentsNavigator}
+        name="Documents"
+        component={DocumentsNavigator}
         options={{
-          title: 'Отвес-накладные',
-          tabBarLabel: 'Отвесы',
+          title: 'Документы',
+          tabBarLabel: 'Документы',
           tabBarIcon: ({ color }) => <TabBarIcon name="file-document-box-multiple" color={color} />,
         }}
       />
-      {/* <TabsStack.Screen
-        name="Documents"
-        component={config.system[0].component === 'DocumentsNavigator' ? DocumentsNavigator : undefined}
-        options={{
-          title: config.system[0].options.title,
-          tabBarLabel: config.system[0].options.tabBarLabel,
-          tabBarIcon: config.system[0].options.tabBarIcon,
-          tabBarColor: config.system[0].options.tabBarColor,
-        }}
-      /> */}
       <TabsStack.Screen
         name="References"
         component={ReferencesNavigator}

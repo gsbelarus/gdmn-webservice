@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme, RouteProp, CompositeNavigationProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useLayoutEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -8,21 +8,11 @@ import { Text } from 'react-native-paper';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { TabsStackParams } from '../../../navigation/TabsNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-type SettingsSearchScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<RootStackParamList, 'BoxingDetail'>,
-  StackNavigationProp<TabsStackParams>
->;
-type SettingsSearchScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
-
-interface Props {
-  route: SettingsSearchScreenRouteProp;
-  navigation: SettingsSearchScreenNavigationProp;
-}
+type Props = StackScreenProps<DocumentStackParamList, 'FilterEdit'>;
 
 const Line = React.memo(
   ({ name, title, selected, onPress }: { name: string; title: string; selected: boolean; onPress: () => void }) => {
@@ -41,11 +31,11 @@ const Line = React.memo(
   },
 );
 
-const SettingsSearchScreen = ({ navigation }: Props) => {
+const FilterEditScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const [fieldSearch, setFieldSearch] = useState<string[]>(state.settingsSearch ?? []);
+  const [fieldSearch, setFieldSearch] = useState<string[]>(state.filterParams ?? []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -54,7 +44,7 @@ const SettingsSearchScreen = ({ navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            navigation.navigate('SellDocuments');
+            navigation.navigate('DocumentList');
           }}
         />
       ),
@@ -63,7 +53,7 @@ const SettingsSearchScreen = ({ navigation }: Props) => {
           text="Готово"
           onPress={() => {
             actions.setSettingsSearch(fieldSearch);
-            navigation.navigate('SellDocuments');
+            navigation.navigate('DocumentList');
           }}
         />
       ),
@@ -135,7 +125,7 @@ const SettingsSearchScreen = ({ navigation }: Props) => {
   );
 };
 
-export { SettingsSearchScreen };
+export { FilterEditScreen };
 
 const localeStyles = StyleSheet.create({
   container: {
