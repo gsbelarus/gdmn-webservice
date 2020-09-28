@@ -34,7 +34,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
-  const [line, setLine] = useState<ISellLine | ILine | undefined>();
+  const [line, setLine] = useState<ISellLine | undefined>();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
@@ -158,12 +158,20 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            if (line?.id && route?.params?.modeCor) {
+            const editeLine = (document as ISellDocument).lines.find(
+              (item) =>
+                item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params.prodId,
+            );
+            if ((line?.id && route?.params?.modeCor) || editeLine) {
               actions.editLine({
                 docId: route.params.docId,
                 line: {
-                  ...line,
+                  ...(editeLine ?? line),
                   ...(state.formParams as ISellLine),
+                  quantity: (state.formParams as ISellLine).quantity + (editeLine ? editeLine.quantity : line.quantity),
+                  tara: (editeLine ? editeLine.tara : (line as ISellLine).tara).concat(
+                    (state.formParams as ISellLine).tara ?? [],
+                  ),
                 },
               });
             } else {

@@ -114,6 +114,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
       const document = state.documents[idx];
       const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
+      console.log(action.payload.line);
       return {
         ...state,
         documents: [
