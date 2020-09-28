@@ -114,7 +114,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
       const document = state.documents[idx];
       const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
-      console.log(action.payload.line);
       return {
         ...state,
         documents: [
@@ -161,18 +160,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.CLEAR_FORM_PARAMS: {
       return { ...state, formParams: undefined };
     }
-    /*case ActionAppTypes.SET_PRODUCT_PARAMS: {
-      return { ...state, productParams: { ...state.productParams, ...action.payload } };
-    }
-    case ActionAppTypes.CLEAR_PRODUCT_PARAMS: {
-      return { ...state, productParams: undefined };
-    }
-    case ActionAppTypes.SET_DOCUMENT_PARAMS: {
-      return { ...state, documentParams: { ...state.documentParams, ...action.payload } };
-    }
-    case ActionAppTypes.CLEAR_DOCUMENT_PARAMS: {
-      return { ...state, documentParams: undefined };
-    }*/
     default:
       return state;
   }

@@ -6,7 +6,7 @@ import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-nati
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, TextInput } from 'react-native-paper';
 
-import { IDocument, IGood, ILine } from '../../../../../common';
+import { IDocument, IGood } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
