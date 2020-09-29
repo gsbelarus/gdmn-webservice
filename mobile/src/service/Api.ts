@@ -79,6 +79,9 @@ export default class Api {
     deleteMessage: async (companyId: string, uid: string): Promise<IResponse<void>> =>
       remove(this.getUrl(), `/messages/${companyId}/${uid}?deviceId=${this.deviceId}`),
 
+    deleteAllMessage: async (): Promise<IResponse<void>> =>
+      remove(this.getUrl(), `/messages/?deviceId=${this.deviceId}`),
+
     subscribe: async (companyId: string): Promise<IResponse<IMessage[]>> =>
       get(this.getUrl(), `/messages/subscribe/${companyId}/${config.system[0].name}?deviceId=${this.deviceId}`),
 
