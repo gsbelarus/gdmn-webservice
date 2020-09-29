@@ -104,7 +104,7 @@ class Collection<T extends CollectionItem> {
         try {
           result = JSON.parse(data);
         } catch (jsonErr) {
-          new Error(`The file has data in the wrong format - ${jsonErr}`);
+          reject(jsonErr)
         }
         return resolve(result);
       });
