@@ -169,7 +169,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   ...(editeLine ?? line),
                   ...(state.formParams as ISellLine),
                   quantity: (state.formParams as ISellLine).quantity + (editeLine ? editeLine.quantity : line.quantity),
-                  tara: (editeLine ? editeLine.tara : (line as ISellLine).tara).concat(
+                  tara: (editeLine ? editeLine.tara ?? [] : (line as ISellLine).tara ?? []).concat(
                     (state.formParams as ISellLine).tara ?? [],
                   ),
                 },
