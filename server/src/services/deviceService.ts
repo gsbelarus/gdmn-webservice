@@ -10,7 +10,7 @@ const findAll = async () => {
 };
 
 const findOneByUidAndUser = async ({ deviceId, userName }: { deviceId: string; userName: string }) => {
-  const user = await users.find(i => i.userName === userName);
+  const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
 
   if (!user) {
     throw new Error('пользователь не найден');
