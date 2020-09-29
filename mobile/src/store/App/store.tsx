@@ -77,7 +77,7 @@ const createStoreContext = () => {
     /*  Сохранение контактов в storage при их изменении */
     useEffect(() => {
       const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references.contacts);
+        await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references?.contacts);
       if (state.references.contacts && storagePath && !isLoading) {
         saveData();
       }
@@ -85,7 +85,7 @@ const createStoreContext = () => {
 
     /*  Сохранение товаров в storage при их изменении */
     useEffect(() => {
-      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references.goods);
+      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
       if (state.references.goods && storagePath && !isLoading) {
         saveData();
       }
@@ -94,11 +94,11 @@ const createStoreContext = () => {
     /*  Сохранение типов документов в storage при их изменении */
     useEffect(() => {
       const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references.documentTypes);
-      if (state.references.documentTypes && storagePath && !isLoading) {
+        await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references?.documentTypes);
+      if (state.references?.documentTypes && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.references.documentTypes, storagePath]);
+    }, [state.references?.documentTypes, storagePath]);
 
     /*  Сохранение остатков в storage при их изменении */
     useEffect(() => {

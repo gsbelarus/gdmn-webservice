@@ -32,9 +32,9 @@ export interface IRemain {
   type?: string;
   [fieldName: string]: unknown;
 } */
-/* 
+/*
 
-/* 
+/*
 export interface IGood {
   id: number;
   name: string;
@@ -77,5 +77,5 @@ export interface IContact extends IRefData {
 
 export interface IGood extends IRefData {
   alias?: string;
-  barcode?: string; 
+  barcode?: string;
 }

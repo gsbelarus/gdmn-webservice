@@ -8,19 +8,14 @@ import {
   IMessage,
   IReference,
   IContact,
-  IDocumentType,
   IGood,
   IRemain,
-  IDocument,
+  IDocument, IRefData
 } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
-import config from '../../config';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
-import documentsRef from '../../mockData/Otves/Document.json';
-import referencesRef from '../../mockData/Otves/References.json';
-import { ITara, IWeighedGoods } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
 const SettingsScreen = () => {
@@ -61,8 +56,6 @@ const SettingsScreen = () => {
               appActions.setDocumentTypes([]);
               appActions.setGoods([]);
               appActions.setRemains([]);
-              appActions.setBoxings([]);
-              appActions.setWeighedGoods([]);
             },
           },
           {
@@ -84,7 +77,7 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-      if (config.debug.useMockup) {
+/*       if (config.debug.useMockup) {
         const mockRef = referencesRef as IReference[];
         const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
         appActions.setContacts(mockContacts);
@@ -97,7 +90,7 @@ const SettingsScreen = () => {
         appActions.setBoxings(boxingsRef);
         const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedGoods')?.data as unknown) as IWeighedGoods[];
         appActions.setWeighedGoods(docWeighedRef);
-      } else {
+      } else { */
         try {
           // const response = await apiService.data.subscribe(companyID);
           const response = await apiService.data.getMessages(companyID);
@@ -124,7 +117,7 @@ const SettingsScreen = () => {
                     break;
                   }
                   case 'documenttypes': {
-                    const documentTypes = dataSet.data as IDocumentType[];
+                    const documentTypes = dataSet.data as IRefData[];
                     appActions.setDocumentTypes(documentTypes);
                     break;
                   }
@@ -141,16 +134,6 @@ const SettingsScreen = () => {
                   case 'remains': {
                     const remains = dataSet.data as IRemain[];
                     appActions.setRemains(remains);
-                    break;
-                  }
-                  case 'boxings': {
-                    const boxings = dataSet.data as ITara[];
-                    appActions.setBoxings(boxings);
-                    break;
-                  }
-                  case 'weighedGoods': {
-                    const weighedGoods = dataSet.data as IWeighedGoods[];
-                    appActions.setWeighedGoods(weighedGoods);
                     break;
                   }
                   default:
@@ -189,7 +172,7 @@ const SettingsScreen = () => {
         } catch (err) {
           Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
-      }
+      // }
     };
 
     getMessages();
