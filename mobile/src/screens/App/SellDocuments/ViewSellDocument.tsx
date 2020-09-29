@@ -261,10 +261,12 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <Text style={localStyles.fontWeightBold}>Итого:</Text>
           <Text style={localStyles.fontWeightBold}>
             вес прод.{' '}
-            {(documentLines ?? []).reduce(
-              (total, line) => Number.parseFloat(((Number(line.quantity) ?? 0) + total).toFixed(3)),
-              0,
-            )}{' '}
+            {(documentLines ?? []).reduce((total, line) => {
+              const goodLine = state.goods.find((item) => item.id === line.goodId);
+              return Number.parseFloat(
+                ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
+              );
+            }, 0)}{' '}
           </Text>
         </View>
         <ItemSeparator />
