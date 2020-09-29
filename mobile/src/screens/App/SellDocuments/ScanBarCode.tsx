@@ -91,7 +91,7 @@ const ScanBarCodeScreen = () => {
       ) : undefined}
       <>
         <BarCodeScanner
-          onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+          onBarCodeScanned={({ data }) => !scanned && handleBarCodeScanned(data)}
           style={StyleSheet.absoluteFillObject}
         />
         <Button
