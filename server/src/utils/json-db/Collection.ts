@@ -100,7 +100,13 @@ class Collection<T extends CollectionItem> {
     return new Promise((resolve, reject) => {
       fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
-        return resolve(JSON.parse(data));
+        let result: Array<T> = [];
+        try {
+          result = JSON.parse(data);
+        } catch (jsonErr) {
+          new Error(`The file has data in the wrong format - ${jsonErr}`);
+        }
+        return resolve(result);
       });
     });
   }
