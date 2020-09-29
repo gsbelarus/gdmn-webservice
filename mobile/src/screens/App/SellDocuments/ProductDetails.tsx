@@ -159,20 +159,20 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            const editeLine = (document as ISellDocument).lines.find(
+            const editLine = (document as ISellDocument)?.lines.find(
               (item) =>
                 item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params.prodId,
             );
-            if ((line?.id && route?.params?.modeCor) || editeLine) {
-              const idLine = editeLine ? editeLine.id : line ? line.id : (state.formParams as ISellLine).id;
+            if ((line?.id && route?.params?.modeCor) || editLine) {
+              const idLine = editLine ? editLine.id : line ? line.id : (state.formParams as ISellLine).id;
               const newLine = {
                 ...(state.formParams as ISellLine),
-                ...(editeLine ?? line),
+                ...(editLine ?? line),
                 id: idLine,
                 quantity:
                   Number((state.formParams as ISellLine).quantity) +
-                  Number(editeLine ? editeLine.quantity : line.quantity),
-                tara: (editeLine ? editeLine.tara ?? [] : (line as ISellLine).tara ?? []).concat(
+                  Number(editLine ? editLine.quantity : line.quantity),
+                tara: (editLine ? editLine.tara ?? [] : (line as ISellLine).tara ?? []).concat(
                   (state.formParams as ISellLine).tara ?? [],
                 ),
               };
