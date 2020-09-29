@@ -3,15 +3,7 @@ import React, { useCallback } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 
-import {
-  IResponse,
-  IMessage,
-  IReference,
-  IContact,
-  IGood,
-  IRemain,
-  IDocument, IRefData
-} from '../../../../common';
+import { IResponse, IMessage, IReference, IContact, IGood, IRemain, IDocument, IRefData } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
@@ -77,7 +69,7 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-/*       if (config.debug.useMockup) {
+      /*       if (config.debug.useMockup) {
         const mockRef = referencesRef as IReference[];
         const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
         appActions.setContacts(mockContacts);
@@ -91,87 +83,87 @@ const SettingsScreen = () => {
         const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedGoods')?.data as unknown) as IWeighedGoods[];
         appActions.setWeighedGoods(docWeighedRef);
       } else { */
-        try {
-          // const response = await apiService.data.subscribe(companyID);
-          const response = await apiService.data.getMessages(companyID);
+      try {
+        // const response = await apiService.data.subscribe(companyID);
+        const response = await apiService.data.getMessages(companyID);
 
-          // console.log(response);
+        // console.log(response);
 
-          if (!response.result) {
-            Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
-            return;
+        if (!response.result) {
+          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          return;
+        }
+        if (!isMessagesArray(response.data)) {
+          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          return;
+        }
+
+        response.data?.forEach((message) => {
+          if (message.body.type === 'data') {
+            // Сообщение содержит данные
+            ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+              switch (dataSet.type) {
+                case 'get_SellDocuments': {
+                  const addDocuments = dataSet.data as IDocument[];
+                  appActions.setDocuments([...documents, ...addDocuments]);
+                  break;
+                }
+                case 'documenttypes': {
+                  const documentTypes = dataSet.data as IRefData[];
+                  appActions.setDocumentTypes(documentTypes);
+                  break;
+                }
+                case 'contacts': {
+                  const contacts = dataSet.data as IContact[];
+                  appActions.setContacts(contacts);
+                  break;
+                }
+                case 'goods': {
+                  const goods = dataSet.data as IGood[];
+                  appActions.setGoods(goods);
+                  break;
+                }
+                case 'remains': {
+                  const remains = dataSet.data as IRemain[];
+                  appActions.setRemains(remains);
+                  break;
+                }
+                default:
+                  break;
+              }
+            });
+            apiService.data.deleteMessage(companyID, message.head.id);
           }
-          if (!isMessagesArray(response.data)) {
-            Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
-            return;
+          if (message.body.type === 'cmd') {
+            // Сообщение содержит команду
+            apiService.data.deleteMessage(companyID, message.head.id);
           }
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+        });
 
-          response.data?.forEach((message) => {
-            if (message.body.type === 'data') {
-              // Сообщение содержит данные
-              ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
-                switch (dataSet.type) {
-                  case 'get_SellDocuments': {
-                    const addDocuments = dataSet.data as IDocument[];
-                    appActions.setDocuments([...documents, ...addDocuments]);
-                    break;
+        /* Обработка сообщений, которые связаны с документами */
+        const messagesForDocuments = response.data.filter(
+          (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
+        );
+        if (messagesForDocuments.length > 0) {
+          messagesForDocuments.forEach((message) => {
+            if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
+              message.body.payload.params.forEach((paramDoc) => {
+                if (paramDoc.result) {
+                  const document = documents.find((doc) => doc.id === paramDoc.docId);
+                  if (document && document.head.status === 2) {
+                    appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                   }
-                  case 'documenttypes': {
-                    const documentTypes = dataSet.data as IRefData[];
-                    appActions.setDocumentTypes(documentTypes);
-                    break;
-                  }
-                  case 'contacts': {
-                    const contacts = dataSet.data as IContact[];
-                    appActions.setContacts(contacts);
-                    break;
-                  }
-                  case 'goods': {
-                    const goods = dataSet.data as IGood[];
-                    appActions.setGoods(goods);
-                    break;
-                  }
-                  case 'remains': {
-                    const remains = dataSet.data as IRemain[];
-                    appActions.setRemains(remains);
-                    break;
-                  }
-                  default:
-                    break;
                 }
               });
-              apiService.data.deleteMessage(companyID, message.head.id);
             }
-            if (message.body.type === 'cmd') {
-              // Сообщение содержит команду
-              apiService.data.deleteMessage(companyID, message.head.id);
-            }
-            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+            apiService.data.deleteMessage(companyID, message.head.id);
           });
-
-          /* Обработка сообщений, которые связаны с документами */
-          const messagesForDocuments = response.data.filter(
-            (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
-          );
-          if (messagesForDocuments.length > 0) {
-            messagesForDocuments.forEach((message) => {
-              if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-                message.body.payload.params.forEach((paramDoc) => {
-                  if (paramDoc.result) {
-                    const document = documents.find((doc) => doc.id === paramDoc.docId);
-                    if (document && document.head.status === 2) {
-                      appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
-                    }
-                  }
-                });
-              }
-              apiService.data.deleteMessage(companyID, message.head.id);
-            });
-            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
-          }
-        } catch (err) {
-          Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
+      } catch (err) {
+        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+      }
       // }
     };
 

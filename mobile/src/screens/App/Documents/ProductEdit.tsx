@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -11,27 +11,17 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { getDateString } from '../../../helpers/utils';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-type SellProductDetailScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<RootStackParamList, 'SellProductDetail'>,
-  StackNavigationProp<DocumentStackParamList>
->;
-type SellProductDetailScreenRouteProp = RouteProp<RootStackParamList, 'SellProductDetail'>;
-
-type Props = {
-  route: SellProductDetailScreenRouteProp;
-  navigation: SellProductDetailScreenNavigationProp;
-};
+type Props = StackScreenProps<DocumentStackParamList, 'ProductEdit'>;
 
 const ProductEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
+  const [document, setDocument] = useState<IDocument>(undefined);
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ILine | ILine | undefined>();
 
@@ -43,18 +33,17 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
       return;
     }
 
-    setProduct(state.goods.find((item) => item.id === route.params.prodId));
-    setDocument(state.documents.find((item) => item.id === route.params.docId));
-    const lineDocuments = document
-      ? document instanceof Object && (document as IDocument)
-        ? (document as IDocument).lines
-        : (document as ISellDocument).lines
-      : undefined;
-    lineDocuments ? setLine(lineDocuments.find((item) => item.id === route.params.lineId)) : undefined;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route.params, state.goods, state.documents]);
+    setProduct(((state.references?.goods as unknown) as IGood[])?.find((item) => item.id === route.params.prodId));
 
-  useEffect(() => {
+    setDocument(state.documents.find((item) => item.id === route.params.docId));
+
+    const lineDocuments = (document as IDocument)?.lines;
+
+    lineDocuments && setLine(lineDocuments.find((item) => item.id === route.params.lineId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.params, state.documents]);
+
+  /*   useEffect(() => {
     if (route.params.weighedGood) {
       const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
       const date = good.datework.split('.').reverse();
@@ -71,24 +60,18 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
           })
         : undefined;
     }
-  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.weighedGoods]);
+  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.weighedGoods]); */
 
   useEffect(() => {
     if (document) {
-      const lineDocuments =
-        document instanceof Object && (document as IDocument)
-          ? (document as IDocument).lines
-          : (document as ISellDocument).lines;
-      setLine(lineDocuments.find((item) => item.id === route.params.lineId));
+      const lineDocuments = (document as IDocument)?.lines;
+
+      lineDocuments && setLine(lineDocuments.find((item) => item.id === route.params.lineId));
     }
   }, [document, route.params.lineId]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!document || !product) {
-      return;
-    }
-
-    if (route.params.weighedGood) {
       return;
     }
 
@@ -117,14 +100,15 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
     route.params.modeCor,
     route.params.prodId,
     route.params.weighedGood,
-  ]);
+  ]); */
 
-  useEffect(() => {
-    if (state.productParams && route.params?.manufacturingDate) {
+  /*   useEffect(() => {
+    // TODO для чего этот эффект?
+    if (state.forms.productParams && route.params?.manufacturingDate) {
       actions.setProducParams({ ...state.productParams, manufacturingDate: route.params.manufacturingDate });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document, product, route.params]);
+  }, [actions, document, product, route.params]); */
 
   useEffect(() => {
     if (isFocused) {
@@ -146,8 +130,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            actions.setBoxingsLine([]);
-            navigation.navigate('ViewSellDocument', { docId: document?.id });
+            navigation.navigate('DocumentView', { docId: document?.id });
             actions.clearProductParams();
           }}
         />
@@ -174,14 +157,13 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
                 },
               });
             }
-            actions.setBoxingsLine([]);
-            navigation.navigate('ViewSellDocument', { docId: document?.id });
+            navigation.navigate('DocumentView', { docId: document?.id });
             actions.clearProductParams();
           }}
         />
       ),
     });
-  }, [actions, document, line, navigation, product, route.params, state.boxingsLine, state.productParams]);
+  }, [actions, document, line, navigation, product, route.params, state.productParams]);
 
   const onPress = () => {
     if (isKeyboardVisible) {

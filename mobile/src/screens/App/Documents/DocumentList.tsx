@@ -8,7 +8,7 @@ import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } 
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
-import statuses from '../../../model/docStates.json';
+import statuses from '../../../model/docStates';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const Statuses: IDocumentStatus[] = statuses;

@@ -14,7 +14,7 @@ export interface IHead {
 }
 
 export interface ILine {
-  id: string;
+  id: number;
   goodId: number;
   quantity: number;
 }

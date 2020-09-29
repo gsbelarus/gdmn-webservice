@@ -29,7 +29,6 @@ export interface IFormParams {
 
 export interface IDocumentParams {
   date?: string;
-  expeditorId?: number;
   tocontactId?: number;
   fromcontactId?: number;
   doctype?: number;
@@ -85,6 +84,7 @@ export interface IForm {
 }
 
 export interface IAppState {
+  contacts: unknown;
   settings?: IAppSettings;
   documents?: IDocument[];
   references?: {

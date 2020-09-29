@@ -85,7 +85,8 @@ const createStoreContext = () => {
 
     /*  Сохранение товаров в storage при их изменении */
     useEffect(() => {
-      const saveData = async () => await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
+      const saveData = async () =>
+        await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
       if (state.references.goods && storagePath && !isLoading) {
         saveData();
       }
