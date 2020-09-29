@@ -57,23 +57,24 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   useEffect(() => {
     if (route.params.weighedGood) {
-      const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
-      const date = good.datework.split('.').reverse();
+      const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
+      const good = weighedGood ? state.goods.find((item) => item.id === weighedGood.goodkey) : undefined;
+      const date = weighedGood.datework.split('.').reverse();
       good
         ? actions.setFormParams({
             id: route.params.lineId,
             goodId: route.params.prodId,
-            quantity: good.weight,
+            quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
             manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
               .toISOString()
               .slice(0, 10),
             //timeWork: good.timework,
-            numreceive: good.numreceive,
+            numreceive: weighedGood.numreceive,
             tara: [],
           })
         : undefined;
     }
-  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.weighedGoods]);
+  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.goods, state.weighedGoods]);
 
   useEffect(() => {
     if (document) {
