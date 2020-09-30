@@ -142,7 +142,7 @@ const DocumentViewScreen = ({ route }: Props) => {
                 title: 'Изменить шапку',
                 onPress: () => {
                   if (document?.head?.status === 0) {
-                    navigation.navigate('CreateSellDocument', { docId });
+                    navigation.navigate('DocumentEdit', { docId });
                     return;
                   }
                   Alert.alert('Изменения доступны только для черновика', '', [

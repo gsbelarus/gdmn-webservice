@@ -163,7 +163,7 @@ const DocumentListScreen = ({ navigation }) => {
             showActionSheet([
               {
                 title: 'Загрузить',
-                onPress: () => navigation.navigate('SettingsGettingDocument'),
+                onPress: () => navigation.navigate('DocumentRequestScreen'),
               },
               {
                 title: 'Выгрузить',
@@ -213,7 +213,7 @@ const DocumentListScreen = ({ navigation }) => {
       <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-down-bold"
-        onPress={() => navigation.navigate('SettingsGettingDocument')}
+        onPress={() => navigation.navigate('DocumentRequestScreen')}
       />
       <FAB
         style={[localStyles.fabImport, { backgroundColor: colors.primary }]}
@@ -223,7 +223,7 @@ const DocumentListScreen = ({ navigation }) => {
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
         icon="plus"
-        onPress={() => navigation.navigate('CreateSellDocument')}
+        onPress={() => navigation.navigate('DocumentEdit')}
       />
     </View>
   );

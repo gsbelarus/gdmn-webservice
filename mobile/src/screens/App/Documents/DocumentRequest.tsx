@@ -286,7 +286,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
               style={localeStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'SettingsGettingDocument',
+                  parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
                   value: documentParams.dateBegin,
@@ -305,7 +305,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
               style={localeStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'SettingsGettingDocument',
+                  parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
                   value: documentParams.dateEnd,

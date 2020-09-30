@@ -176,7 +176,7 @@ const DocumentEditScreen = ({ route }: Props) => {
               style={localeStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'CreateSellDocument',
+                  parentScreen: 'DocumentEdit',
                   fieldName: 'date',
                   title: 'Дата документа:',
                   value: date,
@@ -219,7 +219,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             value={selectedItem(listDepartments, fromcontactId)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
-                parentScreen: 'CreateSellDocument',
+                parentScreen: 'DocumentEdit',
                 title: 'Подразделение',
                 fieldName: 'fromcontactId',
                 list: listDepartments,
@@ -234,7 +234,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             value={selectedItem(listDepartments, fromcontactId)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
-                parentScreen: 'CreateSellDocument',
+                parentScreen: 'DocumentEdit',
                 title: 'Подразделение',
                 fieldName: 'fromcontactId',
                 list: listDepartments,
