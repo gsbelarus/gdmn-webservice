@@ -106,13 +106,8 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
   try {
-    const messages = await messageService.findAll();
+    await messageService.deleteAll();
 
-    messages.map(async message => {
-      if (message.id) {
-        await messageService.deleteOne(message.id);
-      }
-    });
     const result: IResponse<void> = { result: true };
 
     ctx.status = 200;

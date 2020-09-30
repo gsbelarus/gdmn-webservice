@@ -98,4 +98,8 @@ const deleteByUid = async ({
   );
 };
 
-export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid };
+const deleteAll = async (): Promise<void> => {
+  await messages.deleteAll();
+};
+
+export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };

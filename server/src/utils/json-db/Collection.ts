@@ -88,6 +88,10 @@ class Collection<T extends CollectionItem> {
     return this._save(deleted);
   }
 
+  public async deleteAll(): Promise<void> {
+    return this._save([]);
+  }
+
   private _initObject(obj: T): T {
     return R.assoc('id', uuid(), obj);
   }
@@ -104,7 +108,7 @@ class Collection<T extends CollectionItem> {
         try {
           result = JSON.parse(data);
         } catch (jsonErr) {
-          reject(jsonErr)
+          reject(jsonErr);
         }
         return resolve(result);
       });
