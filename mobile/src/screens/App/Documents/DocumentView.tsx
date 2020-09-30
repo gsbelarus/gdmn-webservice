@@ -22,7 +22,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
 
   const good: IGood = useMemo(() => state.references?.goods.find((i) => i.id === item.goodId)?.data[0], [
     item.goodId,
-    state.references?.goods,
+    state.references.goods,
   ]);
 
   return (
@@ -100,6 +100,8 @@ const DocumentViewScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const [docId, setDocId] = useState<number>(undefined);
 
+  const contacts = useMemo(() => state.references?.contacts, [state.references.contacts]);
+
   useEffect(() => {
     if (!route.params?.docId) {
       return;
@@ -114,10 +116,9 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const contact: IContact = useMemo(
     () =>
-      ((state.references?.contacts as unknown) as IContact[])?.find(
-        (item: { id: number }) => item.id === document?.head.tocontactId,
-      )?.data[0] ?? notFound,
-    [document.head.tocontactId, state.references?.contacts],
+      ((contacts as unknown) as IContact[])?.find((item: { id: number }) => item.id === document?.head.tocontactId)
+        ?.data[0] ?? notFound,
+    [document.head.tocontactId, contacts],
   );
 
   const refList = React.useRef<FlatList<ILine>>(null);

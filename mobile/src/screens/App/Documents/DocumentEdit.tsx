@@ -22,16 +22,17 @@ const DocumentEditScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
 
+  const contacts = useMemo(() => appState.references?.contacts, [appState.references.contacts]);
+
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const getListItems = (contacts: IContact[]): IListItem[] =>
-    contacts.map((item) => ({ id: item.id, value: item.name }));
+  const getListItems = (con: IContact[]): IListItem[] => con.map((item) => ({ id: item.id, value: item.name }));
 
   const departments: IContact[] = useMemo(
-    () => ((appState.references?.contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
-    [appState.references?.contacts],
+    () => ((contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
+    [contacts],
   );
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);

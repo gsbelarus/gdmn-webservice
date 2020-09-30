@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -32,7 +33,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const navigation = useNavigation();
 
   const documentParams = useMemo(() => (appState.forms?.documentParams as unknown) as IFormParams, [
-    appState.forms.documentParams,
+    appState.forms?.documentParams,
   ]);
 
   const today = new Date();
@@ -46,7 +47,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings', 'weighedGoods'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
         },
       }),
     )
@@ -84,9 +85,11 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const getListItems = (contacts: IContact[]): IListItem[] =>
     contacts.map((item) => ({ id: item.id, value: item.name }));
 
+  const contacts = useMemo(() => appState.references?.contacts || [], [appState.references?.contacts]);
+
   const departments: IContact[] = useMemo(
-    () => ((appState.references?.contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
-    [appState.references?.contacts],
+    () => ((contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
+    [contacts],
   );
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
@@ -99,16 +102,18 @@ const DocumentRequestScreen = ({ route }: Props) => {
           name: 'get_InvDocuments',
           params: [
             {
-              dateBegin: documentParams.dateBegin
-                ? new Date(documentParams.dateBegin).toISOString()
+              dateBegin: documentParams?.dateBegin
+                ? new Date(documentParams?.dateBegin).toISOString()
                 : yesterday.toISOString(),
-              dateEnd: documentParams.dateBegin ? new Date(documentParams.dateEnd).toISOString() : today.toISOString(),
-              fromContact: Array.isArray(documentParams.fromContact)
-                ? documentParams.fromContact[0]
-                : documentParams.fromContact,
-              toContact: Array.isArray(documentParams.toContact)
-                ? documentParams.toContact[0]
-                : documentParams.toContact,
+              dateEnd: documentParams?.dateBegin
+                ? new Date(documentParams?.dateEnd).toISOString()
+                : today.toISOString(),
+              fromContact: Array.isArray(documentParams?.fromContact)
+                ? documentParams?.fromContact[0]
+                : documentParams?.fromContact,
+              toContact: Array.isArray(documentParams?.toContact)
+                ? documentParams?.toContact[0]
+                : documentParams?.toContact,
             },
           ],
         },
@@ -144,10 +149,10 @@ const DocumentRequestScreen = ({ route }: Props) => {
     apiService.baseUrl.timeout,
     apiService.data,
     state.companyID,
-    documentParams.dateBegin,
-    documentParams.dateEnd,
-    documentParams.fromContact,
-    documentParams.toContact,
+    documentParams?.dateBegin,
+    documentParams?.dateEnd,
+    documentParams?.fromContact,
+    documentParams?.toContact,
     yesterday,
     today,
     appActions,
@@ -182,8 +187,8 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 break;
               }
               case 'contacts': {
-                const contacts = dataSet.data as IContact[];
-                appActions.setContacts(contacts);
+                const con = dataSet.data as IContact[];
+                appActions.setContacts(con);
                 break;
               }
               case 'goods': {
@@ -289,7 +294,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                   parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
-                  value: documentParams.dateBegin,
+                  value: documentParams?.dateBegin,
                 })
               }
             >
@@ -308,7 +313,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                   parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
-                  value: documentParams.dateEnd,
+                  value: documentParams?.dateEnd,
                 })
               }
             >

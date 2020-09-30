@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -19,13 +20,13 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
   const { state } = useAppStore();
 
+  const contacts = useMemo(() => state.references?.contacts, [state.references.contacts]);
+
   const getContact = useCallback(
     (id: number): IContact => {
-      return ((state.references?.contacts as unknown) as IContact[])?.find(
-        (contact: { id: number }) => contact.id === id,
-      );
+      return ((contacts as unknown) as IContact[])?.find((contact: { id: number }) => contact.id === id);
     },
-    [state.references?.contacts],
+    [contacts],
   );
 
   const docHead = useMemo(() => item.head, [item.head]);
@@ -39,7 +40,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('DocumentViewScreen', { docId: item.id });
+        navigation.navigate('DocumentView', { docId: item.id });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -76,19 +77,18 @@ const DocumentListScreen = ({ navigation }) => {
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
-
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
   const showActionSheet = useActionSheet();
 
+  const contacts = useMemo(() => appState.references?.contacts, [appState.references?.contacts]);
+
   const getContact = useCallback(
     (id: number): IContact => {
-      return ((appState.references?.contacts as unknown) as IContact[])?.find(
-        (contact: { id: number }) => contact.id === id,
-      );
+      return ((contacts as unknown) as IContact[])?.find((contact: { id: number }) => contact.id === id);
     },
-    [appState.references?.contacts],
+    [contacts],
   );
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const DocumentListScreen = ({ navigation }) => {
           : true;
       }) || [],
     );
-  }, [appState.references?.contacts, appState.documents, appState.filterParams, searchText, getContact]);
+  }, [appState.documents, appState.filterParams, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
@@ -163,7 +163,7 @@ const DocumentListScreen = ({ navigation }) => {
             showActionSheet([
               {
                 title: 'Загрузить',
-                onPress: () => navigation.navigate('DocumentRequestScreen'),
+                onPress: () => navigation.navigate('DocumentRequest'),
               },
               {
                 title: 'Выгрузить',
@@ -198,7 +198,7 @@ const DocumentListScreen = ({ navigation }) => {
           icon="settings"
           size={24}
           style={localStyles.iconSettings}
-          onPress={() => navigation.navigate('SettingsSearchScreen')}
+          onPress={() => navigation.navigate('FilterEdit')}
         />
       </View>
       <ItemSeparator />
@@ -213,7 +213,7 @@ const DocumentListScreen = ({ navigation }) => {
       <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-down-bold"
-        onPress={() => navigation.navigate('DocumentRequestScreen')}
+        onPress={() => navigation.navigate('DocumentRequest')}
       />
       <FAB
         style={[localStyles.fabImport, { backgroundColor: colors.primary }]}

@@ -3,12 +3,12 @@ import React from 'react';
 
 import {
   DocumentEditScreen,
-  FilterEditScreen,
   DocumentViewScreen,
   DocumentListScreen,
   ProductEditScreen,
   ProductListScreen,
   DocumentRequestScreen,
+  FilterEditScreen,
 } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
@@ -40,9 +40,9 @@ const DocumentsNavigator = () => {
         options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
-      <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
       <Stack.Screen key="ProductList" name="ProductList" component={ProductListScreen} options={{ title: '' }} />
       <Stack.Screen key="ProductEdit" name="ProductEdit" component={ProductEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
       <Stack.Screen
         key="DocumentRequest"
         name="DocumentRequest"
