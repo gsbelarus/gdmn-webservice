@@ -25,7 +25,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         (contact: { id: number }) => contact.id === id,
       );
     },
-    [state.references.contacts],
+    [state.references?.contacts],
   );
 
   const docHead = useMemo(() => item.head, [item.head]);
@@ -88,7 +88,7 @@ const DocumentListScreen = ({ navigation }) => {
         (contact: { id: number }) => contact.id === id,
       );
     },
-    [appState.references.contacts],
+    [appState.references?.contacts],
   );
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const DocumentListScreen = ({ navigation }) => {
           : true;
       }) || [],
     );
-  }, [appState.references.contacts, appState.documents, appState.filterParams, searchText, getContact]);
+  }, [appState.references?.contacts, appState.documents, appState.filterParams, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 

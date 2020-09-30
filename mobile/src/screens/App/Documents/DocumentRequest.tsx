@@ -11,25 +11,29 @@ import {
   IContact,
   IRemain,
   IGood,
-  IDocumentType,
   IDocument,
   IDataMessage,
+  IRefData,
 } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils';
-import { IListItem, ITara, IWeighedGoods } from '../../../model';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { IListItem, IFormParams } from '../../../model/types';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
 
-type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
+type Props = StackScreenProps<DocumentStackParamList, 'DocumentRequest'>;
 
-const SettingsGettingDocumentScreen = ({ route }: Props) => {
+const DocumentRequestScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
   const navigation = useNavigation();
+
+  const documentParams = useMemo(() => (appState.forms?.documentParams as unknown) as IFormParams, [
+    appState.forms.documentParams,
+  ]);
 
   const today = new Date();
   const yesterday = new Date();
@@ -57,14 +61,14 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
   useEffect(() => {
-    if (!appState.formParams) {
+    if (!documentParams) {
       // Инициализируем параметры
       appActions.setFormParams({
         dateBegin: yesterday.toISOString().slice(0, 10),
         dateEnd: today.toISOString().slice(0, 10),
       });
     }
-  }, [appActions, appState.formParams, today, yesterday]);
+  }, [appActions, documentParams, today, yesterday]);
 
   useEffect(() => {
     if (!route?.params) {
@@ -77,39 +81,34 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const getListItems = useCallback(
-    (contacts: IContact[]) => contacts.map((item) => ({ id: item.id, value: item.name } as IListItem)),
-    [],
+  const getListItems = (contacts: IContact[]): IListItem[] =>
+    contacts.map((item) => ({ id: item.id, value: item.name }));
+
+  const departments: IContact[] = useMemo(
+    () => ((appState.references?.contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
+    [appState.references?.contacts],
   );
-  const people: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '2'), [appState.contacts]);
-  const listPeople = useMemo(() => getListItems(people), [getListItems, people]);
-  const companies: IContact[] = useMemo(() => appState.contacts.filter((item) => item.type === '3'), [
-    appState.contacts,
-  ]);
 
-  const listCompanies = useMemo(() => getListItems(companies), [companies, getListItems]);
-
+  const listDepartments = useMemo(() => getListItems(departments), [departments]);
   const sendDocumentRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
-          name: 'get_SellDocuments',
+          name: 'get_InvDocuments',
           params: [
             {
-              dateBegin: appState.formParams?.dateBegin
-                ? new Date(appState.formParams?.dateBegin).toISOString()
+              dateBegin: documentParams.dateBegin
+                ? new Date(documentParams.dateBegin).toISOString()
                 : yesterday.toISOString(),
-              dateEnd: appState.formParams?.dateBegin
-                ? new Date(appState.formParams?.dateEnd).toISOString()
-                : today.toISOString(),
-              expiditor: Array.isArray(appState.formParams?.expiditor)
-                ? appState.formParams?.expiditor[0]
-                : appState.formParams?.expiditor,
-              toContact: Array.isArray(appState.formParams?.toContact)
-                ? appState.formParams?.toContact[0]
-                : appState.formParams?.toContact,
+              dateEnd: documentParams.dateBegin ? new Date(documentParams.dateEnd).toISOString() : today.toISOString(),
+              fromContact: Array.isArray(documentParams.fromContact)
+                ? documentParams.fromContact[0]
+                : documentParams.fromContact,
+              toContact: Array.isArray(documentParams.toContact)
+                ? documentParams.toContact[0]
+                : documentParams.toContact,
             },
           ],
         },
@@ -145,10 +144,10 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
     apiService.baseUrl.timeout,
     apiService.data,
     state.companyID,
-    appState.formParams.dateBegin,
-    appState.formParams.dateEnd,
-    appState.formParams.expiditor,
-    appState.formParams.toContact,
+    documentParams.dateBegin,
+    documentParams.dateEnd,
+    documentParams.fromContact,
+    documentParams.toContact,
     yesterday,
     today,
     appActions,
@@ -178,7 +177,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IDocumentType[];
+                const documentTypes = dataSet.data as IRefData[];
                 appActions.setDocumentTypes(documentTypes);
                 break;
               }
@@ -195,16 +194,6 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
               case 'remains': {
                 const remains = dataSet.data as IRemain[];
                 appActions.setRemains(remains);
-                break;
-              }
-              case 'boxings': {
-                const boxings = dataSet.data as ITara[];
-                appActions.setBoxings(boxings);
-                break;
-              }
-              case 'weighedGoods': {
-                const weighedGoods = dataSet.data as IWeighedGoods[];
-                appActions.setWeighedGoods(weighedGoods);
                 break;
               }
               default:
@@ -300,12 +289,12 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
-                  value: appState.formParams?.dateBegin,
+                  value: documentParams.dateBegin,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(appState?.formParams?.dateBegin || yesterday.toISOString())}
+                {getDateString(documentParams?.dateBegin || yesterday.toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -319,43 +308,43 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                   parentScreen: 'SettingsGettingDocument',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
-                  value: appState.formParams?.dateEnd,
+                  value: documentParams.dateEnd,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(appState?.formParams?.dateEnd || today.toUTCString())}
+                {getDateString(documentParams?.dateEnd || today.toUTCString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
         </View>
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+          <Text style={localeStyles.subdivisionText}>Отправитель:</Text>
           <ReferenceItem
-            value={selectedItem(listPeople, appState.formParams?.expiditor)?.value}
+            value={selectedItem(departments, documentParams?.fromContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
-                parentScreen: 'SettingsGettingDocument',
-                fieldName: 'expiditor',
-                title: 'Экспедитор',
-                list: listPeople,
-                value: appState.formParams?.expiditor,
+                parentScreen: 'DocumenRrequestScreen',
+                fieldName: 'fromContact',
+                title: 'Подразделение',
+                list: departments,
+                value: documentParams?.fromContact,
               })
             }
           />
         </View>
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Организация:</Text>
+          <Text style={localeStyles.subdivisionText}>Получатель:</Text>
           <ReferenceItem
-            value={selectedItem(listCompanies, appState.formParams?.toContact)?.value}
+            value={selectedItem(departments, documentParams?.toContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
-                parentScreen: 'SettingsGettingDocument',
+                parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'toContact',
-                title: 'Организация',
-                list: listCompanies,
-                value: appState.formParams?.toContact,
+                title: 'Подразделение',
+                list: departments,
+                value: documentParams?.toContact,
               })
             }
           />
@@ -365,7 +354,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   );
 };
 
-export { SettingsGettingDocumentScreen };
+export { DocumentRequestScreen };
 
 const localeStyles = StyleSheet.create({
   area: {

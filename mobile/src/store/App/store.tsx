@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
+import { IDocument } from '../../../../common';
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
@@ -44,7 +45,7 @@ const createStoreContext = () => {
         const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
         actions.setDocumentTypes(documentTypes || []);
         // документы
-        const documents = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`);
+        const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents || []);
         // остатки
         const remains = await appStorage.getItem(`${storagePath}/${sections.REMAINS}`);
@@ -78,19 +79,19 @@ const createStoreContext = () => {
     useEffect(() => {
       const saveData = async () =>
         await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references?.contacts);
-      if (state.references.contacts && storagePath && !isLoading) {
+      if (state.references?.contacts && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.references.contacts, storagePath]);
+    }, [state.references?.contacts, storagePath]);
 
     /*  Сохранение товаров в storage при их изменении */
     useEffect(() => {
       const saveData = async () =>
         await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
-      if (state.references.goods && storagePath && !isLoading) {
+      if (state.references?.goods && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.references.goods, storagePath]);
+    }, [state.references?.goods, storagePath]);
 
     /*  Сохранение типов документов в storage при их изменении */
     useEffect(() => {
@@ -104,13 +105,13 @@ const createStoreContext = () => {
     /*  Сохранение остатков в storage при их изменении */
     useEffect(() => {
       const saveData = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references.remains);
+        await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references?.remains);
       };
 
-      if (state.references.remains && storagePath && !isLoading) {
+      if (state.references?.remains && storagePath && !isLoading) {
         saveData();
       }
-    }, [state.references.remains, storagePath]);
+    }, [state.references?.remains, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {

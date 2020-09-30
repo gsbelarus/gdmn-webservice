@@ -7,6 +7,8 @@ import {
   DocumentViewScreen,
   DocumentListScreen,
   ProductEditScreen,
+  ProductListScreen,
+  DocumentRequestScreen,
 } from '../screens/App/Documents';
 
 export type DocumentStackParamList = {
@@ -15,6 +17,8 @@ export type DocumentStackParamList = {
   DocumentView: { docId: number };
   FilterEdit: undefined;
   ProductEdit: { docId: number; prodId: number; lineId: number };
+  ProductList: { docId: number };
+  DocumentRequest: undefined;
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -37,7 +41,14 @@ const DocumentsNavigator = () => {
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
       <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="ProductList" name="ProductList" component={ProductListScreen} options={{ title: '' }} />
       <Stack.Screen key="ProductEdit" name="ProductEdit" component={ProductEditScreen} options={{ title: '' }} />
+      <Stack.Screen
+        key="DocumentRequest"
+        name="DocumentRequest"
+        component={DocumentRequestScreen}
+        options={{ title: 'Получить документы' }}
+      />
     </Stack.Navigator>
   );
 };

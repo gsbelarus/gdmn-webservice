@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
 
-import { IDocument, ILine, IHead, IReference } from '../../../../../common';
+import { IDocument, ILine, IHead, IReference, IGood, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
@@ -15,10 +15,15 @@ import styles from '../../../styles/global';
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
 const ContentItem = React.memo(({ item, status }: { item: ILine; status: number }) => {
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-  const good: IReference = state.goods.find((i: { id: number }) => i.id === item.goodId);
+
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
+
+  const good: IGood = useMemo(() => state.references?.goods.find((i) => i.id === item.goodId)?.data[0], [
+    item.goodId,
+    state.references?.goods,
+  ]);
 
   return (
     <>
@@ -107,8 +112,13 @@ const DocumentViewScreen = ({ route }: Props) => {
     return state.documents.find((item: { id: number }) => item.id === docId);
   }, [docId, state.documents]);
 
-  const contact: IReference =
-    state.contacts?.find((item: { id: number }) => item.id === document?.head.tocontactId) ?? notFound;
+  const contact: IContact = useMemo(
+    () =>
+      ((state.references?.contacts as unknown) as IContact[])?.find(
+        (item: { id: number }) => item.id === document?.head.tocontactId,
+      )?.data[0] ?? notFound,
+    [document.head.tocontactId, state.references?.contacts],
+  );
 
   const refList = React.useRef<FlatList<ILine>>(null);
 

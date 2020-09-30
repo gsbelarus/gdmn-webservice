@@ -3,5 +3,5 @@ export { DocumentViewScreen } from './DocumentView';
 export { DocumentEditScreen } from './DocumentEdit';
 export { ProductListScreen } from './ProductList';
 export { ProductEditScreen } from './ProductEdit';
-export { SettingsGettingDocumentScreen } from './SettingsGettingDocument';
+export { DocumentRequestScreen } from './DocumentRequest';
 export { FilterEditScreen } from './FilterEdit';

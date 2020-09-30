@@ -78,13 +78,12 @@ export interface IAppSettings {
 }
 
 export interface IForm {
-  name: string;
-  parent: string;
+  // name: string;
+  // parent: string;
   [name: string]: unknown;
 }
 
 export interface IAppState {
-  contacts: unknown;
   settings?: IAppSettings;
   documents?: IDocument[];
   references?: {

@@ -7,7 +7,7 @@ import { IListItem } from '../model/types';
   DocumentListScreen,
   DocumentEditScreen,
   ,
-  SettingsGettingDocumentScreen,
+  DocumentRequest,
   FilterEditScreen,
 } from '../screens/App/Documents';
  */
@@ -106,7 +106,7 @@ const AppNavigator = () => {
         {/* <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"
-          component={SettingsGettingDocumentScreen}
+          component={DocumentRequest}
           options={{ title: '' }}
         />
          */}

@@ -7,8 +7,7 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { IWeighedGoods } from '../../../model';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -16,7 +15,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'ProductList'>>().params?.docId;
 
   return (
     <TouchableOpacity
@@ -69,7 +68,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
 }); */
 
 const ProductListScreen = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>();
+  const route = useRoute<RouteProp<DocumentStackParamList, 'ProductList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -78,9 +77,7 @@ const ProductListScreen = () => {
   const { state } = useAppStore();
 
   const ref = React.useRef<FlatList<IGood>>(null);
-  const refWeighed = React.useRef<FlatList<IWeighedGoods>>(null);
   useScrollToTop(ref);
-  useScrollToTop(refWeighed);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
   // const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
@@ -184,7 +181,7 @@ const ProductListScreen = () => {
           </View> */}
           <FlatList
             ref={ref}
-            data={state.goods.filter(
+            data={((state.references?.goods as unknown) as IGood[]).filter(
               (item) =>
                 item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                 item.name.toLowerCase().includes(text.toLowerCase()),

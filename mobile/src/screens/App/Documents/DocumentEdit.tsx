@@ -31,7 +31,7 @@ const DocumentEditScreen = ({ route }: Props) => {
 
   const departments: IContact[] = useMemo(
     () => ((appState.references?.contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
-    [appState.references.contacts],
+    [appState.references?.contacts],
   );
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
