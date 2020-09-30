@@ -161,7 +161,7 @@ const SettingsScreen = () => {
             }
             if (message.body.type === 'cmd') {
               // Сообщение содержит команду
-              apiService.data.deleteMessage(companyID, message.head.id);
+              //apiService.data.deleteMessage(companyID, message.head.id);
             }
             Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
           });
