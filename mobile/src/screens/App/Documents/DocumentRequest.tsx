@@ -93,6 +93,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   );
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
+
   const sendDocumentRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
@@ -333,7 +334,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'fromContact',
                 title: 'Подразделение',
-                list: departments,
+                list: listDepartments,
                 value: documentParams?.fromContact,
               })
             }
@@ -348,7 +349,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'toContact',
                 title: 'Подразделение',
-                list: departments,
+                list: listDepartments,
                 value: documentParams?.toContact,
               })
             }
