@@ -12,6 +12,7 @@ export interface IUserProfile {
 
 export interface IUser {
   id?: string;
+  externalId?: string;
   userName: string;
   password: string;
   activationCode?: string;
@@ -39,6 +40,7 @@ export interface IActivationCode {
 
 export interface ICompany {
   id: string;
+  externalId?: string;
   title: string;
   admin: string;
 }
@@ -47,18 +49,18 @@ export type DeviceState  = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED'
 
 export interface IDevice {
   id?: string;
-  name: string;  
-  userId: string;  
+  name: string;
+  userId: string;
   uid: string;
-  state: DeviceState;  
+  state: DeviceState;
 }
 
 export interface IDeviceInfo {
   id: string;
   deviceId: string;
-  deviceName: string;  
+  deviceName: string;
   userId: string;
-  userName: string;  
+  userName: string;
   state: DeviceState;
 }
 
@@ -83,7 +85,7 @@ export interface IMessage<T = any> {
   id?: string;
   head: {
     id: string;
-    appSystem: string;    
+    appSystem: string;
     companyid: string;
     producer: string;
     consumer: string;

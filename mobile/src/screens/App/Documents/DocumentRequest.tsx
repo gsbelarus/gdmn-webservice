@@ -354,6 +354,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
               })
             }
           />
+          {/* TODO: добавить тип документ */}
         </View>
       </ScrollView>
     </View>
