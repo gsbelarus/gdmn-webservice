@@ -35,12 +35,13 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ISellLine | undefined>();
+  const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    if (!route.params) {
+    if (!route.params || saved) {
       return;
     }
 
@@ -150,8 +151,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           text="Отмена"
           onPress={() => {
             actions.setBoxingsLine([]);
-            navigation.navigate('ViewSellDocument', { docId: document?.id });
             actions.clearFormParams();
+            navigation.navigate('ViewSellDocument', { docId: document?.id });
           }}
         />
       ),
@@ -163,6 +164,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               (item) =>
                 item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params.prodId,
             );
+            setSaved(true);
             if ((line?.id && route?.params?.modeCor) || editLine) {
               const idLine = editLine ? editLine.id : line ? line.id : (state.formParams as ISellLine).id;
               const newLine = {
@@ -192,8 +194,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               });
             }
             actions.setBoxingsLine([]);
-            navigation.navigate('ViewSellDocument', { docId: document?.id });
             actions.clearFormParams();
+            navigation.navigate('ViewSellDocument', { docId: document?.id });
           }}
         />
       ),
