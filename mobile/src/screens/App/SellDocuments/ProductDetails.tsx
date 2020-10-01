@@ -166,8 +166,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             if ((line?.id && route?.params?.modeCor) || editLine) {
               const idLine = editLine ? editLine.id : line ? line.id : (state.formParams as ISellLine).id;
               const newLine = {
-                ...(state.formParams as ISellLine),
                 ...(editLine ?? line),
+                ...(state.formParams as ISellLine),
                 id: idLine,
                 quantity: route?.params?.modeCor
                   ? Number((state.formParams as ISellLine).quantity)
