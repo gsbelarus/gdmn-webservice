@@ -104,6 +104,21 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
+const clear = async (ctx: ParameterizedContext): Promise<void> => {
+  try {
+    await messageService.deleteAll();
+
+    const result: IResponse<void> = { result: true };
+
+    ctx.status = 200;
+    ctx.body = result; //TODO передавать только код 204 без body
+
+    log.info('clear messages: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
 const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, appSystem } = ctx.params;
 
@@ -205,4 +220,4 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { newMessage, removeMessage, getMessage, publish, subscribe };
+export { newMessage, removeMessage, getMessage, publish, subscribe, clear };

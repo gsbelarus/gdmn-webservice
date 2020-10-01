@@ -11,7 +11,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
-  const user = await users.find(i => i.userName === userName);
+  const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
 
   if (!user) {
     throw new Error(`пользователь не найден`);
@@ -46,7 +46,8 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
 const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
-  if (!(await users.read()).length) {
+  const userCount = (await users.read()).length;
+  if (!userCount) {
     const gdmnUser = await users.insert({
       userName: 'gdmn',
       creatorId: user.userName,
@@ -58,7 +59,8 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
 
   const userid = await userService.addOne(user);
 
-  if (deviceId === 'WEB') {
+  //TODO: обработать поиск по передаваемой организации
+  if (deviceId === 'WEB' && !userCount) {
     await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
   }
 

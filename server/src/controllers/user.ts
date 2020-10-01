@@ -5,6 +5,7 @@ import { userService } from '../services';
 
 export const makeProfile = (user: IUser) => ({
   id: user.id,
+  externalId: user.externalId,
   userName: user.userName,
   firstName: user.firstName,
   lastName: user.lastName,

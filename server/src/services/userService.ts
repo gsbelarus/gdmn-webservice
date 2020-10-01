@@ -4,7 +4,7 @@ import { IUser } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
-const findByName = async (userName: string) => users.find(user => user.userName === userName);
+const findByName = async (userName: string) => users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
 
@@ -14,7 +14,7 @@ const findAll = async () => (await users.read()).map(el => makeProfile(el));
  * @return id, идентификатор пользователя
  * */
 const addOne = async (user: IUser) => {
-  if (await users.find(i => i.userName === user.userName)) {
+  if (await users.find(i => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
   return await users.insert(user);

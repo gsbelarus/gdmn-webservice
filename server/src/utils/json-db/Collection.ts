@@ -88,6 +88,10 @@ class Collection<T extends CollectionItem> {
     return this._save(deleted);
   }
 
+  public async deleteAll(): Promise<void> {
+    return this._save([]);
+  }
+
   private _initObject(obj: T): T {
     return R.assoc('id', uuid(), obj);
   }
@@ -100,7 +104,13 @@ class Collection<T extends CollectionItem> {
     return new Promise((resolve, reject) => {
       fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
-        return resolve(JSON.parse(data));
+        let result: Array<T> = [];
+        try {
+          result = JSON.parse(data);
+        } catch (jsonErr) {
+          reject(jsonErr);
+        }
+        return resolve(result);
       });
     });
   }

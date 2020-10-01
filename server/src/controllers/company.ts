@@ -4,7 +4,7 @@ import { ICompany, IResponse, IUserProfile } from '../../../common';
 import { companyService } from '../services';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { title } = ctx.request.body;
+  const { title, externalId } = ctx.request.body;
 
   const { id: userId } = ctx.state.user;
 
@@ -12,7 +12,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указано название организации');
   }
 
-  const company: ICompany = { id: title, title, admin: userId };
+  const company: ICompany = { id: title, title, admin: userId, externalId };
 
   try {
     const companyId = await companyService.addOne({ ...company, admin: userId });
