@@ -132,9 +132,9 @@ const localeStyles = StyleSheet.create({
     flexDirection: 'row',
   },
   chip: {
-    fontSize: 18,
-    height: 50,
-    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 20,
+    height: 45,
   },
   container: {
     flex: 1,
