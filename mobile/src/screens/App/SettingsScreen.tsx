@@ -240,7 +240,7 @@ const SettingsScreen = () => {
         />
       </View>
       <View style={localStyles.content}>
-        <Button mode="text" onPress={sendGetReferencesRequest}>
+        <Button mode="text" style={localStyles.refreshButton}  onPress={sendGetReferencesRequest}>
           Проверить обновления
         </Button>
       </View>
@@ -286,6 +286,9 @@ const localStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  refreshButton: {
+    margin: 20,
+  }
 });
 
 export { SettingsScreen };
