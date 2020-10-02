@@ -175,9 +175,11 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   ? Number((state.formParams as ISellLine).quantity)
                   : Number((state.formParams as ISellLine).quantity) +
                     Number(editLine ? editLine.quantity : line.quantity),
-                tara: (editLine ? editLine.tara ?? [] : (line as ISellLine).tara ?? []).concat(
-                  (state.formParams as ISellLine).tara ?? [],
-                ),
+                tara: !route?.params?.modeCor
+                  ? (editLine ? editLine.tara ?? [] : (line as ISellLine).tara ?? []).concat(
+                      (state.formParams as ISellLine).tara ?? [],
+                    )
+                  : (state.formParams as ISellLine).tara ?? [],
               };
               actions.editLine({
                 docId: route.params.docId,
