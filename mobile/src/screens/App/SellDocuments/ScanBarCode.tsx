@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 
-import { ISellLine } from '../../../model';
+import { ISellLine, ISellDocument, IWeighedGoods } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -25,6 +25,41 @@ const ScanBarCodeScreen = () => {
     permission();
   }, []);
 
+  const editLineDocument = (weighedGood: IWeighedGoods) => {
+    const document = state.documents.find((item) => item.id === route.params.docId);
+    const editLine = (document as ISellDocument)?.lines.find(
+      (item) => item.numreceive === weighedGood.numreceive && item.goodId === weighedGood.goodkey,
+    );
+    const good = state.goods.find((item) => item.id === weighedGood.goodkey);
+    if (editLine) {
+      const newLine = {
+        ...editLine,
+        quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
+      } as ISellLine;
+      actions.editLine({
+        docId: route.params.docId,
+        line: newLine,
+      });
+    } else {
+      const date = weighedGood.datework.split('.').reverse();
+      actions.addLine({
+        docId: route.params.docId,
+        line: {
+          id: '0',
+          goodId: weighedGood.goodkey,
+          tara: [],
+          manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
+            .toISOString()
+            .slice(0, 10),
+          quantity: good ? weighedGood.weight / good.itemWeight : 0,
+          orderQuantity: 0,
+          numreceive: weighedGood.numreceive,
+          timework: weighedGood.timework,
+        } as ISellLine,
+      });
+    }
+  };
+
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
     Alert.alert('Сохранить результат?', data, [
@@ -34,23 +69,7 @@ const ScanBarCodeScreen = () => {
           setScanned(false);
           const addGood = findGood(data);
           if (addGood) {
-            const good = state.goods.find((item) => item.id === addGood.goodkey);
-            const date = addGood.datework.split('.').reverse();
-            actions.addLine({
-              docId: route.params.docId,
-              line: {
-                id: '0',
-                goodId: addGood.goodkey,
-                tara: [],
-                manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-                  .toISOString()
-                  .slice(0, 10),
-                quantity: good ? addGood.weight / good.itemWeight : 0,
-                orderQuantity: 0,
-                numreceive: addGood.numreceive,
-                timework: addGood.timework,
-              } as ISellLine,
-            });
+            editLineDocument(addGood);
             navigation.goBack();
           }
         },
@@ -71,25 +90,11 @@ const ScanBarCodeScreen = () => {
 
     const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
     if (finded) {
-      //отправляем на заполнение позиции
-      /*navigation.navigate('SellProductDetail', {
-        prodId: finded.goodkey,
-        docId: route.params.docId,
-        modeCor: false,
-        weighedGood: finded.id,
-      });*/
       return finded;
     }
 
     const findedFullCode = state.weighedGoods.find((good) => Number(good.id) === Number(text));
     if (findedFullCode) {
-      //отправляем на заполнение позиции
-      /*navigation.navigate('SellProductDetail', {
-        prodId: findedFullCode.goodkey,
-        docId: route.params.docId,
-        modeCor: false,
-        weighedGood: findedFullCode.id,
-      });*/
       return findedFullCode;
     }
 
