@@ -32,13 +32,12 @@ const ScanBarCodeScreen = () => {
     );
     const good = state.goods.find((item) => item.id === weighedGood.goodkey);
     if (editLine) {
-      const newLine = {
-        ...editLine,
-        quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
-      } as ISellLine;
       actions.editLine({
         docId: route.params.docId,
-        line: newLine,
+        line: {
+          ...editLine,
+          quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
+        } as ISellLine,
       });
     } else {
       const date = weighedGood.datework.split('.').reverse();
