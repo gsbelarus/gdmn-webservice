@@ -1,11 +1,11 @@
-import { IHead, ILine, IDocument, IRemain, IRefData, IGood, IContact } from '../../../../common';
-import { IAppSettings, IFormParams, IDocumentParams } from '../../model/types';
+import { IHead, ILine, IDocument, IRemain, IRefData, IGood, IContact, IReference } from '../../../../common';
+import { IAppSettings, IFormParams, IDocumentParams, IForm } from '../../model/types';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 // eslint-disable-next-line no-shadow
 export enum ActionAppTypes {
   ADD_DOCUMENT = 'ADD_DOCUMENT',
-  UPDATE_DOCUMENT = 'UPDATE_DOCUMENT',
+  UPDATE_DOCUMENT_HEAD = 'UPDATE_DOCUMENT_HEAD',
   UPDATE_DOCUMENT_STATUS = 'UPDATE_DOCUMENT_STATUS',
   DELETE_DOCUMENT = 'DELETE_DOCUMENT',
   DELETE_ALL_DOCUMENTS = 'DELETE_ALL_DOCUMENTS',
@@ -13,9 +13,11 @@ export enum ActionAppTypes {
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_UPDATE_LINE = 'DOCUMENT_UPDATE_LINE',
   SET_SETTINGS = 'SET_SETTINGS',
-  // SET_REFERENCES = 'SET_REFERENCES',
+  SET_REFERENCE = 'SET_REFERENCE',
+  SET_REFERENCES = 'SET_REFERENCES',
   SET_DOCUMENTS = 'SET_DOCUMENTS',
-  SET_GOODS = 'SET_GOODS',
+  SET_FORM = 'SET_FORM',
+  /*   SET_GOODS = 'SET_GOODS',
   SET_DOCUMENTTYPES = 'SET_DOCUMENTTYPES',
   SET_CONTACTS = 'SET_CONTACTS',
   SET_REMAINS = 'SET_REMAINS',
@@ -25,13 +27,13 @@ export enum ActionAppTypes {
   SET_PRODUCT_PARAMS = 'SET_PRODUCT_PARAMS',
   CLEAR_PRODUCT_PARAMS = 'CLEAR_PRODUCT_PARAMS',
   SET_DOCUMENT_PARAMS = 'SET_DOCUMENT_PARAMS',
-  CLEAR_DOCUMENT_PARAMS = 'CLEAR_DOCUMENT_PARAMS',
+  CLEAR_DOCUMENT_PARAMS = 'CLEAR_DOCUMENT_PARAMS', */
 }
 
 export const AppActions = {
   addDocument: createActionPayload<ActionAppTypes.ADD_DOCUMENT, IDocument>(ActionAppTypes.ADD_DOCUMENT),
-  updateDocument: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT, { id: number; head: IHead }>(
-    ActionAppTypes.UPDATE_DOCUMENT,
+  updateDocument: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT_HEAD, { id: number; head: IHead }>(
+    ActionAppTypes.UPDATE_DOCUMENT_HEAD,
   ),
   updateDocumentStatus: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT_STATUS, { id: number; status: number }>(
     ActionAppTypes.UPDATE_DOCUMENT_STATUS,
@@ -48,9 +50,13 @@ export const AppActions = {
     ActionAppTypes.DOCUMENT_UPDATE_LINE,
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
-  // setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, IReference[]>(ActionAppTypes.SET_REFERENCES),
+  setReference: createActionPayload<ActionAppTypes.SET_REFERENCE, IReference<unknown>>(ActionAppTypes.SET_REFERENCE),
+  setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, { [name: string]: IReference }>(
+    ActionAppTypes.SET_REFERENCES,
+  ),
   setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
-  setRemains: createActionPayload<ActionAppTypes.SET_REMAINS, IRemain[]>(ActionAppTypes.SET_REMAINS),
+  setForm: createActionPayload<ActionAppTypes.SET_FORM, IForm>(ActionAppTypes.SET_FORM),
+  /*   setRemains: createActionPayload<ActionAppTypes.SET_REMAINS, IRemain[]>(ActionAppTypes.SET_REMAINS),
   setDocumentTypes: createActionPayload<ActionAppTypes.SET_DOCUMENTTYPES, IRefData[]>(ActionAppTypes.SET_DOCUMENTTYPES),
   setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
   setContacts: createActionPayload<ActionAppTypes.SET_CONTACTS, IContact[]>(ActionAppTypes.SET_CONTACTS),
@@ -64,7 +70,7 @@ export const AppActions = {
   setDocumentParams: createActionPayload<ActionAppTypes.SET_DOCUMENT_PARAMS, IDocumentParams>(
     ActionAppTypes.SET_DOCUMENT_PARAMS,
   ),
-  clearDocumentParams: createAction<ActionAppTypes.CLEAR_DOCUMENT_PARAMS>(ActionAppTypes.CLEAR_DOCUMENT_PARAMS),
+  clearDocumentParams: createAction<ActionAppTypes.CLEAR_DOCUMENT_PARAMS>(ActionAppTypes.CLEAR_DOCUMENT_PARAMS), */
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

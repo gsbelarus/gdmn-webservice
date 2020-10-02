@@ -78,7 +78,7 @@ export interface IAppSettings {
 }
 
 export interface IForm {
-  // name: string;
+  name: string;
   // parent: string;
   [name: string]: unknown;
 }
@@ -87,10 +87,10 @@ export interface IAppState {
   settings?: IAppSettings;
   documents?: IDocument[];
   references?: {
-    [name: string]: IReference[];
+    [name: string]: IReference;
   };
   forms?: {
-    [name: string]: IForm[];
+    [name: string]: IForm;
   };
   filterParams: string[];
 }

@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 
-import { IMessage } from '../../../common';
+import { IDocument, IMessage } from '../../../common';
 import config from '../config';
 
 // export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
@@ -78,4 +78,12 @@ export const getDateString = (_date: string) => {
     -2,
     3,
   )}.${date.getFullYear()}`;
+};
+
+export const getNextDocLineId = (document: IDocument) => {
+  return (
+    document?.lines
+      .map((item: { id: number }) => item.id)
+      .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 0
+  );
 };

@@ -21,7 +21,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
 
   const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
 
-  const good: IGood = useMemo(() => state.references?.goods.find((i) => i.id === item.goodId)?.data[0], [
+  const good: IGood = useMemo(() => state.references?.goods?.data.find((i) => i.id === item.goodId)?.data[0], [
     item.goodId,
     state.references?.goods,
   ]);

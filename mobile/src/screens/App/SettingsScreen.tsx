@@ -44,10 +44,7 @@ const SettingsScreen = () => {
             text: 'Да',
             onPress: () => {
               appActions.setDocuments([]);
-              appActions.setContacts([]);
-              appActions.setDocumentTypes([]);
-              appActions.setGoods([]);
-              appActions.setRemains([]);
+              appActions.setReferences({});
             },
           },
           {
@@ -109,23 +106,23 @@ const SettingsScreen = () => {
                   break;
                 }
                 case 'documenttypes': {
-                  const documentTypes = dataSet.data as IRefData[];
-                  appActions.setDocumentTypes(documentTypes);
+                  const documentTypes = dataSet.data as IReference<IRefData[]>;
+                  appActions.setReference(documentTypes);
                   break;
                 }
                 case 'contacts': {
-                  const contacts = dataSet.data as IContact[];
-                  appActions.setContacts(contacts);
+                  const contacts = dataSet.data as IReference<IContact[]>;
+                  appActions.setReference(contacts);
                   break;
                 }
                 case 'goods': {
-                  const goods = dataSet.data as IGood[];
-                  appActions.setGoods(goods);
+                  const goods = dataSet.data as IReference<IGood[]>;
+                  appActions.setReference(goods);
                   break;
                 }
                 case 'remains': {
-                  const remains = dataSet.data as IRemain[];
-                  appActions.setRemains(remains);
+                  const remains = dataSet.data as IReference<IRemain[]>;
+                  appActions.setReference(remains);
                   break;
                 }
                 default:

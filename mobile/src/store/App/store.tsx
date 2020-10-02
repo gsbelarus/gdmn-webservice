@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
-import { IDocument } from '../../../../common';
+import { IDocument, IReference } from '../../../../common';
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
@@ -16,11 +16,12 @@ const defaultAppState: IAppContextProps = {
 
 const sections = {
   SETTINGS: 'SETTINGS',
-  CONTACTS: 'CONTACTS',
+  REFERENCES: 'REFERENCES',
+  /*   CONTACTS: 'CONTACTS',
   DOCUMENTTYPES: 'DOCUMENTTYPES',
-  GOODS: 'GOODS',
-  DOCUMENTS: 'DOCUMENTS',
+  GOODS: 'GOODS', */
   REMAINS: 'REMAINS',
+  DOCUMENTS: 'DOCUMENTS',
 };
 
 const createStoreContext = () => {
@@ -41,12 +42,15 @@ const createStoreContext = () => {
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
         actions.setSettings(storageSettings || {});
-        // типы документов
-        const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
-        actions.setDocumentTypes(documentTypes || []);
+        // Справочники
+        const references = await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`);
+        actions.setReferences(references || {});
         // документы
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents || []);
+        // типы документов
+        /*  const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
+        actions.setDocumentTypes(documentTypes || []);
         // остатки
         const remains = await appStorage.getItem(`${storagePath}/${sections.REMAINS}`);
         actions.setRemains(remains || []);
@@ -55,7 +59,7 @@ const createStoreContext = () => {
         actions.setGoods(goods || []);
         // контакты
         const contacts = await appStorage.getItem(`${storagePath}/${sections.CONTACTS}`);
-        actions.setContacts(contacts || []);
+        actions.setContacts(contacts || []); */
         setLoading(false);
       };
 
@@ -67,42 +71,15 @@ const createStoreContext = () => {
     /*  Сохранение настроек в storage при их изменении */
     useEffect(() => {
       const saveSettings = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.SETTINGS}`, state.settings);
+        await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
       };
 
-      if (state.settings && storagePath && !isLoading) {
+      if (state.references && storagePath && !isLoading) {
         saveSettings();
       }
-    }, [state.settings, storagePath]);
+    }, [state.references, storagePath]);
 
-    /*  Сохранение контактов в storage при их изменении */
-    useEffect(() => {
-      const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references?.contacts);
-      if (state.references?.contacts && storagePath && !isLoading) {
-        saveData();
-      }
-    }, [state.references?.contacts, storagePath]);
-
-    /*  Сохранение товаров в storage при их изменении */
-    useEffect(() => {
-      const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
-      if (state.references?.goods && storagePath && !isLoading) {
-        saveData();
-      }
-    }, [state.references?.goods, storagePath]);
-
-    /*  Сохранение типов документов в storage при их изменении */
-    useEffect(() => {
-      const saveData = async () =>
-        await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references?.documentTypes);
-      if (state.references?.documentTypes && storagePath && !isLoading) {
-        saveData();
-      }
-    }, [state.references?.documentTypes, storagePath]);
-
-    /*  Сохранение остатков в storage при их изменении */
+    /*  Сохранение справочников в storage при их изменении */
     useEffect(() => {
       const saveData = async () => {
         await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references?.remains);
@@ -112,6 +89,44 @@ const createStoreContext = () => {
         saveData();
       }
     }, [state.references?.remains, storagePath]);
+
+    // /*  Сохранение контактов в storage при их изменении */
+    // useEffect(() => {
+    //   const saveData = async () =>
+    //     await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references?.contacts);
+    //   if (state.references?.contacts && storagePath && !isLoading) {
+    //     saveData();
+    //   }
+    // }, [state.references?.contacts, storagePath]);
+
+    // /*  Сохранение товаров в storage при их изменении */
+    // useEffect(() => {
+    //   const saveData = async () =>
+    //     await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
+    //   if (state.references?.goods && storagePath && !isLoading) {
+    //     saveData();
+    //   }
+    // }, [state.references?.goods, storagePath]);
+
+    // /*  Сохранение типов документов в storage при их изменении */
+    // useEffect(() => {
+    //   const saveData = async () =>
+    //     await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references?.documentTypes);
+    //   if (state.references?.documentTypes && storagePath && !isLoading) {
+    //     saveData();
+    //   }
+    // }, [state.references?.documentTypes, storagePath]);
+
+    // /*  Сохранение остатков в storage при их изменении */
+    // useEffect(() => {
+    //   const saveData = async () => {
+    //     await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references?.remains);
+    //   };
+
+    //   if (state.references?.remains && storagePath && !isLoading) {
+    //     saveData();
+    //   }
+    // }, [state.references?.remains, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {

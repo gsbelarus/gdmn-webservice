@@ -23,7 +23,7 @@ const DocumentEditScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
 
-  /*   const contacts = useMemo(() => appState.references?.contacts, [appState.references?.contacts]);
+  const contacts = useMemo(() => appState.references?.contacts, [appState.references?.contacts]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -89,7 +89,7 @@ const DocumentEditScreen = ({ route }: Props) => {
     });
     return id;
   }, [appActions, appState.documents, date, docnumber, doctype, fromcontactId, tocontactId]);
-  */
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
@@ -124,7 +124,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             //   return;
             // }
 
-            appActions.clearDocumentParams();
+            // appActions.clearDocumentParams();
             navigation.navigate('DocumentView');
             // navigation.navigate('DocumentView', { docId: id });
           }}
