@@ -47,7 +47,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
           {
             ...document,
             head: {
-              ...document.head,
+              ...document?.head,
               status: action.payload.status,
             },
           },

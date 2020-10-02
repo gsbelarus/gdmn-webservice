@@ -126,7 +126,7 @@ const createStoreContext = () => {
 
     useEffect(() => {
       if (!!state.settings?.autodeletingDocument && !isLoading) {
-        const deleteDocs = state.documents.filter((document) => document.head.status === 3);
+        const deleteDocs = state.documents.filter((document) => document?.head?.status === 3);
         if (deleteDocs.length > 0) {
           deleteDocs.forEach((document) => {
             actions.deleteDocument(document.id);

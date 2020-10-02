@@ -224,7 +224,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             message.body.payload.params.forEach((paramDoc) => {
               if (paramDoc.result) {
                 const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
-                if (document && document.head.status === 2) {
+                if (document?.head.status === 2) {
                   appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                 }
               }

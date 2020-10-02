@@ -97,7 +97,7 @@ const DocumentEditScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            navigation.navigate('DocumentView');
+            navigation.navigate('DocumentList');
             //     appActions.clearDocumentParams();
             //     if (!route.params) {
             //       navigation.navigate('DocumentListScreen');

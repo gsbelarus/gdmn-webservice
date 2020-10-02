@@ -20,7 +20,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
   const { state } = useAppStore();
 
-  const contacts = useMemo(() => state.references?.contacts, [state.references.contacts]);
+  const contacts = useMemo(() => state.references?.contacts, [state.references?.contacts]);
 
   const getContact = useCallback(
     (id: number): IContact => {
@@ -29,28 +29,28 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     [contacts],
   );
 
-  const docHead = useMemo(() => item.head, [item.head]);
+  const docHead = useMemo(() => item?.head, [item?.head]);
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
   const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
-  const docDate = new Date(item.head?.date).toLocaleDateString();
+  const docDate = new Date(item?.head?.date).toLocaleDateString();
 
-  const status = useMemo(() => Statuses.find((type) => type.id === item.head.status), [item.head.status]);
+  const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('DocumentView', { docId: item.id });
+        navigation.navigate('DocumentView', { docId: item?.id });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
+        <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status] }]}>
           <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
-            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead.docnumber} от ${docDate}`}</Text>
-            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
+            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
+            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
               {status ? status.name : ''}
             </Text>
           </View>
@@ -94,18 +94,18 @@ const DocumentListScreen = ({ navigation }) => {
   useEffect(() => {
     setData(
       appState.documents?.filter((item) => {
-        const docHead = item.head;
+        const docHead = item?.head;
 
         const fromContact = getContact(docHead?.fromcontactId);
 
         const toContact = getContact(docHead?.tocontactId);
 
-        const status = Statuses.find((type) => type.id === item.head.status);
+        const status = Statuses.find((type) => type.id === item?.head?.status);
 
         return appState.filterParams
           ? appState.filterParams.some((value: string) =>
               value === 'number'
-                ? item.head.docnumber?.includes(searchText)
+                ? item?.head.docnumber?.includes(searchText)
                 : value === 'state' && status
                 ? status.name.includes(searchText)
                 : value === 'toContact' && toContact
@@ -122,7 +122,7 @@ const DocumentListScreen = ({ navigation }) => {
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = useCallback(async () => {
-    const documents = appState.documents.filter((document) => document.head.status === 1);
+    const documents = appState.documents.filter((document) => document?.head?.status === 1);
 
     timeout(
       apiService.baseUrl.timeout,
@@ -141,7 +141,7 @@ const DocumentListScreen = ({ navigation }) => {
               text: 'Закрыть',
               onPress: () => {
                 documents.forEach((item) => {
-                  actions.updateDocumentStatus({ id: item.id, status: item.head.status + 1 });
+                  actions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
                 });
               },
             },

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo } from 'react';
@@ -10,14 +11,13 @@ import {
   IResponse,
   IDataMessage,
   IDocument,
-  IDocumentType,
+  IRefData,
   IContact,
   IGood,
   IRemain,
 } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
-import { ITara, IWeighedGoods } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -58,34 +58,22 @@ const ReferenceListScreen = () => {
         id: 0,
         name: 'Типы документов',
         type: 'documenttypes',
-        data: AppState.documentTypes,
+        data: AppState.references?.documentTypes,
       },
       {
         id: 1,
         name: 'Контакты',
         type: 'contacts',
-        data: AppState.contacts,
+        data: AppState.references?.contacts,
       },
       {
         id: 2,
         name: 'Товары',
         type: 'goods',
-        data: AppState.goods,
-      },
-      {
-        id: 3,
-        name: 'Тары',
-        type: 'boxings',
-        data: AppState.boxings,
-      },
-      {
-        id: 4,
-        name: 'Взвешенные товары',
-        type: 'weighedgoods',
-        data: AppState.weighedGoods,
+        data: AppState.references?.goods,
       },
     ],
-    [AppState.documentTypes, AppState.contacts, AppState.goods, AppState.boxings, AppState.weighedGoods],
+    [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
   );
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
@@ -134,7 +122,7 @@ const ReferenceListScreen = () => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IDocumentType[];
+                const documentTypes = dataSet.data as IRefData[];
                 appActions.setDocumentTypes(documentTypes);
                 break;
               }
@@ -151,16 +139,6 @@ const ReferenceListScreen = () => {
               case 'remains': {
                 const remains = dataSet.data as IRemain[];
                 appActions.setRemains(remains);
-                break;
-              }
-              case 'boxings': {
-                const boxings = dataSet.data as ITara[];
-                appActions.setBoxings(boxings);
-                break;
-              }
-              case 'weighedgoods': {
-                const weighedGoods = dataSet.data as IWeighedGoods[];
-                appActions.setWeighedGoods(weighedGoods);
                 break;
               }
               default:
@@ -184,7 +162,7 @@ const ReferenceListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <FlatList
         ref={ref}
-        data={references.filter((i) => i.data?.length)}
+        data={references?.filter((i) => i.data?.length)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

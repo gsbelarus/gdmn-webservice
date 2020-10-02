@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -22,7 +23,7 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
 
   const good: IGood = useMemo(() => state.references?.goods.find((i) => i.id === item.goodId)?.data[0], [
     item.goodId,
-    state.references.goods,
+    state.references?.goods,
   ]);
 
   return (
@@ -100,7 +101,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const [docId, setDocId] = useState<number>(undefined);
 
-  const contacts = useMemo(() => state.references?.contacts, [state.references.contacts]);
+  const contacts = useMemo(() => state.references?.contacts, [state.references?.contacts]);
 
   useEffect(() => {
     if (!route.params?.docId) {
@@ -111,14 +112,14 @@ const DocumentViewScreen = ({ route }: Props) => {
   }, [route.params.docId]);
 
   const document: IDocument | undefined = useMemo(() => {
-    return state.documents.find((item: { id: number }) => item.id === docId);
-  }, [docId, state.documents]);
+    return state.documents?.find((item: { id: number }) => item.id === docId);
+  }, [docId, state?.documents]);
 
   const contact: IContact = useMemo(
     () =>
-      ((contacts as unknown) as IContact[])?.find((item: { id: number }) => item.id === document?.head.tocontactId)
+      ((contacts as unknown) as IContact[])?.find((item: { id: number }) => item.id === document?.head?.tocontactId)
         ?.data[0] ?? notFound,
-    [document.head.tocontactId, contacts],
+    [document?.head?.tocontactId, contacts],
   );
 
   const refList = React.useRef<FlatList<ILine>>(null);
@@ -128,7 +129,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: ILine }) => (
-    <LineItem item={item} status={document?.head.status} docId={document?.id} />
+    <LineItem item={item} status={document?.head?.status} docId={document?.id} />
   );
 
   React.useLayoutEffect(() => {
@@ -188,7 +189,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, document.head.status, navigation, showActionSheet]);
+  }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
 
   return document ? (
     <>
@@ -196,7 +197,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         <View
           style={[
             localStyles.documentHeader,
-            { backgroundColor: document.head.status === 0 ? colors.primary : statusColors[1] },
+            { backgroundColor: document?.head?.status === 0 ? colors.primary : statusColors[1] },
           ]}
         >
           <View style={localStyles.header}>
