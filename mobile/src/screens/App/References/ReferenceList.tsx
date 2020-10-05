@@ -103,7 +103,7 @@ const ReferenceListScreen = () => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Запрос отправлен!', '', [{ text: 'Закрыть' }]);
+          Alert.alert('Запрос отправлен!', 'Подождите 2 минуты, затем проверьте обновления.', [{ text: 'Закрыть' }]);
         } else {
           Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть' }]);
         }

@@ -74,7 +74,7 @@ const DocumentsListScreen = ({ navigation }) => {
     )
       .then((response: IResponse<IMessageInfo>) => {
         if (response.result) {
-          Alert.alert('Запрос отправлен!', '', [
+          Alert.alert('Запрос отправлен!', 'Подождите 2 минуты, затем проверьте обновления.', [
             {
               text: 'Закрыть',
               onPress: () => {
