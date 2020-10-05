@@ -68,14 +68,14 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
             const addBoxings =
               idxl > -1
                 ? [
-                    ...state.boxingsLine[idx].lineBoxings.slice(0, idx),
+                    ...state.boxingsLine[idx].lineBoxings.slice(0, idxl),
                     {
                       tarakey: boxing.id,
                       type: boxing.type,
                       weight: Number.parseFloat(weight),
                       quantity: Number(quantity),
                     },
-                    ...state.boxingsLine[idx].lineBoxings.slice(idx + 1),
+                    ...state.boxingsLine[idx].lineBoxings.slice(idxl + 1),
                   ]
                 : state.boxingsLine && idx > -1
                 ? [
