@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
@@ -9,7 +9,7 @@ import { Text, TextInput, Chip } from 'react-native-paper';
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString } from '../../../helpers/utils';
+import { getDateString, getNextDocId, getNextDocLineId } from '../../../helpers/utils';
 import { IDocumentParams, IListItem } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -18,10 +18,11 @@ import styles from '../../../styles/global';
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentEdit'>;
 
 const DocumentEditScreen = ({ route }: Props) => {
-  const today = new Date();
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
+
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
 
   const contacts = useMemo(() => appState.references?.contacts, [appState.references?.contacts]);
 
@@ -32,15 +33,13 @@ const DocumentEditScreen = ({ route }: Props) => {
   const getListItems = (con: IContact[]): IListItem[] => con?.map((item) => ({ id: item.id, value: item.name }));
 
   const departments: IContact[] = useMemo(() => {
-    return [];
-    // ((contacts as unknown) as IContact[])?.filter((item) => item.contactType === 4)
+    return ((contacts as unknown) as IContact[])?.filter((item) => item.contactType === 4);
   }, [contacts]);
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
   const { date, docnumber, tocontactId, fromcontactId, doctype } = useMemo(() => {
-    return {} as IDocumentParams;
-    // ((appState.forms?.documentParams as unknown) as IDocumentParams) || {},
+    return ((appState.forms?.documentParams as unknown) as IDocumentParams) || {};
   }, [appState.forms?.documentParams]);
 
   const checkDocument = useCallback(() => {
@@ -54,7 +53,7 @@ const DocumentEditScreen = ({ route }: Props) => {
 
   const updateDocument = useCallback(() => {
     appActions.updateDocument({
-      id: route.params?.docId,
+      id: Number(route.params?.docId),
       head: {
         doctype,
         fromcontactId,
@@ -68,12 +67,7 @@ const DocumentEditScreen = ({ route }: Props) => {
   }, [appActions, date, docnumber, doctype, fromcontactId, route.params?.docId, tocontactId]);
 
   const addDocument = useCallback(() => {
-    const id =
-      appState.documents
-        ?.map((item) => item.id)
-        .reduce((newId, currId) => {
-          return newId > currId ? newId : currId;
-        }, 0) + 1;
+    const id = getNextDocId(appState.documents);
 
     appActions.addDocument({
       id,
@@ -97,16 +91,10 @@ const DocumentEditScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            navigation.navigate('DocumentList');
-            //     appActions.clearDocumentParams();
-            //     if (!route.params) {
-            //       navigation.navigate('DocumentListScreen');
-            //       return;
-            //     }
-            //     const { docId } = route.params;
-            //     // При нажатии 'отмена' если редактирование документа
-            //     // то возвращаемся к документу, иначе к списку документов
-            // docId ? navigation.navigate('DocumentViewScreen', { docId }) : navigation.navigate('DocumentListScreen');
+            appActions.setForm({ DocumentEdit: undefined });
+            // При нажатии 'отмена' если редактирование документа
+            // то возвращаемся к документу, иначе к списку документов
+            docId ? navigation.navigate('DocumentView', { docId }) : navigation.navigate('DocumentList');
           }}
         />
       ),
@@ -114,34 +102,36 @@ const DocumentEditScreen = ({ route }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            // if (!checkDocument()) {
-            //   return;
-            // }
+            if (!checkDocument()) {
+              return;
+            }
 
-            // const id = route.params?.docId ? updateDocument() : addDocument();
+            const id = route.params?.docId ? updateDocument() : addDocument();
 
-            // if (!id) {
-            //   return;
-            // }
+            if (!id) {
+              return;
+            }
 
-            // appActions.clearDocumentParams();
-            navigation.navigate('DocumentView');
-            // navigation.navigate('DocumentView', { docId: id });
+            appActions.setForm({ DocumentEdit: undefined });
+            navigation.navigate('DocumentView', { docId: id });
           }}
         />
       ),
     });
   }, []);
 
-  /*   useEffect(() => {
-    if (!appState.forms?.documentParams && !route.params?.docId) {
-      // Инициализируем параметры
-      appActions.setDocumentParams({
-        date: today.toISOString().slice(0, 10),
-      });
-    }
-  }, [appActions, appState.forms?.documentParams, route.params?.docId, today]);
- */
+  useEffect(() => {
+    // if (!appState.forms?.DocumentEdit && !route.params?.docId) {
+    // Инициализируем параметры
+    appActions.setForm({
+      DocumentEdit: {
+        name: 'DocumentEdit',
+        date: new Date().toISOString().slice(0, 10),
+      },
+    });
+    // }
+  }, [appActions]);
+
   /*   useEffect(() => {
     if (!route.params) {
       return;
@@ -151,7 +141,7 @@ const DocumentEditScreen = ({ route }: Props) => {
       ? appActions.setDocumentParams(appState.documents?.find((i) => i.id === route.params.docId).head)
       : appActions.setDocumentParams(route.params as IDocumentParams);
   }, [route.params, appActions, appState.documents]);
-
+*/
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
       return (
@@ -165,14 +155,13 @@ const DocumentEditScreen = ({ route }: Props) => {
     },
     [colors.border, colors.text],
   );
- */
+
   return (
     <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
         {route.params?.docId ? 'Редактирование Документа' : 'Создание документа'}
       </SubTitle>
       <ScrollView>
-        {/*
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
           <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
           <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
@@ -182,13 +171,13 @@ const DocumentEditScreen = ({ route }: Props) => {
                 navigation.navigate('SelectDateScreen', {
                   parentScreen: 'DocumentEdit',
                   fieldName: 'date',
-                  title: 'Дата документа:',
+                  title: 'Дата документа',
                   value: date,
                 })
               }
             >
               <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(date || today.toISOString())}
+                {getDateString(date || new Date().toISOString())}
               </Text>
               <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
@@ -205,7 +194,9 @@ const DocumentEditScreen = ({ route }: Props) => {
                 color: colors.text,
               },
             ]}
-            onChangeText={(text) => appActions.setDocumentParams({ docnumber: text.trim() })}
+            onChangeText={(text) =>
+              appActions.setForm({ DocumentEdit: { ...appState.forms?.DocumentEdit, docnumber: text.trim() } })
+            }
             value={docnumber || ' '}
             placeholder="Введите номер"
             placeholderTextColor={colors.border}
@@ -217,6 +208,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             autoCorrect={false}
           />
         </View>
+        {/*
         <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
           <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
           <ReferenceItem

@@ -15,7 +15,7 @@ export const initialState: IAppState = {
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
   if (__DEV__) {
-    // console.log('App action: ', JSON.stringify(action));
+    console.log('App action: ', JSON.stringify(action));
     Reactotron.log('appStore', action);
   }
 

@@ -7,7 +7,7 @@ import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
-import { RootStackParamList } from '../../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 
 LocaleConfig.locales.ru = {
   monthNames: [
@@ -30,7 +30,9 @@ LocaleConfig.locales.ru = {
 };
 LocaleConfig.defaultLocale = 'ru';
 
-type Props = StackScreenProps<RootStackParamList, 'SelectDateScreen'>;
+type Props = StackScreenProps<DocumentStackParamList, 'SelectDateScreen'>;
+
+type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
 
 export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -58,13 +60,13 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
+      headerLeft: () => <HeaderRight text="Отмена" onPress={navigation.goBack} />,
       headerRight: () => (
         <HeaderRight
           text="Готово"
           onPress={() => {
             // appActions.setFormParams({ [fieldName]: date });
-            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: date }) : null;
+            parentScreen ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: date }) : null;
           }}
         />
       ),
@@ -85,16 +87,6 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
             onDayPress={dayPressHandle}
             firstDay={1}
           />
-          {/* <RNDateTimePicker
-            testID="dateTimePicker"
-            timeZoneOffsetInMinutes={0}
-            value={date}
-            is24Hour={true}
-            display="calendar"
-            onChange={(_, newDate) => setDate(newDate)}
-            mode="date"
-            locale="ru_RU"
-          /> */}
         </>
       ) : null}
     </View>

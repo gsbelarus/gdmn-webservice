@@ -87,3 +87,7 @@ export const getNextDocLineId = (document: IDocument) => {
       .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 0
   );
 };
+
+export const getNextDocId = (documents: IDocument[]) => {
+  return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 0;
+};
