@@ -77,12 +77,15 @@ export interface IAppSettings {
   autodeletingDocument?: boolean;
   darkTheme?: boolean;
 }
+
+export interface IReferences {
+  [name: string]: IReference;
+}
+
 export interface IAppState {
   settings?: IAppSettings;
   documents?: IDocument[];
-  references?: {
-    [name: string]: IReference;
-  };
+  references?: IReferences;
   forms?: {
     [name: string]: IForm;
   };
