@@ -18,6 +18,7 @@ import {
 } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
+import { IReferences } from '../../../model/types';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -53,26 +54,7 @@ const ReferenceListScreen = () => {
   useScrollToTop(ref);
 
   const references: IReference[] = useMemo(
-    () => [
-      {
-        id: 0,
-        name: 'Типы документов',
-        type: 'documenttypes',
-        data: AppState.references?.documentTypes,
-      },
-      {
-        id: 1,
-        name: 'Контакты',
-        type: 'contacts',
-        data: AppState.references?.contacts,
-      },
-      {
-        id: 2,
-        name: 'Товары',
-        type: 'goods',
-        data: AppState.references?.goods,
-      },
-    ],
+    () => [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
     [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
   );
 
@@ -122,23 +104,23 @@ const ReferenceListScreen = () => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IRefData[];
-                appActions.setDocumentTypes(documentTypes);
+                const documentTypes = dataSet.data as IReference;
+                appActions.setReference(documentTypes);
                 break;
               }
               case 'contacts': {
-                const contacts = dataSet.data as IContact[];
-                appActions.setContacts(contacts);
+                const contacts = dataSet.data as IReference<IContact[]>;
+                appActions.setReference(contacts);
                 break;
               }
               case 'goods': {
-                const goods = dataSet.data as IGood[];
-                appActions.setGoods(goods);
+                const goods = dataSet.data as IReference<IGood[]>;
+                appActions.setReference(goods);
                 break;
               }
               case 'remains': {
-                const remains = dataSet.data as IRemain[];
-                appActions.setRemains(remains);
+                const remains = dataSet.data as IReference<IRemain[]>;
+                appActions.setReference(remains);
                 break;
               }
               default:
