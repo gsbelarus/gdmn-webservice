@@ -18,7 +18,6 @@ import {
 } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
-import { IReferences } from '../../../model/types';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -53,9 +52,12 @@ const ReferenceListScreen = () => {
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const references: IReference[] = useMemo(
-    () => [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-    [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
+  const references: IReference<any>[] = useMemo(
+    () => {
+      console.log('AppState.references');
+      console.log(AppState.references);
+      return [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goodgroups, AppState.references?.goods]},
+    [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goodgroups, AppState.references?.goods],
   );
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
@@ -139,6 +141,8 @@ const ReferenceListScreen = () => {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
   }, [AppState.documents, apiService.data, appActions, state.companyID]);
+
+  console.log(AppState);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
