@@ -184,6 +184,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.SET_FORM: {
       return { ...state, forms: { ...state.forms, [action.payload.name]: action.payload } };
     }
+    case ActionAppTypes.CLEAR_FORM: {
+      return { ...state, forms: { ...state.forms, [action.payload]: undefined } };
+    }
     /*  case ActionAppTypes.SET_REMAINS:
       return { ...state, remains: action.payload }
     case ActionAppTypes.SET_CONTACTS:

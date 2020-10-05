@@ -91,7 +91,7 @@ const DocumentEditScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.setForm({ DocumentEdit: undefined });
+            appActions.clearForm('DocumentEdit');
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
             docId ? navigation.navigate('DocumentView', { docId }) : navigation.navigate('DocumentList');
@@ -112,7 +112,7 @@ const DocumentEditScreen = ({ route }: Props) => {
               return;
             }
 
-            appActions.setForm({ DocumentEdit: undefined });
+            appActions.clearForm('DocumentEdit');
             navigation.navigate('DocumentView', { docId: id });
           }}
         />
@@ -124,10 +124,8 @@ const DocumentEditScreen = ({ route }: Props) => {
     // if (!appState.forms?.DocumentEdit && !route.params?.docId) {
     // Инициализируем параметры
     appActions.setForm({
-      DocumentEdit: {
-        name: 'DocumentEdit',
-        date: new Date().toISOString().slice(0, 10),
-      },
+      name: 'DocumentEdit',
+      date: new Date().toISOString().slice(0, 10),
     });
     // }
   }, [appActions]);
@@ -194,9 +192,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                 color: colors.text,
               },
             ]}
-            onChangeText={(text) =>
-              appActions.setForm({ DocumentEdit: { ...appState.forms?.DocumentEdit, docnumber: text.trim() } })
-            }
+            onChangeText={(text) => appActions.setForm({ ...appState.forms?.DocumentEdit, docnumber: text.trim() })}
             value={docnumber || ' '}
             placeholder="Введите номер"
             placeholderTextColor={colors.border}
