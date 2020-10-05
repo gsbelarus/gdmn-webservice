@@ -68,7 +68,7 @@ const ReferenceListScreen = () => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'boxings', 'weighedGoods'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
         },
       }),
     )
@@ -85,7 +85,7 @@ const ReferenceListScreen = () => {
   const sendSubscribe = useCallback(async () => {
     try {
       const response = await apiService.data.subscribe(state.companyID);
-      console.log(response);
+      // console.log(response);
       if (!response.result) {
         Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
         return;
@@ -105,22 +105,22 @@ const ReferenceListScreen = () => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IReference;
+                const documentTypes = (dataSet as unknown) as IReference;
                 appActions.setReference(documentTypes);
                 break;
               }
               case 'contacts': {
-                const contacts = dataSet.data as IReference<IContact[]>;
+                const contacts = (dataSet as unknown) as IReference<IContact[]>;
                 appActions.setReference(contacts);
                 break;
               }
               case 'goods': {
-                const goods = dataSet.data as IReference<IGood[]>;
+                const goods = (dataSet as unknown) as IReference<IGood[]>;
                 appActions.setReference(goods);
                 break;
               }
               case 'remains': {
-                const remains = dataSet.data as IReference<IRemain[]>;
+                const remains = (dataSet as unknown) as IReference<IRemain[]>;
                 appActions.setReference(remains);
                 break;
               }

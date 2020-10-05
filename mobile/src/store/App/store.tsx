@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
-import { IDocument, IReference } from '../../../../common';
+import { IDocument } from '../../../../common';
 import { appStorage } from '../../helpers/utils';
-import { IAppContextProps, IAppState, IAppSettings } from '../../model/types';
+import { IAppContextProps, IAppState, IAppSettings, IReferences } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
@@ -17,10 +17,6 @@ const defaultAppState: IAppContextProps = {
 const sections = {
   SETTINGS: 'SETTINGS',
   REFERENCES: 'REFERENCES',
-  /*   CONTACTS: 'CONTACTS',
-  DOCUMENTTYPES: 'DOCUMENTTYPES',
-  GOODS: 'GOODS', */
-  REMAINS: 'REMAINS',
   DOCUMENTS: 'DOCUMENTS',
 };
 
@@ -41,25 +37,13 @@ const createStoreContext = () => {
         setLoading(true);
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
-        actions.setSettings(storageSettings || {});
+        actions.setSettings(storageSettings);
         // Справочники
-        const references = await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`);
-        actions.setReferences(references || {});
+        const references = (await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`)) as IReferences;
+        actions.setReferences(references);
         // документы
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
-        actions.setDocuments(documents || []);
-        // типы документов
-        /*  const documentTypes = await appStorage.getItem(`${storagePath}/${sections.DOCUMENTTYPES}`);
-        actions.setDocumentTypes(documentTypes || []);
-        // остатки
-        const remains = await appStorage.getItem(`${storagePath}/${sections.REMAINS}`);
-        actions.setRemains(remains || []);
-        // товары
-        const goods = await appStorage.getItem(`${storagePath}/${sections.GOODS}`);
-        actions.setGoods(goods || []);
-        // контакты
-        const contacts = await appStorage.getItem(`${storagePath}/${sections.CONTACTS}`);
-        actions.setContacts(contacts || []); */
+        actions.setDocuments(documents);
         setLoading(false);
       };
 
@@ -78,55 +62,6 @@ const createStoreContext = () => {
         saveSettings();
       }
     }, [state.references, storagePath]);
-
-    /*  Сохранение справочников в storage при их изменении */
-    useEffect(() => {
-      const saveData = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references?.remains);
-      };
-
-      if (state.references?.remains && storagePath && !isLoading) {
-        saveData();
-      }
-    }, [state.references?.remains, storagePath]);
-
-    // /*  Сохранение контактов в storage при их изменении */
-    // useEffect(() => {
-    //   const saveData = async () =>
-    //     await appStorage.setItem(`${storagePath}/${sections.CONTACTS}`, state.references?.contacts);
-    //   if (state.references?.contacts && storagePath && !isLoading) {
-    //     saveData();
-    //   }
-    // }, [state.references?.contacts, storagePath]);
-
-    // /*  Сохранение товаров в storage при их изменении */
-    // useEffect(() => {
-    //   const saveData = async () =>
-    //     await appStorage.setItem(`${storagePath}/${sections.GOODS}`, state.references?.goods);
-    //   if (state.references?.goods && storagePath && !isLoading) {
-    //     saveData();
-    //   }
-    // }, [state.references?.goods, storagePath]);
-
-    // /*  Сохранение типов документов в storage при их изменении */
-    // useEffect(() => {
-    //   const saveData = async () =>
-    //     await appStorage.setItem(`${storagePath}/${sections.DOCUMENTTYPES}`, state.references?.documentTypes);
-    //   if (state.references?.documentTypes && storagePath && !isLoading) {
-    //     saveData();
-    //   }
-    // }, [state.references?.documentTypes, storagePath]);
-
-    // /*  Сохранение остатков в storage при их изменении */
-    // useEffect(() => {
-    //   const saveData = async () => {
-    //     await appStorage.setItem(`${storagePath}/${sections.REMAINS}`, state.references?.remains);
-    //   };
-
-    //   if (state.references?.remains && storagePath && !isLoading) {
-    //     saveData();
-    //   }
-    // }, [state.references?.remains, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {

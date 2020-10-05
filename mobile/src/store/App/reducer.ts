@@ -6,17 +6,21 @@ import { IAppState } from '../../model/types';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
-  settings: {},
-  documents: [],
-  references: {},
-  forms: {},
+  settings: undefined,
+  documents: undefined,
+  references: undefined,
+  forms: undefined,
   filterParams: ['number'],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
   if (__DEV__) {
-    console.log('App action: ', JSON.stringify(action));
-    Reactotron.log('appStore', action);
+    // console.log('App action: ', JSON.stringify(action));
+    Reactotron.display({
+      name: `App action ${action.type}`,
+      value: action,
+      important: false,
+    });
   }
 
   switch (action.type) {
@@ -180,9 +184,12 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.SET_REFERENCES:
       return { ...state, references: action.payload };
     case ActionAppTypes.SET_REFERENCE:
-      return { ...state, references: { ...state.references, [action.payload.name]: action.payload } };
+      return { ...state, references: { ...state.references, [action.payload.type]: action.payload } };
     case ActionAppTypes.SET_FORM: {
-      return { ...state, forms: { ...state.forms, [action.payload.name]: action.payload } };
+      return {
+        ...state,
+        forms: { ...state.forms, [action.payload.name]: action.payload },
+      };
     }
     case ActionAppTypes.CLEAR_FORM: {
       return { ...state, forms: { ...state.forms, [action.payload]: undefined } };
