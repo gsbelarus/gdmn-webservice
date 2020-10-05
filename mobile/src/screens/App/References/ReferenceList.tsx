@@ -11,14 +11,12 @@ import {
   IResponse,
   IDataMessage,
   IDocument,
-  IRefData,
   IContact,
   IGood,
   IRemain,
 } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
-import { IReferences } from '../../../model/types';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
@@ -53,10 +51,13 @@ const ReferenceListScreen = () => {
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const references: IReference[] = useMemo(
-    () => [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-    [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-  );
+  const references: IReference[] = useMemo(() => Object.keys(AppState.references).map((i) => AppState.references[i]), [
+    AppState.references,
+  ]);
+
+  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
+  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
+  // [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
