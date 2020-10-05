@@ -1,4 +1,5 @@
 import { IDocument, IBaseUrl, IReference } from '../../../common';
+import { IForm } from '../../../common/base';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
@@ -76,13 +77,6 @@ export interface IAppSettings {
   autodeletingDocument?: boolean;
   darkTheme?: boolean;
 }
-
-export interface IForm {
-  name: string;
-  // parent: string;
-  [name: string]: unknown;
-}
-
 export interface IAppState {
   settings?: IAppSettings;
   documents?: IDocument[];

@@ -19,40 +19,19 @@ export interface ILine {
   quantity: number;
 }
 
-export interface IRemain {
-  goodId: number;
-  quantity: number;
-  price: number;
-  contactId: number;
-}
-
-/* export interface IContact {
-  id: number;
-  name: string;
-  type?: string;
-  [fieldName: string]: unknown;
-} */
-/*
-
-/*
-export interface IGood {
-  id: number;
-  name: string;
-  barcode?: string;
-  alias?: string;
-  itemWeight?: number;
-  [fieldName: string]: unknown;
-} */
-export interface IDocumentStatus {
-  id: number;
-  name: string;
-}
-
 export interface IRefData {
   id: number;
   name?: string;
   [fieldName: string]: unknown;
 }
+
+
+export interface IForm {
+  name: string;
+  // parent: string;
+  [name: string]: unknown;
+}
+
 
 export interface IReference<T = IRefData> {
   id: number;
@@ -61,11 +40,6 @@ export interface IReference<T = IRefData> {
   data: T[];
 }
 
-/* {
-  id: number;
-  name?: string;
-  [fieldName: string]: unknown;
-}[] */
 export interface IDocumentMessage {
   name: string;
   data: IDocument[];
@@ -78,4 +52,16 @@ export interface IContact extends IRefData {
 export interface IGood extends IRefData {
   alias?: string;
   barcode?: string;
+}
+
+export interface IRemain {
+  goodId: number;
+  quantity: number;
+  price: number;
+  contactId: number;
+}
+
+export interface IDocumentStatus {
+  id: number;
+  name: string;
 }

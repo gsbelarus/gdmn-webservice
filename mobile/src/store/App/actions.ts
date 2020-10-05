@@ -1,5 +1,6 @@
-import { IHead, ILine, IDocument, IRemain, IRefData, IGood, IContact, IReference } from '../../../../common';
-import { IAppSettings, IFormParams, IDocumentParams, IForm } from '../../model/types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { IHead, ILine, IDocument, IReference, IForm } from '../../../../common';
+import { IAppSettings } from '../../model/types';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 // eslint-disable-next-line no-shadow
@@ -55,7 +56,7 @@ export const AppActions = {
     ActionAppTypes.SET_REFERENCES,
   ),
   setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
-  setForm: createActionPayload<ActionAppTypes.SET_FORM, { [name: string]: IForm }>(ActionAppTypes.SET_FORM),
+  setForm: createActionPayload<ActionAppTypes.SET_FORM, IForm>(ActionAppTypes.SET_FORM),
   /*   setRemains: createActionPayload<ActionAppTypes.SET_REMAINS, IRemain[]>(ActionAppTypes.SET_REMAINS),
   setDocumentTypes: createActionPayload<ActionAppTypes.SET_DOCUMENTTYPES, IRefData[]>(ActionAppTypes.SET_DOCUMENTTYPES),
   setGoods: createActionPayload<ActionAppTypes.SET_GOODS, IGood[]>(ActionAppTypes.SET_GOODS),
