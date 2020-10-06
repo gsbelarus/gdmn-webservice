@@ -19,28 +19,28 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
   const { state, actions } = useAppStore();
 
   const [document, setDocument] = useState<IDocument>(undefined);
-  const [product, setProduct] = useState<IGood | undefined>();
-  const [line, setLine] = useState<ILine | ILine | undefined>();
+  const [product, setProduct] = useState<IGood>(undefined);
+  const [line, setLine] = useState<ILine>(undefined);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
-  const productParams = useMemo(() => (state.forms.productParams as unknown) as ILine, [state.forms.productParams]);
+  // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
 
   useEffect(() => {
     // Поиск редактируемой позиции документа
-    document?.lines && setLine(document.lines.find((item) => item.id === route.params.lineId));
-  }, [document, route.params.lineId]);
+    document?.lines && setLine(document.lines.find((item) => item.id === route.params?.lineId));
+  }, [document, route.params?.lineId]);
 
   useEffect(() => {
     if (!route.params) {
       return;
     }
 
-    setProduct(((state.references?.goods as unknown) as IGood[])?.find((item) => item.id === route.params.prodId));
+    setProduct(((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === route.params?.prodId));
 
-    setDocument(state.documents.find((item) => item.id === route.params.docId));
-  }, [route.params, state.documents, state.references?.goods]);
+    setDocument(state.documents.find((item) => item.id === route.params?.docId));
+  }, [route.params, state.documents, state.references?.goods?.data]);
 
   /*   useEffect(() => {
     if (route.params.weighedGood) {
@@ -122,7 +122,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
           text="Отмена"
           onPress={() => {
             navigation.navigate('DocumentView', { docId: document?.id });
-            actions.clearProductParams();
+            // actions.clearProductParams();
           }}
         />
       ),
@@ -132,29 +132,26 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
           onPress={() => {
             if (line?.id) {
               actions.editLine({
-                docId: route.params.docId,
-                line: {
-                  ...line,
-                  ...productParams,
-                },
+                docId: route.params?.docId,
+                line,
               });
             } else {
               actions.addLine({
-                docId: route.params.docId,
+                docId: route.params?.docId,
                 line: {
-                  goodId: route.params.prodId,
+                  goodId: route.params?.prodId,
                   ...productParams,
                   id: 0,
                 },
               });
             }
             navigation.navigate('DocumentView', { docId: document?.id });
-            actions.clearProductParams();
+            // actions.clearProductParams();
           }}
         />
       ),
     });
-  }, [actions, document.id, line, navigation, productParams, route.params.docId, route.params.prodId]);
+  }, [actions, document?.id, line, navigation, route.params?.docId, route.params?.prodId]);
 
   /*   const onPress = () => {
       if (isKeyboardVisible) {
@@ -190,15 +187,15 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
             editable={true}
             keyboardType="decimal-pad"
             onChangeText={(text) => {
-              actions.setProducParams({
-                ...productParams,
+              setLine((prev) => ({
+                ...prev,
                 quantity: Number(!Number.isNaN(text) ? text : '1'),
-              });
+              }));
             }}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={(productParams?.quantity ?? 1).toString()}
+            value={(line?.quantity ?? 1).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,

@@ -11,9 +11,12 @@ import SubTitle from '../../../../components/SubTitle';
 // import { IField } from '../../../model';
 import { IListItem } from '../../../../model/types';
 import { RootStackParamList } from '../../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 // import { useAppStore } from '../../../store';
 
-type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
+type Props = StackScreenProps<DocumentStackParamList, 'SelectItemScreen'>;
+
+type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
 
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -28,6 +31,8 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   } = route.params;
 
   // const { state: appState, actions: appActions } = useAppStore();
+
+  console.log(newList);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
@@ -90,7 +95,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
           text="Готово"
           onPress={() => {
             parentScreen
-              ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: checkedItem })
+              ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: checkedItem })
               : null;
           }}
         />

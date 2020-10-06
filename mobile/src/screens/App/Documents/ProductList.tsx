@@ -21,7 +21,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('SellProductDetail', { prodId: item.id, docId, modeCor: false });
+        navigation.navigate('ProductEdit', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
@@ -181,7 +181,8 @@ const ProductListScreen = () => {
           </View> */}
           <FlatList
             ref={ref}
-            data={((state.references?.goods as unknown) as IGood[]).filter(
+             data={
+               ((state.references?.goods?.data as unknown) as IGood[]).filter(
               (item) =>
                 item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                 item.name.toLowerCase().includes(text.toLowerCase()),

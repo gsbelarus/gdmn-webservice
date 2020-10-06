@@ -78,7 +78,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
       style={localStyles.listContainer}
       onPress={() => {
         // actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
-        navigation.navigate('SellProductDetail', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
+        navigation.navigate('ProductEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
       }}
     >
       <ContentItem item={item} status={status} />
@@ -99,21 +99,23 @@ const DocumentViewScreen = ({ route }: Props) => {
   const { state, actions } = useAppStore();
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
-  const [docId, setDocId] = useState<number>(undefined);
+  // const [docId, setDocId] = useState<number>(undefined);
 
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
-  useEffect(() => {
-    if (!route.params?.docId) {
-      return;
-    }
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
 
-    setDocId(route.params.docId);
-  }, [route.params.docId]);
+  // useEffect(() => {
+  //   if (!route.params?.docId) {
+  //     return;
+  //   }
+
+  //   setDocId(route.params.docId);
+  // }, [route.params?.docId]);
 
   const document = useMemo(() =>
     state.documents?.find((item: { id: number }) => item.id === docId)
-  , [docId, state?.documents]);
+  , [docId, state.documents]);
 
   const contact = useMemo(
     () =>
@@ -268,12 +270,12 @@ const DocumentViewScreen = ({ route }: Props) => {
               <FAB
                 style={localStyles.fabScan}
                 icon="barcode-scan"
-                onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document.id, weighedGood: true })}
+                onPress={() => navigation.navigate('ScanBarCode', { docId: document.id })}
               />
               <FAB
                 style={localStyles.fabAdd}
                 icon="plus"
-                onPress={() => navigation.navigate('SelectItemScreen', { docId: document.id })}
+                onPress={() => navigation.navigate('ProductList', { docId: document.id })}
               />
             </>
           )}
