@@ -92,7 +92,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
 
-const notFound = { id: -1, name: '' };
+// const notFound: IContact = { id: -1, name: '', contactType: -1 };
 
 const DocumentViewScreen = ({ route }: Props) => {
   const { colors } = useTheme();
@@ -101,7 +101,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const [docId, setDocId] = useState<number>(undefined);
 
-  const contacts = useMemo(() => state.references?.contacts, [state.references?.contacts]);
+  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   useEffect(() => {
     if (!route.params?.docId) {
@@ -111,14 +111,13 @@ const DocumentViewScreen = ({ route }: Props) => {
     setDocId(route.params.docId);
   }, [route.params.docId]);
 
-  const document: IDocument | undefined = useMemo(() => {
-    return state.documents?.find((item: { id: number }) => item.id === docId);
-  }, [docId, state?.documents]);
+  const document = useMemo(() =>
+    state.documents?.find((item: { id: number }) => item.id === docId)
+  , [docId, state?.documents]);
 
-  const contact: IContact = useMemo(
+  const contact = useMemo(
     () =>
-      ((contacts as unknown) as IContact[])?.find((item: { id: number }) => item.id === document?.head?.tocontactId)
-        ?.data[0] ?? notFound,
+      contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId),
     [document?.head?.tocontactId, contacts],
   );
 
@@ -205,7 +204,7 @@ const DocumentViewScreen = ({ route }: Props) => {
               №{(document?.head as IHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()} г.
             </Text>
             <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {contact.name}
+              {contact?.name}
             </Text>
           </View>
           {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
@@ -274,7 +273,7 @@ const DocumentViewScreen = ({ route }: Props) => {
               <FAB
                 style={localStyles.fabAdd}
                 icon="plus"
-                onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
+                onPress={() => navigation.navigate('SelectItemScreen', { docId: document.id })}
               />
             </>
           )}
