@@ -1,7 +1,8 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
 import { IResponse, IMessage, IReference, IContact, IGood, IRemain, IDocument, IRefData } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
@@ -16,7 +17,7 @@ const SettingsScreen = () => {
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents },
+    state: { settings, documents, references, forms },
   } = useAppStore();
   const {
     state: { companyID, userID },
@@ -106,22 +107,22 @@ const SettingsScreen = () => {
                   break;
                 }
                 case 'documenttypes': {
-                  const documentTypes = dataSet.data as IReference<IRefData[]>;
+                  const documentTypes = (dataSet as unknown) as IReference<IRefData[]>;
                   appActions.setReference(documentTypes);
                   break;
                 }
                 case 'contacts': {
-                  const contacts = dataSet.data as IReference<IContact[]>;
+                  const contacts = (dataSet as unknown) as IReference<IContact[]>;
                   appActions.setReference(contacts);
                   break;
                 }
                 case 'goods': {
-                  const goods = dataSet.data as IReference<IGood[]>;
+                  const goods = (dataSet as unknown) as IReference<IGood[]>;
                   appActions.setReference(goods);
                   break;
                 }
                 case 'remains': {
-                  const remains = dataSet.data as IReference<IRemain[]>;
+                  const remains = (dataSet as unknown) as IReference<IRemain[]>;
                   appActions.setReference(remains);
                   break;
                 }
@@ -129,11 +130,11 @@ const SettingsScreen = () => {
                   break;
               }
             });
-            apiService.data.deleteMessage(companyID, message.head.id);
+            // apiService.data.deleteMessage(companyID, message.head.id);
           }
           if (message.body.type === 'cmd') {
             // Сообщение содержит команду
-            apiService.data.deleteMessage(companyID, message.head.id);
+            // apiService.data.deleteMessage(companyID, message.head.id);
           }
           Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         });
@@ -168,7 +169,7 @@ const SettingsScreen = () => {
   }, [apiService.data, appActions, companyID, documents]);
 
   return (
-    <ScrollView style={{ backgroundColor: colors.background }}>
+    <>
       <View style={[localStyles.profileContainer, { backgroundColor: colors.primary }]}>
         <View style={localStyles.profileIcon}>
           <Avatar.Icon size={50} icon="account-badge" style={{ backgroundColor: colors.primary }} />
@@ -211,26 +212,73 @@ const SettingsScreen = () => {
           }
         />
       </View>
-      <View style={localStyles.content}>
-        <Button mode="text" onPress={sendGetReferencesRequest}>
-          Проверить обновления
-        </Button>
-      </View>
-      <Divider />
-      <SettingsItem
-        label="Синхронизировать"
-        value={settings?.synchronization}
-        onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
-      />
-      <Divider />
-      <SettingsItem
-        label="Удалять документы после обработки на сервере"
-        value={settings?.autodeletingDocument}
-        onValueChange={() =>
-          appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
-        }
-      />
-    </ScrollView>
+      <ScrollView style={{ backgroundColor: colors.background }}>
+        <View>
+          <Button mode="text" onPress={sendGetReferencesRequest}>
+            Проверить обновления
+          </Button>
+          <Button
+            mode="text"
+            onPress={async () => {
+              const log = await appStorage.getItem(`${AuthState.userID}/${AuthState.companyID}/REFERENCES`);
+              Reactotron.display({
+                name: 'Mobile Storage',
+                preview: log,
+                value: log,
+                important: true,
+              });
+            }}
+          >
+            Проверить хранилище
+          </Button>
+          <Button
+            mode="text"
+            onPress={async () => {
+              Reactotron.display({
+                name: 'settings',
+                preview: 'settings',
+                value: settings,
+                important: true,
+              });
+              Reactotron.display({
+                name: 'documents',
+                preview: 'documents',
+                value: documents,
+                important: true,
+              });
+              Reactotron.display({
+                name: 'references',
+                preview: 'references',
+                value: references,
+                important: true,
+              });
+              Reactotron.display({
+                name: 'forms',
+                preview: 'forms',
+                value: forms,
+                important: true,
+              });
+            }}
+          >
+            Проверить стейт
+          </Button>
+        </View>
+        <Divider />
+        <SettingsItem
+          label="Синхронизировать"
+          value={settings?.synchronization}
+          onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
+        />
+        <Divider />
+        <SettingsItem
+          label="Удалять документы после обработки на сервере"
+          value={settings?.autodeletingDocument}
+          onValueChange={() =>
+            appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
+          }
+        />
+      </ScrollView>
+    </>
   );
 };
 
@@ -239,9 +287,9 @@ const localStyles = StyleSheet.create({
     flex: 1,
   },
   profileContainer: {
-    flex: 1,
+    alignItems: 'center',
     flexDirection: 'row',
-    height: 60,
+    height: 50,
   },
   profileIcon: {
     justifyContent: 'space-around',

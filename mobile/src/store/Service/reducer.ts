@@ -1,4 +1,5 @@
 import { Reducer } from 'react';
+import Reactotron from 'reactotron-react-native';
 
 import { IServiceState } from '../../model/types';
 import { TServiceActions, ActionServiceTypes } from './actions';
@@ -12,7 +13,12 @@ export const initialState: IServiceState = {
 
 export const reducer: Reducer<IServiceState, TServiceActions> = (state = initialState, action): IServiceState => {
   if (__DEV__) {
-    console.log('Service action: ', JSON.stringify(action));
+    // console.log('Service action: ', JSON.stringify(action));
+    Reactotron.display({
+      name: `Service action ${action.type}`,
+      value: action,
+      important: false,
+    });
   }
 
   switch (action.type) {
