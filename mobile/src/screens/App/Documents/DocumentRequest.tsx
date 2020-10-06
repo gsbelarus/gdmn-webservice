@@ -14,7 +14,7 @@ import {
   IGood,
   IDocument,
   IDataMessage,
-  IRefData,
+  IReference
 } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
@@ -61,22 +61,22 @@ const DocumentRequestScreen = ({ route }: Props) => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
-  useEffect(() => {
-    if (!documentParams) {
-      // Инициализируем параметры
-      appActions.setFormParams({
-        dateBegin: yesterday.toISOString().slice(0, 10),
-        dateEnd: today.toISOString().slice(0, 10),
-      });
-    }
-  }, [appActions, documentParams, today, yesterday]);
+  // useEffect(() => {
+  //   if (!documentParams) {
+  //     // Инициализируем параметры
+  //     appActions.setFormParams({
+  //       dateBegin: yesterday.toISOString().slice(0, 10),
+  //       dateEnd: today.toISOString().slice(0, 10),
+  //     });
+  //   }
+  // }, [appActions, documentParams, today, yesterday]);
 
-  useEffect(() => {
-    if (!route?.params) {
-      return;
-    }
-    appActions.setFormParams(route.params);
-  }, [appActions, route]);
+  // useEffect(() => {
+  //   if (!route?.params) {
+  //     return;
+  //   }
+  //   appActions.setFormParams(route.params);
+  // }, [appActions, route]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -126,7 +126,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             {
               text: 'Закрыть',
               onPress: () => {
-                appActions.clearFormParams();
+                appActions.clearForm('DocumentRequest');
               },
             },
           ]);
@@ -183,23 +183,23 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IRefData[];
-                appActions.setDocumentTypes(documentTypes);
+                const documentTypes = dataSet.data as IReference<IContact[]>;;
+                appActions.setReference(documentTypes);
                 break;
               }
               case 'contacts': {
-                const con = dataSet.data as IContact[];
-                appActions.setContacts(con);
+                const con = dataSet.data as IReference<IContact[]>;;
+                appActions.setReference(con);
                 break;
               }
               case 'goods': {
-                const goods = dataSet.data as IGood[];
-                appActions.setGoods(goods);
+                const goods = dataSet.data as IReference<IContact[]>;;
+                appActions.setReference(goods);
                 break;
               }
               case 'remains': {
-                const remains = dataSet.data as IRemain[];
-                appActions.setRemains(remains);
+                const remains = dataSet.data as IReference<IContact[]>;;
+                appActions.setReference(remains);
                 break;
               }
               default:
@@ -246,7 +246,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.clearFormParams();
+            appActions.clearForm('DocumentRequest');
             navigation.navigate('SellDocuments');
           }}
         />
@@ -258,7 +258,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             sendUpdateRequest();
             sendDocumentRequest();
             sendSubscribe();
-            appActions.clearFormParams();
+            appActions.clearForm('DocumentRequest');
             navigation.navigate('SellDocuments');
           }}
         />

@@ -20,12 +20,12 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
   const { state } = useAppStore();
 
-  const contacts = useMemo(() => state.references?.contacts, [state.references?.contacts]);
+  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const getContact = useCallback(
-    (id: number): IContact => {
-      return ((contacts as unknown) as IContact[])?.find((contact: { id: number }) => contact.id === id);
-    },
+    (id: number): IContact =>
+      contacts?.find((contact: { id: number }) => contact.id === id)
+    ,
     [contacts],
   );
 
@@ -82,12 +82,14 @@ const DocumentListScreen = ({ navigation }) => {
 
   const showActionSheet = useActionSheet();
 
-  const contacts = useMemo(() => appState.references?.contacts, [appState.references?.contacts]);
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [appState.references?.contacts?.data]);
+
+  const notFound: IContact = { id: -1, name: '', contactType: -1 };
 
   const getContact = useCallback(
-    (id: number): IContact => {
-      return ((contacts as unknown) as IContact[])?.find((contact: { id: number }) => contact.id === id);
-    },
+    (id: number): IContact =>
+       contacts?.find(contact => contact.id === id)
+    ,
     [contacts],
   );
 

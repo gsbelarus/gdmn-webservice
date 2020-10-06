@@ -12,7 +12,6 @@ import {
   IUserCredentials,
 } from '../../../common';
 import config from '../config';
-import { INewDevice } from '../model';
 import { get, post, remove } from './http.service';
 
 export default class Api {
@@ -53,9 +52,9 @@ export default class Api {
     verifyActivationCode: async (code: string): Promise<IResponse<string>> =>
       post(this.getUrl(), '/auth/device/code', JSON.stringify({ uid: this.deviceId, code })),
 
-    //TODO: избавиться от роута
-    addDevice: async (newDevice: INewDevice): Promise<IResponse<IDevice>> =>
-      post(this.getUrl(), '/devices/', JSON.stringify({ uid: newDevice.uid, user: newDevice.user })),
+    // //TODO: избавиться от роута
+    // addDevice: async (newDevice: INewDevice): Promise<IResponse<IDevice>> =>
+    //   post(this.getUrl(), '/devices/', JSON.stringify({ uid: newDevice.uid, user: newDevice.user })),
   };
 
   data = {
