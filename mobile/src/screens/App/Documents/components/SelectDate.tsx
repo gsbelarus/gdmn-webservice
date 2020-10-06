@@ -30,7 +30,7 @@ LocaleConfig.locales.ru = {
 };
 LocaleConfig.defaultLocale = 'ru';
 
-type Props = StackScreenProps<DocumentStackParamList, 'SelectDateScreen'>;
+type Props = StackScreenProps<DocumentStackParamList, 'SelectDate'>;
 
 type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
 

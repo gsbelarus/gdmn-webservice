@@ -14,7 +14,7 @@ import {
   IGood,
   IDocument,
   IDataMessage,
-  IReference
+  IReference,
 } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
@@ -162,7 +162,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const sendSubscribe = useCallback(async () => {
     try {
       const response = await apiService.data.subscribe(state.companyID);
-      console.log(response);
+
       if (!response.result) {
         Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
         return;
@@ -183,22 +183,22 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 break;
               }
               case 'documenttypes': {
-                const documentTypes = dataSet.data as IReference<IContact[]>;;
+                const documentTypes = dataSet.data as IReference<IContact[]>;
                 appActions.setReference(documentTypes);
                 break;
               }
               case 'contacts': {
-                const con = dataSet.data as IReference<IContact[]>;;
+                const con = dataSet.data as IReference<IContact[]>;
                 appActions.setReference(con);
                 break;
               }
               case 'goods': {
-                const goods = dataSet.data as IReference<IContact[]>;;
+                const goods = dataSet.data as IReference<IContact[]>;
                 appActions.setReference(goods);
                 break;
               }
               case 'remains': {
-                const remains = dataSet.data as IReference<IContact[]>;;
+                const remains = dataSet.data as IReference<IContact[]>;
                 appActions.setReference(remains);
                 break;
               }
@@ -291,7 +291,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             <TouchableOpacity
               style={localeStyles.containerDate}
               onPress={() =>
-                navigation.navigate('SelectDateScreen', {
+                navigation.navigate('SelectDate', {
                   parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
@@ -310,7 +310,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             <TouchableOpacity
               style={localeStyles.containerDate}
               onPress={() =>
-                navigation.navigate('SelectDateScreen', {
+                navigation.navigate('SelectDate', {
                   parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
@@ -330,7 +330,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
           <ReferenceItem
             value={selectedItem(departments, documentParams?.fromContact)?.value}
             onPress={() =>
-              navigation.navigate('SelectItemScreen', {
+              navigation.navigate('SelectItem', {
                 parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'fromContact',
                 title: 'Подразделение',
@@ -345,7 +345,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
           <ReferenceItem
             value={selectedItem(departments, documentParams?.toContact)?.value}
             onPress={() =>
-              navigation.navigate('SelectItemScreen', {
+              navigation.navigate('SelectItem', {
                 parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'toContact',
                 title: 'Подразделение',

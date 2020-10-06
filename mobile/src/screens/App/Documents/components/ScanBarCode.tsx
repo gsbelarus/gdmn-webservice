@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 
-import { RootStackParamList } from '../../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
-const ScanBarCodeScreen = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'ScanBarCodeScreen'>>();
+const ScanBarcodeScreen = () => {
+  const route = useRoute<RouteProp<DocumentStackParamList, 'ScanBarcode'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -48,7 +48,7 @@ const ScanBarCodeScreen = () => {
       return;
     }
 
-    const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
+    /*   const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
     if (finded) {
       //отправляем на заполнение позиции
       navigation.navigate('SellProductDetail', {
@@ -70,7 +70,7 @@ const ScanBarCodeScreen = () => {
         weighedGood: findedFullCode.id,
       });
       return;
-    }
+    } */
 
     Alert.alert('Предупреждение!', `Запись не найдена с таким кодом: ${text}`, [
       {
@@ -106,7 +106,7 @@ const ScanBarCodeScreen = () => {
   );
 };
 
-export { ScanBarCodeScreen };
+export { ScanBarcodeScreen };
 
 const localStyles = StyleSheet.create({
   content: {

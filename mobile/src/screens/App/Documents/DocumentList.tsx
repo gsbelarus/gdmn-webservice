@@ -23,9 +23,8 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const getContact = useCallback(
-    (id: number): IContact =>
-      contacts?.find((contact: { id: number }) => contact.id === id)
-    ,
+    (id: number | number[]): IContact =>
+      contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
     [contacts],
   );
 
@@ -60,9 +59,9 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             На подразделение: {toContact?.name || ''}
           </Text>
-          <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
+          {/* <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
             {toContact ? toContact.name : ''}
-          </Text>
+          </Text> */}
         </View>
       </View>
     </TouchableOpacity>
@@ -82,14 +81,15 @@ const DocumentListScreen = ({ navigation }) => {
 
   const showActionSheet = useActionSheet();
 
-  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [appState.references?.contacts?.data]);
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
+    appState.references?.contacts?.data,
+  ]);
 
   const notFound: IContact = { id: -1, name: '', contactType: -1 };
 
   const getContact = useCallback(
-    (id: number): IContact =>
-       contacts?.find(contact => contact.id === id)
-    ,
+    (id: number | number[]): IContact =>
+      contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
     [contacts],
   );
 
@@ -242,10 +242,10 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
-  company: {
+  /*   company: {
     fontSize: 12,
     fontWeight: 'bold',
-  },
+  }, */
   details: {
     margin: 8,
     marginRight: 0,

@@ -185,7 +185,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             <TouchableOpacity
               style={localeStyles.containerDate}
               onPress={() =>
-                navigation.navigate('SelectDateScreen', {
+                navigation.navigate('SelectDate', {
                   parentScreen: 'DocumentEdit',
                   fieldName: 'date',
                   title: 'Дата документа',
@@ -228,7 +228,7 @@ const DocumentEditScreen = ({ route }: Props) => {
           <ReferenceItem
             value={selectedItem(listDepartments, fromcontactId)?.value}
             onPress={() =>
-              navigation.navigate('SelectItemScreen', {
+              navigation.navigate('SelectItem', {
                 parentScreen: 'DocumentEdit',
                 title: 'Подразделение',
                 fieldName: 'fromcontactId',
@@ -243,7 +243,7 @@ const DocumentEditScreen = ({ route }: Props) => {
           <ReferenceItem
             value={selectedItem(listDepartments, tocontactId)?.value}
             onPress={() =>
-              navigation.navigate('SelectItemScreen', {
+              navigation.navigate('SelectItem', {
                 parentScreen: 'DocumentEdit',
                 title: 'Подразделение',
                 fieldName: 'tocontactId',

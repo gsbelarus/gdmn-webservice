@@ -7,8 +7,8 @@ import Reactotron, { asyncStorage } from 'reactotron-react-native';
 // Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either come from `react-native` or `@react-native-community/async-storage` depending on where you get it from
 Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either come from `react-native` or `@react-native-community/async-storage` depending on where you get it from
   .configure({
-    name: 'Mob Inventory App',
-    host: '192.168.100.10',
+    name: 'Demo App',
+    host: '127.0.0.1',
     port: 9090,
   }) // controls connection & communication settings
   .use(asyncStorage({ ignore: [] }))
@@ -18,22 +18,7 @@ Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either com
 // Reactotron.onCustomCommand('appStore', () => console.log('test'));
 
 Reactotron.onCustomCommand({
-  command: 'Clear AsyncStorage',
-  handler: () => {
-    AsyncStorage.getAllKeys()
-      .then((keys) => AsyncStorage.multiRemove(keys))
-      .then(() => {
-        // eslint-disable-next-line no-alert
-        alert('AsyncStorage cleared.');
-      });
-  },
-
-  title: 'Clear AsyncStorage',
-  description: 'Clears all data from AsyncStorage.',
-});
-
-Reactotron.onCustomCommand({
-  command: 'Get AsyncStorage',
+  command: 'get AsyncStorage',
   handler: () => {
     AsyncStorage.getAllKeys()
       .then((keys) =>

@@ -14,5 +14,7 @@ web-report/
 # macOS
 .DS_Store
 
+# Reactotron
+./src/service/ReactotronConfig.ts
 
 */log/*

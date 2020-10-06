@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo } from 'react';
@@ -140,8 +139,6 @@ const ReferenceListScreen = () => {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
   }, [AppState.documents, apiService.data, appActions, state.companyID]);
-
-  console.log(AppState);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

@@ -15,13 +15,13 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'ProductList'>>().params?.docId;
+  const docId = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>().params?.docId;
 
   return (
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('ProductEdit', { prodId: item.id, docId, modeCor: false });
+        navigation.navigate('DocumentLineEdit', { prodId: item.id, docId, modeCor: false });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
@@ -67,8 +67,8 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 }); */
 
-const ProductListScreen = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'ProductList'>>();
+const GoodListScreen = () => {
+  const route = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -181,8 +181,7 @@ const ProductListScreen = () => {
           </View> */}
           <FlatList
             ref={ref}
-             data={
-               ((state.references?.goods?.data as unknown) as IGood[]).filter(
+            data={((state.references?.goods?.data as unknown) as IGood[]).filter(
               (item) =>
                 item.barcode.toLowerCase().includes(text.toLowerCase()) ||
                 item.name.toLowerCase().includes(text.toLowerCase()),
@@ -198,7 +197,7 @@ const ProductListScreen = () => {
   );
 };
 
-export { ProductListScreen };
+export { GoodListScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {

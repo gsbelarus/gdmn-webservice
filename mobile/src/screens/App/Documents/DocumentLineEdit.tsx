@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useTheme, useIsFocused } from '@react-navigation/native';
+import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
 import { IDocument, IGood, ILine } from '../../../../../common';
@@ -12,35 +11,48 @@ import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-type Props = StackScreenProps<DocumentStackParamList, 'ProductEdit'>;
+type Props = StackScreenProps<DocumentStackParamList, 'DocumentLineEdit'>;
 
-const ProductEditScreen = ({ route, navigation }: Props) => {
+const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
+  const { docId, lineId, prodId } = useRoute<RouteProp<DocumentStackParamList, 'DocumentLineEdit'>>().params;
+
   const [document, setDocument] = useState<IDocument>(undefined);
-  const [product, setProduct] = useState<IGood>(undefined);
+  // const [product, setProduct] = useState<IGood>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
+  const productName = useMemo(() => {
+    return (
+      ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.name ||
+      'товар не найден'
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prodId, state.references?.goods?.data]);
+
   // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
 
-  useEffect(() => {
-    // Поиск редактируемой позиции документа
-    document?.lines && setLine(document.lines.find((item) => item.id === route.params?.lineId));
-  }, [document, route.params?.lineId]);
+  // useEffect(() => {
+  //   // Поиск редактируемой позиции документа
+  //   document?.lines && setLine(document.lines.find((item) => item.id === route.params?.lineId));
+  // }, [document, route.params?.lineId]);
 
   useEffect(() => {
-    if (!route.params) {
-      return;
-    }
+    const docLine: ILine = document?.lines.find((item) => item.id === lineId);
 
-    setProduct(((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === route.params?.prodId));
+    setLine({
+      goodId: docLine?.goodId || prodId,
+      id: docLine?.id || 1,
+      quantity: docLine?.quantity || 1,
+    });
 
-    setDocument(state.documents.find((item) => item.id === route.params?.docId));
-  }, [route.params, state.documents, state.references?.goods?.data]);
+    setDocument(state.documents.find((item) => item.id === docId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.documents, prodId, document?.lines, lineId, docId]);
 
   /*   useEffect(() => {
     if (route.params.weighedGood) {
@@ -130,7 +142,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            if (line?.id) {
+            if (lineId) {
               actions.editLine({
                 docId: route.params?.docId,
                 line,
@@ -138,11 +150,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
             } else {
               actions.addLine({
                 docId: route.params?.docId,
-                line: {
-                  goodId: route.params?.prodId,
-                  ...productParams,
-                  id: 0,
-                },
+                line,
               });
             }
             navigation.navigate('DocumentView', { docId: document?.id });
@@ -151,6 +159,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, document?.id, line, navigation, route.params?.docId, route.params?.prodId]);
 
   /*   const onPress = () => {
@@ -178,9 +187,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
             },
           ]}
         >
-          <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
-            {product?.name || 'товар не найден'}
-          </SubTitle>
+          <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
           <TextInput
             mode={'flat'}
             label={'Количество'}
@@ -211,7 +218,7 @@ const ProductEditScreen = ({ route, navigation }: Props) => {
   );
 };
 
-export { ProductEditScreen };
+export { DocumentLineEditScreen };
 
 const localeStyles = StyleSheet.create({
   container: {

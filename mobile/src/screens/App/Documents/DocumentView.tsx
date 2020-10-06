@@ -21,10 +21,9 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
 
   const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
 
-  const good: IGood = useMemo(() => state.references?.goods?.data.find((i) => i.id === item.goodId)?.data[0], [
-    item.goodId,
-    state.references?.goods,
-  ]);
+  const good: IGood = useMemo(() => {
+    return ((state.references?.goods as unknown) as IReference<IGood>)?.data.find((i) => i.id === item.goodId);
+  }, [item?.goodId, state.references?.goods]);
 
   return (
     <>
@@ -78,7 +77,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: num
       style={localStyles.listContainer}
       onPress={() => {
         // actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
-        navigation.navigate('ProductEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
+        navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
       }}
     >
       <ContentItem item={item} status={status} />
@@ -248,7 +247,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Итого:</Text>
           <Text style={localStyles.fontWeightBold}>
-            вес прод.{' '}
+            Общее кол-во:{' '}
             {(documentLines ?? []).reduce(
               (total, line) => Number.parseFloat(((Number(line.quantity) ?? 0) + total).toFixed(3)),
               0,
@@ -267,15 +266,15 @@ const DocumentViewScreen = ({ route }: Props) => {
         >
           {document?.head?.status === 0 && (
             <>
-              <FAB
+              {/*               <FAB
                 style={localStyles.fabScan}
                 icon="barcode-scan"
                 onPress={() => navigation.navigate('ScanBarCode', { docId: document.id })}
-              />
+              /> */}
               <FAB
                 style={localStyles.fabAdd}
                 icon="plus"
-                onPress={() => navigation.navigate('ProductList', { docId: document.id })}
+                onPress={() => navigation.navigate('GoodList', { docId: document.id })}
               />
             </>
           )}
@@ -320,18 +319,18 @@ const localStyles = StyleSheet.create({
   },
   fabAdd: {
     backgroundColor: Colors.blue600,
-    bottom: 65,
+    bottom: 35,
     margin: 20,
     position: 'absolute',
     right: 0,
   },
-  fabScan: {
+  /*   fabScan: {
     backgroundColor: Colors.blue600,
-    bottom: 65,
+    bottom: 35,
     left: 0,
     margin: 20,
     position: 'absolute',
-  },
+  }, */
   flexDirectionRow: {
     flexDirection: 'row',
   },

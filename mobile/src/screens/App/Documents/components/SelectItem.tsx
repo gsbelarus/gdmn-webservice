@@ -14,7 +14,7 @@ import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 // import { useAppStore } from '../../../store';
 
-type Props = StackScreenProps<DocumentStackParamList, 'SelectItemScreen'>;
+type Props = StackScreenProps<DocumentStackParamList, 'SelectItem'>;
 
 type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
 
@@ -29,10 +29,6 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     title: newTitle,
     value: newValue,
   } = route.params;
-
-  // const { state: appState, actions: appActions } = useAppStore();
-
-  console.log(newList);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);

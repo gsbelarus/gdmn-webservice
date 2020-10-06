@@ -6,22 +6,22 @@ import {
   DocumentEditScreen,
   DocumentViewScreen,
   DocumentListScreen,
-  ProductEditScreen,
-  ProductListScreen,
+  DocumentLineEditScreen,
+  GoodListScreen,
   DocumentRequestScreen,
   FilterEditScreen,
 } from '../screens/App/Documents';
-import { ScanBarCodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
+import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
 
 export type DocumentStackParamList = {
   DocumentList: undefined;
   DocumentEdit: { docId: number | { [name: string]: string } };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  ProductEdit: { docId: number; prodId: number; lineId: number };
-  ProductList: { docId: number };
+  DocumentLineEdit: { docId: number; prodId: number; lineId: number };
+  GoodList: { docId: number };
   DocumentRequest: undefined;
-  SelectItemScreen: {
+  SelectItem: {
     parentScreen: keyof DocumentStackParamList;
     fieldName: string;
     title: string;
@@ -29,8 +29,8 @@ export type DocumentStackParamList = {
     list: IListItem[];
     value: number[];
   };
-  SelectDateScreen: { parentScreen: keyof DocumentStackParamList; fieldName: string; title: string; value: string };
-  ScanBarCodeScreen: {
+  SelectDate: { parentScreen: keyof DocumentStackParamList; fieldName: string; title: string; value: string };
+  ScanBarcode: {
     docId: number;
   };
 };
@@ -54,8 +54,13 @@ const DocumentsNavigator = () => {
         options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
-      <Stack.Screen key="ProductList" name="ProductList" component={ProductListScreen} options={{ title: '' }} />
-      <Stack.Screen key="ProductEdit" name="ProductEdit" component={ProductEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="GoodList" name="GoodList" component={GoodListScreen} options={{ title: '' }} />
+      <Stack.Screen
+        key="DocumentLineEdit"
+        name="DocumentLineEdit"
+        component={DocumentLineEditScreen}
+        options={{ title: '' }}
+      />
       <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
       <Stack.Screen
         key="DocumentRequest"
@@ -63,9 +68,9 @@ const DocumentsNavigator = () => {
         component={DocumentRequestScreen}
         options={{ title: 'Загрузить документы' }}
       />
-      <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
-      <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
-      <Stack.Screen key="ScanBarCodeScreen" name="ScanBarCodeScreen" component={ScanBarCodeScreen} />
+      <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
+      <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
+      <Stack.Screen key="ScanBarCodeScreen" name="ScanBarcode" component={ScanBarcodeScreen} />
     </Stack.Navigator>
   );
 };
