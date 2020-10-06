@@ -24,6 +24,8 @@ const SettingsScreen = () => {
     actions: authActions,
   } = useAuthStore();
 
+  const [isLoading, setLoading] = useState(false);
+
   const showActionSheet = useActionSheet();
 
   const logOut = useCallback(
@@ -45,7 +47,7 @@ const SettingsScreen = () => {
             text: 'Да',
             onPress: () => {
               appActions.setDocuments([]);
-              appActions.setReferences({});
+              appActions.setReferences(undefined);
             },
           },
           {
@@ -67,23 +69,9 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-      /*       if (config.debug.useMockup) {
-        const mockRef = referencesRef as IReference[];
-        const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
-        appActions.setContacts(mockContacts);
-        const mockDocumentsType = mockRef.find((itm) => itm.type === 'documentTypes')?.data as IDocumentType[];
-        appActions.setDocumentTypes(mockDocumentsType);
-        const mockGoods = mockRef.find((itm) => itm.type === 'goods')?.data as IGood[];
-        appActions.setGoods(mockGoods);
-        appActions.setDocuments(documentsRef);
-        const boxingsRef = (mockRef.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
-        appActions.setBoxings(boxingsRef);
-        const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedGoods')?.data as unknown) as IWeighedGoods[];
-        appActions.setWeighedGoods(docWeighedRef);
-      } else { */
       try {
         // const response = await apiService.data.subscribe(companyID);
-        const response = await apiService.data.getMessages(companyID);
+        const response = await timeout<IResponse<IMessage[]>>(10000, apiService.data.getMessages(companyID));
 
         // console.log(response);
 
@@ -91,8 +79,9 @@ const SettingsScreen = () => {
           Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
           return;
         }
+
         if (!isMessagesArray(response.data)) {
-          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть' }]);
           return;
         }
 
@@ -157,12 +146,13 @@ const SettingsScreen = () => {
             }
             apiService.data.deleteMessage(companyID, message.head.id);
           });
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
       } catch (err) {
-        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
+      } finally {
+        setLoading(false);
       }
-      // }
     };
 
     getMessages();
@@ -214,7 +204,14 @@ const SettingsScreen = () => {
       </View>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <View>
-          <Button mode="text" onPress={sendGetReferencesRequest}>
+          <Button
+            mode="text"
+            icon={'update'}
+            style={localStyles.refreshButton}
+            disabled={isLoading}
+            loading={isLoading}
+            onPress={sendGetReferencesRequest}
+          >
             Проверить обновления
           </Button>
           <Button
@@ -305,6 +302,9 @@ const localStyles = StyleSheet.create({
   profileInfoTextUser: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  refreshButton: {
+    margin: 20,
   },
 });
 

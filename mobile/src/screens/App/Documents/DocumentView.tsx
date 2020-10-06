@@ -113,19 +113,19 @@ const DocumentViewScreen = ({ route }: Props) => {
   //   setDocId(route.params.docId);
   // }, [route.params?.docId]);
 
-  const document = useMemo(() =>
-    state.documents?.find((item: { id: number }) => item.id === docId)
-  , [docId, state.documents]);
+  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
+    docId,
+    state.documents,
+  ]);
 
-  const contact = useMemo(
-    () =>
-      contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId),
-    [document?.head?.tocontactId, contacts],
-  );
+  const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId), [
+    document?.head?.tocontactId,
+    contacts,
+  ]);
 
   const refList = React.useRef<FlatList<ILine>>(null);
 
-  const documentLines = document?.lines as ILine[];
+  const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
 
   useScrollToTop(refList);
 

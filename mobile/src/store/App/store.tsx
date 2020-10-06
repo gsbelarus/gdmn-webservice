@@ -52,10 +52,21 @@ const createStoreContext = () => {
       }
     }, [actions, storagePath]);
 
+    /*  Сохранение справочников в storage при их изменении */
+    useEffect(() => {
+      const saveReferences = async () => {
+        await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
+      };
+
+      if (state.references && storagePath && !isLoading) {
+        saveReferences();
+      }
+    }, [state.references, storagePath]);
+
     /*  Сохранение настроек в storage при их изменении */
     useEffect(() => {
       const saveSettings = async () => {
-        await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
+        await appStorage.setItem(`${storagePath}/${sections.SETTINGS}`, state.settings);
       };
 
       if (state.references && storagePath && !isLoading) {
