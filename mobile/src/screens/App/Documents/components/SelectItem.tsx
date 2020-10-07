@@ -91,7 +91,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
           text="Готово"
           onPress={() => {
             parentScreen
-              ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: checkedItem })
+              ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: isMultiSelect ? checkedItem : checkedItem[0] })
               : null;
           }}
         />
