@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useCallback, useLayoutEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Chip } from 'react-native-paper';
 
-import { IContact } from '../../../../../common';
+import { IContact, IDocument } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { getDateString, getNextDocId, getNextDocLineId } from '../../../helpers/utils';
@@ -133,31 +133,35 @@ const DocumentEditScreen = ({ route }: Props) => {
       return;
     }
 
+    const docObj = docId && (appState.documents?.find((i) => i.id === docId) as IDocument);
+
     // Инициализируем параметры
     docId
       ? appActions.setForm({
           name: 'documentParams',
-          ...(appState.documents?.find((i) => i.id === docId).head as IDocumentParams),
+          id: docObj.id,
+          ...(docObj.head as IDocumentParams),
         })
       : appActions.setForm({
           name: 'documentParams',
           date: new Date().toISOString().slice(0, 10),
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, appState.forms?.documentParams]);
+  }, [appActions, docId]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!route.params) {
       return;
     }
 
+    console.log('ss');
     appActions.setForm({
       name: 'documentParams',
       ...appState.forms?.documentParams,
       ...(route.params as IDocumentParams),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, route.params]);
+  }, [appActions, route.params]); */
 
   const ReferenceItem = useCallback(
     (props: { value: string; onPress: () => void; color?: string }) => {
@@ -187,6 +191,7 @@ const DocumentEditScreen = ({ route }: Props) => {
               onPress={() =>
                 navigation.navigate('SelectDate', {
                   parentScreen: 'DocumentEdit',
+                  formName: 'documentParams',
                   fieldName: 'date',
                   title: 'Дата документа',
                   value: date,
@@ -230,6 +235,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             onPress={() =>
               navigation.navigate('SelectItem', {
                 parentScreen: 'DocumentEdit',
+                formName: 'documentParams',
                 title: 'Подразделение',
                 fieldName: 'fromcontactId',
                 list: listDepartments,
@@ -245,6 +251,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             onPress={() =>
               navigation.navigate('SelectItem', {
                 parentScreen: 'DocumentEdit',
+                formName: 'documentParams',
                 title: 'Подразделение',
                 fieldName: 'tocontactId',
                 list: listDepartments,

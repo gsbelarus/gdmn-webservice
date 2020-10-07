@@ -50,9 +50,10 @@ const ReferenceListScreen = () => {
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const references: IReference[] = useMemo(() => Object.keys(AppState.references).map((i) => AppState.references[i]), [
-    AppState.references,
-  ]);
+  const references: IReference[] = useMemo(() => {
+    console.log('Вызов окна ReferenceList');
+    return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
+  }, [AppState.references]);
 
   // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
   // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],

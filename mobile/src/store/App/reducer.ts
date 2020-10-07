@@ -10,7 +10,6 @@ export const initialState: IAppState = {
   documents: undefined,
   references: undefined,
   forms: undefined,
-  filterParams: ['number'],
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {

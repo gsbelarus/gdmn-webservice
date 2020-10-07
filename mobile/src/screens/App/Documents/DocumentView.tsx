@@ -7,6 +7,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Colors, FAB, IconButton, Button } from 'react-native-paper';
 
 import { IDocument, ILine, IHead, IReference, IGood, IContact } from '../../../../../common';
+import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
@@ -70,13 +71,12 @@ const ContentItem = React.memo(({ item, status }: { item: ILine; status: number 
 
 const LineItem = React.memo(({ item, status, docId }: { item: ILine; status: number; docId: number }) => {
   const navigation = useNavigation();
-  const { actions } = useAppStore();
+  // const { actions } = useAppStore();
 
   return status === 0 ? (
     <TouchableOpacity
       style={localStyles.listContainer}
       onPress={() => {
-        // actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
         navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
       }}
     >
@@ -126,6 +126,10 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
 
+  const number = useMemo(() => {
+    return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString()}`;
+  }, [document]);
+
   useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: ILine }) => (
@@ -134,6 +138,17 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      title: number || '',
+      headerLeft: () => (
+        <IconButton
+          icon="file-document-box-multiple"
+          size={24}
+          onPress={() => {
+            navigation.setOptions({ animationTypeForReplace: 'push' });
+            navigation.navigate('DocumentList');
+          }}
+        />
+      ),
       headerRight: () => (
         <IconButton
           icon="menu"
@@ -143,15 +158,11 @@ const DocumentViewScreen = ({ route }: Props) => {
               {
                 title: 'Изменить шапку',
                 onPress: () => {
-                  if (document?.head?.status === 0) {
-                    navigation.navigate('DocumentEdit', { docId });
+                  if (document?.head?.status !== 0) {
+                    Alert.alert('Изменения доступны только для черновика', '', [{ text: 'OK' }]);
                     return;
                   }
-                  Alert.alert('Изменения доступны только для черновика', '', [
-                    {
-                      text: 'OK',
-                    },
-                  ]);
+                  navigation.navigate('DocumentEdit', { docId });
                 },
               },
               {
@@ -189,7 +200,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
+  }, [actions, docId, document?.head?.status, navigation, showActionSheet, number]);
 
   return document ? (
     <>
@@ -272,7 +283,7 @@ const DocumentViewScreen = ({ route }: Props) => {
                 onPress={() => navigation.navigate('ScanBarCode', { docId: document.id })}
               /> */}
               <FAB
-                style={localStyles.fabAdd}
+                style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
                 icon="plus"
                 onPress={() => navigation.navigate('GoodList', { docId: document.id })}
               />

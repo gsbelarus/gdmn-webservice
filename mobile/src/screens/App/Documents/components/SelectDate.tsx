@@ -1,4 +1,4 @@
-import { useTheme } from '@react-navigation/native';
+import { RouteProp, useRoute, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
@@ -8,6 +8,7 @@ import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
+import { useAppStore } from '../../../../store';
 
 LocaleConfig.locales.ru = {
   monthNames: [
@@ -38,11 +39,20 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
   const [date, setDate] = useState('');
-  const [title, setTitle] = useState('');
-  const [fieldName, setFieldName] = useState('');
-  const [parentScreen, setParentScreen] = useState('');
+  // const [title, setTitle] = useState('');
+  // const [fieldName, setFieldName] = useState('');
+  // const [parentScreen, setParentScreen] = useState('');
+  const { formName, fieldName, title, value, parentScreen } = useRoute<
+    RouteProp<DocumentStackParamList, 'SelectDate'>
+  >().params;
+
+  const { state, actions } = useAppStore();
 
   useEffect(() => {
+    setDate(value);
+  }, [value]);
+
+  /*   useEffect(() => {
     if (!route.params?.fieldName) {
       return;
     }
@@ -52,7 +62,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
     setFieldName(newFieldName);
     setParentScreen(newParentScreen);
     setDate(newValue);
-  }, [route.params]);
+  }, [route.params]); */
 
   const dayPressHandle = (day: DateObject) => {
     setDate(day.dateString);
@@ -60,18 +70,27 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <HeaderRight text="Отмена" onPress={navigation.goBack} />,
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.setOptions({ animationTypeForReplace: 'push' });
+            navigation.goBack();
+          }}
+        />
+      ),
       headerRight: () => (
         <HeaderRight
           text="Готово"
           onPress={() => {
-            // appActions.setFormParams({ [fieldName]: date });
-            parentScreen ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: date }) : null;
+            actions.setForm({ name: formName, ...state.forms[formName], [fieldName]: date });
+            navigation.goBack();
+            // parentScreen ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: date }) : null;
           }}
         />
       ),
     });
-  }, [colors.primary, date, fieldName, navigation, parentScreen]);
+  }, [actions, date, fieldName, formName, navigation, state.forms]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

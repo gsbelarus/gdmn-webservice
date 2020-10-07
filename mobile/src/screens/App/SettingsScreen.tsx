@@ -59,7 +59,7 @@ const SettingsScreen = () => {
   );
 
   const sendGetReferencesRequest = useCallback(() => {
-    if (documents.some((document) => document.head?.status <= 1)) {
+    if (documents?.some((document) => document.head?.status <= 1)) {
       Alert.alert('Внимание!', 'Нельзя обновить справочники, если есть документы со статусами "Черновик" и "Готово".', [
         {
           text: 'OK',
@@ -85,6 +85,7 @@ const SettingsScreen = () => {
           return;
         }
 
+        let isUpdated = false;
         response.data?.forEach((message) => {
           if (message.body.type === 'data') {
             // Сообщение содержит данные
@@ -95,7 +96,16 @@ const SettingsScreen = () => {
                   appActions.setDocuments([...documents, ...addDocuments]);
                   break;
                 }
-                case 'documenttypes': {
+                case 'documenttypes':
+                case 'contacts':
+                case 'goodgroups':
+                case 'goods': {
+                  // TODO: преобразовывать json данные в модель данных
+                  const refObj = (dataSet as unknown) as IReference<any[]>;
+                  appActions.setReference(refObj);
+                  break;
+                }
+                /* case 'documenttypes': {
                   const documentTypes = (dataSet as unknown) as IReference<IRefData[]>;
                   appActions.setReference(documentTypes);
                   break;
@@ -114,18 +124,18 @@ const SettingsScreen = () => {
                   const remains = (dataSet as unknown) as IReference<IRemain[]>;
                   appActions.setReference(remains);
                   break;
-                }
+                } */
                 default:
                   break;
               }
             });
-            // apiService.data.deleteMessage(companyID, message.head.id);
+            apiService.data.deleteMessage(companyID, message.head.id);
           }
           if (message.body.type === 'cmd') {
             // Сообщение содержит команду
-            // apiService.data.deleteMessage(companyID, message.head.id);
+            apiService.data.deleteMessage(companyID, message.head.id);
           }
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+          isUpdated = true;
         });
 
         /* Обработка сообщений, которые связаны с документами */
@@ -137,7 +147,7 @@ const SettingsScreen = () => {
             if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
               message.body.payload.params.forEach((paramDoc) => {
                 if (paramDoc.result) {
-                  const document = documents.find((doc) => doc.id === paramDoc.docId);
+                  const document = documents?.find((doc) => doc.id === paramDoc.docId);
                   if (document?.head?.status === 2) {
                     appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                   }
@@ -146,8 +156,10 @@ const SettingsScreen = () => {
             }
             apiService.data.deleteMessage(companyID, message.head.id);
           });
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+          isUpdated = true;
+          // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
+        Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
       } catch (err) {
         Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {

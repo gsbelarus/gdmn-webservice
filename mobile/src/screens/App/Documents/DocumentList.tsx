@@ -59,9 +59,6 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             На подразделение: {toContact?.name || ''}
           </Text>
-          {/* <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {toContact ? toContact.name : ''}
-          </Text> */}
         </View>
       </View>
     </TouchableOpacity>
@@ -78,6 +75,7 @@ const DocumentListScreen = ({ navigation }) => {
   const { state: appState, actions } = useAppStore();
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
+  // const [isBottom, setIsBottom] = useState(false);
 
   const showActionSheet = useActionSheet();
 
@@ -85,7 +83,7 @@ const DocumentListScreen = ({ navigation }) => {
     appState.references?.contacts?.data,
   ]);
 
-   const getContact = useCallback(
+  const getContact = useCallback(
     (id: number | number[]): IContact =>
       contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
     [contacts],
@@ -102,7 +100,7 @@ const DocumentListScreen = ({ navigation }) => {
 
         const status = Statuses.find((type) => type.id === item?.head?.status);
 
-        console.log('11111');
+        // console.log('Вызов окна DocumentLst');
 
         return appState.forms?.filterParams?.fieldSearch
           ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
@@ -119,12 +117,12 @@ const DocumentListScreen = ({ navigation }) => {
           : true;
       }) || [],
     );
-  }, [appState.documents, appState.forms, searchText, getContact]);
+  }, [appState.documents, appState.forms?.filterParams?.fieldSearch, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = useCallback(async () => {
-    const documents = appState.documents.filter((document) => document?.head?.status === 1);
+    const documents = appState.documents?.filter((document) => document?.head?.status === 1);
 
     timeout(
       apiService.baseUrl.timeout,
@@ -142,7 +140,7 @@ const DocumentListScreen = ({ navigation }) => {
             {
               text: 'Закрыть',
               onPress: () => {
-                documents.forEach((item) => {
+                documents?.forEach((item) => {
                   actions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
                 });
               },
@@ -163,10 +161,10 @@ const DocumentListScreen = ({ navigation }) => {
           size={24}
           onPress={() =>
             showActionSheet([
-              {
+              /*  {
                 title: 'Загрузить',
                 onPress: () => navigation.navigate('DocumentRequest'),
-              },
+              }, */
               {
                 title: 'Выгрузить',
                 onPress: sendUpdateRequest,
@@ -186,6 +184,15 @@ const DocumentListScreen = ({ navigation }) => {
       ),
     });
   }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
+  /*
+  const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    const paddingToBottom = 60;
+    console.log(layoutMeasurement.height, contentSize.height);
+    return (
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom &&
+      layoutMeasurement.height - paddingToBottom < contentSize.height
+    );
+  }; */
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
@@ -210,23 +217,29 @@ const DocumentListScreen = ({ navigation }) => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        /*         onScroll={({ nativeEvent }) => {
+          setIsBottom(isCloseToBottom(nativeEvent));
+        }} */
+        scrollEventThrottle={400}
         ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
       />
-      <FAB
+      {/*  <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-down-bold"
         onPress={() => navigation.navigate('DocumentRequest')}
-      />
+      /> */}
       <FAB
-        style={[localStyles.fabImport, { backgroundColor: colors.primary }]}
+        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-up-bold"
         onPress={sendUpdateRequest}
       />
+      {/* {isBottom ? null : ( */}
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-        icon="plus"
+        icon="file-document-box-plus"
         onPress={() => navigation.navigate('DocumentEdit')}
       />
+      {/* )} */}
     </View>
   );
 };

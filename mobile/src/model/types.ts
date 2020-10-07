@@ -37,7 +37,7 @@ export interface IDocumentParams {
 }
 
 export interface IFilterParams {
-  fieldSearch: string[]
+  fieldSearch: string[];
 }
 
 export interface IServiceContextProps {

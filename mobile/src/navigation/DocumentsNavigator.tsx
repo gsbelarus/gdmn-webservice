@@ -23,13 +23,20 @@ export type DocumentStackParamList = {
   DocumentRequest: undefined;
   SelectItem: {
     parentScreen: keyof DocumentStackParamList;
+    formName: string;
     fieldName: string;
     title: string;
     isMulti?: boolean;
     list: IListItem[];
     value: number[];
   };
-  SelectDate: { parentScreen: keyof DocumentStackParamList; fieldName: string; title: string; value: string };
+  SelectDate: {
+    parentScreen: keyof DocumentStackParamList;
+    formName: string;
+    fieldName: string;
+    title: string;
+    value: string;
+  };
   ScanBarcode: {
     docId: number;
   };
