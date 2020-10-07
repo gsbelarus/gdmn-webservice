@@ -36,6 +36,10 @@ export interface IDocumentParams {
   docnumber?: string;
 }
 
+export interface IFilterParams {
+  fieldSearch: string[]
+}
+
 export interface IServiceContextProps {
   state: IServiceState;
   actions: typeof ServiceActions;
@@ -89,5 +93,5 @@ export interface IAppState {
   forms?: {
     [name: string]: IForm;
   };
-  filterParams: string[];
+  // filterParams: string[];
 }

@@ -171,7 +171,7 @@ const DocumentViewScreen = ({ route }: Props) => {
                       text: 'OK',
                       onPress: async () => {
                         actions.deleteDocument(docId);
-                        navigation.navigate('SellDocumentListScreen');
+                        navigation.navigate('DocumentList');
                       },
                     },
                     {

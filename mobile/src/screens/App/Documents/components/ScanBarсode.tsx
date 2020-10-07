@@ -9,7 +9,7 @@ import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
 const ScanBarcodeScreen = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'ScanBarcode'>>();
+  //const route = useRoute<RouteProp<DocumentStackParamList, 'ScanBarcode'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);

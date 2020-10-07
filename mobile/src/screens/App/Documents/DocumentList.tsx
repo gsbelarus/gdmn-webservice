@@ -85,9 +85,7 @@ const DocumentListScreen = ({ navigation }) => {
     appState.references?.contacts?.data,
   ]);
 
-  const notFound: IContact = { id: -1, name: '', contactType: -1 };
-
-  const getContact = useCallback(
+   const getContact = useCallback(
     (id: number | number[]): IContact =>
       contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
     [contacts],
@@ -104,8 +102,10 @@ const DocumentListScreen = ({ navigation }) => {
 
         const status = Statuses.find((type) => type.id === item?.head?.status);
 
-        return appState.filterParams
-          ? appState.filterParams.some((value: string) =>
+        console.log('11111');
+
+        return appState.forms?.filterParams?.fieldSearch
+          ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
               value === 'number'
                 ? item?.head.docnumber?.includes(searchText)
                 : value === 'state' && status
@@ -119,7 +119,7 @@ const DocumentListScreen = ({ navigation }) => {
           : true;
       }) || [],
     );
-  }, [appState.documents, appState.filterParams, searchText, getContact]);
+  }, [appState.documents, appState.forms, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 

@@ -1,13 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { IFilterParams } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -35,7 +35,25 @@ const FilterEditScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const [fieldSearch, setFieldSearch] = useState<string[]>(state.filterParams ?? []);
+  const { fieldSearch  } = useMemo(() => {
+    return ((state.forms?.filterParams as unknown) || {}) as IFilterParams;
+  }, [state.forms?.filterParams]);
+
+  const setFieldSearch = (field: string) =>
+    actions.setForm(
+      { ...state.forms?.filterParams,
+        fieldSearch: fieldSearch?.some((item) => item === field) ? fieldSearch.filter((item) => item !== field) : [...fieldSearch, field]
+      });
+
+  useEffect(() => {
+    if (state.forms?.filterParams) {
+      return;
+    }
+    actions.setForm({
+      name: 'filterParams',
+      fieldSearch: []
+    });
+  }, [actions, state.forms?.filterParams]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -44,6 +62,7 @@ const FilterEditScreen = ({ navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
+            actions.clearForm('filterParams');
             navigation.navigate('DocumentList');
           }}
         />
@@ -52,7 +71,6 @@ const FilterEditScreen = ({ navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            actions.setSettingsSearch(fieldSearch);
             navigation.navigate('DocumentList');
           }}
         />
@@ -74,53 +92,37 @@ const FilterEditScreen = ({ navigation }: Props) => {
       <Line
         name="number"
         title={'Номер документа'}
-        selected={fieldSearch.some((item) => item === 'number')}
-        onPress={() =>
-          !fieldSearch.some((item) => item === 'number')
-            ? setFieldSearch([...fieldSearch, 'number'])
-            : setFieldSearch(fieldSearch.filter((item) => item !== 'number'))
-        }
+        selected={fieldSearch?.some((item) => item === 'number')}
+        onPress={() => setFieldSearch('number')}
       />
       <Line
         name="state"
         title={'Статус'}
-        selected={fieldSearch.some((item) => item === 'state')}
-        onPress={() =>
-          !fieldSearch.some((item) => item === 'state')
-            ? setFieldSearch([...fieldSearch, 'state'])
-            : setFieldSearch(fieldSearch.filter((item) => item !== 'state'))
-        }
+        selected={fieldSearch?.some((item) => item === 'state')}
+        onPress={() => setFieldSearch('state')}
       />
-      <Line
+      {/* <Line
         name="toContact"
         title={'Организация'}
-        selected={fieldSearch.some((item) => item === 'toContact')}
-        onPress={() =>
-          !fieldSearch.some((item) => item === 'toContact')
-            ? setFieldSearch([...fieldSearch, 'toContact'])
-            : setFieldSearch(fieldSearch.filter((item) => item !== 'toContact'))
-        }
-      />
+        selected={fieldSearch?.some((item) => item === 'toContact')}
+        onPress={() => setFieldSearch('toContact')}
+      /> */}
       <Line
         name="fromContact"
         title={'Подразделение'}
-        selected={fieldSearch.some((item) => item === 'fromContact')}
-        onPress={() =>
-          !fieldSearch.some((item) => item === 'fromContact')
-            ? setFieldSearch([...fieldSearch, 'fromContact'])
-            : setFieldSearch(fieldSearch.filter((item) => item !== 'fromContact'))
-        }
+        selected={fieldSearch?.some((item) => item === 'fromContact')}
+        onPress={() => setFieldSearch('fromContact')}
       />
-      <Line
+      {/* <Line
         name="expeditor"
         title={'Экспедитор'}
-        selected={fieldSearch.some((item) => item === 'expeditor')}
+        selected={fieldSearch?.some((item) => item === 'expeditor')}
         onPress={() =>
-          !fieldSearch.some((item) => item === 'expeditor')
+          !fieldSearch?.some((item) => item === 'expeditor')
             ? setFieldSearch([...fieldSearch, 'expeditor'])
             : setFieldSearch(fieldSearch.filter((item) => item !== 'expeditor'))
         }
-      />
+      /> */}
     </View>
   );
 };
