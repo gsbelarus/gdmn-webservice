@@ -111,8 +111,9 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const totalQuantity = useMemo(() => {
     return (documentLines ?? []).reduce(
-      // eslint-disable-next-line prettier/prettier
-      (total, line) => Number.parseFloat(((Number(line.quantity) ?? 0) + total).toFixed(3)), 0);
+      (total, line) => Number.parseFloat(((Number(line.quantity) ?? 0) + total).toFixed(3)),
+      0,
+    );
   }, [documentLines]);
 
   const refList = React.useRef<FlatList<ILine>>(null);

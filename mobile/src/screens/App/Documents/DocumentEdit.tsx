@@ -47,10 +47,12 @@ const DocumentEditScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const isBlocked = useMemo(() => statusId !== 0 && statusId !== 1, [statusId]);
+  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
+
+  // const isEditable = useMemo(() => statusId === 0, [statusId]);
 
   const statusName = useMemo(
-    () => (docId ? (isBlocked ? 'Просмотр документа' : 'Редактирование Документа') : 'Создание документа'),
+    () => (docId ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа'),
     [docId, isBlocked],
   );
 
@@ -124,7 +126,7 @@ const DocumentEditScreen = ({ route }: Props) => {
         />
       ),
       headerRight: () =>
-        !isBlocked && (
+        (statusId === 0 || statusId === 1) && (
           <HeaderRight
             text="Готово"
             onPress={() => {
@@ -197,13 +199,13 @@ const DocumentEditScreen = ({ route }: Props) => {
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
       <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
-          {!isBlocked && (
+          {(statusId === 0 || statusId === 1) && (
             <>
               <View style={localeStyles.fieldContainer}>
                 <Text>Черновик:</Text>
                 <Switch
                   value={status === 0}
-                  disabled={isBlocked || !docId}
+                  disabled={!docId}
                   onValueChange={() => {
                     appActions.setForm({ ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 });
                   }}
@@ -288,25 +290,27 @@ const DocumentEditScreen = ({ route }: Props) => {
               }
             />
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-                {
-                  text: 'OK',
-                  onPress: async () => {
-                    appActions.deleteDocument(docId);
-                    navigation.navigate('DocumentList');
+          {docId && (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                  {
+                    text: 'OK',
+                    onPress: async () => {
+                      appActions.deleteDocument(docId);
+                      navigation.navigate('DocumentList');
+                    },
                   },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
-            }}
-            style={localeStyles.buttonContainer}
-          >
-            <Text style={localeStyles.button}>Удалить документ</Text>
-          </TouchableOpacity>
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }}
+              style={localeStyles.buttonContainer}
+            >
+              <Text style={localeStyles.button}>Удалить документ</Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
     </>

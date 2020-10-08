@@ -1,7 +1,7 @@
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
@@ -67,6 +67,10 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
+            if (!checkedItem) {
+              Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
+              return;
+            }
             actions.setForm({
               name: formName,
               ...state.forms[formName],

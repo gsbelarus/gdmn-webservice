@@ -101,6 +101,7 @@ const SettingsScreen = () => {
                 case 'goodgroups':
                 case 'goods': {
                   // TODO: преобразовывать json данные в модель данных
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const refObj = (dataSet as unknown) as IReference<any[]>;
                   appActions.setReference(refObj);
                   break;
