@@ -19,6 +19,6 @@ export { HeaderRight };
 
 const localeStyles = StyleSheet.create({
   marginRight: {
-    marginRight: 10,
+    marginRight: 0,
   },
 });

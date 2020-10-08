@@ -1,18 +1,18 @@
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useCallback, useLayoutEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Text, TextInput, Chip } from 'react-native-paper';
+import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
+import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Text, Switch, Button } from 'react-native-paper';
 
-import { IContact, IDocument } from '../../../../../common';
+import { IContact, IDocument, IRefData } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
+import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString, getNextDocId, getNextDocLineId } from '../../../helpers/utils';
+import { getDateString, getNextDocId } from '../../../helpers/utils';
 import { IDocumentParams, IListItem } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentEdit'>;
 
@@ -21,7 +21,21 @@ const DocumentEditScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
+  const [statusId, setStatusId] = useState(0);
+
+  const docId = route.params?.docId;
+
+  const {
+    date = new Date().toISOString().slice(0, 10),
+    docnumber,
+    tocontactId,
+    fromcontactId,
+    doctype,
+    status = 0,
+  } = useMemo(() => {
+    return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState.forms?.documentParams]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
@@ -33,21 +47,24 @@ const DocumentEditScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const getListItems = (con: IContact[]): IListItem[] => con?.map((item) => ({ id: item.id, value: item.name }));
+  const isBlocked = useMemo(() => statusId !== 0 && statusId !== 1, [statusId]);
+
+  const statusName = useMemo(
+    () => (docId ? (isBlocked ? 'Просмотр документа' : 'Редактирование Документа') : 'Создание документа'),
+    [docId, isBlocked],
+  );
+
+  const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
+    con?.map((item) => ({ id: item.id, value: item.name }));
 
   const departments: IContact[] = useMemo(() => {
     // return ((contacts as unknown) as IContact[])?.filter((item) => item.contactType === 4);
     return (contacts as unknown) as IContact[];
   }, [contacts]);
 
-  const listDepartments = useMemo(() => {
-    return getListItems(departments);
-  }, [departments]);
+  const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
-  const { date, docnumber, tocontactId, fromcontactId, doctype } = useMemo(() => {
-    return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.forms?.documentParams]);
+  const listDocumentType = useMemo(() => getListItems(docTypes), [docTypes]);
 
   const checkDocument = useCallback(() => {
     const res = date && docnumber && tocontactId && fromcontactId && doctype;
@@ -67,12 +84,12 @@ const DocumentEditScreen = ({ route }: Props) => {
         fromcontactId,
         tocontactId,
         date,
-        status: 0,
+        status,
         docnumber,
       },
     });
     return docId;
-  }, [appActions, date, docnumber, doctype, fromcontactId, docId, tocontactId]);
+  }, [appActions, docId, doctype, fromcontactId, tocontactId, date, status, docnumber]);
 
   const addDocument = useCallback(() => {
     const id = getNextDocId(appState.documents);
@@ -84,13 +101,13 @@ const DocumentEditScreen = ({ route }: Props) => {
         fromcontactId,
         tocontactId,
         date,
-        status: 0,
+        status,
         docnumber,
       },
       lines: [],
     });
     return id;
-  }, [appActions, appState.documents, date, docnumber, doctype, fromcontactId, tocontactId]);
+  }, [appActions, appState.documents, date, docnumber, doctype, fromcontactId, status, tocontactId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -106,27 +123,28 @@ const DocumentEditScreen = ({ route }: Props) => {
           }}
         />
       ),
-      headerRight: () => (
-        <HeaderRight
-          text="Готово"
-          onPress={() => {
-            if (!checkDocument()) {
-              return;
-            }
+      headerRight: () =>
+        !isBlocked && (
+          <HeaderRight
+            text="Готово"
+            onPress={() => {
+              if (!checkDocument()) {
+                return;
+              }
 
-            const id = docId ? updateDocument() : addDocument();
+              const id = docId ? updateDocument() : addDocument();
 
-            if (!id) {
-              return;
-            }
+              if (!id) {
+                return;
+              }
 
-            appActions.clearForm('documentParams');
-            navigation.navigate('DocumentView', { docId: id });
-          }}
-        />
-      ),
+              appActions.clearForm('documentParams');
+              navigation.navigate('DocumentView', { docId: id });
+            }}
+          />
+        ),
     });
-  }, [addDocument, appActions, checkDocument, docId, navigation, updateDocument]);
+  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, updateDocument]);
 
   useEffect(() => {
     if (appState.forms?.documentParams) {
@@ -134,6 +152,8 @@ const DocumentEditScreen = ({ route }: Props) => {
     }
 
     const docObj = docId && (appState.documents?.find((i) => i.id === docId) as IDocument);
+
+    setStatusId(docObj?.head?.status || 0);
 
     // Инициализируем параметры
     docId
@@ -144,212 +164,207 @@ const DocumentEditScreen = ({ route }: Props) => {
         })
       : appActions.setForm({
           name: 'documentParams',
-          date: new Date().toISOString().slice(0, 10),
+          date,
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, docId]);
 
-  /*   useEffect(() => {
-    if (!route.params) {
-      return;
-    }
-
-    console.log('ss');
-    appActions.setForm({
-      name: 'documentParams',
-      ...appState.forms?.documentParams,
-      ...(route.params as IDocumentParams),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, route.params]); */
-
   const ReferenceItem = useCallback(
-    (props: { value: string; onPress: () => void; color?: string }) => {
+    (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
       return (
-        <TouchableOpacity {...props}>
-          <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-            <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
-            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
-          </View>
+        <TouchableOpacity
+          {...item}
+          onPress={item.disabled ? null : item.onPress}
+          style={[localeStyles.picker, { borderColor: colors.border }]}
+        >
+          <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+          {!item.disabled && (
+            <MaterialCommunityIcons
+              style={localeStyles.pickerButton}
+              name="menu-right"
+              size={30}
+              color={colors.primary}
+            />
+          )}
         </TouchableOpacity>
       );
     },
-    [colors.border, colors.text],
+    [colors.border, colors.primary, colors.text],
   );
 
   return (
-    <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
-        {docId ? 'Редактирование Документа' : 'Создание документа'}
-      </SubTitle>
-      <ScrollView>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-          <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-            <TouchableOpacity
-              style={localeStyles.containerDate}
+    <>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
+      <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
+        <ScrollView>
+          {!isBlocked && (
+            <>
+              <View style={localeStyles.fieldContainer}>
+                <Text>Черновик:</Text>
+                <Switch
+                  value={status === 0}
+                  disabled={isBlocked || !docId}
+                  onValueChange={() => {
+                    appActions.setForm({ ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 });
+                  }}
+                />
+              </View>
+              <ItemSeparator />
+            </>
+          )}
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem
+              value={selectedItem(listDocumentType, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  fieldName: 'doctype',
+                  title: 'Тип документа',
+                  list: listDocumentType,
+                  value: doctype,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Номер:</Text>
+            <TextInput
+              editable={!isBlocked}
+              style={[localeStyles.input, { borderColor: colors.border }]}
+              onChangeText={(text) => appActions.setForm({ ...appState.forms?.documentParams, docnumber: text.trim() })}
+              value={docnumber || ' '}
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Дата: </Text>
+            <ReferenceItem
+              value={getDateString(date || new Date().toISOString())}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectDate', {
-                  parentScreen: 'DocumentEdit',
                   formName: 'documentParams',
                   fieldName: 'date',
                   title: 'Дата документа',
                   value: date,
                 })
               }
-            >
-              <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString(date || new Date().toISOString())}
-              </Text>
-              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-            </TouchableOpacity>
+            />
           </View>
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
-          <TextInput
-            style={[
-              styles.input,
-              localeStyles.textNumberInput,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-              },
-            ]}
-            onChangeText={(text) => appActions.setForm({ ...appState.forms?.documentParams, docnumber: text.trim() })}
-            value={docnumber || ' '}
-            placeholder="Введите номер"
-            placeholderTextColor={colors.border}
-            multiline={false}
-            autoCapitalize="sentences"
-            underlineColorAndroid="transparent"
-            selectionColor={'black'}
-            returnKeyType="done"
-            autoCorrect={false}
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Откуда:</Text>
-          <ReferenceItem
-            value={selectedItem(listDepartments, fromcontactId)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItem', {
-                parentScreen: 'DocumentEdit',
-                formName: 'documentParams',
-                title: 'Подразделение',
-                fieldName: 'fromcontactId',
-                list: listDepartments,
-                value: fromcontactId,
-              })
-            }
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-          <Text style={localeStyles.subdivisionText}>Куда:</Text>
-          <ReferenceItem
-            value={selectedItem(listDepartments, tocontactId)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItem', {
-                parentScreen: 'DocumentEdit',
-                formName: 'documentParams',
-                title: 'Подразделение',
-                fieldName: 'tocontactId',
-                list: listDepartments,
-                value: tocontactId,
-              })
-            }
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {docTypes.length ? (
-              appState.references?.documenttypes?.data?.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[localeStyles.margin, doctype === item.id ? { backgroundColor: colors.primary } : {}]}
-                  onPress={() => appActions.setForm({ ...appState.forms?.documentParams, doctype: item.id })}
-                  selected={doctype === item.id}
-                  selectedColor={doctype === item.id ? colors.card : colors.text}
-                >
-                  {item.name}
-                </Chip>
-              ))
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </ScrollView>
-        </View>
-      </ScrollView>
-    </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Откуда:</Text>
+            <ReferenceItem
+              value={selectedItem(listDepartments, fromcontactId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  title: 'Подразделение',
+                  fieldName: 'fromcontactId',
+                  list: listDepartments,
+                  value: fromcontactId,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Куда:</Text>
+            <ReferenceItem
+              value={selectedItem(listDepartments, tocontactId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  title: 'Подразделение',
+                  fieldName: 'tocontactId',
+                  list: listDepartments,
+                  value: tocontactId,
+                })
+              }
+            />
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    appActions.deleteDocument(docId);
+                    navigation.navigate('DocumentList');
+                  },
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+            style={localeStyles.buttonContainer}
+          >
+            <Text style={localeStyles.button}>Удалить документ</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
 export { DocumentEditScreen };
 
 const localeStyles = StyleSheet.create({
-  areaChips: {
+  button: {
+    alignSelf: 'center',
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  buttonContainer: {
+    backgroundColor: '#FC3F4D',
+    borderRadius: 10,
+    elevation: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  container: {
+    paddingHorizontal: 5,
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
+  },
+  input: {
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
-    margin: 5,
-    padding: 5,
+    flexGrow: 1,
+    padding: 10,
   },
-  container: {
-    flex: 1,
-  },
-  containerDate: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    margin: 0,
-    padding: 0,
-  },
-  margin: {
-    margin: 2,
-  },
-  marginRight: {
-    marginRight: 10,
+  inputCaption: {
+    width: 70,
   },
   picker: {
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
     flexDirection: 'row',
-    margin: 5,
-    padding: 5,
+    flex: 1,
   },
   pickerButton: {
-    flex: 1,
-    marginRight: 10,
+    alignSelf: 'center',
+    padding: 0,
     textAlign: 'right',
   },
   pickerText: {
     alignSelf: 'center',
-    flex: 10,
-    fontSize: 16,
-  },
-  scroll: {
-    maxHeight: 150,
-  },
-  scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  subdivisionText: {
-    flex: 1,
-    marginBottom: 5,
-    textAlign: 'left',
-  },
-  textDate: {
-    flex: 1,
-    flexGrow: 4,
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  textNumberInput: {
-    fontSize: 16,
-    height: 40,
+    flexGrow: 1,
+    padding: 10,
   },
   title: {
     padding: 10,

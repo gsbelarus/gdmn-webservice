@@ -3,36 +3,26 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
-import Reactotron from 'reactotron-react-native';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
-// import { IField } from '../../../model';
 import { IListItem } from '../../../../model/types';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 
 type Props = StackScreenProps<DocumentStackParamList, 'SelectItem'>;
 
-type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
-
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
-  const { list, isMulti, formName, parentScreen, fieldName, title, value } = route.params;
-
   const { state, actions } = useAppStore();
+
+  const { list, isMulti, formName, fieldName, title, value } = route.params;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
   const [checkedItem, setCheckedItem] = useState<number[]>([]);
-
-  // const [parentScreen, setParentScreen] = useState('');
-  // const [title, setTitle] = useState('');
-  // const [fieldName, setFieldName] = useState('');
-  // const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
-  // const [list, setList] = useState<IListItem[]>(undefined);
 
   useEffect(() => {
     setCheckedItem(value);
@@ -83,12 +73,6 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
               [fieldName]: isMulti ? checkedItem : checkedItem[0],
             });
             navigation.goBack();
-            /*  parentScreen
-              ? navigation.navigate(parentScreen as ParentScreen, {
-                  docId: 0,
-                  [fieldName]: isMultiSelect ? checkedItem : checkedItem[0],
-                })
-              : null; */
           }}
         />
       ),

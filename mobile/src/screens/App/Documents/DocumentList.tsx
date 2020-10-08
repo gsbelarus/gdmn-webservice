@@ -7,16 +7,18 @@ import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
+// import { statusColors}
 
 const Statuses: IDocumentStatus[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
-  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
+  // const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
 
@@ -32,7 +34,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
   const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
-  const docDate = new Date(item?.head?.date).toLocaleDateString();
+  const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
@@ -43,7 +45,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status] }]}>
+        <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status || 0] }]}>
           <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
@@ -286,7 +288,7 @@ const localStyles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
   },
-  fabAdd: {
+  /*  fabAdd: {
     bottom: 0,
     margin: 20,
     position: 'absolute',
@@ -305,7 +307,7 @@ const localStyles = StyleSheet.create({
     margin: 20,
     position: 'absolute',
     // right: 80,
-  },
+  }, */
   field: {
     opacity: 0.5,
   },

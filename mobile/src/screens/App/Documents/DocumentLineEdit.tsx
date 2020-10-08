@@ -17,10 +17,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const { docId, lineId, prodId } = useRoute<RouteProp<DocumentStackParamList, 'DocumentLineEdit'>>().params;
+  const { docId, lineId, prodId } = route.params;
 
   const [document, setDocument] = useState<IDocument>(undefined);
-  // const [product, setProduct] = useState<IGood>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -161,19 +160,6 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, document?.id, line, navigation, route.params?.docId, route.params?.prodId]);
-
-  /*   const onPress = () => {
-      if (isKeyboardVisible) {
-        return;
-      }
-      navigation.navigate('SelectBoxingsScreen', {
-        lineId: route.params.lineId,
-        prodId: route.params.prodId,
-        docId: route.params.docId,
-        quantity: '0',
-        batchNumber: '0',
-      });
-    }; */
 
   return (
     <SafeAreaView>
