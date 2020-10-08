@@ -155,10 +155,19 @@ const DocumentListScreen = ({ navigation }) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <IconButton
+          icon="file-document-box-plus-outline"
+          size={26}
+          onPress={() => {
+            navigation.navigate('DocumentEdit');
+          }}
+        />
+      ),
       headerRight: () => (
         <IconButton
           icon="menu"
-          size={24}
+          size={28}
           onPress={() =>
             showActionSheet([
               /*  {
@@ -166,7 +175,13 @@ const DocumentListScreen = ({ navigation }) => {
                 onPress: () => navigation.navigate('DocumentRequest'),
               }, */
               {
-                title: 'Выгрузить',
+                title: 'Создать документ',
+                onPress: () => {
+                  navigation.navigate('DocumentEdit');
+                },
+              },
+              {
+                title: 'Выгрузить документы',
                 onPress: sendUpdateRequest,
               },
               {
@@ -227,19 +242,18 @@ const DocumentListScreen = ({ navigation }) => {
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-down-bold"
         onPress={() => navigation.navigate('DocumentRequest')}
-      /> */}
+      />
       <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
         icon="arrow-up-bold"
         onPress={sendUpdateRequest}
       />
-      {/* {isBottom ? null : ( */}
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
         icon="file-document-box-plus"
         onPress={() => navigation.navigate('DocumentEdit')}
       />
-      {/* )} */}
+       */}
     </View>
   );
 };

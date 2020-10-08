@@ -100,22 +100,25 @@ const DocumentViewScreen = ({ route }: Props) => {
   const navigation = useNavigation();
   // const [docId, setDocId] = useState<number>(undefined);
 
-  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
-
   const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
-
-  // useEffect(() => {
-  //   if (!route.params?.docId) {
-  //     return;
-  //   }
-
-  //   setDocId(route.params.docId);
-  // }, [route.params?.docId]);
 
   const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
     docId,
     state.documents,
   ]);
+
+  const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
+
+  const number = useMemo(() => {
+    return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString()}`;
+  }, [document]);
+
+  const documentTypeName = useMemo(
+    () => state.references?.documenttypes?.data?.find((i) => i.id === document?.head?.doctype).name,
+    [state.references?.contacts?.data, document?.head],
+  );
+
+  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId), [
     document?.head?.tocontactId,
@@ -123,12 +126,6 @@ const DocumentViewScreen = ({ route }: Props) => {
   ]);
 
   const refList = React.useRef<FlatList<ILine>>(null);
-
-  const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
-
-  const number = useMemo(() => {
-    return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString()}`;
-  }, [document]);
 
   useScrollToTop(refList);
 
@@ -138,7 +135,7 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      title: number || '',
+      title: documentTypeName || '',
       headerLeft: () => (
         <IconButton
           icon="file-document-box-multiple"
@@ -200,7 +197,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, document?.head?.status, navigation, showActionSheet, number]);
+  }, [actions, docId, document?.head?.status, navigation, showActionSheet, documentTypeName]);
 
   return document ? (
     <>
