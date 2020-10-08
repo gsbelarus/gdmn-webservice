@@ -60,9 +60,9 @@ const createStoreContext = () => {
       const saveState = async () => {
         if (!state.isLoading) {
           // записываем путь к серверу в хранилище утройства
-          storageService.setServer(state.serverUrl);
+          storageService.setServer(state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: 5000 });
         }
-        apiService.setUrl(state.serverUrl); // в службе Service обновляем путь к серверу
+        apiService.setUrl(state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: 5000 }); // в службе Service обновляем путь к серверу
       };
       if (state.serverUrl) {
         saveState();
