@@ -99,6 +99,7 @@ const SettingsScreen = () => {
                 case 'documenttypes':
                 case 'contacts':
                 case 'goodgroups':
+                case 'remains':
                 case 'goods': {
                   // TODO: преобразовывать json данные в модель данных
                   const refObj = (dataSet as unknown) as IReference<any[]>;

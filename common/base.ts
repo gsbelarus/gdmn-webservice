@@ -56,10 +56,16 @@ export interface IGood extends IRefData {
 
 export interface IRemain {
   goodId: number;
-  quantity: number;
+  q: number;
   price: number;
-  contactId: number;
 }
+
+export interface IRemains {
+  contactId: number;
+  date: Date;
+  data: IRemain[];
+}
+
 
 export interface IDocumentStatus {
   id: number;

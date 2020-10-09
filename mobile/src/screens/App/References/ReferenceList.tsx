@@ -14,6 +14,7 @@ import {
   IGood,
   IRemain,
 } from '../../../../../common';
+import { IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
@@ -68,7 +69,7 @@ const ReferenceListScreen = () => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'remains'],
         },
       }),
     )
@@ -120,7 +121,7 @@ const ReferenceListScreen = () => {
                 break;
               }
               case 'remains': {
-                const remains = (dataSet as unknown) as IReference<IRemain[]>;
+                const remains = (dataSet as unknown) as IReference<IRemains[]>;
                 appActions.setReference(remains);
                 break;
               }
