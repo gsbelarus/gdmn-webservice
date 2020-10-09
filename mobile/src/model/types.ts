@@ -29,6 +29,7 @@ export interface IFormParams {
 }
 
 export interface IDocumentParams {
+  status: number;
   date?: string;
   tocontactId?: number;
   fromcontactId?: number;

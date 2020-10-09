@@ -292,7 +292,6 @@ const DocumentRequestScreen = ({ route }: Props) => {
               style={localeStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDate', {
-                  parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateBegin',
                   title: 'Дата начала',
                   value: documentParams?.dateBegin,
@@ -311,7 +310,6 @@ const DocumentRequestScreen = ({ route }: Props) => {
               style={localeStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDate', {
-                  parentScreen: 'DocumentRequestScreen',
                   fieldName: 'dateEnd',
                   title: 'Дата окончания',
                   value: documentParams?.dateEnd,
@@ -331,7 +329,6 @@ const DocumentRequestScreen = ({ route }: Props) => {
             value={selectedItem(departments, documentParams?.fromContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItem', {
-                parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'fromContact',
                 title: 'Подразделение',
                 list: listDepartments,
@@ -346,7 +343,6 @@ const DocumentRequestScreen = ({ route }: Props) => {
             value={selectedItem(departments, documentParams?.toContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItem', {
-                parentScreen: 'DocumenRrequestScreen',
                 fieldName: 'toContact',
                 title: 'Подразделение',
                 list: listDepartments,

@@ -1,4 +1,4 @@
-import { RouteProp, useRoute, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
@@ -33,36 +33,18 @@ LocaleConfig.defaultLocale = 'ru';
 
 type Props = StackScreenProps<DocumentStackParamList, 'SelectDate'>;
 
-type ParentScreen = keyof Pick<DocumentStackParamList, 'DocumentEdit'>;
-
 export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
   const [date, setDate] = useState('');
-  // const [title, setTitle] = useState('');
-  // const [fieldName, setFieldName] = useState('');
-  // const [parentScreen, setParentScreen] = useState('');
-  const { formName, fieldName, title, value, parentScreen } = useRoute<
-    RouteProp<DocumentStackParamList, 'SelectDate'>
-  >().params;
+
+  const { formName, fieldName, title, value } = route.params;
 
   const { state, actions } = useAppStore();
 
   useEffect(() => {
     setDate(value);
   }, [value]);
-
-  /*   useEffect(() => {
-    if (!route.params?.fieldName) {
-      return;
-    }
-    const { fieldName: newFieldName, title: newTitle, parentScreen: newParentScreen, value: newValue } = route.params;
-
-    setTitle(newTitle);
-    setFieldName(newFieldName);
-    setParentScreen(newParentScreen);
-    setDate(newValue);
-  }, [route.params]); */
 
   const dayPressHandle = (day: DateObject) => {
     setDate(day.dateString);
@@ -85,7 +67,6 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
           onPress={() => {
             actions.setForm({ name: formName, ...state.forms[formName], [fieldName]: date });
             navigation.goBack();
-            // parentScreen ? navigation.navigate(parentScreen as ParentScreen, { docId: 0, [fieldName]: date }) : null;
           }}
         />
       ),

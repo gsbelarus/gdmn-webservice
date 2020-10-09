@@ -4,6 +4,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useLayoutEffect, useMemo, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
+
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
@@ -35,15 +36,18 @@ const FilterEditScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const { fieldSearch  } = useMemo(() => {
+  const { fieldSearch } = useMemo(() => {
     return ((state.forms?.filterParams as unknown) || {}) as IFilterParams;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.forms?.filterParams]);
 
   const setFieldSearch = (field: string) =>
-    actions.setForm(
-      { ...state.forms?.filterParams,
-        fieldSearch: fieldSearch?.some((item) => item === field) ? fieldSearch.filter((item) => item !== field) : [...fieldSearch, field]
-      });
+    actions.setForm({
+      ...state.forms?.filterParams,
+      fieldSearch: fieldSearch?.some((item) => item === field)
+        ? fieldSearch.filter((item) => item !== field)
+        : [...fieldSearch, field],
+    });
 
   useEffect(() => {
     if (state.forms?.filterParams) {
@@ -51,8 +55,9 @@ const FilterEditScreen = ({ navigation }: Props) => {
     }
     actions.setForm({
       name: 'filterParams',
-      fieldSearch: []
+      fieldSearch: [],
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, state.forms?.filterParams]);
 
   useLayoutEffect(() => {

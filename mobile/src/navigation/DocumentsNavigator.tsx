@@ -15,14 +15,13 @@ import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screen
 
 export type DocumentStackParamList = {
   DocumentList: undefined;
-  DocumentEdit: { docId: number | { [name: string]: string } };
+  DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
   DocumentLineEdit: { docId: number; prodId: number; lineId: number };
   GoodList: { docId: number };
   DocumentRequest: undefined;
   SelectItem: {
-    parentScreen: keyof DocumentStackParamList;
     formName: string;
     fieldName: string;
     title: string;
@@ -31,7 +30,6 @@ export type DocumentStackParamList = {
     value: number[];
   };
   SelectDate: {
-    parentScreen: keyof DocumentStackParamList;
     formName: string;
     fieldName: string;
     title: string;
