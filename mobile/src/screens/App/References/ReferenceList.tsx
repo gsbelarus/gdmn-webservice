@@ -26,7 +26,9 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('Reference', { item });
+        item.type === 'remains'
+        ? navigation.navigate('Remains', { item })
+        : navigation.navigate('Reference', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>

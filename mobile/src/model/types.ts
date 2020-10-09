@@ -37,6 +37,10 @@ export interface IDocumentParams {
   docnumber?: string;
 }
 
+export interface IRemainsParams {
+  contactId?: number;
+}
+
 export interface IFilterParams {
   fieldSearch: string[];
 }

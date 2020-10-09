@@ -1,12 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { ReferenceDetailScreen, ViewReferenceScreen, ReferenceListScreen } from '../screens/App/References';
+import { ReferenceDetailScreen, ViewReferenceScreen, ReferenceListScreen, RemainsViewScreen } from '../screens/App/References';
 
 type ReferenceStackParamList = {
   ReferenceList: undefined;
   Reference: { docId: number };
   ReferenceDetail: undefined;
+  Remains: undefined;
 };
 
 const Stack = createStackNavigator<ReferenceStackParamList>();
@@ -21,6 +22,7 @@ const ReferencesNavigator = () => {
         options={{ title: 'Справочники' }}
       />
       <Stack.Screen key="Reference" name="Reference" component={ViewReferenceScreen} options={{ title: '' }} />
+      <Stack.Screen key="Remains" name="Remains" component={RemainsViewScreen} options={{ title: '' }} />
       <Stack.Screen
         key="ReferenceDetail"
         name="ReferenceDetail"
