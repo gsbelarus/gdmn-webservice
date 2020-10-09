@@ -25,7 +25,7 @@ const ScanBarcodeScreen2 = () => {
   const navigation = useNavigation();
 
   const [barcode, setBarcode] = useState('');
-  const [goodName, setGoodName] = useState('');
+  const [good, setGood] = useState<IGood>(undefined);
 
   useEffect(() => {
     const permission = async () => {
@@ -41,70 +41,14 @@ const ScanBarcodeScreen2 = () => {
     });
   });
 
-  /*
-  const editLineDocument = (weighedGood: IWeighedGoods) => {
-     const document = state.documents.find((item) => item.id === route.params.docId);
-    const editLine = (document as ISellDocument)?.lines.find(
-      (item) => item.numreceive === weighedGood.numreceive && item.goodId === weighedGood.goodkey,
-    );
-    const good = state.references?.goods.find((item) => item.id === weighedGood.goodkey);
-    if (editLine) {
-      actions.editLine({
-        docId: route.params?.docId,
-        line: {
-          ...editLine,
-          quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
-        } as ISellLine,
-      });
-    } else {
-      const date = weighedGood.datework.split('.').reverse();
-      actions.addLine({
-        docId: route.params.docId,
-        line: {
-          id: '0',
-          goodId: weighedGood.goodkey,
-          tara: [],
-          manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-            .toISOString()
-            .slice(0, 10),
-          quantity: good ? weighedGood.weight / good.itemWeight : 0,
-          orderQuantity: 0,
-          numreceive: weighedGood.numreceive,
-          timework: weighedGood.timework,
-        } as ISellLine,
-      });
-    }
-  };
-  */
-
   const handleBarCodeScanned = (data: string) => {
-    console.log('data', data);
     setScanned(true);
     setBarcode(data);
-    // Alert.alert('Сохранить результат?', data, [
-    //   {
-    //     text: 'Да',
-    //     onPress: () => {
-    //       setScanned(false);
-    //       const addGood = findGood(data);
-    //       if (addGood) {
-    //         // editLineDocument(addGood);
-    //         navigation.goBack();
-    //       }
-    //     },
-    //   },
-    //   {
-    //     text: 'Нет',
-    //     onPress: () => {
-    //       setScanned(false);
-    //     },
-    //   },
-    // ]);
   };
 
   useEffect(() => {
     if (!barcode) {
-      setGoodName('');
+      setGood(undefined);
       return;
     }
 
@@ -112,66 +56,17 @@ const ScanBarcodeScreen2 = () => {
       (item) => item.barcode === barcode,
     );
 
-    setGoodName(goodObj ? goodObj.name : 'не найден');
+    setGood(goodObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode, state.references?.goods]);
 
-  /*   const findGood = (text: string) => {
-    if (text === '' || Number.isNaN(text) || text.length < 12) {
-      return;
-    }
-
-    const finded = state.references?.goods?.data?.find((good) => Number(good.id) === Number(text.slice(0, -1)));
-    if (finded) {
-      return finded;
-    }
-    /*
-    const findedFullCode = state.weighedGoods.find((good) => Number(good.id) === Number(text));
-    if (findedFullCode) {
-      return findedFullCode;
-    } */
-  /*
-    Alert.alert('Предупреждение!', `Запись не найдена с таким кодом: ${text}`, [
-      {
-        text: 'ОК',
-        onPress: () => {
-          setScanned(false);
-        },
-      },
-    ]);
-    return undefined;
-  }; */
-
   return (
-    // <SafeAreaView>
-    <View style={[localStyles.content, { backgroundColor: colors.card, paddingTop: StatusBar.currentHeight ?? 0 }]}>
+    <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       {hasPermission === null ? (
         <Text style={styles.title}>Запрос на получение доступа к камере</Text>
       ) : hasPermission === false ? (
         <Text style={styles.title}>Нет доступа к камере</Text>
       ) : undefined}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#0008', padding: 10 }}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: 'transparent',
-          }}
-          onPress={() => navigation.goBack()}
-        >
-          <Feather name={'arrow-left'} color={'#FFF'} size={30} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            backgroundColor: 'transparent',
-          }}
-          onPress={() => setFlashMode(!flashMode)}
-        >
-          <MaterialCommunityIcons
-            name={flashMode ? 'flashlight' : 'flashlight-off'}
-            color={flashMode ? '#FF8' : '#FFF'}
-            size={30}
-          />
-        </TouchableOpacity>
-      </View>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -181,9 +76,28 @@ const ScanBarcodeScreen2 = () => {
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
       >
+        <View style={localStyles.header}>
+          <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
+            <Feather name={'arrow-left'} color={'#FFF'} size={30} />
+          </TouchableOpacity>
+          <TouchableOpacity style={localStyles.transparent} onPress={() => setFlashMode(!flashMode)}>
+            <MaterialCommunityIcons
+              name={flashMode ? 'flashlight' : 'flashlight-off'}
+              color={flashMode ? '#FF8' : '#FFF'}
+              size={30}
+            />
+          </TouchableOpacity>
+        </View>
         {!scanned ? (
-          <View style={[styles.container, { alignItems: 'center' }]}>
-            <View style={{ width: '75%', height: '50%', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
+            <View
+              style={{
+                width: '70%',
+                height: '50%',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View style={[localStyles.border, localStyles.borderTop, localStyles.borderLeft]} />
                 <View style={[localStyles.border, localStyles.borderTop, localStyles.borderRight]} />
@@ -195,35 +109,43 @@ const ScanBarcodeScreen2 = () => {
             </View>
           </View>
         ) : (
-          <View style={localStyles.scanResultContainer}>
-            <TouchableOpacity style={localStyles.rescanButton} onPress={() => setScanned(false)}>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
-              <Text style={localStyles.button}>Пересканировать</Text>
-            </TouchableOpacity>
-
-            {!goodName && (
-              <TouchableOpacity style={localStyles.selectButton} onPress={() => navigation.goBack()}>
-                <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                <Text style={localStyles.button}>Выбрать</Text>
+          <View style={localStyles.scannerContainer}>
+            <View style={localStyles.buttonsContainer}>
+              <TouchableOpacity
+                style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}
+                onPress={() => setScanned(false)}
+              >
+                <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
+                <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
+            </View>
+            {scanned && good && (
+              <View style={localStyles.buttonsContainer}>
+                <TouchableOpacity
+                  style={[localStyles.buttons, { backgroundColor: '#4380D3' }]}
+                  onPress={() => navigation.goBack()}
+                >
+                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  <Text style={localStyles.text}>Выбрать</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         )}
+        <View style={localStyles.footer}>
+          {!scanned ? (
+            <>
+              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+              <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
+            </>
+          ) : (
+            <>
+              <Text style={localStyles.text}>{`Штрихкод: ${barcode || ''}`}</Text>
+              <Text style={localStyles.text}>{`Товар: ${good?.name || 'не найден'}`}</Text>
+            </>
+          )}
+        </View>
       </Camera>
-      <View style={[localStyles.textContainer, { backgroundColor: colors.text }]}>
-        {!scanned ? (
-          <>
-            {/* <Image source={scan} style={{ width: 60, height: 60, tintColor: '#fff' }} /> */}
-            <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-            <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
-          </>
-        ) : (
-          <>
-            <Text style={localStyles.text}>{`Штрихкод: ${barcode || ''}`}</Text>
-            <Text style={localStyles.text}>{`Товар: ${goodName || ''}`}</Text>
-          </>
-        )}
-      </View>
     </View>
   );
 };
@@ -251,53 +173,52 @@ const localStyles = StyleSheet.create({
     borderTopColor: '#FF8',
     borderTopWidth: 2,
   },
-  button: {
-    alignSelf: 'center',
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
+  buttons: {
+    alignItems: 'center',
+    borderRadius: 10,
+    elevation: 8,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // paddingHorizontal: 15,
+  },
+  buttonsContainer: {
+    height: 100,
+    padding: 10,
   },
   camera: {
     flex: 1,
-    justifyContent: 'center',
+    flexGrow: 1,
   },
   content: {
     flex: 1,
+    paddingTop: StatusBar.currentHeight ?? 0,
   },
-  rescanButton: {
-    backgroundColor: '#CC3C4D',
-    borderRadius: 10,
-    elevation: 8,
-    flexDirection: 'row',
+  footer: {
+    alignItems: 'center',
+    backgroundColor: '#0008',
+    height: 100,
     justifyContent: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
   },
-  scanResultContainer: {
+  header: {
+    backgroundColor: '#0008',
+    flexDirection: 'row',
+    height: 70,
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingTop: 30,
+  },
+  scannerContainer: {
     flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
-    margin: 10,
-  },
-  selectButton: {
-    backgroundColor: '#FAC',
-    borderRadius: 10,
-    elevation: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
   },
   text: {
     color: '#fff',
     fontSize: 18,
+    textTransform: 'uppercase',
   },
-  textContainer: {
-    alignItems: 'center',
-    bottom: 0,
-    height: 100,
-    justifyContent: 'center',
-    left: 0,
-    position: 'absolute',
-    width: '100%',
+  transparent: {
+    backgroundColor: 'transparent',
   },
 });

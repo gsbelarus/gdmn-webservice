@@ -106,7 +106,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   const contact = useMemo(
     () => contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [contacts, document.head?.tocontactId],
+    [contacts, document?.head?.tocontactId],
   );
 
   const totalQuantity = useMemo(() => {

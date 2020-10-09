@@ -1,6 +1,6 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Text, Chip, Button } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
@@ -53,9 +53,15 @@ const CompaniesScreen = () => {
   }, [userID, companies, actions]);
 
   const logOut = async () => {
-    const res = await apiService.auth.logout();
-    if (res.result) {
-      actions.logOut();
+    try {
+      const res = await apiService.auth.logout();
+      if (res.result) {
+        actions.logOut();
+        return;
+      }
+      Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
+    } catch (error) {
+      Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
     }
   };
 

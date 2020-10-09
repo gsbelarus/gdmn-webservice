@@ -84,10 +84,10 @@ export const getNextDocLineId = (document: IDocument) => {
   return (
     document?.lines
       .map((item: { id: number }) => item.id)
-      .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 0
+      .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 1
   );
 };
 
 export const getNextDocId = (documents: IDocument[]) => {
-  return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 0;
+  return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1;
 };
