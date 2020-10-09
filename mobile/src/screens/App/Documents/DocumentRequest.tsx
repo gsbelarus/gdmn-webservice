@@ -218,6 +218,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
       const messagesForDocuments = response.data.filter(
         (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
       );
+
       if (messagesForDocuments.length > 0) {
         messagesForDocuments.forEach((message) => {
           if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {

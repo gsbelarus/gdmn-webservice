@@ -146,7 +146,7 @@ const DocumentEditScreen = ({ route }: Props) => {
           />
         ),
     });
-  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, updateDocument]);
+  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
 
   useEffect(() => {
     if (appState.forms?.documentParams) {
@@ -214,22 +214,6 @@ const DocumentEditScreen = ({ route }: Props) => {
               <ItemSeparator />
             </>
           )}
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Тип:</Text>
-            <ReferenceItem
-              value={selectedItem(listDocumentType, doctype)?.value}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  fieldName: 'doctype',
-                  title: 'Тип документа',
-                  list: listDocumentType,
-                  value: doctype,
-                })
-              }
-            />
-          </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
             <Text style={localeStyles.inputCaption}>Номер:</Text>
@@ -252,6 +236,23 @@ const DocumentEditScreen = ({ route }: Props) => {
                   fieldName: 'date',
                   title: 'Дата документа',
                   value: date,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem
+              value={selectedItem(listDocumentType, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  fieldName: 'doctype',
+                  title: 'Тип документа',
+                  list: listDocumentType,
+                  value: doctype,
                 })
               }
             />

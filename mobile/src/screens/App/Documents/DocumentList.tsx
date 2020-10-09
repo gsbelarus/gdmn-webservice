@@ -157,7 +157,7 @@ const DocumentListScreen = ({ navigation }) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
+      /* headerLeft: () => (
         <IconButton
           icon="file-document-box-plus-outline"
           size={26}
@@ -165,7 +165,7 @@ const DocumentListScreen = ({ navigation }) => {
             navigation.navigate('DocumentEdit');
           }}
         />
-      ),
+      ), */
       headerRight: () => (
         <IconButton
           icon="menu"
@@ -250,12 +250,12 @@ const DocumentListScreen = ({ navigation }) => {
         icon="arrow-up-bold"
         onPress={sendUpdateRequest}
       />
+       */}
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
         icon="file-document-box-plus"
         onPress={() => navigation.navigate('DocumentEdit')}
       />
-       */}
     </View>
   );
 };
@@ -288,12 +288,13 @@ const localStyles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
   },
-  /*  fabAdd: {
+  fabAdd: {
     bottom: 0,
     margin: 20,
     position: 'absolute',
     right: 0,
   },
+  /*
   fabImport: {
     bottom: 0,
     margin: 20,
