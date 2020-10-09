@@ -51,13 +51,8 @@ const ReferenceListScreen = () => {
   useScrollToTop(ref);
 
   const references: IReference[] = useMemo(() => {
-    console.log('Вызов окна ReferenceList');
     return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
   }, [AppState.references]);
-
-  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-  // [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 

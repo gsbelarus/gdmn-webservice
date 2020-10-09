@@ -188,11 +188,11 @@ const DocumentViewScreen = ({ route }: Props) => {
       </View>
       {isEditable && (
         <>
-          {/* <FAB
-                style={localStyles.fabScan}
-                icon="barcode-scan"
-                onPress={() => navigation.navigate('ScanBarCode', { docId: document.id })}
-              /> */}
+          <FAB
+            style={localStyles.fabScan}
+            icon="barcode-scan"
+            onPress={() => navigation.navigate('ScanBarcode2', { docId: document.id })}
+          />
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="plus"
@@ -234,14 +234,13 @@ const localStyles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  /*
-    fabScan: {
+  fabScan: {
     backgroundColor: Colors.blue600,
     bottom: 35,
     left: 0,
     margin: 20,
     position: 'absolute',
-  }, */
+  },
   flexDirectionRow: {
     flexDirection: 'row',
   },
