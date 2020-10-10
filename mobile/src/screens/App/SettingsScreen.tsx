@@ -70,13 +70,12 @@ const SettingsScreen = () => {
 
     const getMessages = async () => {
       try {
+        setLoading(true);
         // const response = await apiService.data.subscribe(companyID);
         const response = await timeout<IResponse<IMessage[]>>(10000, apiService.data.getMessages(companyID));
 
-        // console.log(response);
-
         if (!response.result) {
-          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть', onPress: () => ({}) }]);
           return;
         }
 
@@ -89,7 +88,7 @@ const SettingsScreen = () => {
         response.data?.forEach((message) => {
           if (message.body.type === 'data') {
             // Сообщение содержит данные
-            ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+            ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
               switch (dataSet.type) {
                 case 'get_SellDocuments': {
                   const addDocuments = dataSet.data as IDocument[];
@@ -144,10 +143,11 @@ const SettingsScreen = () => {
         const messagesForDocuments = response.data.filter(
           (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
         );
+
         if (messagesForDocuments.length > 0) {
-          messagesForDocuments.forEach((message) => {
-            if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-              message.body.payload.params.forEach((paramDoc) => {
+          messagesForDocuments?.forEach((message) => {
+            if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
+              message.body.payload?.params?.forEach((paramDoc) => {
                 if (paramDoc.result) {
                   const document = documents?.find((doc) => doc.id === paramDoc.docId);
                   if (document?.head?.status === 2) {
@@ -161,7 +161,9 @@ const SettingsScreen = () => {
           isUpdated = true;
           // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
-        Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+        isUpdated
+          ? Alert.alert('Запрос обработан', 'Справочники обновлены', [{ text: 'Закрыть' }])
+          : Alert.alert('Запрос обработан', 'Обновлений нет', [{ text: 'Закрыть' }]);
       } catch (err) {
         Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {

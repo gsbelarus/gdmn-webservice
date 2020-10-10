@@ -175,7 +175,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
       response.data?.forEach((message) => {
         if (message.body.type === 'data') {
           // Сообщение содержит данные
-          ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+          ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
                 const addDocuments = dataSet.data as IDocument[];
@@ -218,10 +218,11 @@ const DocumentRequestScreen = ({ route }: Props) => {
       const messagesForDocuments = response.data.filter(
         (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
       );
+
       if (messagesForDocuments.length > 0) {
-        messagesForDocuments.forEach((message) => {
-          if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-            message.body.payload.params.forEach((paramDoc) => {
+        messagesForDocuments?.forEach((message) => {
+          if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
+            message.body.payload?.params?.forEach((paramDoc) => {
               if (paramDoc.result) {
                 const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
                 if (document?.head.status === 2) {

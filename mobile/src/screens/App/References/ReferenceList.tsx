@@ -100,7 +100,7 @@ const ReferenceListScreen = () => {
       response.data?.forEach((message) => {
         if (message.body.type === 'data') {
           // Сообщение содержит данные
-          ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+          ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
                 const addDocuments = dataSet.data as IDocument[];

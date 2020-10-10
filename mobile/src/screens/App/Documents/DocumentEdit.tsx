@@ -52,7 +52,8 @@ const DocumentEditScreen = ({ route }: Props) => {
   // const isEditable = useMemo(() => statusId === 0, [statusId]);
 
   const statusName = useMemo(
-    () => (docId ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа'),
+    () =>
+      docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа',
     [docId, isBlocked],
   );
 
@@ -80,7 +81,7 @@ const DocumentEditScreen = ({ route }: Props) => {
 
   const updateDocument = useCallback(() => {
     appActions.updateDocument({
-      id: Number(docId),
+      id: docId,
       head: {
         doctype,
         fromcontactId,
@@ -121,7 +122,7 @@ const DocumentEditScreen = ({ route }: Props) => {
             appActions.clearForm('documentParams');
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
-            docId ? navigation.navigate('DocumentView', { docId }) : navigation.navigate('DocumentList');
+            docId !== undefined ? navigation.navigate('DocumentView', { docId }) : navigation.navigate('DocumentList');
           }}
         />
       ),
@@ -134,7 +135,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                 return;
               }
 
-              const id = docId ? updateDocument() : addDocument();
+              const id = docId !== undefined ? updateDocument() : addDocument();
 
               if (!id) {
                 return;
@@ -146,23 +147,23 @@ const DocumentEditScreen = ({ route }: Props) => {
           />
         ),
     });
-  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, updateDocument]);
+  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
 
   useEffect(() => {
     if (appState.forms?.documentParams) {
       return;
     }
 
-    const docObj = docId && (appState.documents?.find((i) => i.id === docId) as IDocument);
+    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
 
     setStatusId(docObj?.head?.status || 0);
 
     // Инициализируем параметры
-    docId
+    docId !== undefined
       ? appActions.setForm({
           name: 'documentParams',
-          id: docObj.id,
-          ...(docObj.head as IDocumentParams),
+          id: docObj?.id,
+          ...(docObj?.head as IDocumentParams),
         })
       : appActions.setForm({
           name: 'documentParams',
@@ -205,7 +206,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                 <Text>Черновик:</Text>
                 <Switch
                   value={status === 0}
-                  disabled={!docId}
+                  disabled={docId === undefined}
                   onValueChange={() => {
                     appActions.setForm({ ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 });
                   }}
@@ -214,22 +215,6 @@ const DocumentEditScreen = ({ route }: Props) => {
               <ItemSeparator />
             </>
           )}
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Тип:</Text>
-            <ReferenceItem
-              value={selectedItem(listDocumentType, doctype)?.value}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  fieldName: 'doctype',
-                  title: 'Тип документа',
-                  list: listDocumentType,
-                  value: doctype,
-                })
-              }
-            />
-          </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
             <Text style={localeStyles.inputCaption}>Номер:</Text>
@@ -252,6 +237,23 @@ const DocumentEditScreen = ({ route }: Props) => {
                   fieldName: 'date',
                   title: 'Дата документа',
                   value: date,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem
+              value={selectedItem(listDocumentType, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  fieldName: 'doctype',
+                  title: 'Тип документа',
+                  list: listDocumentType,
+                  value: doctype,
                 })
               }
             />
@@ -290,7 +292,7 @@ const DocumentEditScreen = ({ route }: Props) => {
               }
             />
           </View>
-          {docId && (
+          {docId !== undefined && (
             <TouchableOpacity
               onPress={() => {
                 Alert.alert('Вы уверены, что хотите удалить документ?', '', [
@@ -348,6 +350,7 @@ const localeStyles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     flexGrow: 1,
+    height: 40,
     padding: 10,
   },
   inputCaption: {
