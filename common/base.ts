@@ -17,6 +17,8 @@ export interface ILine {
   id: number;
   goodId: number;
   quantity: number;
+  price?: number;
+  remains?: number
 }
 
 export interface IRefData {
@@ -54,18 +56,29 @@ export interface IGood extends IRefData {
   barcode?: string;
 }
 
-export interface IRemain {
-  goodId: number;
-  q: number;
-  price: number;
+export interface IRem extends IGood {
+  remains?: number;
+  price?: number;
 }
 
 export interface IRemains {
-  contactId: number;
-  date: Date;
+  id: number;
+  name: string;
+  type: string;
   data: IRemain[];
 }
 
+export interface IRemain {
+  contactId: number;
+  date: Date;
+  data: IRemainData[];
+}
+
+export interface IRemainData {
+  goodId: number;
+  q?: number;
+  price?: number;
+}
 
 export interface IDocumentStatus {
   id: number;

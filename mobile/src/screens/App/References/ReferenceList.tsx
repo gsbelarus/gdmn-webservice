@@ -19,7 +19,7 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout, isMessagesArray } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
-const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
+const ReferenceItem = React.memo(({ item }: { item: IReference | IRemains }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -53,7 +53,7 @@ const ReferenceListScreen = () => {
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const references: IReference[] = useMemo(() => {
+  const references: (IReference | IRemains)[] = useMemo(() => {
     console.log('Вызов окна ReferenceList');
     return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
   }, [AppState.references]);
@@ -62,7 +62,7 @@ const ReferenceListScreen = () => {
   // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
   // [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
 
-  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
+  const renderItem = ({ item }: { item: IReference | IRemains}) => <ReferenceItem item={item} />;
 
   const sendUpdateRequest = useCallback(() => {
     timeout(

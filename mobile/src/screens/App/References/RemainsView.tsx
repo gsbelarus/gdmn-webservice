@@ -8,6 +8,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback,
 import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
+import { IContact, IRefData, IRemain, IRemainData, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { IListItem, IRemainsParams } from '../../../model/types';
@@ -18,8 +19,6 @@ import styles from '../../../styles/global';
 interface IField {
   id: number;
   name?: string;
-  price?: number;
-  q?: number;
   [fieldName: string]: unknown;
 }
 
@@ -28,11 +27,10 @@ type Props = StackScreenProps<RemainsStackParamList, 'RemainsView'>;
 const LineItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
+        navigation.navigate('RemainsList', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -42,18 +40,14 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
         </View>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.price, { color: colors.text }]}>{item.price ?? ''}</Text>
-        </View>
       </View>
     </TouchableOpacity>
   );
 });
 
-const RemainsViewScreen = ({ route }: Props) => {
+const RemainsViewScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   console.log('RemainsViewScreen');
-  const navigation = useNavigation();
 
   const { state: appState, actions: appActions } = useAppStore();
   const { contactId } = useMemo(() => {
@@ -61,12 +55,15 @@ const RemainsViewScreen = ({ route }: Props) => {
   }, [appState.forms?.remainsParams]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IReference>();
+  const [filteredList, setFilteredList] = useState<IRemains>();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
 
-  const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [appState.references?.contacts?.data]);
+  const goods = useMemo(() => appState.references?.goods?.data, [appState.references?.goods?.data]);
+
+  const remains = useMemo(() => appState.references?.remains?.data as IRemain[], [appState.references?.remains?.data]);
 
   const listContacts = useMemo(() => contacts?.map((item) => ({ id: item.id, value: item.name })), [contacts]);
 
@@ -74,7 +71,7 @@ const RemainsViewScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const { item: refItem }: { item: IReference } = route.params;
+  const { item: refItem }: { item: IRemains } = route.params;
 
   useEffect(() => {
     if (appState.forms?.documentParams) {
@@ -86,17 +83,17 @@ const RemainsViewScreen = ({ route }: Props) => {
     })
   }, [appActions, contactId]);
 
-  useEffect(() => {
-    // console.log('params', route.params);
-    if (!refItem) {
-      return;
-    }
+  // useEffect(() => {
+  //   // console.log('params', route.params);
+  //   if (!refItem) {
+  //     return;
+  //   }
 
-    setFilteredList({
-      ...refItem,
-      data: refItem.data.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
-    });
-  }, [refItem, searchQuery]);
+  //   setFilteredList({
+  //     ...refItem,
+  //     data: refItem.data.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+  //   });
+  // }, [refItem, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -133,28 +130,30 @@ const RemainsViewScreen = ({ route }: Props) => {
     ]);
   };
 
-  const ReferenceItem = useCallback(
-    (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
-      return (
-        <TouchableOpacity
-          {...item}
-          onPress={item.disabled ? null : item.onPress}
-          style={[localStyles.picker, { borderColor: colors.border }]}
-        >
-          <Text style={[localStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
-          {!item.disabled && (
-            <MaterialCommunityIcons
-              style={localStyles.pickerButton}
-              name="menu-right"
-              size={30}
-              color={colors.primary}
-            />
-          )}
-        </TouchableOpacity>
-      );
-    },
-    [colors.border, colors.primary, colors.text],
-  );
+  // const ReferenceItem = useCallback(
+  //   (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
+  //     return (
+  //       <TouchableOpacity
+  //         {...item}
+  //         onPress={item.disabled ? null : item.onPress}
+  //         style={[localStyles.picker, { borderColor: colors.border }]}
+  //       >
+  //         <Text style={[localStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+  //         {!item.disabled && (
+  //           <MaterialCommunityIcons
+  //             style={localStyles.pickerButton}
+  //             name="menu-right"
+  //             size={30}
+  //             color={colors.primary}
+  //           />
+  //         )}
+  //       </TouchableOpacity>
+  //     );
+  //   },
+  //   [colors.border, colors.primary, colors.text],
+  // );
+  //console.log(filteredList?.data[0].contactId);
+ // console.log(filteredList?.data[0]);
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -182,7 +181,7 @@ const RemainsViewScreen = ({ route }: Props) => {
         ) : (
           <View style={[localStyles.content, { backgroundColor: colors.card }]}>
             <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-              {filteredList?.name}
+              {appState.references?.remains?.name}
             </SubTitle>
             <ItemSeparator />
             <View style={localStyles.flexDirectionRow}>
@@ -194,10 +193,11 @@ const RemainsViewScreen = ({ route }: Props) => {
               />
             </View>
             <ItemSeparator />
+            {/* <View style={localStyles.fieldContainer}>
              <ReferenceItem
               value={selectedItem(listContacts, contactId)?.value}
               onPress={() =>
-                navigation.navigate('SelectItem1', {
+                navigation.navigate('SelectItem', {
                   formName: 'remainsParams',
                   fieldName: 'contactId',
                   title: 'Подразделение',
@@ -206,9 +206,10 @@ const RemainsViewScreen = ({ route }: Props) => {
                 })
               }
             />
+            </View> */}
             <FlatList
               ref={ref}
-              data={filteredList?.data}
+              data={contacts}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
@@ -282,5 +283,12 @@ const localStyles = StyleSheet.create({
     alignSelf: 'center',
     padding: 0,
     textAlign: 'right',
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
   },
 });

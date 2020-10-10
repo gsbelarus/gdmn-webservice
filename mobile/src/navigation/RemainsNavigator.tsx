@@ -5,13 +5,13 @@ import { SelectItemScreen } from '../screens/App/Documents/components';
 
 export type RemainsStackParamList = {
   RemainsView: undefined;
-  SelectItem1: {
+  SelectItem: {
     formName: string;
     fieldName: string;
     title: string;
     isMulti?: boolean;
     list: IListItem[];
-    value: number[];
+    value: number;
   };
 };
 
@@ -20,7 +20,7 @@ const Stack = createStackNavigator<RemainsStackParamList>();
 const RemainsNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="RemainsView">
-      <Stack.Screen key="SelectItem1" name="SelectItem1" options={{ title: '' }} component={SelectItemScreen} />
+      <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen}/>
     </Stack.Navigator>
   );
 };
