@@ -54,10 +54,9 @@ const ViewReferenceScreen = ({ route }) => {
     if (!refItem) {
       return;
     }
-
     setFilteredList({
       ...refItem,
-      data: refItem.data.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+      data: refItem?.data?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
     });
   }, [refItem, searchQuery]);
 
@@ -150,7 +149,7 @@ const ViewReferenceScreen = ({ route }) => {
               ref={ref}
               data={
                 filteredList && filteredList.type === 'weighedgoods'
-                  ? filteredList?.data.filter((item) =>
+                  ? filteredList?.data?.filter((item) =>
                       searchQuery.length >= 12 && searchQuery.length <= 13 && !Number.isNaN(searchQuery)
                         ? item.id.toString().includes(Number(searchQuery).toString().slice(0, -1)) ||
                           item.id.toString().includes(Number(searchQuery).toString())

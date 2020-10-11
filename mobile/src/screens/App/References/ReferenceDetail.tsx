@@ -43,7 +43,7 @@ const ReferenceDetailScreen = ({ route }) => {
       <ItemSeparator />
       <FlatList
         ref={ref}
-        data={fields.filter((i) => !['id', 'name'].includes(i[0]))}
+        data={fields.filter((i) => !['id', 'name', 'price', 'remains'].includes(i[0]))}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

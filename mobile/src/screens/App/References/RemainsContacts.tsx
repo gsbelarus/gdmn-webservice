@@ -1,14 +1,13 @@
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
-import { IContact, IGood, IRemains } from '../../../../../common/base';
+import { Text, Searchbar, Button } from 'react-native-paper';
+import { IContact, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { IRemainsParams } from '../../../model/types';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -18,14 +17,21 @@ interface IField {
   [fieldName: string]: unknown;
 }
 
+//type Props = StackScreenProps<ReferencesStackParamList, 'RemainsView'>;
+
 const LineItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const { state: appState, actions: appActions } = useAppStore();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
+        appActions.setForm({
+         ...appState.forms?.remainsParams,
+          contactId: item.id
+        });
+        navigation.navigate('RemainsView', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -34,18 +40,16 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
-          <View style={localStyles.flexDirectionRow}>
-            <Text>Цена: {item.price}</Text>
-            <Text>  Остаток: {item.remains}</Text>
-          </View>
         </View>
       </View>
     </TouchableOpacity>
   );
 });
 
-const RemainsViewScreen = ({ route }) => {
+const RemainsContactsViewScreen = () => {
   const { colors } = useTheme();
+
+  const { state: appState, actions: appActions } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRemains>();
@@ -53,35 +57,17 @@ const RemainsViewScreen = ({ route }) => {
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
 
-  //const { item: refItem }: { item: IReference } = route.params;
-
-  const { state, actions } = useAppStore();
-  const refItem = useMemo(() =>
-    state.references?.remains as IRemains,
-    [state.references?.remains]);
-
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
-
-  const { contactId } = useMemo(() => {
-    return ((state.forms?.remainsParams as unknown) || {}) as IRemainsParams;
-  }, [state.forms?.remainsParams]);
-
-  const contactName = useMemo(() => (state.references?.contacts?.data as IContact[])?.find(cont => cont.id === contactId).name, [state.references?.contacts?.data, contactId]);
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [appState.references?.contacts?.data]);
 
   useEffect(() => {
-    // console.log('params', route.params);
-    if (!refItem) {
+    if (appState.forms?.remainsParams) {
       return;
     }
-    console.log('RemainsViewScreen');
-
-    setFilteredList({
-      ...refItem,
-     // data: refItem?.data?.filter(rem => rem.contactId === 147074146)
-      //.map(rem => ({...goods.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
-      //.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+    appActions.setForm({
+      name: 'remainsParams',
+      contactId: 0,
     });
-  }, [refItem, searchQuery]);
+  }, [appActions, appState.forms?.remainsParams]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -144,7 +130,7 @@ const RemainsViewScreen = ({ route }) => {
         ) : (
           <View style={[localStyles.content, { backgroundColor: colors.card }]}>
             <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-              {contactName}
+              {appState.references?.contacts?.name}
             </SubTitle>
             <ItemSeparator />
             <View style={localStyles.flexDirectionRow}>
@@ -152,27 +138,13 @@ const RemainsViewScreen = ({ route }) => {
                 placeholder="Поиск"
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                style={
-                  filteredList && filteredList.type === 'weighedgoods'
-                    ? [localStyles.flexGrow, localStyles.searchBar]
-                    : localStyles.searchBar
-                }
+                style={localStyles.searchBar}
               />
-              {filteredList && filteredList.type === 'weighedgoods' ? (
-                <IconButton
-                  icon="barcode-scan"
-                  size={26}
-                  style={localStyles.iconSettings}
-                  onPress={() => setDoScanned(true)}
-                />
-              ) : undefined}
             </View>
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={filteredList?.data?.find(rem => rem.contactId === contactId)?.data?.map(rem =>
-                ({...goods?.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
-                .sort((a, b) => a.name < b.name ? -1 : 1)}
+              data={contacts}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
@@ -184,7 +156,7 @@ const RemainsViewScreen = ({ route }) => {
   );
 };
 
-export { RemainsViewScreen };
+export { RemainsContactsViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
@@ -219,11 +191,39 @@ const localStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+  price: {
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
   },
   title: {
     padding: 10,
+  },
+  picker: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    flexDirection: 'row',
+    flex: 1,
+  },
+  pickerText: {
+    alignSelf: 'center',
+    flexGrow: 1,
+    padding: 10,
+  },
+  pickerButton: {
+    alignSelf: 'center',
+    padding: 0,
+    textAlign: 'right',
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
   },
 });

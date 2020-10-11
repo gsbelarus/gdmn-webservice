@@ -101,7 +101,7 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const documentTypeName = useMemo(
     () => (state.references?.documenttypes?.data as IRefData[])?.find((i) => i.id === document?.head?.doctype)?.name,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-depscd
     [state.references?.contacts?.data, document?.head],
   );
 
