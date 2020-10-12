@@ -1,16 +1,14 @@
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
-import { IContact, IGood, IReference, IRem, IRemain, IRemains } from '../../../../../common/base';
+import { Text, Searchbar } from 'react-native-paper';
+
+import { IGood, IReference, IRem, IRemain } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
 interface IField {
   id: number;
@@ -33,9 +31,11 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
+          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
           <View style={localStyles.flexDirectionRow}>
-            <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price as number)} Остаток: {item.remains}</Text>
+            <Text>
+              Цена: {formatValue({ type: 'number', decimals: 2 }, item.price as number)} Остаток: {item.remains}
+            </Text>
           </View>
         </View>
       </View>
@@ -48,118 +48,67 @@ const RemainsViewScreen = ({ route }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRem[]>();
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [doScanned, setDoScanned] = useState(false);
 
   const { item: contactItem }: { item: IReference } = route.params;
 
   const { state } = useAppStore();
 
-  const remains = useMemo(() => state.references?.remains?.data as IRemain[], [state.references?.remains?.data]);
+  const remains = useMemo(
+    () => ((state.references?.remains?.data as unknown) as IRemain[])?.filter((itm) => itm.contactId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.references?.remains?.data],
+  );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
 
-  const contactId = useMemo(() => contactItem.id, [contactItem.id]);
-
-  const contactName = useMemo(() => (state.references?.contacts?.data as IContact[])?.find(cont => cont.id === contactId).name, [state.references?.contacts?.data, contactId]);
+  useEffect(() => {
+    console.log(contactItem);
+  }, [contactItem]);
 
   useEffect(() => {
     if (!remains) {
       return;
     }
+
     setFilteredList(
-      remains?.find(rem => rem.contactId === contactId)?.data?.map(rem =>
-        ({...goods?.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
-        .filter(i => (i.name ? i.name?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        .filter(i => (i.barcode ? i.barcode?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        .sort((a, b) => a.name < b.name ? -1 : 1)
+      remains
+        .map((rem) => ({ ...goods?.find((good) => good.id === rem.goodId), price: rem.price, remains: rem.q }))
+        .filter((i) => (i.name ? i.name?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .filter((i) => (i.barcode ? i.barcode?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .sort((a, b) => (a.name < b.name ? -1 : 1)),
     );
-  }, [remains, searchQuery, contactId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remains, searchQuery, goods, contactItem?.id]);
 
   const ref = React.useRef<FlatList<IField>>(null);
+
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
 
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
-
-  const handleBarCodeScanned = (data: string) => {
-    setScanned(true);
-    Alert.alert('Сохранить результат?', data, [
-      {
-        text: 'Да',
-        onPress: () => {
-          setDoScanned(false);
-          setSearchQuery(data);
-          setScanned(false);
-        },
-      },
-      {
-        text: 'Нет',
-        onPress: () => {
-          // setDoScanned(false);
-          // onChangeText(data);
-          setScanned(false);
-        },
-      },
-    ]);
-  };
-
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <>
-        {hasPermission === null ? (
-          <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-        ) : hasPermission === false ? (
-          <Text style={styles.title}>Нет доступа к камере</Text>
-        ) : undefined}
-        {doScanned ? (
-          <>
-            <BarCodeScanner
-              onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
-              style={StyleSheet.absoluteFillObject}
-            />
-            <Button
-              onPress={() => {
-                setScanned(false);
-                setDoScanned(false);
-              }}
-            >
-              Назад
-            </Button>
-          </>
-        ) : (
-          <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-            <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-              {contactName}
-            </SubTitle>
-            <ItemSeparator />
-            <View style={localStyles.flexDirectionRow}>
-              <Searchbar
-                placeholder="Поиск"
-                onChangeText={setSearchQuery}
-                value={searchQuery}
-                style={[localStyles.flexGrow, localStyles.searchBar]}
-              />
-            </View>
-            <ItemSeparator />
-            <FlatList
-              ref={ref}
-              data={filteredList}
-              keyExtractor={(_, i) => String(i)}
-              renderItem={renderItem}
-              ItemSeparatorComponent={ItemSeparator}
-            />
-          </View>
-        )}
-      </>
+      <View style={[localStyles.content, { backgroundColor: colors.card }]}>
+        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{contactItem?.name}</SubTitle>
+        <ItemSeparator />
+        <View style={localStyles.flexDirectionRow}>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={[localStyles.flexGrow, localStyles.searchBar]}
+          />
+        </View>
+        <ItemSeparator />
+        <FlatList
+          ref={ref}
+          data={filteredList}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -187,15 +136,10 @@ const localStyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
-  iconSettings: {
-    width: 36,
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-   // padding: 8,
-    marginRight: 4,
-    marginLeft: 4
+    marginHorizontal: 4,
   },
   name: {
     fontSize: 14,

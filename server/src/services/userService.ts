@@ -4,7 +4,13 @@ import { IUser } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
-const findByName = async (userName: string) => users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
+const findByName = async (userName: string) => {
+  const user = await users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
+  if (!user) {
+    throw new Error('пользователь с таким именем не найден');
+  }
+  return user;
+};
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
 

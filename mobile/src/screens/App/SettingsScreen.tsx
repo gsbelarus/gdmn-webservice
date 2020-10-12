@@ -161,9 +161,7 @@ const SettingsScreen = () => {
           isUpdated = true;
           // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
-        isUpdated
-          ? Alert.alert('Запрос обработан', 'Справочники обновлены', [{ text: 'Закрыть' }])
-          : Alert.alert('Запрос обработан', 'Обновлений нет', [{ text: 'Закрыть' }]);
+        Alert.alert('Запрос обработан', isUpdated ? 'Справочники обновлены' : 'Обновлений нет', [{ text: 'Закрыть' }]);
       } catch (err) {
         Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {
