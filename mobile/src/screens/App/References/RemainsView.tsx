@@ -1,13 +1,15 @@
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
-
-import { IReference } from '../../../../../common';
+import { IContact, IGood, IReference, IRem, IRemain, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { formatValue } from '../../../helpers/utils';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 interface IField {
@@ -32,33 +34,48 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
+          <View style={localStyles.flexDirectionRow}>
+            <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price as number)} Остаток: {item.remains}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
   );
 });
 
-const ViewReferenceScreen = ({ route }) => {
+const RemainsViewScreen = ({ route }) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IReference>();
+  const [filteredList, setFilteredList] = useState<IRem[]>();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
 
-  const { item: refItem }: { item: IReference } = route.params;
+  const { item: contactItem }: { item: IReference } = route.params;
+
+  const { state } = useAppStore();
+
+  const remains = useMemo(() => state.references?.remains?.data as IRemain[], [state.references?.remains?.data]);
+
+  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
+
+  const contactId = useMemo(() => contactItem.id, [contactItem.id]);
+
+  const contactName = useMemo(() => (state.references?.contacts?.data as IContact[])?.find(cont => cont.id === contactId).name, [state.references?.contacts?.data, contactId]);
 
   useEffect(() => {
-    // console.log('params', route.params);
-    if (!refItem) {
+    if (!remains) {
       return;
     }
-    setFilteredList({
-      ...refItem,
-      data: refItem?.data?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
-    });
-  }, [refItem, searchQuery]);
+    setFilteredList(
+      remains?.find(rem => rem.contactId === contactId)?.data?.map(rem =>
+        ({...goods?.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
+        .filter(i => (i.name ? i.name?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .filter(i => (i.barcode ? i.barcode?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .sort((a, b) => a.name < b.name ? -1 : 1)
+    );
+  }, [remains, searchQuery, contactId]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -121,7 +138,7 @@ const ViewReferenceScreen = ({ route }) => {
         ) : (
           <View style={[localStyles.content, { backgroundColor: colors.card }]}>
             <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-              {filteredList?.name}
+              {contactName}
             </SubTitle>
             <ItemSeparator />
             <View style={localStyles.flexDirectionRow}>
@@ -135,7 +152,7 @@ const ViewReferenceScreen = ({ route }) => {
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={filteredList?.data}
+              data={filteredList}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
@@ -147,7 +164,7 @@ const ViewReferenceScreen = ({ route }) => {
   );
 };
 
-export { ViewReferenceScreen };
+export { RemainsViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
@@ -176,7 +193,9 @@ const localStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+   // padding: 8,
+    marginRight: 4,
+    marginLeft: 4
   },
   name: {
     fontSize: 14,

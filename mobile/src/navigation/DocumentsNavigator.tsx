@@ -10,6 +10,7 @@ import {
   GoodListScreen,
   DocumentRequestScreen,
   FilterEditScreen,
+  RemainsListScreen,
 } from '../screens/App/Documents';
 import {
   ScanBarcodeScreen,
@@ -23,8 +24,9 @@ export type DocumentStackParamList = {
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  DocumentLineEdit: { docId: number; prodId: number; lineId: number };
+  DocumentLineEdit: { docId: number; prodId: number; lineId: number, price: number, remains: number };
   GoodList: { docId: number };
+  RemainsList: { docId: number };
   DocumentRequest: undefined;
   SelectItem: {
     formName: string;
@@ -68,6 +70,7 @@ const DocumentsNavigator = () => {
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
       <Stack.Screen key="GoodList" name="GoodList" component={GoodListScreen} options={{ title: '' }} />
+      <Stack.Screen key="RemainsList" name="RemainsList" component={RemainsListScreen} options={{ title: '' }} />
       <Stack.Screen
         key="DocumentLineEdit"
         name="DocumentLineEdit"

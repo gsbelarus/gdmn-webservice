@@ -1,13 +1,14 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
-
-import { IReference } from '../../../../../common';
+import { Text, Searchbar, Button } from 'react-native-paper';
+import { IContact, IRefData } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 interface IField {
@@ -16,6 +17,8 @@ interface IField {
   [fieldName: string]: unknown;
 }
 
+//type Props = StackScreenProps<ReferencesStackParamList, 'RemainsView'>;
+
 const LineItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -23,7 +26,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
+        navigation.navigate('RemainsView', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -38,27 +41,36 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   );
 });
 
-const ViewReferenceScreen = ({ route }) => {
+const RemainsContactListViewScreen = () => {
   const { colors } = useTheme();
 
+  const { state: appState, actions: appActions } = useAppStore();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IReference>();
+  const [filteredList, setFilteredList] = useState<IRefData[]>();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
 
-  const { item: refItem }: { item: IReference } = route.params;
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [appState.references?.contacts?.data]);
 
   useEffect(() => {
-    // console.log('params', route.params);
-    if (!refItem) {
+    if (appState.forms?.remainsParams) {
       return;
     }
-    setFilteredList({
-      ...refItem,
-      data: refItem?.data?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+    appActions.setForm({
+      name: 'remainsParams',
+      contactId: 0,
     });
-  }, [refItem, searchQuery]);
+  }, [appActions, appState.forms?.remainsParams]);
+
+
+  useEffect(() => {
+    if (!contacts) {
+      return;
+    }
+    setFilteredList(contacts?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)));
+  }, [contacts, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -121,7 +133,7 @@ const ViewReferenceScreen = ({ route }) => {
         ) : (
           <View style={[localStyles.content, { backgroundColor: colors.card }]}>
             <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-              {filteredList?.name}
+              {appState.references?.contacts?.name}
             </SubTitle>
             <ItemSeparator />
             <View style={localStyles.flexDirectionRow}>
@@ -135,7 +147,7 @@ const ViewReferenceScreen = ({ route }) => {
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={filteredList?.data}
+              data={filteredList}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
@@ -147,7 +159,7 @@ const ViewReferenceScreen = ({ route }) => {
   );
 };
 
-export { ViewReferenceScreen };
+export { RemainsContactListViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
@@ -182,11 +194,39 @@ const localStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+  price: {
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
   },
   title: {
     padding: 10,
+  },
+  picker: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    flexDirection: 'row',
+    flex: 1,
+  },
+  pickerText: {
+    alignSelf: 'center',
+    flexGrow: 1,
+    padding: 10,
+  },
+  pickerButton: {
+    alignSelf: 'center',
+    padding: 0,
+    textAlign: 'right',
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
   },
 });

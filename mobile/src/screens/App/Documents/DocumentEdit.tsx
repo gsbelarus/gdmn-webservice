@@ -67,7 +67,7 @@ const DocumentEditScreen = ({ route }: Props) => {
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
-  const listDocumentType = useMemo(() => getListItems(docTypes), [docTypes]);
+  const listDocumentType = useMemo(() => getListItems(docTypes as IRefData[]), [docTypes]);
 
   const checkDocument = useCallback(() => {
     const res = date && docnumber && tocontactId && fromcontactId && doctype;

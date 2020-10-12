@@ -98,6 +98,7 @@ const SettingsScreen = () => {
                 case 'documenttypes':
                 case 'contacts':
                 case 'goodgroups':
+                case 'remains':
                 case 'goods': {
                   // TODO: преобразовывать json данные в модель данных
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

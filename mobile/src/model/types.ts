@@ -1,5 +1,5 @@
 import { IDocument, IBaseUrl, IReference } from '../../../common';
-import { IForm } from '../../../common/base';
+import { IForm, IRemains } from '../../../common/base';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
@@ -35,6 +35,10 @@ export interface IDocumentParams {
   fromcontactId?: number;
   doctype?: number;
   docnumber?: string;
+}
+
+export interface IRemainsParams {
+  contactId?: number;
 }
 
 export interface IFilterParams {
@@ -84,7 +88,7 @@ export interface IAppSettings {
 }
 
 export interface IReferences {
-  [name: string]: IReference;
+  [name: string]: IReference | IRemains;
 }
 
 export interface IAppState {
