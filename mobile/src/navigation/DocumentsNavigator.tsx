@@ -21,10 +21,10 @@ import {
 
 export type DocumentStackParamList = {
   DocumentList: undefined;
-  /*DocumentEdit: { docId: number };
+  DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  DocumentLineEdit: { docId: number; prodId: number; lineId: number, price: number, remains: number };
+  DocumentLineEdit: { docId: number; prodId: number; lineId: number; price: number; remains: number };
   GoodList: { docId: number };
   RemainsList: { docId: number };
   DocumentRequest: undefined;
@@ -47,14 +47,20 @@ export type DocumentStackParamList = {
   };
   ScanBarcode2: {
     docId: number;
-  };*/
+  };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
 
 const DocumentsNavigator = () => {
-{/*return (
-    <Stack.Navigator initialRouteName="DocumentView">
+  return (
+    <Stack.Navigator initialRouteName="DocumentList">
+      <Stack.Screen
+        key="DocumentList"
+        name="DocumentList"
+        component={DocumentListScreen}
+        options={{ title: '', animationTypeForReplace: 'pop' }}
+      />
       <Stack.Screen
         key="DocumentView"
         name="DocumentView"
@@ -82,17 +88,6 @@ const DocumentsNavigator = () => {
       <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
       <Stack.Screen key="ScanBarCodeScreen" name="ScanBarcode" component={ScanBarcodeScreen} />
       <Stack.Screen key="ScanBarCodeScreen2" name="ScanBarcode2" component={ScanBarcodeScreen2} />
-    </Stack.Navigator>
-);*/}
-
-  return (
-    <Stack.Navigator initialRouteName="DocumentList">
-      <Stack.Screen
-        key="DocumentList"
-        name="DocumentList"
-        component={DocumentListScreen}
-        options={{ title: '', animationTypeForReplace: 'pop' }}
-      />
     </Stack.Navigator>
   );
 };

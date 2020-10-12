@@ -3,7 +3,6 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { DocumentListScreen } from '../screens/App/Documents';
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
