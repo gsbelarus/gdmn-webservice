@@ -1,7 +1,7 @@
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { InitialState, NavigationContainerRef, NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import React from 'react';
-import { Platform, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import {
   Provider as PaperProvider,
   DefaultTheme as PaperLightTheme,
@@ -43,7 +43,7 @@ const App = () => {
       <ServiceStoreProvider>
         <AuthStoreProvider>
           <PaperProvider theme={paperTheme}>
-            {Platform.OS === 'ios' && <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />}
+            <StatusBar barStyle={theme.dark ? 'dark-content' : 'light-content'} />
             <NavigationContainer
               ref={containerRef}
               initialState={initialState}

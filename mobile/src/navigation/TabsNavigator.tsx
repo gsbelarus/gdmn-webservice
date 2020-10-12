@@ -3,12 +3,12 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import DocumentsNavigator from './DocumentsNavigator';
+import { DocumentListScreen } from '../screens/App/Documents';
 import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {
-  Documents: undefined;
+  DocumentList: undefined;
   References: undefined;
   Settings: undefined;
   SellDocuments: undefined;
@@ -20,8 +20,8 @@ const TabsNavigator = () => {
   return (
     <TabsStack.Navigator barStyle={styles.tabBar}>
       <TabsStack.Screen
-        name="Documents"
-        component={DocumentsNavigator}
+        name="DocumentList"
+        component={DocumentListScreen}
         options={{
           title: 'Документы',
           tabBarLabel: 'Документы',

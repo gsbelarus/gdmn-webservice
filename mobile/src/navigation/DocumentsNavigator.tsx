@@ -14,7 +14,7 @@ import {
 import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
 
 export type DocumentStackParamList = {
-  DocumentList: undefined;
+  //DocumentList: undefined;
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
@@ -44,13 +44,7 @@ const Stack = createStackNavigator<DocumentStackParamList>();
 
 const DocumentsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="DocumentList">
-      <Stack.Screen
-        key="DocumentList"
-        name="DocumentList"
-        component={DocumentListScreen}
-        options={{ title: 'Документы' }}
-      />
+    <Stack.Navigator initialRouteName="DocumentView">
       <Stack.Screen
         key="DocumentView"
         name="DocumentView"
