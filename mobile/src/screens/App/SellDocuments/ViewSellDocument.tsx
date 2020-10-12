@@ -297,23 +297,33 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ]}
         >
           {document?.head?.status === 0 && (
-            <>
+            <View style={localStyles.buttons}>
               <FAB
-                style={localStyles.fabScan}
+                style={localStyles.fab}
                 icon="barcode-scan"
                 onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document.id, weighedGood: true })}
               />
               <FAB
-                style={localStyles.fabAddW}
+                style={localStyles.fab}
                 icon="barcode"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document.id, weighedGood: true })}
               />
               <FAB
-                style={localStyles.fabAdd}
+                style={localStyles.fab}
                 icon="plus"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
               />
-            </>
+              <FAB
+                style={localStyles.fab}
+                icon="check"
+                onPress={() =>
+                  actions.editStatusDocument({
+                    id: docId,
+                    status: document?.head?.status + 1,
+                  })
+                }
+              />
+            </View>
           )}
         </View>
       </View>
@@ -345,8 +355,11 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttons: {
-    alignItems: 'center',
-    margin: 10,
+    flex: 1,
+    flexDirection: 'row',
+    position: 'relative',
+    justifyContent: 'space-evenly',
+    margin: 15,
   },
   container: {
     padding: 0,
@@ -361,26 +374,8 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
   },
-  fabAdd: {
+  fab: {
     backgroundColor: Colors.blue600,
-    bottom: 65,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
-  },
-  fabAddW: {
-    backgroundColor: Colors.blue600,
-    bottom: 65,
-    margin: 20,
-    position: 'absolute',
-    right: 75,
-  },
-  fabScan: {
-    backgroundColor: Colors.blue600,
-    bottom: 65,
-    left: 0,
-    margin: 20,
-    position: 'absolute',
   },
   flexDirectionRow: {
     flexDirection: 'row',
@@ -417,9 +412,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
-  },
-  marginRight: {
-    marginRight: 15,
   },
   productBarcodeView: {
     fontSize: 12,
