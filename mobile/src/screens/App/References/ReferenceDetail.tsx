@@ -14,7 +14,6 @@ interface IEntity {
 
 const LineItem = React.memo(({ item }: { item: [string, string] }) => {
   const { colors } = useTheme();
-
   return (
     <View style={[localStyles.item, { backgroundColor: colors.card }]}>
       <View style={localStyles.details}>
@@ -37,13 +36,14 @@ const ReferenceDetailScreen = ({ route }) => {
 
   const renderItem = ({ item }: { item: [string, string] }) => <LineItem item={item} />;
 
+
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{itm.name}</SubTitle>
       <ItemSeparator />
       <FlatList
         ref={ref}
-        data={fields.filter((i) => !['id', 'name', 'price', 'remains'].includes(i[0]))}
+        data={fields.filter((i) => !['id', 'name'].includes(i[0]))}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

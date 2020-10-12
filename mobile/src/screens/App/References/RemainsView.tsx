@@ -8,6 +8,7 @@ import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
 import { IContact, IGood, IReference, IRem, IRemain, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { formatValue } from '../../../helpers/utils';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -34,7 +35,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
           <View style={localStyles.flexDirectionRow}>
-            <Text>Цена: {(item.price as number).toFixed(2)} Остаток: {item.remains}</Text>
+            <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price as number)} Остаток: {item.remains}</Text>
           </View>
         </View>
       </View>
@@ -53,7 +54,7 @@ const RemainsViewScreen = ({ route }) => {
 
   const { item: contactItem }: { item: IReference } = route.params;
 
-  const { state, actions } = useAppStore();
+  const { state } = useAppStore();
 
   const remains = useMemo(() => state.references?.remains?.data as IRemain[], [state.references?.remains?.data]);
 
@@ -192,7 +193,9 @@ const localStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+   // padding: 8,
+    marginRight: 4,
+    marginLeft: 4
   },
   name: {
     fontSize: 14,
