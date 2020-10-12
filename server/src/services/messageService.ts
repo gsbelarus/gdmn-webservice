@@ -18,10 +18,7 @@ const findAll = async () => {
  * */
 const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
   return (await messages.read()).filter(
-    i =>
-      i.head.appSystem === appSystem &&
-      i.head.companyid === companyId &&
-      (i.head.consumer === userId || i.head.consumer === 'gdmn'),
+    i => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
   );
 };
 

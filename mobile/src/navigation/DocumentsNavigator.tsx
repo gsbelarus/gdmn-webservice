@@ -10,16 +10,23 @@ import {
   GoodListScreen,
   DocumentRequestScreen,
   FilterEditScreen,
+  RemainsListScreen,
 } from '../screens/App/Documents';
-import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
+import {
+  ScanBarcodeScreen,
+  ScanBarcodeScreen2,
+  SelectDateScreen,
+  SelectItemScreen,
+} from '../screens/App/Documents/components/';
 
 export type DocumentStackParamList = {
   //DocumentList: undefined;
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  DocumentLineEdit: { docId: number; prodId: number; lineId: number };
+  DocumentLineEdit: { docId: number; prodId: number; lineId: number, price: number, remains: number };
   GoodList: { docId: number };
+  RemainsList: { docId: number };
   DocumentRequest: undefined;
   SelectItem: {
     formName: string;
@@ -38,6 +45,9 @@ export type DocumentStackParamList = {
   ScanBarcode: {
     docId: number;
   };
+  ScanBarcode2: {
+    docId: number;
+  };
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -54,6 +64,7 @@ const DocumentsNavigator = () => {
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
       <Stack.Screen key="GoodList" name="GoodList" component={GoodListScreen} options={{ title: '' }} />
+      <Stack.Screen key="RemainsList" name="RemainsList" component={RemainsListScreen} options={{ title: '' }} />
       <Stack.Screen
         key="DocumentLineEdit"
         name="DocumentLineEdit"
@@ -70,6 +81,7 @@ const DocumentsNavigator = () => {
       <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
       <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
       <Stack.Screen key="ScanBarCodeScreen" name="ScanBarcode" component={ScanBarcodeScreen} />
+      <Stack.Screen key="ScanBarCodeScreen2" name="ScanBarcode2" component={ScanBarcodeScreen2} />
     </Stack.Navigator>
   );
 };

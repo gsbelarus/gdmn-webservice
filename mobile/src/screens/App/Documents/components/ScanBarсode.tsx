@@ -1,10 +1,9 @@
-import { useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 

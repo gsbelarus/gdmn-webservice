@@ -14,7 +14,6 @@ interface IEntity {
 
 const LineItem = React.memo(({ item }: { item: [string, string] }) => {
   const { colors } = useTheme();
-
   return (
     <View style={[localStyles.item, { backgroundColor: colors.card }]}>
       <View style={localStyles.details}>
@@ -36,6 +35,7 @@ const ReferenceDetailScreen = ({ route }) => {
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: [string, string] }) => <LineItem item={item} />;
+
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

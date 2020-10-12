@@ -4,9 +4,8 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button, Avatar } from 'react-native-paper';
-import { callbackify } from 'util';
 
-import { ILine, IReference, IGood, IContact } from '../../../../../common';
+import { ILine, IReference, IGood, IContact, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -33,6 +32,11 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfo}>
+        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
+          {item.price}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
@@ -95,8 +99,8 @@ const DocumentViewScreen = ({ route }: Props) => {
   }, [document]);
 
   const documentTypeName = useMemo(
-    () => state.references?.documenttypes?.data?.find((i) => i.id === document?.head?.doctype)?.name,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => (state.references?.documenttypes?.data as IRefData[])?.find((i) => i.id === document?.head?.doctype)?.name,
+    // eslint-disable-next-line react-hooks/exhaustive-depscd
     [state.references?.contacts?.data, document?.head],
   );
 
@@ -104,9 +108,9 @@ const DocumentViewScreen = ({ route }: Props) => {
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const contact = useMemo(
-    () => contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId),
+    () => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [contacts, document.head?.tocontactId],
+    [contacts, document.head?.fromcontactId],
   );
 
   const totalQuantity = useMemo(() => {
@@ -152,7 +156,7 @@ const DocumentViewScreen = ({ route }: Props) => {
           style={localStyles.listContainer}
           disabled={!isEditable}
           onPress={() => {
-            navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
+            navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true, price: item.price, remains: item.remains });
           }}
         >
           <ContentItem item={item} isEditable={isEditable} />
@@ -171,6 +175,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         </View>
         <View style={[localStyles.header, { borderColor: colors.border }]}>
           <Text>Наименование ТМЦ</Text>
+          <Text>Цена</Text>
           <Text>Кол-во</Text>
         </View>
         <FlatList
@@ -182,21 +187,21 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-          <Text style={localStyles.fontWeightBold}>Общее кол-во:</Text>
+          <Text style={localStyles.fontWeightBold}>Общее количество:</Text>
           <Text style={localStyles.fontWeightBold}>{totalQuantity}</Text>
         </View>
       </View>
       {isEditable && (
         <>
-          {/* <FAB
-                style={localStyles.fabScan}
-                icon="barcode-scan"
-                onPress={() => navigation.navigate('ScanBarCode', { docId: document.id })}
-              /> */}
+          <FAB
+            style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
+            icon="barcode-scan"
+            onPress={() => navigation.navigate('ScanBarcode2', { docId: document.id })}
+          />
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="plus"
-            onPress={() => navigation.navigate('GoodList', { docId: document.id })}
+            onPress={() => navigation.navigate('RemainsList', { docId: document.id })}
           />
         </>
       )}
@@ -234,14 +239,13 @@ const localStyles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  /*
-    fabScan: {
+  fabScan: {
     backgroundColor: Colors.blue600,
     bottom: 35,
     left: 0,
     margin: 20,
     position: 'absolute',
-  }, */
+  },
   flexDirectionRow: {
     flexDirection: 'row',
   },

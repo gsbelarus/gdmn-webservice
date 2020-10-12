@@ -24,7 +24,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
 
   switch (action.type) {
     case ActionAppTypes.ADD_DOCUMENT: {
-      return { ...state, documents: [...state.documents, action.payload] };
+      return { ...state, documents: [...(state.documents || []), action.payload] };
     }
     case ActionAppTypes.UPDATE_DOCUMENT_HEAD: {
       return {
@@ -33,18 +33,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
           doc.id === action.payload.id ? { ...doc, head: action.payload.head } : doc,
         ),
       };
-      // const idx = state.documents.findIndex((document) => document.id === action.payload.id);
-      // return {
-      //   ...state,
-      //   documents: [
-      //     ...state.documents.slice(0, idx),
-      //     {
-      //       ...state.documents.find((document) => document.id === action.payload.id),
-      //       head: action.payload.head,
-      //     },
-      //     ...state.documents.slice(idx + 1),
-      //   ],
-      // };
     }
     case ActionAppTypes.UPDATE_DOCUMENT_STATUS: {
       return {
@@ -53,22 +41,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
           doc.id === action.payload.id ? { ...doc, head: { ...doc.head, status: action.payload.status } } : doc,
         ),
       };
-      // const idx = state.documents.findIndex((document) => document.id === action.payload.id);
-      // const document = state.documents[idx];
-      // return {
-      //   ...state,
-      //   documents: [
-      //     ...state.documents.slice(0, idx),
-      //     {
-      //       ...document,
-      //       head: {
-      //         ...document?.head,
-      //         status: action.payload.status,
-      //       },
-      //     },
-      //     ...state.documents.slice(idx + 1),
-      //   ],
-      // };
     }
     case ActionAppTypes.DELETE_DOCUMENT:
       return {
@@ -91,27 +63,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
             : doc,
         ),
       };
-
-      /*   const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-      const document = state.documents[idx];
-      const docLine = document.lines;
-      const id =
-        docLine
-          .map((item: { id: unknown }) => Number(item.id))
-          .reduce((lineId: number, currLineId: number) => {
-            return lineId > currLineId ? lineId : currLineId;
-          }, -1) + 1;
-      return {
-        ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            lines: [...document.lines, { ...action.payload.line, id: id.toString() }],
-          },
-          ...state.documents.slice(idx + 1),
-        ],
-      }; */
     }
     case ActionAppTypes.DOCUMENT_DELETE_LINE: {
       return {
@@ -126,21 +77,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         ),
       };
     }
-
-    /* const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-    const document = state.documents[idx];
-    return {
-      ...state,
-      documents: [
-        ...state.documents.slice(0, idx),
-        {
-          ...document,
-          lines: document.lines.filter((line) => line.id !== action.payload.lineId),
-        },
-        ...state.documents.slice(idx + 1),
-      ],
-    };
-  } */
     case ActionAppTypes.DOCUMENT_UPDATE_LINE: {
       return {
         ...state,
@@ -153,31 +89,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
             : doc,
         ),
       };
-      /*       const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-      const document = state.documents[idx];
-      const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
-      return {
-        ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            lines: [
-              ...document.lines.slice(0, idxl),
-              {
-                ...action.payload.line,
-              },
-              ...document.lines.slice(idxl + 1),
-            ],
-          },
-          ...state.documents.slice(idx + 1),
-        ],
-      }; */
     }
     case ActionAppTypes.SET_SETTINGS:
       return { ...state, settings: action.payload };
-    // case ActionAppTypes.SET_DOCUMENTTYPES:
-    //   return { ...state, references: {...state.references, documentTypes: { action.payload }}}
     case ActionAppTypes.SET_DOCUMENTS:
       return { ...state, documents: action.payload };
     case ActionAppTypes.SET_REFERENCES:
@@ -193,33 +107,6 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.CLEAR_FORM: {
       return { ...state, forms: { ...state.forms, [action.payload]: undefined } };
     }
-    /*  case ActionAppTypes.SET_REMAINS:
-      return { ...state, remains: action.payload }
-    case ActionAppTypes.SET_CONTACTS:
-      return { ...state, contacts: action.payload }
-    case ActionAppTypes.SET_GOODS:
-      return { ...state, goods: action.payload }
-    case ActionAppTypes.SET_SETTINGS_SEARCH: {
-      return { ...state, filterParams: action.payload }
-    }
-    case ActionAppTypes.SET_FORM_PARAMS: {
-      return { ...state, formParams: { ...state.formParams, ...action.payload } }
-    }
-    case ActionAppTypes.CLEAR_FORM_PARAMS: {
-      return { ...state, formParams: undefined };
-    }
-    case ActionAppTypes.SET_PRODUCT_PARAMS: {
-      return { ...state, productParams: { ...state.productParams, ...action.payload } };
-    }
-    case ActionAppTypes.CLEAR_PRODUCT_PARAMS: {
-      return { ...state, productParams: undefined };
-    }
-    case ActionAppTypes.SET_DOCUMENT_PARAMS: {
-      return { ...state, documentParams: { ...state.documentParams, ...action.payload } };
-    }
-    case ActionAppTypes.CLEAR_DOCUMENT_PARAMS: {
-      return { ...state, documentParams: undefined };
-    } */
     default:
       return state;
   }

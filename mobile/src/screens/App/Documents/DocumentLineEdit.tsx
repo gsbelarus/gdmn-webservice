@@ -2,10 +2,11 @@ import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/n
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo } from 'react';
 import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { TextInput, Text, Colors } from 'react-native-paper';
 
 import { IDocument, IGood, ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
+import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -17,7 +18,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const { docId, lineId, prodId } = route.params;
+  const { docId, lineId, prodId, price, remains } = route.params;
 
   const [document, setDocument] = useState<IDocument>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
@@ -47,11 +48,13 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
       quantity: docLine?.quantity || 1,
+      price: docLine?.price || price,
+      remains: docLine?.remains || remains
     });
 
     setDocument(state.documents.find((item) => item.id === docId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.documents, prodId, document?.lines, lineId, docId]);
+  }, [state.documents, prodId, document?.lines, lineId, docId, price, remains]);
 
   /*   useEffect(() => {
     if (route.params.weighedGood) {
@@ -167,13 +170,35 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         <View
           style={[
             styles.container,
-            localeStyles.container,
+            localStyles.container,
             {
               backgroundColor: colors.card,
             },
           ]}
         >
-          <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
+          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
+            <View style={localStyles.item}>
+              <Text style={localStyles.label}>
+                Цена
+              </Text>
+              <View>
+                <Text style={localStyles.text}>
+                  {line?.price ?? 0}
+                </Text>
+              </View>
+            </View>
+            <ItemSeparator />
+            <View style={localStyles.item}>
+              <Text style={localStyles.label}>
+                Остаток
+              </Text>
+              <View>
+                <Text style={localStyles.text}>
+                  {line?.remains ?? 0}
+                </Text>
+              </View>
+            </View>
+          <ItemSeparator />
           <TextInput
             mode={'flat'}
             label={'Количество'}
@@ -206,12 +231,33 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
 export { DocumentLineEditScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     padding: 0,
   },
   title: {
     padding: 10,
+  },
+    remainsInfo: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+  },
+  label: {
+    color: Colors.blue600,
+    fontSize: 12,
+  },
+  text: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  // containerItems: {
+  // //  marginHorizontal: 8,
+  //   marginVertical: 8,
+  // },
+  item: {
+    marginHorizontal: 8,
+    marginVertical: 8,
   },
 });

@@ -11,7 +11,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
-  const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
+  const user = await users.find(i => i.userName.toUpperCase() === String(userName).toUpperCase());
 
   if (!user) {
     throw new Error(`пользователь не найден`);
