@@ -11,11 +11,11 @@ export default {
     useMockup: false,
   },
   system: [{
-    name: "SellDocuments",
-    component: "SellDocumentsNavigator",
+    name: "tradeAgentDocuments",
+    component: "DocumentsNavigator",
     options: {
-      title: 'Отвес-накладные',
-      tabBarLabel: 'Отвесы',
+      title: 'Заявки',
+      tabBarLabel: 'Заявки',
       tabBarIcon: 'file-document-box',
       tabBarColor: '#CEE7E3',
     }
