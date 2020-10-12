@@ -190,7 +190,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <View style={localStyles.flexDirectionRow}>
         <Searchbar
-          placeholder="Поиск по номеру"
+          placeholder="Поиск по организации"
           onChangeText={setSearchText}
           value={searchText}
           style={[localStyles.flexGrow, localStyles.searchBar]}
@@ -236,9 +236,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
 export { SellDocumentsListScreen };
 
 const localStyles = StyleSheet.create({
-  alignItems: {
-    alignItems: 'flex-end',
-  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -246,14 +243,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  button: {
-    alignItems: 'center',
-    margin: 10,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   company: {
     fontSize: 12,

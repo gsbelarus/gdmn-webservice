@@ -14,7 +14,7 @@ export const initialState: IAppState = {
   documentTypes: undefined,
   boxings: undefined,
   boxingsLine: undefined,
-  settingsSearch: ['number'],
+  settingsSearch: ['toContact'],
   weighedGoods: undefined,
 };
 
