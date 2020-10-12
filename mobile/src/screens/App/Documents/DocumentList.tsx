@@ -157,15 +157,7 @@ const DocumentListScreen = ({ navigation }) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      /* headerLeft: () => (
-        <IconButton
-          icon="file-document-box-plus-outline"
-          size={26}
-          onPress={() => {
-            navigation.navigate('DocumentEdit');
-          }}
-        />
-      ), */
+      headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
       headerRight: () => (
         <IconButton
           icon="menu"

@@ -91,3 +91,35 @@ export const getNextDocLineId = (document: IDocument) => {
 export const getNextDocId = (documents: IDocument[]) => {
   return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1;
 };
+
+export type NumberFormat = 'currency' | 'number' | 'percentage';
+
+interface INumberFormat {
+  type: NumberFormat;
+  decimals: number;
+}
+
+export const formatValue = (format: NumberFormat | INumberFormat, value: number | string) => {
+  const type = typeof format === 'string' ? format : format.type;
+  const decimals = typeof format === 'string' ? 2 : format.decimals;
+
+  const transform = function (org: number, n: number, x: number, s: string, c: string) {
+    const re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : 'р') + ')',
+      num = org.toFixed(Math.max(0, Math.floor(n)));
+
+    return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
+  };
+
+  value = typeof value === 'string' ? parseFloat(value) : value;
+
+  switch (type) {
+    case 'currency':
+      return `${transform(value, decimals, 3, ' ', ',')} р.`;
+    case 'number':
+      return `${transform(value, decimals, 3, ' ', ',')}`;
+    case 'percentage':
+      return `${transform(value, decimals, 3, ' ', ',')} %`;
+    default:
+      return value;
+  }
+};

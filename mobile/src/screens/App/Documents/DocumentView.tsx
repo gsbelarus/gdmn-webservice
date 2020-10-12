@@ -4,7 +4,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button, Avatar } from 'react-native-paper';
-import { callbackify } from 'util';
 
 import { ILine, IReference, IGood, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -182,14 +181,14 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-          <Text style={localStyles.fontWeightBold}>Общее кол-во:</Text>
+          <Text style={localStyles.fontWeightBold}>Общее количество:</Text>
           <Text style={localStyles.fontWeightBold}>{totalQuantity}</Text>
         </View>
       </View>
       {isEditable && (
         <>
           <FAB
-            style={localStyles.fabScan}
+            style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
             icon="barcode-scan"
             onPress={() => navigation.navigate('ScanBarcode2', { docId: document.id })}
           />

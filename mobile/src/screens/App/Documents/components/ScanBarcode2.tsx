@@ -112,13 +112,24 @@ const ScanBarcodeScreen2 = () => {
           <View style={localStyles.scannerContainer}>
             <View style={localStyles.buttonsContainer}>
               <TouchableOpacity
-                style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}
+                style={[localStyles.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
                 <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
                 <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
+            {scanned && !good && (
+              <View style={localStyles.infoContainer}>
+                <View style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}>
+                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
+                  <View>
+                    <Text style={localStyles.text}>{barcode}</Text>
+                    <Text style={localStyles.text}>{'Товар не найден'}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
             {scanned && good && (
               <View style={localStyles.buttonsContainer}>
                 <TouchableOpacity
@@ -126,25 +137,21 @@ const ScanBarcodeScreen2 = () => {
                   onPress={() => navigation.goBack()}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <Text style={localStyles.text}>Выбрать</Text>
+                  {/* <Text style={localStyles.text}>Выбрать</Text> */}
+                  <Text style={localStyles.text}>{good?.name}</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         )}
-        <View style={localStyles.footer}>
-          {!scanned ? (
+        {!scanned && (
+          <View style={localStyles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
               <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
             </>
-          ) : (
-            <>
-              <Text style={localStyles.text}>{`Штрихкод: ${barcode || ''}`}</Text>
-              <Text style={localStyles.text}>{`Товар: ${good?.name || 'не найден'}`}</Text>
-            </>
-          )}
-        </View>
+          </View>
+        )}
       </Camera>
     </View>
   );
@@ -180,7 +187,6 @@ const localStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    // paddingHorizontal: 15,
   },
   buttonsContainer: {
     height: 100,
@@ -207,6 +213,11 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingTop: 30,
+  },
+  infoContainer: {
+    height: 100,
+    padding: 10,
+    // justifyContent: 'center',
   },
   scannerContainer: {
     flex: 1,
