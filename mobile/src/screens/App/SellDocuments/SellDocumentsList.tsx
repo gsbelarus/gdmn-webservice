@@ -51,14 +51,12 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
               {status ? status.name : ''}
             </Text>
           </View>
+          <Text style={[localStyles.name, { color: colors.text }]}>{toContact ? toContact.name : ''}</Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             Подразделение: {fromContact ? fromContact.name : ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             Экспедитор: {expeditor ? expeditor.name : ''}
-          </Text>
-          <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {toContact ? toContact.name : ''}
           </Text>
         </View>
       </View>
@@ -243,10 +241,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  company: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   details: {
     margin: 8,
