@@ -189,14 +189,6 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <FAB
-        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
-        icon="sync"
-        onPress={() => {
-          sendUpdateRequest();
-          // sendSubscribe();
-        }}
-      />
     </View>
   );
 };
@@ -217,12 +209,6 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
-  },
-  fabSync: {
-    bottom: 0,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
   },
   fieldDesciption: {
     opacity: 0.5,
