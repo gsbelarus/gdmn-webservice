@@ -10,7 +10,12 @@ import {
   DocumentRequestScreen,
   FilterEditScreen,
 } from '../screens/App/Documents';
-import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components';
+import {
+  SelectDateScreen,
+  SelectItemScreen,
+  ScanBarcodeScreen,
+  ScanBarcodeScreen2,
+} from '../screens/App/Documents/components';
 import { AppStoreProvider } from '../store';
 //import DocumentsNavigator from './DocumentsNavigator';
 import TabsNavigator from './TabsNavigator';
@@ -39,6 +44,9 @@ export type RootStackParamList = {
     value: string;
   };
   ScanBarcode: {
+    docId: number;
+  };
+  ScanBarcode2: {
     docId: number;
   };
 };
@@ -84,6 +92,7 @@ const AppNavigator = () => {
         <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
         <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
         <Stack.Screen key="ScanBarCodeScreen" name="ScanBarcode" component={ScanBarcodeScreen} />
+        <Stack.Screen key="ScanBarCodeScreen2" name="ScanBarcode2" component={ScanBarcodeScreen2} />
       </Stack.Navigator>
     </AppStoreProvider>
   );

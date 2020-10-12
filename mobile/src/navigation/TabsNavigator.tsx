@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { DocumentListScreen } from '../screens/App/Documents';
+import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
@@ -21,7 +22,7 @@ const TabsNavigator = () => {
     <TabsStack.Navigator barStyle={styles.tabBar}>
       <TabsStack.Screen
         name="DocumentList"
-        component={DocumentListScreen}
+        component={DocumentsNavigator}
         options={{
           title: 'Документы',
           tabBarLabel: 'Документы',
