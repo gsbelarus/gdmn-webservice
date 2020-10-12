@@ -27,7 +27,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference | IRemains }) => 
     <TouchableOpacity
       onPress={() => {
         item.type === 'remains'
-        ? navigation.navigate('Remains', { item })
+        ? navigation.navigate('RemainsContactList', { item })
         : navigation.navigate('Reference', { item });
       }}
     >

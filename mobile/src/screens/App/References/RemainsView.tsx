@@ -5,10 +5,9 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Text, Searchbar, Button, IconButton } from 'react-native-paper';
-import { IContact, IGood, IRemains } from '../../../../../common/base';
+import { IContact, IGood, IReference, IRem, IRemain, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { IRemainsParams } from '../../../model/types';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -35,8 +34,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
           <View style={localStyles.flexDirectionRow}>
-            <Text>Цена: {item.price}</Text>
-            <Text>  Остаток: {item.remains}</Text>
+            <Text>Цена: {(item.price as number).toFixed(2)} Остаток: {item.remains}</Text>
           </View>
         </View>
       </View>
@@ -48,40 +46,35 @@ const RemainsViewScreen = ({ route }) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IRemains>();
+  const [filteredList, setFilteredList] = useState<IRem[]>();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
 
-  //const { item: refItem }: { item: IReference } = route.params;
+  const { item: contactItem }: { item: IReference } = route.params;
 
   const { state, actions } = useAppStore();
-  const refItem = useMemo(() =>
-    state.references?.remains as IRemains,
-    [state.references?.remains]);
+
+  const remains = useMemo(() => state.references?.remains?.data as IRemain[], [state.references?.remains?.data]);
 
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
 
-  const { contactId } = useMemo(() => {
-    return ((state.forms?.remainsParams as unknown) || {}) as IRemainsParams;
-  }, [state.forms?.remainsParams]);
+  const contactId = useMemo(() => contactItem.id, [contactItem.id]);
 
   const contactName = useMemo(() => (state.references?.contacts?.data as IContact[])?.find(cont => cont.id === contactId).name, [state.references?.contacts?.data, contactId]);
 
   useEffect(() => {
-    // console.log('params', route.params);
-    if (!refItem) {
+    if (!remains) {
       return;
     }
-    console.log('RemainsViewScreen');
-
-    setFilteredList({
-      ...refItem,
-     // data: refItem?.data?.filter(rem => rem.contactId === 147074146)
-      //.map(rem => ({...goods.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
-      //.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
-    });
-  }, [refItem, searchQuery]);
+    setFilteredList(
+      remains?.find(rem => rem.contactId === contactId)?.data?.map(rem =>
+        ({...goods?.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
+        .filter(i => (i.name ? i.name?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .filter(i => (i.barcode ? i.barcode?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        .sort((a, b) => a.name < b.name ? -1 : 1)
+    );
+  }, [remains, searchQuery, contactId]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -152,27 +145,13 @@ const RemainsViewScreen = ({ route }) => {
                 placeholder="Поиск"
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                style={
-                  filteredList && filteredList.type === 'weighedgoods'
-                    ? [localStyles.flexGrow, localStyles.searchBar]
-                    : localStyles.searchBar
-                }
+                style={[localStyles.flexGrow, localStyles.searchBar]}
               />
-              {filteredList && filteredList.type === 'weighedgoods' ? (
-                <IconButton
-                  icon="barcode-scan"
-                  size={26}
-                  style={localStyles.iconSettings}
-                  onPress={() => setDoScanned(true)}
-                />
-              ) : undefined}
             </View>
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={filteredList?.data?.find(rem => rem.contactId === contactId)?.data?.map(rem =>
-                ({...goods?.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q}))
-                .sort((a, b) => a.name < b.name ? -1 : 1)}
+              data={filteredList}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}

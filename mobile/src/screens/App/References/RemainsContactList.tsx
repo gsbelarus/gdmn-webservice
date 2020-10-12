@@ -5,7 +5,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Text, Searchbar, Button } from 'react-native-paper';
-import { IContact, IRemains } from '../../../../../common/base';
+import { IContact, IRefData } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { useAppStore } from '../../../store';
@@ -22,15 +22,10 @@ interface IField {
 const LineItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { state: appState, actions: appActions } = useAppStore();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        appActions.setForm({
-         ...appState.forms?.remainsParams,
-          contactId: item.id
-        });
         navigation.navigate('RemainsView', { item });
       }}
     >
@@ -46,13 +41,13 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   );
 });
 
-const RemainsContactsViewScreen = () => {
+const RemainsContactListViewScreen = () => {
   const { colors } = useTheme();
 
   const { state: appState, actions: appActions } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IRemains>();
+  const [filteredList, setFilteredList] = useState<IRefData[]>();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
@@ -68,6 +63,14 @@ const RemainsContactsViewScreen = () => {
       contactId: 0,
     });
   }, [appActions, appState.forms?.remainsParams]);
+
+
+  useEffect(() => {
+    if (!contacts) {
+      return;
+    }
+    setFilteredList(contacts?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)));
+  }, [contacts, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -138,13 +141,13 @@ const RemainsContactsViewScreen = () => {
                 placeholder="Поиск"
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                style={localStyles.searchBar}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
               />
             </View>
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={contacts}
+              data={filteredList}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}
@@ -156,7 +159,7 @@ const RemainsContactsViewScreen = () => {
   );
 };
 
-export { RemainsContactsViewScreen };
+export { RemainsContactListViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {

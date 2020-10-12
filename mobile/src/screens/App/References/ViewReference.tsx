@@ -129,34 +129,13 @@ const ViewReferenceScreen = ({ route }) => {
                 placeholder="Поиск"
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                style={
-                  filteredList && filteredList.type === 'weighedgoods'
-                    ? [localStyles.flexGrow, localStyles.searchBar]
-                    : localStyles.searchBar
-                }
+                style={[localStyles.flexGrow, localStyles.searchBar]}
               />
-              {filteredList && filteredList.type === 'weighedgoods' ? (
-                <IconButton
-                  icon="barcode-scan"
-                  size={26}
-                  style={localStyles.iconSettings}
-                  onPress={() => setDoScanned(true)}
-                />
-              ) : undefined}
             </View>
             <ItemSeparator />
             <FlatList
               ref={ref}
-              data={
-                filteredList && filteredList.type === 'weighedgoods'
-                  ? filteredList?.data?.filter((item) =>
-                      searchQuery.length >= 12 && searchQuery.length <= 13 && !Number.isNaN(searchQuery)
-                        ? item.id.toString().includes(Number(searchQuery).toString().slice(0, -1)) ||
-                          item.id.toString().includes(Number(searchQuery).toString())
-                        : item.id.toString().includes(Number(searchQuery).toString()),
-                    )
-                  : filteredList?.data
-              }
+              data={filteredList?.data}
               keyExtractor={(_, i) => String(i)}
               renderItem={renderItem}
               ItemSeparatorComponent={ItemSeparator}

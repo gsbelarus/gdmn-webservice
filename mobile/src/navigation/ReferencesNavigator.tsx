@@ -1,13 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { ReferenceDetailScreen, ViewReferenceScreen, ReferenceListScreen, RemainsContactsViewScreen, RemainsViewScreen } from '../screens/App/References';
+import { ReferenceDetailScreen, ViewReferenceScreen, ReferenceListScreen, RemainsContactListViewScreen, RemainsViewScreen } from '../screens/App/References';
 
 type ReferenceStackParamList = {
   ReferenceList: undefined;
   Reference: { docId: number };
   ReferenceDetail: undefined;
-  Remains: undefined;
+  RemainsContactList: undefined;
   RemainsContactsView: undefined;
   RemainsView: undefined;
 };
@@ -31,7 +31,7 @@ const ReferencesNavigator = () => {
         options={{ title: '' }}
       />
       <Stack.Screen key="RemainsView" name="RemainsView" options={{ title: 'Остатки ТМЦ' }} component={RemainsViewScreen}/>
-      <Stack.Screen key="Remains" name="Remains" component={RemainsContactsViewScreen} options={{ title: 'Остатки ТМЦ' }} />
+      <Stack.Screen key="RemainsContactList" name="RemainsContactList" component={RemainsContactListViewScreen} options={{ title: 'Справочники' }} />
     </Stack.Navigator>
   );
 };

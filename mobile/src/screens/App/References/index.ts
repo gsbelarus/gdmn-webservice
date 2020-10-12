@@ -1,5 +1,5 @@
 export { ReferenceDetailScreen } from './ReferenceDetail';
 export { ReferenceListScreen } from './ReferenceList';
 export { ViewReferenceScreen } from './ViewReference';
-export { RemainsContactsViewScreen } from './RemainsContacts';
+export { RemainsContactListViewScreen } from './RemainsContactList';
 export { RemainsViewScreen } from './RemainsView';
