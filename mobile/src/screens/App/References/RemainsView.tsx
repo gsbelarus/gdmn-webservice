@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IGood, IReference, IRem, IRemain } from '../../../../../common/base';
+import { IGood, IReference, IRem, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
@@ -54,7 +54,9 @@ const RemainsViewScreen = ({ route }) => {
   const { state } = useAppStore();
 
   const remains = useMemo(
-    () => ((state.references?.remains?.data as unknown) as IRemain[])?.filter((itm) => itm.contactId),
+    () =>
+      ((state.references?.remains?.data as unknown) as IRemains[])?.find((itm) => itm.contactId === contactItem?.id)
+        ?.data,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.references?.remains?.data],
   );
