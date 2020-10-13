@@ -1,11 +1,11 @@
 import { Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
-import { IGood } from '../../../../../common';
+import { IGood, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -75,6 +75,26 @@ const GoodListScreen = () => {
   const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
   const { state } = useAppStore();
+  const [filteredList, setFilteredList] = useState<IRefData[]>();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
+
+  useEffect(() => {
+    // if (!goods) {
+    //   return;
+    // }
+
+    setFilteredList(
+      goods
+        ?.filter(
+          (item) =>
+            item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
+            item.name?.toLowerCase().includes(text.toLowerCase()),
+        )
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
+    );
+  }, [goods, text]);
 
   const ref = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(ref);
@@ -181,11 +201,7 @@ const GoodListScreen = () => {
           </View> */}
           <FlatList
             ref={ref}
-            data={((state.references?.goods?.data as unknown) as IGood[]).filter(
-              (item) =>
-                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                item.name.toLowerCase().includes(text.toLowerCase()),
-            )}
+            data={filteredList}
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItem}
             ItemSeparatorComponent={ItemSeparator}

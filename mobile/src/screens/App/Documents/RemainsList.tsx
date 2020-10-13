@@ -83,7 +83,7 @@ const RemainsListScreen = ({ route }: Props) => {
     () =>
       ((state.references?.remains?.data as unknown) as IRemains[])?.find(
         (rem) => rem.contactId === document?.head?.fromcontactId,
-      )?.data,
+      )?.data || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.references?.remains?.data],
   );
@@ -91,13 +91,17 @@ const RemainsListScreen = ({ route }: Props) => {
   //список остатков + поля из справочника тмц
   const goodRemains = useMemo(
     () =>
-      remains.map((item) => ({ ...goods.find((good) => good.id === item.goodId), price: item.price, remains: item.q })),
+      remains?.map((item) => ({
+        ...goods.find((good) => good.id === item.goodId),
+        price: item.price,
+        remains: item.q,
+      })),
     [goods, remains],
   );
 
   useEffect(() => {
     setList(
-      goodRemains.filter(
+      goodRemains?.filter(
         (item) =>
           item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
           item.name?.toLowerCase().includes(text.toLowerCase()),
