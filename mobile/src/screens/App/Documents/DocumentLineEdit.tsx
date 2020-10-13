@@ -181,7 +181,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           <View style={localStyles.item}>
             <Text style={localStyles.label}>Цена</Text>
             <View>
-              <Text style={localStyles.text}>{formatValue({type: 'number', decimals: 2}, line?.price ?? 0)}</Text>
+              <Text style={localStyles.text}>{formatValue({ type: 'number', decimals: 2 }, line?.price ?? 0)}</Text>
             </View>
           </View>
           <ItemSeparator />

@@ -69,10 +69,10 @@ const createStoreContext = () => {
         await appStorage.setItem(`${storagePath}/${sections.SETTINGS}`, state.settings);
       };
 
-      if (state.references && storagePath && !isLoading) {
+      if (state.settings && storagePath && !isLoading) {
         saveSettings();
       }
-    }, [state.references, storagePath]);
+    }, [state.settings, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {

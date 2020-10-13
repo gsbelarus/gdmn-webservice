@@ -6,7 +6,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
-import { IGood, IReference, IRemain } from '../../../../../common';
+import { IGood } from '../../../../../common';
+import { IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
@@ -18,7 +19,7 @@ interface IField extends IGood {
   price?: number;
 }
 
-const RemainItem = React.memo(({ item }: { item: IField }) => {
+const RemainsItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -42,7 +43,9 @@ const RemainItem = React.memo(({ item }: { item: IField }) => {
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <View style={localStyles.flexDirectionRow}>
-          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price ?? 0)}  Остаток: {item.remains}</Text>
+          <Text>
+            Цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} Остаток: {item.remains}
+          </Text>
         </View>
         <View style={localStyles.barcode}>
           {/* <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}333333</Text> */}
@@ -78,9 +81,9 @@ const RemainsListScreen = ({ route }: Props) => {
 
   const remains = useMemo(
     () =>
-      ((state.references?.remains?.data as unknown) as IRemain[])?.filter(
-        (item) => item.contactId === document?.head?.fromcontactId,
-      ),
+      ((state.references?.remains?.data as unknown) as IRemains[])?.find(
+        (rem) => rem.contactId === document?.head?.fromcontactId,
+      )?.data || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.references?.remains?.data],
   );
@@ -88,16 +91,20 @@ const RemainsListScreen = ({ route }: Props) => {
   //список остатков + поля из справочника тмц
   const goodRemains = useMemo(
     () =>
-      remains.map((item) => ({ ...goods.find((good) => good.id === item.goodId), price: item.price, remains: item.q })),
+      remains?.map((item) => ({
+        ...goods.find((good) => good.id === item.goodId),
+        price: item.price,
+        remains: item.q,
+      })),
     [goods, remains],
   );
 
   useEffect(() => {
     setList(
-      goodRemains.filter(
+      goodRemains?.filter(
         (item) =>
           item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
-          item.name.toLowerCase().includes(text.toLowerCase()),
+          item.name?.toLowerCase().includes(text.toLowerCase()),
       ),
     );
   }, [goodRemains, text]);
@@ -105,7 +112,7 @@ const RemainsListScreen = ({ route }: Props) => {
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IField }) => <RemainItem item={item} />;
+  const renderItem = ({ item }: { item: IField }) => <RemainsItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {

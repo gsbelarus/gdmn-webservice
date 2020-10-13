@@ -9,6 +9,7 @@ import { ILine, IReference, IGood, IContact, IRefData } from '../../../../../com
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
+import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -36,7 +37,7 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.price}
+          {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>

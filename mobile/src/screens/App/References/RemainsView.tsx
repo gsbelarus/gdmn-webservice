@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IGood, IReference, IRem, IRemain } from '../../../../../common/base';
+import { IGood, IReference, IRem, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
@@ -54,7 +54,9 @@ const RemainsViewScreen = ({ route }) => {
   const { state } = useAppStore();
 
   const remains = useMemo(
-    () => ((state.references?.remains?.data as unknown) as IRemain[])?.filter((itm) => itm.contactId),
+    () =>
+      ((state.references?.remains?.data as unknown) as IRemains[])?.find((itm) => itm.contactId === contactItem?.id)
+        ?.data || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.references?.remains?.data],
   );
@@ -63,20 +65,15 @@ const RemainsViewScreen = ({ route }) => {
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
 
   useEffect(() => {
-    console.log(contactItem);
-  }, [contactItem]);
-
-  useEffect(() => {
-    if (!remains) {
-      return;
-    }
-
     setFilteredList(
       remains
-        .map((rem) => ({ ...goods?.find((good) => good.id === rem.goodId), price: rem.price, remains: rem.q }))
-        .filter((i) => (i.name ? i.name?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        .filter((i) => (i.barcode ? i.barcode?.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        .sort((a, b) => (a.name < b.name ? -1 : 1)),
+        ?.map((rem) => ({ ...goods?.find((good) => good.id === rem.goodId), price: rem.price, remains: rem.q }))
+        ?.filter(
+          (item) =>
+            item.barcode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remains, searchQuery, goods, contactItem?.id]);

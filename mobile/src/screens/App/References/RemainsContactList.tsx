@@ -40,7 +40,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
 const RemainsContactListViewScreen = () => {
   const { colors } = useTheme();
 
-  const { state: appState, actions: appActions } = useAppStore();
+  const { state: appState } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();
@@ -50,17 +50,6 @@ const RemainsContactListViewScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     appState.references?.contacts?.data,
   ]);
-
-  /*   useEffect(() => {
-    if (appState.forms?.remainsParams) {
-      return;
-    }
-    appActions.setForm({
-      name: 'remainsParams',
-      contactId: 0,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, appState.forms?.remainsParams]); */
 
   useEffect(() => {
     if (!contacts) {
