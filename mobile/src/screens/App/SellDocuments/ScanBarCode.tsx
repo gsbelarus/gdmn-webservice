@@ -22,6 +22,8 @@ const ScanBarCodeScreen = () => {
   const { state, actions } = useAppStore();
   const navigation = useNavigation();
 
+  const [document, setDocument] = useState<ISellDocument>(undefined);
+  const [error, setError] = useState<string>(undefined);
   const [barcode, setBarcode] = useState('');
   const [weighedGood, setWeighedGood] = useState<IWeighedGoods>(undefined);
   const [good, setGood] = useState<IGood>(undefined);
@@ -34,6 +36,10 @@ const ScanBarCodeScreen = () => {
     permission();
   }, []);
 
+  useEffect(() => {
+    setDocument(state.documents?.find((item) => item.id === route.params.docId) as ISellDocument);
+  }, [route.params.docId, state.documents]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -45,8 +51,15 @@ const ScanBarCodeScreen = () => {
     setBarcode(data);
   }, []);
 
+  useEffect(() => {
+    if (!scanned) {
+      setBarcode('');
+    }
+  }, [scanned]);
+
   const findGood = useCallback(() => {
     if (barcode === '' || Number.isNaN(barcode) || barcode.length < 12) {
+      setError('Неверный штрих-код');
       return;
     }
 
@@ -60,8 +73,9 @@ const ScanBarCodeScreen = () => {
       return findedFullCode;
     }
 
+    setError('Товар не найден');
     return undefined;
-  }, [state.weighedGoods, barcode]);
+  }, [barcode, state.weighedGoods]);
 
   useEffect(() => {
     if (!weighedGood) {
@@ -79,6 +93,17 @@ const ScanBarCodeScreen = () => {
       return;
     }
 
+    const done = document?.lines
+      ?.reduce((prev, curr) => {
+        return prev.concat(curr.barcodes ?? []);
+      }, [] as string[])
+      .find((item) => item === barcode);
+
+    if (done) {
+      setError('Ранее был считан');
+      return;
+    }
+
     const weighedGoodObj = findGood();
 
     setWeighedGood(weighedGoodObj);
@@ -89,8 +114,7 @@ const ScanBarCodeScreen = () => {
       return;
     }
 
-    const document = state.documents.find((item) => item.id === route.params.docId);
-    const editLine = (document as ISellDocument)?.lines.find(
+    const editLine = document?.lines?.find(
       (item) => item.numreceive === weighedGood.numreceive && item.goodId === weighedGood.goodkey,
     );
     if (editLine) {
@@ -99,6 +123,7 @@ const ScanBarCodeScreen = () => {
         line: {
           ...editLine,
           quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
+          barcodes: (editLine.barcodes ?? []).concat([barcode]),
         } as ISellLine,
       });
     } else {
@@ -115,11 +140,12 @@ const ScanBarCodeScreen = () => {
           quantity: good ? weighedGood.weight / good.itemWeight : 0,
           orderQuantity: 0,
           numreceive: weighedGood.numreceive,
+          barcodes: [barcode],
           //timework: weighedGood.timework,
         } as ISellLine,
       });
     }
-  }, [actions, good, route.params.docId, state.documents, weighedGood]);
+  }, [actions, barcode, good, route.params.docId, weighedGood]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -130,9 +156,9 @@ const ScanBarCodeScreen = () => {
       ) : undefined}
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        barCodeScannerSettings={{
+        /*barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
-        }}
+        }}*/
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
@@ -167,19 +193,22 @@ const ScanBarCodeScreen = () => {
             <View style={localStyles.buttonsContainer}>
               <TouchableOpacity
                 style={[localStyles.buttons, localStyles.backgroundColorYellow]}
-                onPress={() => setScanned(false)}
+                onPress={() => {
+                  setScanned(false);
+                  setError(undefined);
+                }}
               >
                 <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
                 <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {scanned && !good && (
+            {scanned && (!good || error) && (
               <View style={localStyles.infoContainer}>
                 <View style={[localStyles.buttons, localStyles.backgroundColorRed]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={localStyles.text}>{barcode}</Text>
-                    <Text style={localStyles.text}>{'Товар не найден'}</Text>
+                    <Text style={localStyles.text}>{error ?? 'Товар не найден'}</Text>
                   </View>
                 </View>
               </View>
