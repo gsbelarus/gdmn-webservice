@@ -8,6 +8,7 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 import { IGood } from '../../../../../common';
 import { IRem, IRemain, IRemainData, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -31,7 +32,7 @@ const RemainItem = React.memo(({ item }: { item: IRem }) => {
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <View style={localStyles.flexDirectionRow}>
-          <Text>Цена: {item.price}</Text>
+          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price)}</Text>
           <Text>  Остаток: {item.remains}</Text>
         </View>
         <View style={localStyles.barcode}>
