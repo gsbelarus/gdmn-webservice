@@ -14,6 +14,7 @@ import {
   SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
 import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
+//import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { AppStoreProvider } from '../store';
