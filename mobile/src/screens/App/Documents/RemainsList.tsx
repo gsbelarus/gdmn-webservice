@@ -97,7 +97,7 @@ const RemainsListScreen = ({ route }: Props) => {
       goodRemains.filter(
         (item) =>
           item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
-          item.name?.toLowerCase().includes(text.toLowerCase()),
+          item.name.toLowerCase().includes(text.toLowerCase()),
       ),
     );
   }, [goodRemains, text]);
