@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
-import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
+import { IResponse, IMessageInfo } from '../../../../../common';
+import { IDocumentType } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
@@ -101,15 +102,15 @@ const SellDocumentsListScreen = ({ navigation }) => {
             return appState.settingsSearch
               ? appState.settingsSearch.some((value) =>
                   value === 'number'
-                    ? item.head.docnumber?.includes(searchText)
+                    ? item.head.docnumber.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'state' && status
-                    ? status.name.includes(searchText)
+                    ? status.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'toContact' && toContact
-                    ? toContact.name.includes(searchText)
+                    ? toContact.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'fromContact' && fromContact
-                    ? fromContact.name.includes(searchText)
+                    ? fromContact.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'expeditor' && expeditor
-                    ? expeditor.name.includes(searchText)
+                    ? expeditor.name.toUpperCase().includes(searchText.toUpperCase())
                     : true,
                 )
               : true;
