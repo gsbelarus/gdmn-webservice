@@ -42,9 +42,9 @@ const CompaniesScreen = () => {
         TODO Если хотим сменить то происходит снова автоматический вход
       */
       // console.log(savedCompany, savedCompany);
-      !!savedCompany && companies.some((company) => company === savedCompany)
-        ? actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
-        : undefined;
+      !!savedCompany &&
+        companies.some((company) => company === savedCompany) &&
+        actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
     };
 
     if (userID !== null && companies) {

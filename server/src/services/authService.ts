@@ -37,9 +37,9 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
       throw new Error('неверный пользователь или пароль');
     }
 
-    await ctx.login(user);
+    // await ;
 
-    return user;
+    return ctx.login(user);
   })(ctx, next);
 };
 
@@ -70,7 +70,7 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await userService.findByName(userName);
 
-  // TODO: use password hash
+  // TODO: use password hash using bcryptjs
   if (!user || user.password !== password) {
     done(null, false);
   } else {

@@ -1,16 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { MaterialBottomTabNavigationProp } from '@react-navigation/material-bottom-tabs';
+import { useScrollToTop, useTheme, useNavigation, useRoute, CompositeNavigationProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
+import { Text, Searchbar, FAB, IconButton } from 'react-native-paper';
 
-import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } from '../../../../../common';
+import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
+import { TabsStackParams } from '../../../navigation/TabsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 // import { statusColors}
 
@@ -67,8 +72,9 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const DocumentListScreen = ({ navigation }) => {
+const DocumentListScreen = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 

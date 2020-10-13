@@ -4,31 +4,23 @@ import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, FAB } from 'react-native-paper';
 
-import {
-  IReference,
-  IMessageInfo,
-  IResponse,
-  IDataMessage,
-  IDocument,
-  IContact,
-  IGood,
-  IRemain,
-} from '../../../../../common';
-import { IRemains } from '../../../../../common/base';
+import { IReference, IMessageInfo, IResponse, IDataMessage, IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { timeout, isMessagesArray } from '../../../helpers/utils';
+import { timeout } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
-const ReferenceItem = React.memo(({ item }: { item: IReference | IRemains }) => {
+const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        item.type === 'remains'
-        ? navigation.navigate('RemainsContactList', { item })
-        : navigation.navigate('Reference', { item });
+        if (item.type === 'remains') {
+          navigation.navigate('RemainsContactList', { item });
+        } else {
+          navigation.navigate('Reference', { item });
+        }
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -47,22 +39,17 @@ const ReferenceItem = React.memo(({ item }: { item: IReference | IRemains }) => 
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
-  const { state: AppState, actions: appActions } = useAppStore();
+  const { state: AppState } = useAppStore();
   const { apiService } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
 
-  const references: (IReference | IRemains)[] = useMemo(() => {
-    console.log('Вызов окна ReferenceList');
+  const references: IReference[] = useMemo(() => {
     return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
   }, [AppState.references]);
 
-  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-  // references?. [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-  // [AppState.references?.documentTypes, AppState.references?.contacts, AppState.references?.goods],
-
-  const renderItem = ({ item }: { item: IReference | IRemains}) => <ReferenceItem item={item} />;
+  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
@@ -85,7 +72,7 @@ const ReferenceListScreen = () => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
-  const sendSubscribe = useCallback(async () => {
+  /*  const sendSubscribe = useCallback(async () => {
     try {
       const response = await apiService.data.subscribe(state.companyID);
       // console.log(response);
@@ -142,7 +129,7 @@ const ReferenceListScreen = () => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
-  }, [AppState.documents, apiService.data, appActions, state.companyID]);
+  }, [AppState.documents, apiService.data, appActions, state.companyID]); */
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

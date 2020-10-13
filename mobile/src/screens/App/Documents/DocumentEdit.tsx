@@ -122,7 +122,11 @@ const DocumentEditScreen = ({ route }: Props) => {
             appActions.clearForm('documentParams');
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
-            docId !== undefined ? navigation.navigate('DocumentView', { docId }) : navigation.navigate('DocumentList');
+            if (docId) {
+              navigation.navigate('DocumentView', { docId });
+            } else {
+              navigation.navigate('DocumentList');
+            }
           }}
         />
       ),
@@ -159,16 +163,18 @@ const DocumentEditScreen = ({ route }: Props) => {
     setStatusId(docObj?.head?.status || 0);
 
     // Инициализируем параметры
-    docId !== undefined
-      ? appActions.setForm({
-          name: 'documentParams',
-          id: docObj?.id,
-          ...(docObj?.head as IDocumentParams),
-        })
-      : appActions.setForm({
-          name: 'documentParams',
-          date,
-        });
+    if (docId) {
+      appActions.setForm({
+        name: 'documentParams',
+        id: docObj?.id,
+        ...(docObj?.head as IDocumentParams),
+      });
+    } else {
+      appActions.setForm({
+        name: 'documentParams',
+        date,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, docId]);
 

@@ -61,14 +61,21 @@ export interface IRem extends IGood {
   price?: number;
 }
 
-export interface IRemains {
+/* export interface IRemains {
   id: number;
   name: string;
   type: string;
   data: IRemain[];
-}
+} */
 
 export interface IRemain {
+  contactId: number;
+  goodId: number;
+  q?: number;
+  price?: number;
+}
+
+/* export interface IRemain {
   contactId: number;
   date: Date;
   data: IRemainData[];
@@ -78,7 +85,7 @@ export interface IRemainData {
   goodId: number;
   q?: number;
   price?: number;
-}
+} */
 
 export interface IDocumentStatus {
   id: number;

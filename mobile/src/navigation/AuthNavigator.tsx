@@ -152,7 +152,11 @@ const AuthNavigator = () => {
     };
 
     if (deviceRegistered !== undefined) {
-      deviceRegistered ? getUser() : authActions.setUserStatus({ userID: null, userName: undefined });
+      if (deviceRegistered) {
+        getUser();
+      } else {
+        authActions.setUserStatus({ userID: null, userName: undefined });
+      }
     }
   }, [authActions, apiService.auth, deviceRegistered]);
   // Вынести всё в store  - deviceRegistered
@@ -170,16 +174,24 @@ const AuthNavigator = () => {
       const response = await apiService.auth.getUserStatus();
       // authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
 
-      !!savedCompany &&
-      response.result &&
-      response.data?.companies &&
-      response.data.companies.some((company) => company === savedCompany)
-        ? authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
-        : authActions.setCompanyID({ companyId: null, companyName: undefined });
+      if (
+        !!savedCompany &&
+        response.result &&
+        response.data?.companies &&
+        response.data.companies.some((company) => company === savedCompany)
+      ) {
+        authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+      } else {
+        authActions.setCompanyID({ companyId: null, companyName: undefined });
+      }
     };
 
     if (userID !== undefined) {
-      userID ? getCompanyId() : authActions.setCompanyID({ companyId: null, companyName: '' });
+      if (userID) {
+        getCompanyId();
+      } else {
+        authActions.setCompanyID({ companyId: null, companyName: '' });
+      }
     }
   }, [apiService.auth, authActions, userID]);
 

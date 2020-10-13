@@ -8,12 +8,13 @@ import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood, IReference } from '../../../../../../common';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
 const ScanBarcodeScreen2 = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'ScanBarcode2'>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'ScanBarcode2'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   //фонарик: torch - включен, off - выключен
