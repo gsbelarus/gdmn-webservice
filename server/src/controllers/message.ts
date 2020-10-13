@@ -97,7 +97,15 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userId = ctx.state.user.id;
+    let userId = ctx.state.user.id;
+
+    const userName = (await userService.findOne(userId)).userName;
+
+    if (userName === 'gdmn') {
+      // TODO переделать
+      userId = 'gdmn';
+    }
+
     await messageService.deleteByUid({ companyId, uid, userId });
 
     const result: IResponse<void> = { result: true };

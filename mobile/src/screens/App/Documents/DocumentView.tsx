@@ -100,7 +100,7 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const documentTypeName = useMemo(
     () => (state.references?.documenttypes?.data as IRefData[])?.find((i) => i.id === document?.head?.doctype)?.name,
-    // eslint-disable-next-line react-hooks/exhaustive-depscd
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.references?.contacts?.data, document?.head],
   );
 
@@ -110,7 +110,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   const contact = useMemo(
     () => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [contacts, document.head?.fromcontactId],
+    [contacts, document?.head?.fromcontactId],
   );
 
   const totalQuantity = useMemo(() => {
@@ -156,7 +156,14 @@ const DocumentViewScreen = ({ route }: Props) => {
           style={localStyles.listContainer}
           disabled={!isEditable}
           onPress={() => {
-            navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true, price: item.price, remains: item.remains });
+            navigation.navigate('DocumentLineEdit', {
+              lineId: item.id,
+              prodId: item.goodId,
+              docId,
+              modeCor: true,
+              price: item.price,
+              remains: item.remains,
+            });
           }}
         >
           <ContentItem item={item} isEditable={isEditable} />

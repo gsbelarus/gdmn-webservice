@@ -1,19 +1,24 @@
 import { Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
-import { IGood } from '../../../../../common';
-import { IRem, IRemain, IRemainData, IRemains } from '../../../../../common/base';
+import { IGood, IReference, IRemain } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const RemainItem = React.memo(({ item }: { item: IRem }) => {
+interface IField extends IGood {
+  remains?: number;
+  price?: number;
+}
+
+const RemainItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -23,7 +28,12 @@ const RemainItem = React.memo(({ item }: { item: IRem }) => {
     <TouchableOpacity
       style={[localStyles.item, { backgroundColor: colors.card }]}
       onPress={() => {
-        navigation.navigate('DocumentLineEdit', { prodId: item.id, docId, modeCor: false, price: item.price, remains: item.remains });
+        navigation.navigate('DocumentLineEdit', {
+          prodId: item.id,
+          docId,
+          price: item.price,
+          remains: item.remains,
+        });
       }}
     >
       <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
@@ -32,27 +42,28 @@ const RemainItem = React.memo(({ item }: { item: IRem }) => {
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <View style={localStyles.flexDirectionRow}>
-          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price)}</Text>
-          <Text>  Остаток: {item.remains}</Text>
+          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price)}  Остаток: {item.remains}</Text>
         </View>
         <View style={localStyles.barcode}>
           {/* <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}333333</Text> */}
           <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
         </View>
       </View>
-
     </TouchableOpacity>
   );
 });
 
-const RemainsListScreen = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'RemainsList'>>();
+type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
+
+const RemainsListScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
   const { state } = useAppStore();
+
+  const [list, setList] = useState<IField[]>([]);
 
   //const docId = useRoute<RouteProp<DocumentStackParamList, 'RemainsList'>>().params?.docId;
   const docId = route.params?.docId;
@@ -62,17 +73,39 @@ const RemainsListScreen = () => {
     state.documents,
   ]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
 
-  const remains = useMemo(() => (state.references?.remains.data as IRemain[])?.find(rem => rem.contactId === document?.head?.fromcontactId).data as IRemainData[], [state.references?.remains?.data]);
+  const remains = useMemo(
+    () =>
+      ((state.references?.remains?.data as unknown) as IRemain[])?.filter(
+        (item) => item.contactId === document?.head?.fromcontactId,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.references?.remains?.data],
+  );
 
   //список остатков + поля из справочника тмц
-  const goodRemains = useMemo(() => remains.map(rem => ({...goods.find(good => good.id === rem.goodId), price: rem.price, remains: rem.q})), [goods, remains])
+  const goodRemains = useMemo(
+    () =>
+      remains.map((item) => ({ ...goods.find((good) => good.id === item.goodId), price: item.price, remains: item.q })),
+    [goods, remains],
+  );
 
-  const ref = React.useRef<FlatList<IRem>>(null);
+  useEffect(() => {
+    setList(
+      goodRemains.filter(
+        (item) =>
+          item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
+          item.name.toLowerCase().includes(text.toLowerCase()),
+      ),
+    );
+  }, [goodRemains, text]);
+
+  const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IRem }) => <RemainItem item={item} />;
+  const renderItem = ({ item }: { item: IField }) => <RemainItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
@@ -82,14 +115,14 @@ const RemainsListScreen = () => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = (data: string) => {
+  const handleBarCodeScanned = (barcodeData: string) => {
     setScanned(true);
-    Alert.alert('Сохранить результат?', data, [
+    Alert.alert('Сохранить результат?', barcodeData, [
       {
         text: 'Да',
         onPress: () => {
           setDoScanned(false);
-          onChangeText(data);
+          onChangeText(barcodeData);
           setScanned(false);
         },
       },
@@ -145,10 +178,7 @@ const RemainsListScreen = () => {
           <ItemSeparator />
           <FlatList
             ref={ref}
-            data={goodRemains.filter(item =>
-                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                item.name.toLowerCase().includes(text.toLowerCase()),
-            )}
+            data={list}
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItem}
             ItemSeparatorComponent={ItemSeparator}
@@ -170,6 +200,9 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
+  },
+  barcode: {
+    paddingRight: 0,
   },
   content: {
     height: '100%',
@@ -213,7 +246,4 @@ const localStyles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
   },
-  barcode: {
-    paddingRight: 0
-  }
 });

@@ -36,7 +36,6 @@ const ReferenceDetailScreen = ({ route }) => {
 
   const renderItem = ({ item }: { item: [string, string] }) => <LineItem item={item} />;
 
-
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{itm.name}</SubTitle>

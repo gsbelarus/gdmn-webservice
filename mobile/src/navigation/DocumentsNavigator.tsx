@@ -24,7 +24,7 @@ export type DocumentStackParamList = {
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  DocumentLineEdit: { docId: number; prodId: number; lineId: number, price: number, remains: number };
+  DocumentLineEdit: { docId: number; prodId: number; lineId: number; price: number; remains: number };
   GoodList: { docId: number };
   RemainsList: { docId: number };
   DocumentRequest: undefined;
@@ -59,7 +59,7 @@ const DocumentsNavigator = () => {
         key="DocumentList"
         name="DocumentList"
         component={DocumentListScreen}
-        options={{ title: 'Документы' }}
+        options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen
         key="DocumentView"

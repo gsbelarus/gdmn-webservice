@@ -8,7 +8,7 @@ import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {
-  Documents: undefined;
+  DocumentList: undefined;
   References: undefined;
   Settings: undefined;
   SellDocuments: undefined;
@@ -20,7 +20,7 @@ const TabsNavigator = () => {
   return (
     <TabsStack.Navigator barStyle={styles.tabBar}>
       <TabsStack.Screen
-        name="Documents"
+        name="DocumentList"
         component={DocumentsNavigator}
         options={{
           title: 'Документы',

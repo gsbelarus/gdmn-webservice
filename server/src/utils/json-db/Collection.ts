@@ -117,7 +117,7 @@ class Collection<T extends CollectionItem> {
 
   private _save(data: Array<T>): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(this.collectionPath, JSON.stringify(data), (err: unknown) => {
+      fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
         if (err) return reject(err);
         return resolve();
       });

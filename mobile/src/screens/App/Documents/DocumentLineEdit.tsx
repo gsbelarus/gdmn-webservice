@@ -49,7 +49,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       id: docLine?.id || 1,
       quantity: docLine?.quantity || 1,
       price: docLine?.price || price,
-      remains: docLine?.remains || remains
+      remains: docLine?.remains || remains,
     });
 
     setDocument(state.documents.find((item) => item.id === docId));
@@ -177,27 +177,19 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           ]}
         >
           <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
-            <View style={localStyles.item}>
-              <Text style={localStyles.label}>
-                Цена
-              </Text>
-              <View>
-                <Text style={localStyles.text}>
-                  {line?.price ?? 0}
-                </Text>
-              </View>
+          <View style={localStyles.item}>
+            <Text style={localStyles.label}>Цена</Text>
+            <View>
+              <Text style={localStyles.text}>{line?.price ?? 0}</Text>
             </View>
-            <ItemSeparator />
-            <View style={localStyles.item}>
-              <Text style={localStyles.label}>
-                Остаток
-              </Text>
-              <View>
-                <Text style={localStyles.text}>
-                  {line?.remains ?? 0}
-                </Text>
-              </View>
+          </View>
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <Text style={localStyles.label}>Остаток</Text>
+            <View>
+              <Text style={localStyles.text}>{line?.remains ?? 0}</Text>
             </View>
+          </View>
           <ItemSeparator />
           <TextInput
             mode={'flat'}
@@ -236,13 +228,9 @@ const localStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     padding: 0,
   },
-  title: {
-    padding: 10,
-  },
-    remainsInfo: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 40,
+  item: {
+    marginHorizontal: 8,
+    marginVertical: 8,
   },
   label: {
     color: Colors.blue600,
@@ -252,12 +240,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  // containerItems: {
-  // //  marginHorizontal: 8,
-  //   marginVertical: 8,
-  // },
-  item: {
-    marginHorizontal: 8,
-    marginVertical: 8,
+  title: {
+    padding: 10,
   },
 });

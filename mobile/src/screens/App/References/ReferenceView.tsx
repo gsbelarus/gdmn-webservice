@@ -1,13 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IContact, IRefData } from '../../../../../common/base';
+import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { useAppStore } from '../../../store';
 
 interface IField {
   id: number;
@@ -22,7 +21,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('RemainsView', { item });
+        navigation.navigate('ReferenceDetail', { item });
       }}
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
@@ -37,39 +36,24 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   );
 });
 
-const RemainsContactListViewScreen = () => {
+const ReferenceViewScreen = ({ route }) => {
   const { colors } = useTheme();
 
-  const { state: appState, actions: appActions } = useAppStore();
-
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IRefData[]>();
+  const [filteredList, setFilteredList] = useState<IReference>();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    appState.references?.contacts?.data,
-  ]);
-
-  /*   useEffect(() => {
-    if (appState.forms?.remainsParams) {
-      return;
-    }
-    appActions.setForm({
-      name: 'remainsParams',
-      contactId: 0,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, appState.forms?.remainsParams]); */
+  const { item: refItem }: { item: IReference } = route.params;
 
   useEffect(() => {
-    if (!contacts) {
+    // console.log('params', route.params);
+    if (!refItem) {
       return;
     }
-    setFilteredList(
-      contacts?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
-    );
-  }, [contacts, searchQuery]);
+    setFilteredList({
+      ...refItem,
+      data: refItem?.data?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+    });
+  }, [refItem, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -79,9 +63,7 @@ const RemainsContactListViewScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-          {appState.references?.contacts?.name}
-        </SubTitle>
+        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
         <ItemSeparator />
         <View style={localStyles.flexDirectionRow}>
           <Searchbar
@@ -94,7 +76,7 @@ const RemainsContactListViewScreen = () => {
         <ItemSeparator />
         <FlatList
           ref={ref}
-          data={filteredList}
+          data={filteredList?.data}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
@@ -104,7 +86,7 @@ const RemainsContactListViewScreen = () => {
   );
 };
 
-export { RemainsContactListViewScreen };
+export { ReferenceViewScreen };
 
 const localStyles = StyleSheet.create({
   avatar: {
