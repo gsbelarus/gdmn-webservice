@@ -34,7 +34,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
           <View style={localStyles.flexDirectionRow}>
             <Text>
-              Цена: {formatValue({ type: 'number', decimals: 2 }, item.price as number)} Остаток: {item.remains}
+              Цена: {formatValue({ type: 'number', decimals: 2 }, (item.price as number) ?? 0)} Остаток: {item.remains}
             </Text>
           </View>
         </View>

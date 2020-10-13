@@ -8,6 +8,7 @@ import { IDocument, IGood, ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -180,7 +181,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           <View style={localStyles.item}>
             <Text style={localStyles.label}>Цена</Text>
             <View>
-              <Text style={localStyles.text}>{line?.price ?? 0}</Text>
+              <Text style={localStyles.text}>{formatValue({type: 'number', decimals: 2}, line?.price ?? 0)}</Text>
             </View>
           </View>
           <ItemSeparator />

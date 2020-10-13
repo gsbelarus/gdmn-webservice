@@ -42,7 +42,7 @@ const RemainItem = React.memo(({ item }: { item: IField }) => {
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <View style={localStyles.flexDirectionRow}>
-          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price)}  Остаток: {item.remains}</Text>
+          <Text>Цена: {formatValue({type: 'number', decimals: 2}, item.price ?? 0)}  Остаток: {item.remains}</Text>
         </View>
         <View style={localStyles.barcode}>
           {/* <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}333333</Text> */}
@@ -97,7 +97,7 @@ const RemainsListScreen = ({ route }: Props) => {
       goodRemains.filter(
         (item) =>
           item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
-          item.name.toLowerCase().includes(text.toLowerCase()),
+          item.name?.toLowerCase().includes(text.toLowerCase()),
       ),
     );
   }, [goodRemains, text]);
