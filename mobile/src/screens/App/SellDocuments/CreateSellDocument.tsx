@@ -324,7 +324,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                     text: 'OK',
                     onPress: async () => {
                       appActions.deleteDocument(docId);
-                      navigation.navigate('DocumentList');
+                      navigation.navigate('SellDocumentsListScreen');
                     },
                   },
                   {
