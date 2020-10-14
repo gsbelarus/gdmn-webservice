@@ -61,4 +61,5 @@ export interface IDocumentParams {
   fromcontactId?: number;
   doctype?: number;
   docnumber?: string;
+  status?: number;
 }

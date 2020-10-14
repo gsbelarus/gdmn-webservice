@@ -202,6 +202,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
 
   return document ? (
@@ -382,11 +383,6 @@ const localStyles = StyleSheet.create({
   },
   fontWeightBold: {
     fontWeight: 'bold',
-  },
-  goDetailsHeader: {
-    flex: 1,
-    justifyContent: 'center',
-    marginRight: 15,
   },
   goodInfo: {
     flexBasis: '30%',

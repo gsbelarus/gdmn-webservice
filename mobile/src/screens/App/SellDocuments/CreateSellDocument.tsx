@@ -1,31 +1,54 @@
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Text, TextInput, Chip } from 'react-native-paper';
+import { Text, TextInput, Switch } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
+import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString } from '../../../helpers/utils';
+import { getDateString, getNextDocId } from '../../../helpers/utils';
 import { IListItem } from '../../../model';
-import { IDocumentParams } from '../../../model/sell';
+import { IDocumentParams, ISellDocument } from '../../../model/sell';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
 type Props = StackScreenProps<RootStackParamList, 'CreateSellDocument'>;
 
 const CreateSellDocumentScreen = ({ route }: Props) => {
-  const today = new Date();
+  const [selectedDocType, setSelectedDocType] = useState<number>();
+  const [selectedContact, setSelectedContact] = useState<number>();
+  const { state: appState, actions: appActions } = useAppStore();
+  const [statusId, setStatusId] = useState(0);
+  const docId = route.params?.docId;
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { state: appState, actions: appActions } = useAppStore();
+
+  const {
+    date = new Date().toISOString().slice(0, 10),
+    docnumber,
+    tocontactId,
+    fromcontactId,
+    expeditorId,
+    doctype,
+    status = 0,
+  } = useMemo(() => {
+    return ((appState.formParams as unknown) || {}) as IDocumentParams;
+  }, [appState.formParams]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
-    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
+
+  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
+
+  const statusName = useMemo(
+    () =>
+      docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа',
+    [docId, isBlocked],
+  );
 
   const getListItems = (contacts: IContact[]) =>
     contacts.map((item) => {
@@ -39,77 +62,64 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   const departments: IContact[] = appState.contacts.filter((item) => item.type === '4');
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
+  const docTypes = useMemo(() => getListItems(appState.documentTypes ?? []), [appState.documentTypes]);
+
   const checkDocument = useCallback(() => {
-    const res =
-      (appState.formParams as IDocumentParams)?.date &&
-      (appState.formParams as IDocumentParams)?.docnumber &&
-      (appState.formParams as IDocumentParams)?.expeditorId &&
-      (appState.formParams as IDocumentParams)?.tocontactId &&
-      (appState.formParams as IDocumentParams)?.fromcontactId &&
-      (appState.formParams as IDocumentParams)?.doctype;
+    const res = date && docnumber && tocontactId && fromcontactId && doctype;
 
     if (!res) {
       Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
     }
+
     return res;
-  }, [appState.formParams]);
+  }, [date, docnumber, doctype, fromcontactId, tocontactId]);
 
   const updateDocument = useCallback(() => {
     appActions.editDocument({
-      id: route.params?.docId,
+      id: docId,
       head: {
-        doctype: (appState.formParams as IDocumentParams)?.doctype,
-        fromcontactId: (appState.formParams as IDocumentParams)?.fromcontactId,
-        tocontactId: (appState.formParams as IDocumentParams)?.tocontactId,
-        date: (appState.formParams as IDocumentParams)?.date,
-        status: 0,
-        docnumber: (appState.formParams as IDocumentParams)?.docnumber,
-        expeditorId: (appState.formParams as IDocumentParams)?.expeditorId,
+        doctype,
+        fromcontactId,
+        tocontactId,
+        date,
+        expeditorId,
+        status,
+        docnumber,
       },
     });
-    return route.params?.docId;
-  }, [appActions, route.params?.docId, appState.formParams]);
+    return docId;
+  }, [appActions, docId, doctype, fromcontactId, tocontactId, date, expeditorId, status, docnumber]);
 
   const addDocument = useCallback(() => {
-    const id =
-      appState.documents
-        .map((item) => item.id)
-        .reduce((newId, currId) => {
-          return newId > currId ? newId : currId;
-        }, 0) + 1;
+    const id = getNextDocId(appState.documents as ISellDocument[]);
 
     appActions.newDocument({
       id,
       head: {
-        doctype: (appState.formParams as IDocumentParams)?.doctype,
-        fromcontactId: (appState.formParams as IDocumentParams)?.fromcontactId[0],
-        tocontactId: (appState.formParams as IDocumentParams)?.tocontactId[0],
-        date: (appState.formParams as IDocumentParams)?.date,
-        status: 0,
-        docnumber: (appState.formParams as IDocumentParams)?.docnumber,
-        expeditorId: (appState.formParams as IDocumentParams)?.expeditorId[0],
+        doctype,
+        fromcontactId,
+        tocontactId,
+        expeditorId,
+        date,
+        status,
+        docnumber,
       },
       lines: [],
     });
     return id;
-  }, [appActions, appState.formParams, appState.documents]);
+  }, [appActions, appState.documents, date, docnumber, doctype, expeditorId, fromcontactId, status, tocontactId]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
       headerLeft: () => (
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.clearFormParams();
-            if (!route.params) {
-              navigation.navigate('SellDocumentsListScreen');
-              return;
-            }
-            const { docId } = route.params;
-            // При нажатии 'отмена' если редактирование документа
-            // то возвращаемся к документу, иначе к списку документов
-            docId ? navigation.navigate('ViewSellDocument', { docId }) : navigation.navigate('SellDocumentsListScreen');
+            // eslint-disable-next-line @babel/no-unused-expressions
+            docId !== undefined
+              ? navigation.navigate('ViewSellDocument', { docId })
+              : navigation.navigate('SellDocumentsListScreen');
           }}
         />
       ),
@@ -121,7 +131,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
               return;
             }
 
-            const id = route.params?.docId ? updateDocument() : addDocument();
+            const id = docId !== undefined ? updateDocument() : addDocument();
 
             if (!id) {
               return;
@@ -133,292 +143,259 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [addDocument, appActions, navigation, route.params, checkDocument, updateDocument]);
+  }, [
+    addDocument,
+    appActions,
+    checkDocument,
+    date,
+    docId,
+    navigation,
+    selectedContact,
+    selectedDocType,
+    updateDocument,
+  ]);
 
   useEffect(() => {
-    if (!appState.formParams && !route.params?.docId) {
-      // Инициализируем параметры
-      appActions.setFormParams({
-        date: today.toISOString().slice(0, 10),
-      });
+    if (route.params?.docId !== undefined) {
+      const documet = appState.documents.find((item) => item.id === route.params.docId);
+      setSelectedDocType(documet.head?.doctype);
+      setSelectedContact(documet.head?.fromcontactId);
     }
-  }, [appActions, appState.formParams, route.params?.docId, today]);
+  }, [appState.documents, route.params]);
 
   useEffect(() => {
-    if (!route.params) {
+    if (appState.formParams) {
       return;
     }
 
-    route.params.docId && !appState.formParams
-      ? appActions.setFormParams(appState.documents.find((i) => i.id === route.params.docId).head)
-      : appActions.setFormParams(route.params as IDocumentParams);
+    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as ISellDocument);
+
+    setStatusId(docObj?.head?.status || 0);
+
+    // Инициализируем параметры
+    if (docId) {
+      appActions.setFormParams({
+        ...(docObj?.head as IDocumentParams),
+      });
+    } else {
+      appActions.setFormParams({
+        date,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route.params, appActions, appState.documents]);
+  }, [appActions, docId]);
 
   const ReferenceItem = useCallback(
-    (props: { value: string; onPress: () => void; color?: string }) => {
+    (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
       return (
-        <TouchableOpacity {...props}>
-          <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-            <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
-            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
-          </View>
+        <TouchableOpacity
+          {...item}
+          onPress={item.disabled ? null : item.onPress}
+          style={[localeStyles.picker, { borderColor: colors.border }]}
+        >
+          <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+          {!item.disabled && (
+            <MaterialCommunityIcons
+              style={localeStyles.pickerButton}
+              name="menu-right"
+              size={30}
+              color={colors.primary}
+            />
+          )}
         </TouchableOpacity>
       );
     },
-    [colors.border, colors.text],
+    [colors.border, colors.primary, colors.text],
   );
 
   return (
-    <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
-        {route.params?.docId ? 'Редактирование Документа' : 'Создание документа'}
-      </SubTitle>
-      <ScrollView>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-          <Text style={localeStyles.subdivisionText}>Дата документа: </Text>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
-            <TouchableOpacity
-              style={localeStyles.containerDate}
+    <>
+      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
+      <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
+        <ScrollView>
+          {(statusId === 0 || statusId === 1) && (
+            <>
+              <View style={localeStyles.fieldContainer}>
+                <Text>Черновик:</Text>
+                <Switch
+                  value={status === 0}
+                  disabled={docId === undefined}
+                  onValueChange={() => {
+                    appActions.setFormParams({ ...appState.formParams, status: status === 0 ? 1 : 0 });
+                  }}
+                />
+              </View>
+              <ItemSeparator />
+            </>
+          )}
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Номер:</Text>
+            <TextInput
+              editable={!isBlocked}
+              style={[localeStyles.input, { borderColor: colors.border }]}
+              onChangeText={(text) => appActions.setFormParams({ ...appState.formParams, docnumber: text.trim() })}
+              value={docnumber || ' '}
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Дата: </Text>
+            <ReferenceItem
+              value={getDateString(date || new Date().toISOString())}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'CreateSellDocument',
                   fieldName: 'date',
-                  title: 'Дата документа:',
-                  value: (appState.formParams as IDocumentParams)?.date,
+                  title: 'Дата документа',
+                  value: date,
                 })
               }
-            >
-              <Text style={[localeStyles.textDate, { color: colors.text }]}>
-                {getDateString((appState.formParams as IDocumentParams)?.date || today.toISOString())}
-              </Text>
-              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
-            </TouchableOpacity>
+            />
           </View>
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localeStyles.subdivisionText}>Номер документа: </Text>
-          <TextInput
-            style={[
-              styles.input,
-              localeStyles.textNumberInput,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-              },
-            ]}
-            onChangeText={(text) => appActions.setFormParams({ docnumber: text.trim() })}
-            value={(appState.formParams as IDocumentParams)?.docnumber || ' '}
-            placeholder="Введите номер"
-            placeholderTextColor={colors.border}
-            multiline={false}
-            autoCapitalize="sentences"
-            underlineColorAndroid="transparent"
-            selectionColor={'black'}
-            returnKeyType="done"
-            autoCorrect={false}
-          />
-        </View>
-        <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
-          <ReferenceItem
-            value={selectedItem(listPeople, (appState.formParams as IDocumentParams)?.expeditorId)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItemScreen', {
-                parentScreen: 'CreateSellDocument',
-                fieldName: 'expeditorId',
-                title: 'Экспедитор',
-                list: listPeople,
-                value: (appState.formParams as IDocumentParams)?.expeditorId,
-              })
-            }
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={3}>
-          <Text style={localeStyles.subdivisionText}>Подразделение:</Text>
-          <ReferenceItem
-            value={selectedItem(listDepartments, (appState.formParams as IDocumentParams)?.fromcontactId)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItemScreen', {
-                parentScreen: 'CreateSellDocument',
-                title: 'Подразделение',
-                fieldName: 'fromcontactId',
-                list: listDepartments,
-                value: (appState.formParams as IDocumentParams)?.fromcontactId,
-              })
-            }
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Организация:</Text>
-          <ReferenceItem
-            value={selectedItem(listCompanies, (appState.formParams as IDocumentParams)?.tocontactId)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItemScreen', {
-                parentScreen: 'CreateSellDocument',
-                title: 'Организация',
-                fieldName: 'tocontactId',
-                list: listCompanies,
-                value: (appState.formParams as IDocumentParams)?.tocontactId,
-              })
-            }
-          />
-        </View>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={5}>
-          <Text style={localeStyles.subdivisionText}>Тип документа: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {appState.documentTypes && appState.documentTypes.length !== 0 ? (
-              appState.documentTypes.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[
-                    localeStyles.margin,
-                    (appState.formParams as IDocumentParams)?.doctype === item.id
-                      ? { backgroundColor: colors.primary }
-                      : {},
-                  ]}
-                  onPress={() => appActions.setFormParams({ doctype: item.id })}
-                  selected={(appState.formParams as IDocumentParams)?.doctype === item.id}
-                  selectedColor={
-                    (appState.formParams as IDocumentParams)?.doctype === item.id ? colors.card : colors.text
-                  }
-                >
-                  {item.name}
-                </Chip>
-              ))
-            ) : (
-              <Text>Не найдено</Text>
-            )}
-          </ScrollView>
-        </View>
-        {/* </View> */}
-      </ScrollView>
-    </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem
+              value={selectedItem(docTypes, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  fieldName: 'doctype',
+                  title: 'Тип документа',
+                  list: docTypes,
+                  value: doctype,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Экспедитор:</Text>
+            <ReferenceItem
+              value={selectedItem(listPeople, expeditorId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  title: 'Экспедитор',
+                  fieldName: 'expeditorId',
+                  list: listPeople,
+                  value: expeditorId,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Подразделение:</Text>
+            <ReferenceItem
+              value={selectedItem(listDepartments, fromcontactId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  title: 'Подразделение',
+                  fieldName: 'fromcontactId',
+                  list: listDepartments,
+                  value: fromcontactId,
+                })
+              }
+            />
+          </View>
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Организация:</Text>
+            <ReferenceItem
+              value={selectedItem(listCompanies, tocontactId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  title: 'Организация',
+                  fieldName: 'tocontactId',
+                  list: listCompanies,
+                  value: tocontactId,
+                })
+              }
+            />
+          </View>
+          {docId !== undefined && (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                  {
+                    text: 'OK',
+                    onPress: async () => {
+                      appActions.deleteDocument(docId);
+                      navigation.navigate('DocumentList');
+                    },
+                  },
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }}
+              style={localeStyles.buttonContainer}
+            >
+              <Text style={localeStyles.button}>Удалить документ</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
 export { CreateSellDocumentScreen };
 
 const localeStyles = StyleSheet.create({
-  area: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    margin: 5,
-    minHeight: 80,
-    padding: 5,
-  },
-  areaChips: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    margin: 5,
-    padding: 5,
-  },
-  areaPicker: {
-    backgroundColor: 'white',
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    margin: 0,
-    padding: 0,
-  },
   button: {
-    flex: 1,
-    marginLeft: 7,
+    alignSelf: 'center',
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
   },
-  buttonDatePicker: {
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  buttonView: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+  buttonContainer: {
+    backgroundColor: '#FC3F4D',
+    borderRadius: 10,
+    elevation: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   container: {
-    flex: 1,
+    paddingHorizontal: 5,
   },
-  containerDate: {
+  fieldContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    margin: 0,
-    padding: 0,
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
   },
-  filter: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 5,
+  input: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    flexGrow: 1,
+    height: 40,
+    padding: 10,
   },
-  margin: {
-    margin: 2,
-  },
-  marginRight: {
-    marginRight: 10,
+  inputCaption: {
+    width: 70,
   },
   picker: {
     borderRadius: 4,
     borderStyle: 'solid',
     borderWidth: 1,
     flexDirection: 'row',
-    margin: 5,
-    padding: 5,
+    flex: 1,
   },
   pickerButton: {
-    flex: 1,
-    marginRight: 10,
+    alignSelf: 'center',
+    padding: 0,
     textAlign: 'right',
   },
   pickerText: {
     alignSelf: 'center',
-    flex: 10,
-    fontSize: 16,
-  },
-  pickerView: {
-    borderWidth: 1,
-    color: 'black',
-    fontSize: 12,
-    height: 35,
-    margin: 1,
-    paddingHorizontal: 0,
-  },
-  scroll: {
-    maxHeight: 150,
-  },
-  scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  scrollOut: {
-    maxHeight: 400,
-  },
-  subdivisionText: {
-    flex: 1,
-    marginBottom: 5,
-    textAlign: 'left',
-  },
-  text: {
-    color: '#000',
-    fontSize: 14,
-    fontStyle: 'normal',
-  },
-  textDate: {
-    flex: 1,
-    flexGrow: 4,
-    fontSize: 20,
-    textAlign: 'center',
-  },
-  textInput: {
-    fontSize: 14,
-    height: 15,
-    marginTop: 5,
-  },
-  textNumberInput: {
-    fontSize: 16,
-    height: 40,
+    flexGrow: 1,
+    padding: 10,
   },
   title: {
     padding: 10,
