@@ -4,7 +4,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
+import { Text, Button, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import { IRemains } from '../../../../../common/base';
@@ -24,6 +24,7 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
   const navigation = useNavigation();
 
   const docId = useRoute<RouteProp<DocumentStackParamList, 'RemainsList'>>().params?.docId;
+  const barcode = !!item.barcode;
 
   return (
     <TouchableOpacity
@@ -37,20 +38,23 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
         });
       }}
     >
-      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <Feather name="box" size={20} color={'#FFF'} />
+      <View style={{ backgroundColor: colors.card }}>
+        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
       </View>
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <View style={localStyles.flexDirectionRow}>
+        <View style={localStyles.itemInfo}>
           <Text>
             Цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} Остаток: {item.remains}
           </Text>
         </View>
-        <View style={localStyles.barcode}>
-          {/* <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}333333</Text> */}
-          <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
-        </View>
+        {barcode && (
+          <View style={localStyles.barcode}>
+            <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
+              {item.barcode}
+            </Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -200,16 +204,8 @@ const RemainsListScreen = ({ route }: Props) => {
 export { RemainsListScreen };
 
 const localStyles = StyleSheet.create({
-  avatar: {
-    alignItems: 'center',
-    backgroundColor: '#e91e63',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  },
   barcode: {
-    paddingRight: 0,
+    alignItems: 'flex-end',
   },
   content: {
     height: '100%',
@@ -239,7 +235,12 @@ const localStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    paddingLeft: 8,
+    marginHorizontal: 4,
+    marginVertical: 2,
+    paddingLeft: 4,
+  },
+  itemInfo: {
+    opacity: 0.5,
   },
   name: {
     fontSize: 14,
