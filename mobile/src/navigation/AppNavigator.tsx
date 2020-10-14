@@ -40,6 +40,7 @@ export type RootStackParamList = {
     batchNumber?: string;
     manufacturingDate?: string;
     weighedGood?: number;
+    barcode?: string;
   };
   CreateSellDocument: {
     docId: number;

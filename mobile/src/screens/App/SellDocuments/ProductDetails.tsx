@@ -72,6 +72,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             //timeWork: good.timework,
             numreceive: weighedGood.numreceive,
             tara: [],
+            //barcodes: route.params.barcode ? [route.params.barcode] : [],
           })
         : undefined;
     }
@@ -180,6 +181,10 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                       (state.formParams as ISellLine).tara ?? [],
                     )
                   : (state.formParams as ISellLine).tara ?? [],
+                barcodes: [
+                  ...(editLine ? editLine.barcodes ?? [] : line ? line.barcodes ?? [] : []),
+                  ...(route.params.barcode ? [route.params.barcode] : []),
+                ],
               };
               actions.editLine({
                 docId: route.params.docId,
@@ -192,6 +197,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   goodId: route.params.prodId,
                   ...(state.formParams as ISellLine),
                   id: '0',
+                  barcodes: [],
                 },
               });
             }
