@@ -156,9 +156,9 @@ const ScanBarCodeScreen = () => {
       ) : undefined}
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        /*barCodeScannerSettings={{
+        barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
-        }}*/
+        }}
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
