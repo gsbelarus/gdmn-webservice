@@ -54,11 +54,6 @@ const WeighedGoodItem = React.memo(
       <TouchableOpacity
         style={[localStyles.item, { backgroundColor: colors.card }]}
         onPress={() => {
-          console.log('all barcodes', document?.lines
-            ?.reduce((prev, curr) => {
-              return prev.concat(curr.barcodes ?? []);
-            }, [] as string[]));
-          console.log('barcode', barcode)
           const done = document?.lines
             ?.reduce((prev, curr) => {
               return prev.concat(curr.barcodes ?? []);
