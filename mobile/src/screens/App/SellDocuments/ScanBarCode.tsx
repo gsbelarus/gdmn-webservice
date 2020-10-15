@@ -97,7 +97,7 @@ const ScanBarCodeScreen = () => {
       ?.reduce((prev, curr) => {
         return prev.concat(curr.barcodes ?? []);
       }, [] as string[])
-      .find((item) => item === barcode);
+      .find((item) => Number(item) === Number(barcode));
 
     if (done) {
       setError('Ранее был считан');
@@ -123,7 +123,7 @@ const ScanBarCodeScreen = () => {
         line: {
           ...editLine,
           quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
-          barcodes: (editLine.barcodes ?? []).concat([barcode]),
+          barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(0, 1)]),
         } as ISellLine,
       });
     } else {
@@ -140,7 +140,7 @@ const ScanBarCodeScreen = () => {
           quantity: good ? weighedGood.weight / good.itemWeight : 0,
           orderQuantity: 0,
           numreceive: weighedGood.numreceive,
-          barcodes: [barcode],
+          barcodes: [barcode.length === 12 ? barcode : barcode.slice(0, 1)],
           //timework: weighedGood.timework,
         } as ISellLine,
       });

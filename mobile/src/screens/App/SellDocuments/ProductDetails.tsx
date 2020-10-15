@@ -183,7 +183,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   : (state.formParams as ISellLine).tara ?? [],
                 barcodes: [
                   ...(editLine ? editLine.barcodes ?? [] : line ? line.barcodes ?? [] : []),
-                  ...(route.params.barcode ? [route.params.barcode] : []),
+                  ...(route.params.barcode ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(0, 1)] : []),
                 ],
               };
               actions.editLine({
@@ -197,7 +197,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   goodId: route.params.prodId,
                   ...(state.formParams as ISellLine),
                   id: '0',
-                  barcodes: [],
+                  barcodes: route.params.barcode ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(0, 1)] : [],
                 },
               });
             }

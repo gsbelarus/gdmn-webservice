@@ -58,7 +58,7 @@ const WeighedGoodItem = React.memo(
             ?.reduce((prev, curr) => {
               return prev.concat(curr.barcodes ?? []);
             }, [] as string[])
-            .find((barcodeDoc) => barcode === barcodeDoc);
+            .find((barcodeDoc) => Number(barcode) === Number(barcodeDoc));
 
           if (done) {
             onSetError('Штрих-код уже использовали.');
@@ -100,6 +100,12 @@ const SellProductsListScreen = () => {
     setVisible(!!error);
   }, [error, setVisible]);
 
+  useEffect(() => {
+    if (!visible) {
+      setError(undefined);
+    }
+  }, [visible]);
+
   const ref = React.useRef<FlatList<IGood>>(null);
   const refWeighed = React.useRef<FlatList<IWeighedGoods>>(null);
   useScrollToTop(ref);
@@ -126,7 +132,7 @@ const SellProductsListScreen = () => {
             data={
               !Number.isNaN(text)
                 ? state.weighedGoods.filter((item) =>
-                    text.length === 13
+                    text.length >= 12
                       ? item.id.toString().includes(Number(text).toString().slice(0, -1)) ||
                         item.id.toString().includes(Number(text).toString())
                       : false,
@@ -136,7 +142,7 @@ const SellProductsListScreen = () => {
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItemWieghed}
             ItemSeparatorComponent={ItemSeparator}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+            ListEmptyComponent={<Text style={localStyles.emptyList}>{text.length >= 12 ? 'Ничего не найдено' : 'Введите полностью штрих-код'}</Text>}
           />
         ) : (
           <FlatList
@@ -149,7 +155,7 @@ const SellProductsListScreen = () => {
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItem}
             ItemSeparatorComponent={ItemSeparator}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+            ListEmptyComponent={<Text style={localStyles.emptyList}>Ничего не найдено</Text>}
           />
         )}
         <Snackbar
