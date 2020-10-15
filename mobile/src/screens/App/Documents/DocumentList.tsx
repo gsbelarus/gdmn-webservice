@@ -1,8 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MaterialBottomTabNavigationProp } from '@react-navigation/material-bottom-tabs';
-import { useScrollToTop, useTheme, useNavigation, useRoute, CompositeNavigationProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, IconButton } from 'react-native-paper';
@@ -13,20 +10,16 @@ import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
-import { TabsStackParams } from '../../../navigation/TabsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
-// import { statusColors}
 
 const Statuses: IDocumentStatus[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
-  // const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const getContact = useCallback(
@@ -35,12 +28,15 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     [contacts],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docHead = useMemo(() => item?.head, [item?.head]);
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
   const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
   return (
@@ -83,11 +79,12 @@ const DocumentListScreen = () => {
   const { state: appState, actions } = useAppStore();
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
-  // const [isBottom, setIsBottom] = useState(false);
 
   const showActionSheet = useActionSheet();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     appState.references?.contacts?.data,
   ]);
 
@@ -125,7 +122,8 @@ const DocumentListScreen = () => {
           : true;
       }) || [],
     );
-  }, [appState.documents, appState.forms?.filterParams?.fieldSearch, searchText, getContact]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState.documents, searchText, getContact, appState.forms?.filterParams?.fieldSearch]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
@@ -163,7 +161,7 @@ const DocumentListScreen = () => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
+      // headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
       headerRight: () => (
         <IconButton
           icon="menu"
@@ -199,56 +197,37 @@ const DocumentListScreen = () => {
       ),
     });
   }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
-  /*
-  const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-    const paddingToBottom = 60;
-    console.log(layoutMeasurement.height, contentSize.height);
-    return (
-      layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom &&
-      layoutMeasurement.height - paddingToBottom < contentSize.height
-    );
-  }; */
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      <View style={localStyles.flexDirectionRow}>
-        <Searchbar
-          placeholder="Поиск по номеру"
-          onChangeText={setSearchText}
-          value={searchText}
-          style={[localStyles.flexGrow, localStyles.searchBar]}
-        />
-        <IconButton
-          icon="settings"
-          size={24}
-          style={localStyles.iconSettings}
-          onPress={() => navigation.navigate('FilterEdit')}
-        />
-      </View>
-      <ItemSeparator />
+      {!!data?.length && (
+        <>
+          <View style={localStyles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск по номеру"
+              onChangeText={setSearchText}
+              value={searchText}
+              style={[localStyles.flexGrow, localStyles.searchBar]}
+            />
+            <IconButton
+              icon="settings"
+              size={24}
+              style={localStyles.iconSettings}
+              onPress={() => navigation.navigate('FilterEdit')}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <FlatList
         ref={ref}
         data={data}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        /*         onScroll={({ nativeEvent }) => {
-          setIsBottom(isCloseToBottom(nativeEvent));
-        }} */
         scrollEventThrottle={400}
         ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
       />
-      {/*  <FAB
-        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
-        icon="arrow-down-bold"
-        onPress={() => navigation.navigate('DocumentRequest')}
-      />
-      <FAB
-        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
-        icon="arrow-up-bold"
-        onPress={sendUpdateRequest}
-      />
-       */}
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
         icon="file-document-box-plus"

@@ -10,7 +10,6 @@ import {
 } from 'react-native-paper';
 
 import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
-// import { rc } from './src/service/ReactotronConfig';
 import { AuthStoreProvider, ServiceStoreProvider } from './src/store';
 
 if (__DEV__) {
@@ -20,6 +19,7 @@ if (__DEV__) {
 const App = () => {
   const containerRef = React.useRef<NavigationContainerRef>();
   const [theme] = React.useState(DefaultTheme);
+
   const [initialState] = React.useState<InitialState | undefined>();
 
   const paperTheme = React.useMemo(() => {
@@ -43,7 +43,7 @@ const App = () => {
       <ServiceStoreProvider>
         <AuthStoreProvider>
           <PaperProvider theme={paperTheme}>
-            <StatusBar barStyle={theme.dark ? 'dark-content' : 'light-content'} />
+            <StatusBar barStyle={!theme.dark ? 'dark-content' : 'light-content'} />
             <NavigationContainer
               ref={containerRef}
               initialState={initialState}

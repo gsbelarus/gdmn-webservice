@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 import DocumentsNavigator from './DocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
@@ -17,8 +18,9 @@ export type TabsStackParams = {
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
 const TabsNavigator = () => {
+  const { colors } = useTheme();
   return (
-    <TabsStack.Navigator barStyle={styles.tabBar}>
+    <TabsStack.Navigator barStyle={[styles.tabBar, { backgroundColor: colors.background }]}>
       <TabsStack.Screen
         name="DocumentList"
         component={DocumentsNavigator}

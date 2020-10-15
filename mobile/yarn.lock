@@ -6333,6 +6333,11 @@ react-native-gesture-handler@~1.7.0:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
+react-native-honeywell-scanner@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-honeywell-scanner/-/react-native-honeywell-scanner-2.0.0.tgz#b3b611c4013bdc28f32ea3a71962dd909b94350d"
+  integrity sha512-GxHb33my6jdJSA1IuyjoW9qxok/uid1A//j99an/LOTD8agwCd0oF+nmvKo4eEr8MA/UkCJYCozaPpjtT5ZAVQ==
+
 react-native-input-spinner@^1.2.18:
   version "1.2.18"
   resolved "https://registry.yarnpkg.com/react-native-input-spinner/-/react-native-input-spinner-1.2.18.tgz#6380d1e5b9558bca4e3d3f1ba18d5bbfbad24765"

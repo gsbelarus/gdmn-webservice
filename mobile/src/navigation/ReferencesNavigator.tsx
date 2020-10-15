@@ -1,5 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import { useTheme } from 'react-native-paper';
 
 import {
   ReferenceDetailScreen,
@@ -21,8 +22,12 @@ type ReferenceStackParamList = {
 const Stack = createStackNavigator<ReferenceStackParamList>();
 
 const ReferencesNavigator = () => {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator initialRouteName="ReferenceList">
+    <Stack.Navigator
+      initialRouteName="ReferenceList"
+      screenOptions={{ headerStyle: { backgroundColor: colors.background } }}
+    >
       <Stack.Screen
         key="ReferenceList"
         name="ReferenceList"

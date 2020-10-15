@@ -139,6 +139,7 @@ const ReferenceListScreen = () => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
       />
       <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
@@ -168,6 +169,10 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   fabSync: {
     bottom: 0,

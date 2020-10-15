@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
@@ -53,13 +54,20 @@ export type DocumentStackParamList = {
 const Stack = createStackNavigator<DocumentStackParamList>();
 
 const DocumentsNavigator = () => {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator initialRouteName="DocumentList">
+    <Stack.Navigator
+      initialRouteName="DocumentList"
+      screenOptions={{ headerStyle: { backgroundColor: colors.background } }}
+    >
       <Stack.Screen
         key="DocumentList"
         name="DocumentList"
         component={DocumentListScreen}
-        options={{ title: '', animationTypeForReplace: 'pop' }}
+        options={{
+          title: 'Документы',
+          animationTypeForReplace: 'pop',
+        }}
       />
       <Stack.Screen
         key="DocumentView"
