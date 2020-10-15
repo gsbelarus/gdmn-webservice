@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { Text, Searchbar, Avatar } from 'react-native-paper';
 
 import { IGood, IReference, IRem, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -22,21 +22,20 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
 
   return (
     <TouchableOpacity
+      style={localStyles.item}
       onPress={() => {
         navigation.navigate('ReferenceDetail', { item });
       }}
     >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
-        </View>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-          <View style={localStyles.flexDirectionRow}>
-            <Text>
-              Цена: {formatValue({ type: 'number', decimals: 2 }, (item.price as number) ?? 0)} Остаток: {item.remains}
-            </Text>
-          </View>
+      <View style={{ backgroundColor: colors.card }}>
+        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
+      </View>
+      <View style={localStyles.details}>
+        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+        <View style={localStyles.itemInfo}>
+          <Text>
+            Цена: {formatValue({ type: 'number', decimals: 2 }, (item.price as number) ?? 0)} Остаток: {item.remains}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -113,14 +112,6 @@ const RemainsViewScreen = ({ route }) => {
 export { RemainsViewScreen };
 
 const localStyles = StyleSheet.create({
-  avatar: {
-    alignItems: 'center',
-    backgroundColor: '#e91e63',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  },
   content: {
     height: '100%',
   },
@@ -137,6 +128,9 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginHorizontal: 4,
+  },
+  itemInfo: {
+    opacity: 0.5,
   },
   name: {
     fontSize: 14,

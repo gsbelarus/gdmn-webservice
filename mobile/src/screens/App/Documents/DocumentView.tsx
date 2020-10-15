@@ -27,23 +27,18 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
 
   return (
     <>
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      <View style={{ backgroundColor: colors.card }}>
         <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
       </View>
-      <View style={localStyles.goodInfo}>
-        <Text numberOfLines={5} style={localStyles.productTitleView}>
-          {good?.name || 'товар не найден'}
-        </Text>
-      </View>
-      <View style={localStyles.remainsInfo}>
-        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}
-        </Text>
-      </View>
-      <View style={localStyles.remainsInfo}>
-        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.quantity}
-        </Text>
+      <View style={localStyles.details}>
+        <View>
+          <Text style={localStyles.name}> {good?.name || 'товар не найден'} </Text>
+        </View>
+        <View>
+          <Text style={localStyles.itemInfo}>
+            {item.quantity} × {formatValue({ type: 'currency', decimals: 2 }, item.price ?? 0)}
+          </Text>
+        </View>
       </View>
       {isEditable && (
         <View style={localStyles.remainsInfo}>
@@ -154,7 +149,7 @@ const DocumentViewScreen = ({ route }: Props) => {
     ({ item }: { item: ILine }) => {
       return (
         <TouchableOpacity
-          style={localStyles.listContainer}
+          style={localStyles.item}
           disabled={!isEditable}
           onPress={() => {
             navigation.navigate('DocumentLineEdit', {
@@ -180,11 +175,6 @@ const DocumentViewScreen = ({ route }: Props) => {
         <View style={[localStyles.documentHeader, { backgroundColor: statusColors[document?.head?.status] }]}>
           <Text style={[localStyles.documentHeaderText, { color: colors.card }]}>{docTitle}</Text>
           <Text style={[localStyles.documentText, { color: colors.card }]}>{contact?.name}</Text>
-        </View>
-        <View style={[localStyles.header, { borderColor: colors.border }]}>
-          <Text>Наименование ТМЦ</Text>
-          <Text>Цена</Text>
-          <Text>Кол-во</Text>
         </View>
         <FlatList
           ref={refList}
@@ -224,14 +214,22 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     flex: 1,
     justifyContent: 'center',
+    right: 0,
   },
   container: {
     padding: 0,
+  },
+  details: {
+    flexDirection: 'column',
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 3,
   },
   documentHeader: {
     flexDirection: 'column',
     height: 50,
     justifyContent: 'space-around',
+    paddingVertical: 6,
   },
   documentHeaderText: {
     fontWeight: 'bold',
@@ -260,44 +258,28 @@ const localStyles = StyleSheet.create({
   fontWeightBold: {
     fontWeight: 'bold',
   },
-  goodInfo: {
-    flex: 1,
-    justifyContent: 'center',
-    marginLeft: 10,
-  },
-  header: {
-    backgroundColor: '#eee',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 5,
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
+    marginHorizontal: 4,
+    marginVertical: 4,
+    paddingLeft: 4,
+  },
+  itemInfo: {
+    opacity: 0.5,
   },
   lineTotal: {
     backgroundColor: '#eee',
     justifyContent: 'space-between',
     padding: 10,
   },
-  listContainer: {
-    flexDirection: 'row',
-    marginHorizontal: 8,
-    marginVertical: 8,
-  },
-  productBarcodeView: {
-    fontSize: 12,
-    opacity: 0.5,
-  },
-  productTitleView: {
+  name: {
+    fontSize: 14,
     fontWeight: 'bold',
-    maxHeight: 60,
-    minHeight: 15,
   },
   remainsInfo: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
+    width: 30,
   },
 });
