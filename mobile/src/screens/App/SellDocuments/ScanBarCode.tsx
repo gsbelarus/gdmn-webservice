@@ -123,7 +123,7 @@ const ScanBarCodeScreen = () => {
         line: {
           ...editLine,
           quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
-          barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(0, 1)]),
+          barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(1)]),
         } as ISellLine,
       });
     } else {
@@ -140,7 +140,7 @@ const ScanBarCodeScreen = () => {
           quantity: good ? weighedGood.weight / good.itemWeight : 0,
           orderQuantity: 0,
           numreceive: weighedGood.numreceive,
-          barcodes: [barcode.length === 12 ? barcode : barcode.slice(0, 1)],
+          barcodes: [barcode.length === 12 ? barcode : barcode.slice(1)],
           //timework: weighedGood.timework,
         } as ISellLine,
       });
