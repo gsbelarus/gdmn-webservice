@@ -94,8 +94,18 @@ const DocumentsNavigator = () => {
       />
       <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
       <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
-      <Stack.Screen key="ScanBarCodeScreen" name="ScanBarcode" component={ScanBarcodeScreen} />
-      <Stack.Screen key="ScanBarCodeScreen2" name="ScanBarcode2" component={ScanBarcodeScreen2} />
+      <Stack.Screen
+        key="ScanBarCodeScreen"
+        name="ScanBarcode"
+        component={ScanBarcodeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        key="ScanBarCodeScreen2"
+        name="ScanBarcode2"
+        component={ScanBarcodeScreen2}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

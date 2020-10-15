@@ -1,7 +1,19 @@
+/* eslint-disable no-bitwise */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable no-fallthrough */
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
+import BarcodeScanner, {
+  Exception,
+  FocusMode,
+  TorchMode,
+  CameraFillMode,
+  BarcodeType,
+  pauseScanner,
+  resumeScanner,
+} from 'react-native-barcode-scanner-google';
 import { Text, Button } from 'react-native-paper';
 
 import { useAppStore } from '../../../../store';
@@ -22,7 +34,7 @@ const ScanBarcodeScreen = () => {
     };
     permission();
   }, []);
-
+  /*
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
     Alert.alert('Сохранить результат?', data, [
@@ -40,14 +52,14 @@ const ScanBarcodeScreen = () => {
         },
       },
     ]);
-  };
+  }; */
 
-  const findGood = (text: string) => {
+  /*   const findGood = (text: string) => {
     if (text === '' || Number.isNaN(text) || text.length < 12) {
       return;
     }
-
-    /*   const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
+ */
+  /*   const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
     if (finded) {
       //отправляем на заполнение позиции
       navigation.navigate('SellProductDetail', {
@@ -71,7 +83,7 @@ const ScanBarcodeScreen = () => {
       return;
     } */
 
-    Alert.alert('Предупреждение!', `Запись не найдена с таким кодом: ${text}`, [
+  /*     Alert.alert('Предупреждение!', `Запись не найдена с таким кодом: ${text}`, [
       {
         text: 'ОК',
         onPress: () => {
@@ -80,7 +92,7 @@ const ScanBarcodeScreen = () => {
       },
     ]);
   };
-
+ */
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       {hasPermission === null ? (
@@ -90,7 +102,7 @@ const ScanBarcodeScreen = () => {
       ) : undefined}
       <>
         <BarCodeScanner
-          onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+          onBarCodeScanned={({ data }) => (scanned ? undefined : undefined)}
           style={StyleSheet.absoluteFillObject}
         />
         <Button

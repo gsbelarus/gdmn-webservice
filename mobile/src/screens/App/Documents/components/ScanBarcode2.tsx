@@ -1,26 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood, IReference } from '../../../../../../common';
-import { RootStackParamList } from '../../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
+const ONE_SECOND_IN_MS = 1000;
+
 const ScanBarcodeScreen2 = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'ScanBarcode2'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   //фонарик: torch - включен, off - выключен
   const [flashMode, setFlashMode] = useState(false);
   const [visible, setVisible] = React.useState(true);
-  const onDismissSnackBar = () => setVisible(false);
   const [scanned, setScanned] = useState(false);
   const { state, actions } = useAppStore();
   const navigation = useNavigation();
@@ -36,22 +34,22 @@ const ScanBarcodeScreen2 = () => {
     permission();
   }, []);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  });
-
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
     setBarcode(data);
   };
 
   useEffect(() => {
-    if (!barcode) {
+    if (!scanned) {
+      return;
+    }
+
+    if (!barcode && scanned) {
       setGood(undefined);
       return;
     }
+
+    Vibration.vibrate(10 * ONE_SECOND_IN_MS);
 
     const goodObj = ((state.references?.goods as unknown) as IReference<IGood>)?.data?.find(
       (item) => item.barcode === barcode,
@@ -59,20 +57,25 @@ const ScanBarcodeScreen2 = () => {
 
     setGood(goodObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [barcode, state.references?.goods]);
+  }, [barcode, scanned, state.references?.goods]);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text style={styles.title}>Нет доступа к камере</Text>;
+  }
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      {hasPermission === null ? (
-        <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-      ) : hasPermission === false ? (
-        <Text style={styles.title}>Нет доступа к камере</Text>
-      ) : undefined}
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
         }}
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus={false}
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
