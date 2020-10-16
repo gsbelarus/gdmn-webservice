@@ -84,10 +84,10 @@ export interface IOutlets extends IRefData {
 
 // справочник с задолженностями по клиентам на текущую дату 
 export interface IDebt extends IRefData {
-  contactkey: number; // ID группы товаров
-  ondate?: string;  // Наименование ед. изм.
-  saldo?: number; // цена ФСО
-  saldodebt?: number; // цена ФСН
+  contactkey: number; // ID организации
+  ondate?: string;  // текущая дата
+  saldo?: number; // сальдо
+  saldodebt?: number; //сальдо просроченное
 }
 
 // справочник маршрутов
@@ -96,6 +96,7 @@ export interface IRoad extends IRefData {
 
 // справочник складов
 export interface IDepartment extends IRefData { 
+  contactType: number; //4
 }
 
 // справочник видов упаковки
