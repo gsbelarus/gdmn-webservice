@@ -67,6 +67,10 @@ export interface IGood extends IRefData {
   pricefsn?: number; // цена ФСН
 }
 
+// справочник групп товаров
+export interface IGoodGroup extends IRefData {
+}
+
 export interface IRemain {
   goodId: number;
   quantity: number;
@@ -96,7 +100,6 @@ export interface IRoad extends IRefData {
 
 // справочник складов
 export interface IDepartment extends IRefData { 
-  contactType: number; //4
 }
 
 // справочник видов упаковки
