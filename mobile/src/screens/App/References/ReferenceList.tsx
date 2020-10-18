@@ -58,7 +58,7 @@ const ReferenceListScreen = () => {
         type: 'cmd',
         payload: {
           name: 'get_references',
-          params: ['documenttypes', 'goodgroups', 'goods', 'remains', 'contacts', 'remains'],
+          params: ['documenttypes', 'goodgroups', 'goods', 'contacts', 'remains'],
         },
       }),
     )

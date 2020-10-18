@@ -1,8 +1,7 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { Text, Searchbar, Avatar } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -26,7 +25,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+          <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.details}>
           <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>

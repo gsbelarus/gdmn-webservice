@@ -39,9 +39,14 @@ const ReferencesNavigator = () => {
         key="ReferenceDetail"
         name="ReferenceDetail"
         component={ReferenceDetailScreen}
-        options={{ title: '' }}
+        options={{ title: '', headerBackTitle: 'Назад' }}
       />
-      <Stack.Screen key="RemainsView" name="RemainsView" options={{ title: '' }} component={RemainsViewScreen} />
+      <Stack.Screen
+        key="RemainsView"
+        name="RemainsView"
+        options={{ title: '', headerBackTitle: 'Назад' }}
+        component={RemainsViewScreen}
+      />
       <Stack.Screen
         key="RemainsContactList"
         name="RemainsContactList"

@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
 import { IContact, IRefData } from '../../../../../common/base';
@@ -39,7 +39,6 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
 
 const RemainsContactListViewScreen = () => {
   const { colors } = useTheme();
-
   const { state: appState } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,6 +54,7 @@ const RemainsContactListViewScreen = () => {
     if (!contacts) {
       return;
     }
+
     setFilteredList(
       contacts?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
     );

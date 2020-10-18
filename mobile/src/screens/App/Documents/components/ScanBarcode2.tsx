@@ -16,9 +16,8 @@ const ONE_SECOND_IN_MS = 1000;
 const ScanBarcodeScreen2 = () => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
-  //фонарик: torch - включен, off - выключен
   const [flashMode, setFlashMode] = useState(false);
-  const [visible, setVisible] = React.useState(true);
+  const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
   const { state, actions } = useAppStore();
   const navigation = useNavigation();
@@ -49,7 +48,7 @@ const ScanBarcodeScreen2 = () => {
       return;
     }
 
-    Vibration.vibrate(10 * ONE_SECOND_IN_MS);
+    vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
 
     const goodObj = ((state.references?.goods as unknown) as IReference<IGood>)?.data?.find(
       (item) => item.barcode === barcode,
@@ -81,16 +80,36 @@ const ScanBarcodeScreen2 = () => {
         style={localStyles.camera}
       >
         <View style={localStyles.header}>
-          <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
+          <IconButton
+            icon="arrow-left"
+            color={'#FFF'}
+            size={30}
+            style={localStyles.transparent}
+            onPress={() => navigation.goBack()}
+          />
+          <IconButton
+            icon={flashMode ? 'flash' : 'flash-off'}
+            color={'#FFF'}
+            style={localStyles.transparent}
+            onPress={() => setFlashMode(!flashMode)}
+          />
+          <IconButton
+            icon={vibroMode ? 'vibrate' : 'vibrate-off'}
+            color={'#FFF'}
+            style={localStyles.transparent}
+            onPress={() => setVibroMode(!vibroMode)}
+          />
+
+          {/* <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
             <Feather name={'arrow-left'} color={'#FFF'} size={30} />
-          </TouchableOpacity>
-          <TouchableOpacity style={localStyles.transparent} onPress={() => setFlashMode(!flashMode)}>
+          </TouchableOpacity> */}
+          {/* <TouchableOpacity style={localStyles.transparent} onPress={() => setFlashMode(!flashMode)}>
             <MaterialCommunityIcons
               name={flashMode ? 'flashlight' : 'flashlight-off'}
               color={flashMode ? '#FF8' : '#FFF'}
               size={30}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {!scanned ? (
           <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
@@ -211,6 +230,7 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
+    alignItems: 'center',
     backgroundColor: '#0008',
     flexDirection: 'row',
     height: 70,

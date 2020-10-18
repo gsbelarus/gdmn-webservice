@@ -226,6 +226,7 @@ const DocumentListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
+        onEndReached={() => ({})}
         ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
       />
       <FAB
