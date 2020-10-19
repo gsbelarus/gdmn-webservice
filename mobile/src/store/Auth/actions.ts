@@ -1,5 +1,6 @@
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
+// eslint-disable-next-line no-shadow
 export enum ActionAuthTypes {
   DISCONNECT = 'DISCONNECT',
   LOG_OUT = 'LOG_OUT',

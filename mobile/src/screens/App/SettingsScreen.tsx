@@ -3,15 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 
-import {
-  IResponse,
-  IMessage,
-  IContact,
-  IDocumentType,
-  IGood,
-  IRemain,
-  IDocument,
-} from '../../../../common';
+import { IResponse, IMessage, IContact, IDocumentType, IGood, IRemain, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
@@ -31,7 +23,7 @@ const SettingsScreen = () => {
     state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
 
@@ -224,7 +216,14 @@ const SettingsScreen = () => {
         />
       </View>
       <View style={localStyles.content}>
-        <Button mode="text" icon={'update'} style={localStyles.refreshButton} disabled={isLoading} loading={isLoading} onPress={sendGetReferencesRequest}>
+        <Button
+          mode="text"
+          icon={'update'}
+          style={localStyles.refreshButton}
+          disabled={isLoading}
+          loading={isLoading}
+          onPress={sendGetReferencesRequest}
+        >
           Проверить обновления
         </Button>
       </View>
@@ -272,7 +271,7 @@ const localStyles = StyleSheet.create({
   },
   refreshButton: {
     margin: 20,
-  }
+  },
 });
 
 export { SettingsScreen };

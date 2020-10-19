@@ -49,7 +49,6 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
     ({ item }: { item: IListItem }) => {
       return <LineItem item={item} checked={checkedItem?.includes(item.id)} onSelect={selectItem} />;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [checkedItem, selectItem],
   );
 

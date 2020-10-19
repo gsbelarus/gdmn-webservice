@@ -178,6 +178,7 @@ const ReferenceListScreen = () => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService.data, state.companyID]);
 
   return (

@@ -3,6 +3,7 @@ import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } f
 import { IFormParams, IDocumentParams, IWeighedGoods } from '../../model/sell';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
+// eslint-disable-next-line no-shadow
 export enum ActionAppTypes {
   NEW_DOCUMENT = 'NEW_DOCUMENT',
   EDIT_DOCUMENT = 'EDIT_DOCUMENT',

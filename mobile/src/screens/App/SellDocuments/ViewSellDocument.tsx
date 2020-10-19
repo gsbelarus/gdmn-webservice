@@ -302,17 +302,17 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               <FAB
                 style={localStyles.fab}
                 icon="barcode-scan"
-                onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document.id, weighedGood: true })}
+                onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document?.id, weighedGood: true })}
               />
               <FAB
                 style={localStyles.fab}
                 icon="barcode"
-                onPress={() => navigation.navigate('SellProductsList', { docId: document.id, weighedGood: true })}
+                onPress={() => navigation.navigate('SellProductsList', { docId: document?.id, weighedGood: true })}
               />
               <FAB
                 style={localStyles.fab}
                 icon="plus"
-                onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
+                onPress={() => navigation.navigate('SellProductsList', { docId: document?.id })}
               />
               <FAB
                 style={localStyles.fab}

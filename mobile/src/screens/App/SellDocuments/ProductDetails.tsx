@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -53,7 +54,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         : (document as ISellDocument).lines
       : undefined;
     lineDocuments ? setLine(lineDocuments.find((item) => item.id === route.params.lineId)) : undefined;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params, state.goods, state.documents]);
 
   useEffect(() => {
@@ -118,17 +118,17 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     document,
     line,
     product,
-    route.params.lineId,
-    route.params.manufacturingDate,
-    route.params.prodId,
-    route.params.weighedGood,
+    route.params?.lineId,
+    route.params?.manufacturingDate,
+    route.params?.modeCor,
+    route.params?.prodId,
+    route.params?.weighedGood,
   ]);
 
   useEffect(() => {
     if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
       actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
@@ -183,7 +183,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   : (state.formParams as ISellLine).tara ?? [],
                 barcodes: [
                   ...(editLine ? editLine.barcodes ?? [] : line ? line.barcodes ?? [] : []),
-                  ...(route.params.barcode ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)] : []),
+                  ...(route.params.barcode
+                    ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)]
+                    : []),
                 ],
               };
               actions.editLine({
@@ -197,7 +199,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   goodId: route.params.prodId,
                   ...(state.formParams as ISellLine),
                   id: '0',
-                  barcodes: route.params.barcode ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)] : [],
+                  barcodes: route.params.barcode
+                    ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)]
+                    : [],
                 },
               });
             }

@@ -116,7 +116,6 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            // eslint-disable-next-line @babel/no-unused-expressions
             docId !== undefined
               ? navigation.navigate('ViewSellDocument', { docId })
               : navigation.navigate('SellDocumentsListScreen');

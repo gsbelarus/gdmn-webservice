@@ -38,7 +38,8 @@ const ScanBarCodeScreen = () => {
 
   useEffect(() => {
     setDocument(state.documents?.find((item) => item.id === route.params.docId) as ISellDocument);
-  }, [route.params.docId, state.documents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.params?.docId, state.documents]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -85,7 +86,7 @@ const ScanBarCodeScreen = () => {
 
     const goodObj = ((state.goods as unknown) as IGood[])?.find((item) => item.id === weighedGood.goodkey);
     setGood(goodObj);
-  }, [weighedGood]);
+  }, [state.goods, weighedGood]);
 
   useEffect(() => {
     if (!barcode) {
@@ -107,7 +108,8 @@ const ScanBarCodeScreen = () => {
     const weighedGoodObj = findGood();
 
     setWeighedGood(weighedGoodObj);
-  }, [barcode, findGood]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barcode, document?.lines, findGood]);
 
   const editLineDocument = useCallback(() => {
     if (!weighedGood) {
@@ -145,7 +147,8 @@ const ScanBarCodeScreen = () => {
         } as ISellLine,
       });
     }
-  }, [actions, barcode, good, route.params.docId, weighedGood]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actions, barcode, document?.lines, good, route.params?.docId, weighedGood]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -156,9 +159,11 @@ const ScanBarCodeScreen = () => {
       ) : undefined}
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        barCodeScannerSettings={{
-         // barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
-        }}
+        barCodeScannerSettings={
+          {
+            // barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
+          }
+        }
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}

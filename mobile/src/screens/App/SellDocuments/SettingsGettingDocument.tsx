@@ -407,11 +407,6 @@ const localeStyles = StyleSheet.create({
     marginBottom: 5,
     textAlign: 'left',
   },
-  text: {
-    color: '#000',
-    fontSize: 14,
-    fontStyle: 'normal',
-  },
   textDate: {
     flex: 0.95,
     flexGrow: 4,

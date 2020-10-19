@@ -47,8 +47,8 @@ const WeighedGoodItem = React.memo(
       findGood ? setNameGood(findGood.name) : undefined;
     }, [item, state]);
 
-    const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
-    const document = state.documents?.find((item) => item.id === docId) as ISellDocument;
+    const { docId } = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params;
+    const document = state.documents?.find((i) => i.id === docId) as ISellDocument;
 
     return (
       <TouchableOpacity
@@ -120,18 +120,18 @@ const SellProductsListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <>
         <Searchbar
-          placeholder={`Штрих-код ${route.params.weighedGood ? '' : 'или название'}`}
+          placeholder={`Штрих-код ${route.params?.weighedGood ? '' : 'или название'}`}
           onChangeText={onChangeText}
           value={text}
           style={localStyles.searchBar}
         />
         <ItemSeparator />
-        {route.params.weighedGood ? (
+        {route.params?.weighedGood ? (
           <FlatList
             ref={refWeighed}
             data={
               !Number.isNaN(text)
-                ? state.weighedGoods.filter((item) =>
+                ? state.weighedGoods?.filter((item) =>
                     text.length >= 12
                       ? item.id.toString().includes(Number(text).toString().slice(0, -1)) ||
                         item.id.toString().includes(Number(text).toString())
@@ -142,7 +142,11 @@ const SellProductsListScreen = () => {
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItemWieghed}
             ItemSeparatorComponent={ItemSeparator}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>{text.length >= 12 ? 'Ничего не найдено' : 'Введите полностью штрих-код'}</Text>}
+            ListEmptyComponent={
+              <Text style={localStyles.emptyList}>
+                {text.length >= 12 ? 'Ничего не найдено' : 'Введите полностью штрих-код'}
+              </Text>
+            }
           />
         ) : (
           <FlatList
