@@ -228,51 +228,55 @@ const SettingsScreen = () => {
           >
             Проверить обновления
           </Button>
-          <Button
-            mode="text"
-            onPress={async () => {
-              const log = await appStorage.getItem(`${AuthState.userID}/${AuthState.companyID}/REFERENCES`);
-              Reactotron.display({
-                name: 'Mobile Storage',
-                preview: log,
-                value: log,
-                important: true,
-              });
-            }}
-          >
-            Проверить хранилище
-          </Button>
-          <Button
-            mode="text"
-            onPress={async () => {
-              Reactotron.display({
-                name: 'settings',
-                preview: 'settings',
-                value: settings,
-                important: true,
-              });
-              Reactotron.display({
-                name: 'documents',
-                preview: 'documents',
-                value: documents,
-                important: true,
-              });
-              Reactotron.display({
-                name: 'references',
-                preview: 'references',
-                value: references,
-                important: true,
-              });
-              Reactotron.display({
-                name: 'forms',
-                preview: 'forms',
-                value: forms,
-                important: true,
-              });
-            }}
-          >
-            Проверить стейт
-          </Button>
+          {__DEV__ && (
+            <>
+              <Button
+                mode="text"
+                onPress={async () => {
+                  const log = await appStorage.getItem(`${AuthState.userID}/${AuthState.companyID}/REFERENCES`);
+                  Reactotron.display({
+                    name: 'Mobile Storage',
+                    preview: log,
+                    value: log,
+                    important: true,
+                  });
+                }}
+              >
+                Проверить хранилище
+              </Button>
+              <Button
+                mode="text"
+                onPress={async () => {
+                  Reactotron.display({
+                    name: 'settings',
+                    preview: 'settings',
+                    value: settings,
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'documents',
+                    preview: 'documents',
+                    value: documents,
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'references',
+                    preview: 'references',
+                    value: references,
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'forms',
+                    preview: 'forms',
+                    value: forms,
+                    important: true,
+                  });
+                }}
+              >
+                Проверить стейт
+              </Button>
+            </>
+          )}
         </View>
         <Divider />
         <SettingsItem

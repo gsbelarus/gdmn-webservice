@@ -60,8 +60,6 @@ const RemainsViewScreen = ({ route }) => {
     [state.references?.remains?.data],
   );
 
-  console.log(state.references?.remains?.data);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
 
