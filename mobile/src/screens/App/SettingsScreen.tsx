@@ -97,8 +97,12 @@ const SettingsScreen = () => {
                 }
                 case 'documenttypes':
                 case 'contacts':
+                case 'goods':
                 case 'goodgroups':
-                case 'goods': {
+                case 'outlets':
+                case 'debts':
+                case 'departments':
+                case 'roads': {
                   // TODO: преобразовывать json данные в модель данных
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const refObj = (dataSet as unknown) as IReference<any[]>;
@@ -171,6 +175,7 @@ const SettingsScreen = () => {
     };
 
     getMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService.data, appActions, companyID, documents]);
 
   return (

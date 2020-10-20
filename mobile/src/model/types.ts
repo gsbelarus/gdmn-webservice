@@ -31,10 +31,13 @@ export interface IFormParams {
 export interface IDocumentParams {
   status: number;
   date?: string;
-  tocontactId?: number;
-  fromcontactId?: number;
+  outletId?: number;
+  contactId?: number;
   doctype?: number;
   docnumber?: string;
+  roadId?: number;
+  departId?: number;
+  ondate?: string;
 }
 
 export interface IFilterParams {

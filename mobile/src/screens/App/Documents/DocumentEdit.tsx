@@ -3,9 +3,10 @@ import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
-import { Text, Switch, Button } from 'react-native-paper';
+import { Text, Switch } from 'react-native-paper';
 
-import { IContact, IDocument, IRefData } from '../../../../../common';
+import { IDocument, IRefData } from '../../../../../common';
+import { IContact, IDepartment, IOutlet, IRoad } from '../../../../../common/base';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
@@ -20,25 +21,40 @@ const DocumentEditScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
-
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   const [statusId, setStatusId] = useState(0);
 
   const docId = route.params?.docId;
 
   const {
-    date = new Date().toISOString().slice(0, 10),
-    docnumber,
-    tocontactId,
-    fromcontactId,
+    date = today.toISOString().slice(0, 10),
+    docnumber = Math.floor(Math.random() * 10000).toString(),
     doctype,
+    contactId,
+    outletId,
+    roadId,
+    departId,
+    ondate = tomorrow.toISOString().slice(0, 10),
     status = 0,
   } = useMemo(() => {
     return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.forms?.documentParams]);
 
+  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    appState.references?.contacts?.data,
+  ]);
+  const departments = useMemo(() => appState.references?.departments?.data as IDepartment[], [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    appState.references?.departments?.data,
+  ]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
+  const outlets = useMemo(() => appState.references?.outlets?.data as IOutlet[], [appState.references?.outlets?.data]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const roads = useMemo(() => appState.references?.roads?.data as IRoad[], [appState.references?.roads?.data]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const docTypes = useMemo(() => appState.references?.documenttypes?.data, [appState.references?.documenttypes?.data]);
@@ -60,39 +76,39 @@ const DocumentEditScreen = ({ route }: Props) => {
   const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
     con?.map((item) => ({ id: item.id, value: item.name }));
 
-  const departments: IContact[] = useMemo(() => {
-    // return ((contacts as unknown) as IContact[])?.filter((item) => item.contactType === 4);
-    return (contacts as unknown) as IContact[];
-  }, [contacts]);
-
+  const listContacts = useMemo(() => getListItems(contacts), [contacts]);
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
-
+  const listOutlets = useMemo(() => getListItems(outlets), [outlets]);
+  const listRoads = useMemo(() => getListItems(roads), [roads]);
   const listDocumentType = useMemo(() => getListItems(docTypes), [docTypes]);
 
   const checkDocument = useCallback(() => {
-    const res = date && docnumber && tocontactId && fromcontactId && doctype;
+    const res = date && docnumber && outletId && contactId && ondate;
 
     if (!res) {
       Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
     }
 
     return res;
-  }, [date, docnumber, doctype, fromcontactId, tocontactId]);
+  }, [date, docnumber, contactId, ondate, outletId]);
 
   const updateDocument = useCallback(() => {
     appActions.updateDocument({
       id: docId,
       head: {
         doctype,
-        fromcontactId,
-        tocontactId,
+        contactId,
+        outletId,
         date,
         status,
         docnumber,
+        roadId,
+        departId,
+        ondate,
       },
     });
     return docId;
-  }, [appActions, docId, doctype, fromcontactId, tocontactId, date, status, docnumber]);
+  }, [appActions, docId, doctype, contactId, outletId, date, status, docnumber, roadId, departId, ondate]);
 
   const addDocument = useCallback(() => {
     const id = getNextDocId(appState.documents);
@@ -101,16 +117,19 @@ const DocumentEditScreen = ({ route }: Props) => {
       id,
       head: {
         doctype,
-        fromcontactId,
-        tocontactId,
+        contactId,
+        outletId,
         date,
         status,
         docnumber,
+        roadId,
+        departId,
+        ondate,
       },
       lines: [],
     });
     return id;
-  }, [appActions, appState.documents, date, docnumber, doctype, fromcontactId, status, tocontactId]);
+  }, [appActions, appState.documents, date, departId, docnumber, doctype, contactId, ondate, roadId, status, outletId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -172,6 +191,17 @@ const DocumentEditScreen = ({ route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, docId]);
 
+  useEffect(() => {
+    if (!outlets) {
+      return;
+    }
+
+    appActions.setForm({
+      ...appState.forms?.documentParams,
+      contactId: outlets.find((item) => item.id === outletId)?.parent,
+    });
+  }, [appActions, outletId, outlets]);
+
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
       return (
@@ -227,9 +257,9 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Дата: </Text>
+            <Text style={localeStyles.inputCaption}>Дата заявки: </Text>
             <ReferenceItem
-              value={getDateString(date || new Date().toISOString())}
+              value={getDateString(date || today.toISOString())}
               disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectDate', {
@@ -243,51 +273,86 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Тип:</Text>
+            <Text style={localeStyles.inputCaption}>Дата отгрузки: </Text>
             <ReferenceItem
-              value={selectedItem(listDocumentType, doctype)?.value}
+              value={getDateString(ondate || tomorrow.toISOString())}
               disabled={isBlocked}
               onPress={() =>
-                navigation.navigate('SelectItem', {
+                navigation.navigate('SelectDate', {
                   formName: 'documentParams',
-                  fieldName: 'doctype',
-                  title: 'Тип документа',
-                  list: listDocumentType,
-                  value: doctype,
+                  fieldName: 'ondate',
+                  title: 'Дата отгрузки',
+                  value: ondate,
                 })
               }
             />
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Откуда:</Text>
+            <Text style={localeStyles.inputCaption}>Организация:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, fromcontactId)?.value}
+              value={selectedItem(listContacts, contactId)?.value}
               disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectItem', {
                   formName: 'documentParams',
-                  title: 'Подразделение',
-                  fieldName: 'fromcontactId',
-                  list: listDepartments,
-                  value: fromcontactId,
+                  title: 'Организация',
+                  fieldName: 'contactId',
+                  list: listContacts,
+                  value: contactId,
                 })
               }
             />
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Куда:</Text>
+            <Text style={localeStyles.inputCaption}>Магазин:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, tocontactId)?.value}
+              value={selectedItem(listOutlets, outletId)?.value}
               disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectItem', {
                   formName: 'documentParams',
-                  title: 'Подразделение',
-                  fieldName: 'tocontactId',
+                  title: 'Магазин',
+                  fieldName: 'outletId',
+                  list: listOutlets.filter(
+                    (item) => outlets.find((outlet) => outlet.id === item.id)?.parent === contactId,
+                  ),
+                  value: outletId,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Склад:</Text>
+            <ReferenceItem
+              value={selectedItem(listDepartments, departId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  title: 'Склад',
+                  fieldName: 'departId',
                   list: listDepartments,
-                  value: tocontactId,
+                  value: departId,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Маршрут:</Text>
+            <ReferenceItem
+              value={selectedItem(listRoads, roadId)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  title: 'Маршрут',
+                  fieldName: 'roadId',
+                  list: listRoads,
+                  value: roadId,
                 })
               }
             />
@@ -336,7 +401,10 @@ const localeStyles = StyleSheet.create({
     paddingVertical: 10,
   },
   container: {
+    flex: 1,
     paddingHorizontal: 5,
+    // eslint-disable-next-line react-native/sort-styles
+    paddingBottom: 5,
   },
   fieldContainer: {
     alignItems: 'center',

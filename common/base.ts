@@ -7,12 +7,12 @@ export interface IDocument {
 export interface IHead {
   docnumber: string;
   doctype: number;
-  fromcontactId: number; //организация-плательщик   
-  tocontactId: number; // магазин –подразделение организации плательщика
+  contactId: number; //организация-плательщик   
+  outletId: number; // магазин –подразделение организации плательщика
   date: string;
   status: number;
-  roadkey?: number; // 	Маршрут
-  departkey?: number; // Необязательное поле склад (подразделение предприятия-производителя)
+  roadId?: number; // 	Маршрут
+  departId?: number; // Необязательное поле склад (подразделение предприятия-производителя)
   ondate: string; //  Дата отгрузки
 }
 
@@ -79,7 +79,7 @@ export interface IRemain {
 }
 
 // справочник магазинов
-export interface IOutlets extends IRefData {
+export interface IOutlet extends IRefData {
   contactType: number; //4
   parent: number; // ID компании-родителя
   address?: string; // Адрес разгрузки
@@ -99,7 +99,7 @@ export interface IRoad extends IRefData {
 }
 
 // справочник складов
-export interface IDepartment extends IRefData { 
+export interface IDepartment extends IRefData {
 }
 
 // справочник видов упаковки
