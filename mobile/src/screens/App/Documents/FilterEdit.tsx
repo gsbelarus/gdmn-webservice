@@ -106,18 +106,24 @@ const FilterEditScreen = ({ navigation }: Props) => {
         selected={fieldSearch?.some((item) => item === 'state')}
         onPress={() => setFieldSearch('state')}
       />
-      {/* <Line
-        name="toContact"
-        title={'Организация'}
-        selected={fieldSearch?.some((item) => item === 'toContact')}
-        onPress={() => setFieldSearch('toContact')}
-      /> */}
       <Line
+        name="contactId"
+        title={'Организация'}
+        selected={fieldSearch?.some((item) => item === 'contactId')}
+        onPress={() => setFieldSearch('contactId')}
+      />
+      <Line
+        name="outletId"
+        title={'Магазин'}
+        selected={fieldSearch?.some((item) => item === 'outletId')}
+        onPress={() => setFieldSearch('outletId')}
+      />
+      {/* <Line
         name="fromContact"
         title={'Подразделение'}
         selected={fieldSearch?.some((item) => item === 'fromContact')}
         onPress={() => setFieldSearch('fromContact')}
-      />
+      /> */}
       {/* <Line
         name="expeditor"
         title={'Экспедитор'}

@@ -6,6 +6,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } from '../../../../../common';
+import { IOutlet } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -30,9 +31,17 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     [contacts],
   );
 
+  const outlets = useMemo(() => state.references?.outlets?.data as IOutlet[], [state.references?.outlets?.data]);
+
+  const getOutlet = useCallback(
+    (id: number | number[]): IContact =>
+      outlets?.find((outlet) => (Array.isArray(id) ? id.includes(outlet.id) : outlet.id === id)),
+    [contacts],
+  );
+
   const docHead = useMemo(() => item?.head, [item?.head]);
-  const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
-  const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
+  const fromContact = useMemo(() => getContact(docHead?.contactId), [docHead.contactId, getContact]);
+  const toContact = useMemo(() => getOutlet(docHead?.outletId), [docHead.outletId, getOutlet]);
 
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 
@@ -56,10 +65,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            С подразделения: {fromContact?.name || ''}
+            Организация: {fromContact?.name || ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            На подразделение: {toContact?.name || ''}
+            Магазин: {toContact?.name || ''}
           </Text>
         </View>
       </View>
@@ -96,13 +105,11 @@ const DocumentListScreen = ({ navigation }) => {
       appState.documents?.filter((item) => {
         const docHead = item?.head;
 
-        const fromContact = getContact(docHead?.fromcontactId);
+        const fromContact = getContact(docHead?.contactId);
 
-        const toContact = getContact(docHead?.tocontactId);
+        const toContact = getContact(docHead?.outletId);
 
         const status = Statuses.find((type) => type.id === item?.head?.status);
-
-        // console.log('Вызов окна DocumentLst');
 
         return appState.forms?.filterParams?.fieldSearch
           ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
@@ -110,9 +117,9 @@ const DocumentListScreen = ({ navigation }) => {
                 ? item?.head.docnumber?.includes(searchText)
                 : value === 'state' && status
                 ? status.name.includes(searchText)
-                : value === 'toContact' && toContact
+                : value === 'contactId' && toContact
                 ? toContact.name.includes(searchText)
-                : value === 'fromContact' && fromContact
+                : value === 'outletId' && fromContact
                 ? fromContact.name.includes(searchText)
                 : true,
             )
