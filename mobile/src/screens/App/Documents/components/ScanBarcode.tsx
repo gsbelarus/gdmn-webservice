@@ -1,29 +1,63 @@
 /* eslint-disable react-native/no-inline-styles */
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood, IReference } from '../../../../../../common';
+import { IRem, IRemains } from '../../../../../../common/base';
+import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
 const ONE_SECOND_IN_MS = 1000;
 
-const ScanBarcodeScreen2 = () => {
+type Props = StackScreenProps<DocumentStackParamList, 'ScanBarcode'>;
+
+const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const { state, actions } = useAppStore();
-  const navigation = useNavigation();
+  const { state } = useAppStore();
 
   const [barcode, setBarcode] = useState('');
-  const [good, setGood] = useState<IGood>(undefined);
+  const [goodItem, setGoodItem] = useState<IRem>(undefined);
+
+  const docId = route.params?.docId;
+
+  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
+    docId,
+    state.documents,
+  ]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+
+  const remains = useMemo(
+    () =>
+      ((state.references?.remains?.data as unknown) as IRemains[])?.find(
+        (rem) => rem.contactId === document?.head?.fromcontactId,
+      )?.data || [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.references?.remains?.data],
+  );
+
+  //список остатков + поля из справочника тмц
+  const goodRemains = useMemo(
+    () =>
+      remains?.map((item) => ({
+        ...goods.find((good) => good.id === item.goodId),
+        price: item.price,
+        remains: item.q,
+      })),
+    [goods, remains],
+  );
 
   useEffect(() => {
     const permission = async () => {
@@ -39,24 +73,26 @@ const ScanBarcodeScreen2 = () => {
   };
 
   useEffect(() => {
+    vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
+  }, [vibroMode]);
+
+  useEffect(() => {
     if (!scanned) {
       return;
     }
 
     if (!barcode && scanned) {
-      setGood(undefined);
+      setGoodItem(undefined);
       return;
     }
 
     vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
 
-    const goodObj = ((state.references?.goods as unknown) as IReference<IGood>)?.data?.find(
-      (item) => item.barcode === barcode,
-    );
+    const goodObj = goodRemains?.find((item) => item.barcode === barcode);
 
-    setGood(goodObj);
+    setGoodItem(goodObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [barcode, scanned, state.references?.goods]);
+  }, [barcode, scanned, goodRemains]);
 
   if (hasPermission === null) {
     return <View />;
@@ -99,17 +135,6 @@ const ScanBarcodeScreen2 = () => {
             style={localStyles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
-
-          {/* <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
-            <Feather name={'arrow-left'} color={'#FFF'} size={30} />
-          </TouchableOpacity> */}
-          {/* <TouchableOpacity style={localStyles.transparent} onPress={() => setFlashMode(!flashMode)}>
-            <MaterialCommunityIcons
-              name={flashMode ? 'flashlight' : 'flashlight-off'}
-              color={flashMode ? '#FF8' : '#FFF'}
-              size={30}
-            />
-          </TouchableOpacity> */}
         </View>
         {!scanned ? (
           <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
@@ -142,7 +167,7 @@ const ScanBarcodeScreen2 = () => {
                 <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {scanned && !good && (
+            {scanned && !goodItem && (
               <View style={localStyles.infoContainer}>
                 <View style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
@@ -153,15 +178,21 @@ const ScanBarcodeScreen2 = () => {
                 </View>
               </View>
             )}
-            {scanned && good && (
+            {scanned && goodItem && (
               <View style={localStyles.buttonsContainer}>
                 <TouchableOpacity
                   style={[localStyles.buttons, { backgroundColor: '#4380D3' }]}
-                  onPress={() => navigation.goBack()}
+                  onPress={() => {
+                    navigation.navigate('DocumentLineEdit', {
+                      prodId: goodItem.id,
+                      docId,
+                      price: goodItem.price,
+                      remains: goodItem.remains,
+                    });
+                  }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  {/* <Text style={localStyles.text}>Выбрать</Text> */}
-                  <Text style={localStyles.text}>{good?.name}</Text>
+                  <Text style={localStyles.text}>{goodItem?.name}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -180,7 +211,7 @@ const ScanBarcodeScreen2 = () => {
   );
 };
 
-export { ScanBarcodeScreen2 };
+export { ScanBarcodeScreen };
 
 const localStyles = StyleSheet.create({
   border: {

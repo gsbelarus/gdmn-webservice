@@ -11,11 +11,12 @@ export default {
     useMockup: false,
   },
   system: [{
-    name: "SellDocuments",
-    component: "SellDocumentsNavigator",
+    name: "InvDocuments",
+    defaultDocType: 147160592
+    component: "DocumentsNavigator",
     options: {
-      title: 'Отвес-накладные',
-      tabBarLabel: 'Отвесы',
+      title: 'Документы',
+      tabBarLabel: 'Документы',
       tabBarIcon: 'file-document-box',
       tabBarColor: '#CEE7E3',
     }

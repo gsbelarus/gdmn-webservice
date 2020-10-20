@@ -1,10 +1,8 @@
-import { Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Button, Searchbar, IconButton, Avatar } from 'react-native-paper';
+import { Text, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import { IRemains } from '../../../../../common/base';
@@ -12,7 +10,6 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
 interface IField extends IGood {
   remains?: number;
@@ -43,11 +40,9 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
       </View>
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <View style={localStyles.itemInfo}>
-          <Text>
-            Цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} Остаток: {item.remains}
-          </Text>
-        </View>
+        <Text style={localStyles.itemInfo}>
+          цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}, остаток: {item.remains}
+        </Text>
         {barcode && (
           <View style={localStyles.barcode}>
             <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
@@ -62,17 +57,13 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
 
-const RemainsListScreen = ({ route }: Props) => {
+const RemainsListScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
   const { state } = useAppStore();
 
   const [list, setList] = useState<IField[]>([]);
 
-  //const docId = useRoute<RouteProp<DocumentStackParamList, 'RemainsList'>>().params?.docId;
   const docId = route.params?.docId;
 
   const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
@@ -118,85 +109,35 @@ const RemainsListScreen = ({ route }: Props) => {
 
   const renderItem = ({ item }: { item: IField }) => <RemainsItem item={item} />;
 
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
-
-  const handleBarCodeScanned = (barcodeData: string) => {
-    setScanned(true);
-    Alert.alert('Сохранить результат?', barcodeData, [
-      {
-        text: 'Да',
-        onPress: () => {
-          setDoScanned(false);
-          onChangeText(barcodeData);
-          setScanned(false);
-        },
-      },
-      {
-        text: 'Нет',
-        onPress: () => {
-          // setDoScanned(false);
-          // onChangeText(data);
-          setScanned(false);
-        },
-      },
-    ]);
-  };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton
+          icon="barcode-scan"
+          size={24}
+          onPress={() => navigation.navigate('ScanBarcode', { docId: document.id })}
+        />
+      ),
+    });
+  }, [document.id, navigation]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      {hasPermission === null ? (
-        <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-      ) : hasPermission === false ? (
-        <Text style={styles.title}>Нет доступа к камере</Text>
-      ) : undefined}
-      {doScanned ? (
-        <>
-          <BarCodeScanner
-            onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
-            style={StyleSheet.absoluteFillObject}
-          />
-          <Button
-            onPress={() => {
-              setScanned(false);
-              setDoScanned(false);
-            }}
-          >
-            Назад
-          </Button>
-        </>
-      ) : (
-        <>
-          <View style={localStyles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Штрих-код или название"
-              onChangeText={onChangeText}
-              value={text}
-              style={[localStyles.flexGrow, localStyles.searchBar]}
-            />
-            <IconButton
-              icon="barcode-scan"
-              size={26}
-              style={localStyles.iconSettings}
-              onPress={() => setDoScanned(true)}
-            />
-          </View>
-          <ItemSeparator />
-          <FlatList
-            ref={ref}
-            data={list}
-            keyExtractor={(_, i) => String(i)}
-            renderItem={renderItem}
-            ItemSeparatorComponent={ItemSeparator}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
-          />
-        </>
-      )}
+      <Searchbar
+        placeholder="Штрих-код или название"
+        onChangeText={onChangeText}
+        value={text}
+        style={localStyles.searchBar}
+      />
+      <ItemSeparator />
+      <FlatList
+        ref={ref}
+        data={list}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+      />
     </View>
   );
 };
@@ -223,15 +164,6 @@ const localStyles = StyleSheet.create({
   fieldDesciption: {
     opacity: 0.5,
   },
-  flexDirectionRow: {
-    flexDirection: 'row',
-  },
-  flexGrow: {
-    flexGrow: 10,
-  },
-  iconSettings: {
-    width: 36,
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -240,14 +172,14 @@ const localStyles = StyleSheet.create({
     paddingLeft: 4,
   },
   itemInfo: {
-    opacity: 0.5,
+    fontSize: 12,
+    opacity: 0.4,
   },
   name: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   number: {
-    // alignSelf: 'flex-end',
     fontSize: 12,
   },
   searchBar: {

@@ -91,6 +91,15 @@ export const getNextDocId = (documents: IDocument[]) => {
   return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1;
 };
 
+export const getNextDocNumber = (documents: IDocument[]) => {
+  return (
+    documents
+      ?.map((item) => parseInt(item.head.docnumber, 10))
+      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+  ).toString();
+};
+
+// format numbers
 export type NumberFormat = 'currency' | 'number' | 'percentage';
 
 interface INumberFormat {

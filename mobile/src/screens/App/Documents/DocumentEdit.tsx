@@ -3,22 +3,22 @@ import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
-import { Text, Switch, Button } from 'react-native-paper';
+import { Text, Switch } from 'react-native-paper';
 
 import { IContact, IDocument, IRefData } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString, getNextDocId } from '../../../helpers/utils';
+import config from '../../../config';
+import { getDateString, getNextDocId, getNextDocNumber } from '../../../helpers/utils';
 import { IDocumentParams, IListItem } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentEdit'>;
 
-const DocumentEditScreen = ({ route }: Props) => {
+const DocumentEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
   const { state: appState, actions: appActions } = useAppStore();
 
   const [statusId, setStatusId] = useState(0);
@@ -27,10 +27,10 @@ const DocumentEditScreen = ({ route }: Props) => {
 
   const {
     date = new Date().toISOString().slice(0, 10),
-    docnumber,
-    tocontactId,
+    docnumber = getNextDocNumber(appState.documents),
+    tocontactId = -1,
     fromcontactId,
-    doctype,
+    doctype = config.system[0].defaultDocType,
     status = 0,
   } = useMemo(() => {
     return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
@@ -44,12 +44,11 @@ const DocumentEditScreen = ({ route }: Props) => {
   const docTypes = useMemo(() => appState.references?.documenttypes?.data, [appState.references?.documenttypes?.data]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
-    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+    // eslint-disable-next-line eqeqeq
+    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id == id));
   }, []);
 
   const isBlocked = useMemo(() => statusId !== 0, [statusId]);
-
-  // const isEditable = useMemo(() => statusId === 0, [statusId]);
 
   const statusName = useMemo(
     () =>
@@ -165,15 +164,13 @@ const DocumentEditScreen = ({ route }: Props) => {
     // Инициализируем параметры
     if (docId) {
       appActions.setForm({
-        name: 'documentParams',
-        id: docObj?.id,
-        ...(docObj?.head as IDocumentParams),
+        documentParams: {
+          id: docObj?.id,
+          ...(docObj?.head as IDocumentParams),
+        },
       });
     } else {
-      appActions.setForm({
-        name: 'documentParams',
-        date,
-      });
+      appActions.setForm({ documentParams: { date, docnumber, tocontactId, doctype } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, docId]);
@@ -214,7 +211,9 @@ const DocumentEditScreen = ({ route }: Props) => {
                   value={status === 0}
                   disabled={docId === undefined}
                   onValueChange={() => {
-                    appActions.setForm({ ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 });
+                    appActions.setForm({
+                      documentParams: { ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 },
+                    });
                   }}
                 />
               </View>
@@ -227,7 +226,9 @@ const DocumentEditScreen = ({ route }: Props) => {
             <TextInput
               editable={!isBlocked}
               style={[localeStyles.input, { borderColor: colors.border }]}
-              onChangeText={(text) => appActions.setForm({ ...appState.forms?.documentParams, docnumber: text.trim() })}
+              onChangeText={(text) =>
+                appActions.setForm({ documentParams: { ...appState.forms?.documentParams, docnumber: text.trim() } })
+              }
               value={docnumber || ' '}
             />
           </View>
@@ -266,7 +267,7 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Откуда:</Text>
+            <Text style={localeStyles.inputCaption}>Место:</Text>
             <ReferenceItem
               value={selectedItem(listDepartments, fromcontactId)?.value}
               disabled={isBlocked}
@@ -281,7 +282,7 @@ const DocumentEditScreen = ({ route }: Props) => {
               }
             />
           </View>
-          <ItemSeparator />
+          {/*           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
             <Text style={localeStyles.inputCaption}>Куда:</Text>
             <ReferenceItem
@@ -297,7 +298,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                 })
               }
             />
-          </View>
+          </View> */}
           {docId !== undefined && (
             <TouchableOpacity
               onPress={() => {

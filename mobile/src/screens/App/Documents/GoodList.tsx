@@ -36,37 +36,6 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 });
 
-/* const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-  const { state } = useAppStore();
-  const [nameGood, setNameGood] = useState('');
-
-  useEffect(() => {
-    const findGood = state.goods.find((good) => good.id === item.goodkey);
-    findGood ? setNameGood(findGood.name) : undefined;
-  }, [item, state]);
-
-  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
-
-  return (
-    <TouchableOpacity
-      style={[localStyles.item, { backgroundColor: colors.card }]}
-      onPress={() => {
-        navigation.navigate('SellProductDetail', { prodId: item.goodkey, docId, modeCor: false, weighedGood: item.id });
-      }}
-    >
-      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <Feather name="box" size={20} color={'#FFF'} />
-      </View>
-      <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>{nameGood}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.id}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}); */
-
 const GoodListScreen = () => {
   const route = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>();
   const { colors } = useTheme();
@@ -132,13 +101,16 @@ const GoodListScreen = () => {
     ]);
   };
 
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text style={styles.title}>Нет доступа к камере</Text>;
+  }
+
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      {hasPermission === null ? (
-        <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-      ) : hasPermission === false ? (
-        <Text style={styles.title}>Нет доступа к камере</Text>
-      ) : undefined}
       {doScanned ? (
         <>
           <BarCodeScanner
@@ -171,34 +143,6 @@ const GoodListScreen = () => {
             />
           </View>
           <ItemSeparator />
-          {/*  <View style={[localStyles.filter, { borderColor: colors.border }]}>
-            <TextInput
-              style={[
-                styles.input,
-                localStyles.textInput,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
-              ]}
-              onChangeText={onChangeText}
-              value={text}
-              clearButtonMode={'always'}
-              placeholder="Введите шрих-код или название"
-              placeholderTextColor={colors.border}
-              autoCapitalize="sentences"
-              underlineColorAndroid="transparent"
-              selectionColor={'black'}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-            <TouchableOpacity onPress={() => onChangeText('')} style={localStyles.barcodeButton}>
-              <MaterialCommunityIcons name="eraser" size={35} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setDoScanned(true)} style={localStyles.barcodeButton}>
-              <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
-            </TouchableOpacity>
-          </View> */}
           <FlatList
             ref={ref}
             data={filteredList}

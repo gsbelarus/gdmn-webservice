@@ -18,7 +18,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   const { state, actions } = useAppStore();
 
-  const { list, isMulti, formName, fieldName, title, value } = route.params;
+  const { list, isMulti = false, formName, fieldName, title, value } = route.params;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
@@ -47,7 +47,14 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   const renderItem = useCallback(
     ({ item }: { item: IListItem }) => {
-      return <LineItem item={item} checked={checkedItem?.includes(item.id)} onSelect={selectItem} />;
+      return (
+        <LineItem
+          item={item}
+          // eslint-disable-next-line eqeqeq
+          checked={Array.isArray(checkedItem) ? checkedItem?.includes(item.id) : checkedItem == item.id}
+          onSelect={selectItem}
+        />
+      );
     },
     [checkedItem, selectItem],
   );
@@ -71,10 +78,14 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
               Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
               return;
             }
+
+            console.log('formName', formName);
+            console.log('isMulti', isMulti);
             actions.setForm({
-              name: formName,
-              ...state.forms[formName],
-              [fieldName]: isMulti ? checkedItem : checkedItem[0],
+              [formName]: {
+                ...state.forms[formName],
+                [fieldName]: isMulti ? checkedItem : Array.isArray(checkedItem) ? checkedItem[0] : checkedItem,
+              },
             });
             navigation.goBack();
           }}

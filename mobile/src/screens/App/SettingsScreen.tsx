@@ -47,7 +47,7 @@ const SettingsScreen = () => {
             text: 'Да',
             onPress: () => {
               appActions.setDocuments([]);
-              appActions.setReferences(undefined);
+              appActions.setReferences({});
             },
           },
           {

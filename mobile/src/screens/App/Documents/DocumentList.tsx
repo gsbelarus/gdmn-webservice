@@ -56,12 +56,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
               {status ? status.name : ''}
             </Text>
           </View>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            С подразделения: {fromContact?.name || ''}
-          </Text>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>{fromContact?.name || ''}</Text>
+          {/*           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             На подразделение: {toContact?.name || ''}
-          </Text>
+          </Text> */}
         </View>
       </View>
     </TouchableOpacity>

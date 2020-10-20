@@ -43,20 +43,19 @@ const FilterEditScreen = ({ navigation }: Props) => {
 
   const setFieldSearch = (field: string) =>
     actions.setForm({
-      ...state.forms?.filterParams,
-      fieldSearch: fieldSearch?.some((item) => item === field)
-        ? fieldSearch.filter((item) => item !== field)
-        : [...fieldSearch, field],
+      filterParams: {
+        ...state.forms?.filterParams,
+        fieldSearch: fieldSearch?.some((item) => item === field)
+          ? fieldSearch.filter((item) => item !== field)
+          : [...fieldSearch, field],
+      },
     });
 
   useEffect(() => {
     if (state.forms?.filterParams) {
       return;
     }
-    actions.setForm({
-      name: 'filterParams',
-      fieldSearch: [],
-    });
+    actions.setForm({ filterParams: { fieldSearch: [] } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, state.forms?.filterParams]);
 

@@ -22,8 +22,7 @@ export interface IListItem {
 }
 
 export interface IFormParams {
-  fromContact?: number[];
-  toContact?: number[];
+  contact?: number[];
   dateBegin?: string;
   dateEnd?: string;
 }
@@ -37,10 +36,6 @@ export interface IDocumentParams {
   docnumber?: string;
 }
 
-/* export interface IRemainsParams {
-  contactId?: number;
-}
- */
 export interface IFilterParams {
   fieldSearch: string[];
 }
@@ -91,12 +86,12 @@ export interface IReferences {
   [name: string]: IReference;
 }
 
+export interface IForms<T = IForm> {
+  [name: string]: T;
+}
 export interface IAppState {
   settings?: IAppSettings;
   documents?: IDocument[];
   references?: IReferences;
-  forms?: {
-    [name: string]: IForm;
-  };
-  // filterParams: string[];
+  forms?: IForms;
 }

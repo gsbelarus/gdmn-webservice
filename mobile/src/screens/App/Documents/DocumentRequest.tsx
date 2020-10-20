@@ -109,12 +109,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
               dateEnd: documentParams?.dateBegin
                 ? new Date(documentParams?.dateEnd).toISOString()
                 : today.toISOString(),
-              fromContact: Array.isArray(documentParams?.fromContact)
-                ? documentParams?.fromContact[0]
-                : documentParams?.fromContact,
-              toContact: Array.isArray(documentParams?.toContact)
-                ? documentParams?.toContact[0]
-                : documentParams?.toContact,
+              contact: Array.isArray(documentParams?.contact) ? documentParams?.contact[0] : documentParams?.contact,
             },
           ],
         },
@@ -152,8 +147,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
     state.companyID,
     documentParams?.dateBegin,
     documentParams?.dateEnd,
-    documentParams?.fromContact,
-    documentParams?.toContact,
+    documentParams?.contact,
     yesterday,
     today,
     appActions,
@@ -325,33 +319,18 @@ const DocumentRequestScreen = ({ route }: Props) => {
           </View>
         </View>
         <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Отправитель:</Text>
+          <Text style={localeStyles.subdivisionText}>Место:</Text>
           <ReferenceItem
-            value={selectedItem(departments, documentParams?.fromContact)?.value}
+            value={selectedItem(departments, documentParams?.contact)?.value}
             onPress={() =>
               navigation.navigate('SelectItem', {
                 fieldName: 'fromContact',
                 title: 'Подразделение',
                 list: listDepartments,
-                value: documentParams?.fromContact,
+                value: documentParams?.contact,
               })
             }
           />
-        </View>
-        <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Получатель:</Text>
-          <ReferenceItem
-            value={selectedItem(departments, documentParams?.toContact)?.value}
-            onPress={() =>
-              navigation.navigate('SelectItem', {
-                fieldName: 'toContact',
-                title: 'Подразделение',
-                list: listDepartments,
-                value: documentParams?.toContact,
-              })
-            }
-          />
-          {/* TODO: добавить тип документ */}
         </View>
       </ScrollView>
     </View>

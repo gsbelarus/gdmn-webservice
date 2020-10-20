@@ -1,5 +1,5 @@
-import { IDocument, IHead, ILine, IDocumentType } from './base';
-
+// import { IDocument, IHead, ILine, IDocumentType } from './base';
+/* 
 export interface IInventoryDocument extends IDocument {
   id: number;
   head: IInventoryHead;
@@ -26,3 +26,4 @@ export interface IReference {
   type: string;
   data: IRefData[];
 }
+ */

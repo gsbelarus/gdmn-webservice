@@ -65,7 +65,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            actions.setForm({ name: formName, ...state.forms[formName], [fieldName]: date });
+            actions.setForm({ [formName]: { ...state.forms[formName], [fieldName]: date } });
             navigation.goBack();
           }}
         />

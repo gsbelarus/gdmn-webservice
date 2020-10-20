@@ -101,7 +101,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.SET_FORM: {
       return {
         ...state,
-        forms: { ...state.forms, [action.payload.name]: action.payload },
+        forms: { ...state.forms, ...action.payload },
       };
     }
     case ActionAppTypes.CLEAR_FORM: {

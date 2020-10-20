@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button, Avatar } from 'react-native-paper';
 
@@ -120,7 +120,7 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   useScrollToTop(refList);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: documentTypeName || '',
       headerLeft: () => (
@@ -194,12 +194,12 @@ const DocumentViewScreen = ({ route }: Props) => {
           <FAB
             style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
             icon="barcode-scan"
-            onPress={() => navigation.navigate('ScanBarcode2', { docId: document.id })}
+            onPress={() => navigation.navigate('ScanBarcode', { docId: document?.id })}
           />
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="plus"
-            onPress={() => navigation.navigate('RemainsList', { docId: document.id })}
+            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
           />
         </>
       )}

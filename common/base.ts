@@ -29,11 +29,8 @@ export interface IRefData {
 
 
 export interface IForm {
-  name: string;
-  // parent: string;
   [name: string]: unknown;
 }
-
 
 export interface IReference<T = IRefData> {
   id: number;
@@ -60,20 +57,6 @@ export interface IRem extends IGood {
   remains?: number;
   price?: number;
 }
-
-/* export interface IRemains {
-  id: number;
-  name: string;
-  type: string;
-  data: IRemain[];
-} */
-
-// export interface IRemain {
-//   contactId: number;
-//   goodId: number;
-//   q?: number;
-//   price?: number;
-// }
 
  export interface IRemains {
   contactId: number;

@@ -1,4 +1,3 @@
-export { ScanBarcodeScreen } from './ScanBarсode';
-export { ScanBarcodeScreen2 } from './ScanBarcode2';
+export { ScanBarcodeScreen } from './ScanBarcode';
 export { SelectDateScreen } from './SelectDate';
 export { SelectItemScreen } from './SelectItem';
