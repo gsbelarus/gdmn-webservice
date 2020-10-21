@@ -137,7 +137,9 @@ export const getWeightCode = (barcode: string) => {
   return barcode.substring(0, 1) === config.system[0].weightSettings.weightCode
     ? {
         code: barcode.substring(2, config.system[0].weightSettings.code),
-        weight: Number(barcode.substring(7, config.system[0].weightSettings.weight)) / 1000,
+        weight:
+          Number(barcode.substring(2 + config.system[0].weightSettings.code, config.system[0].weightSettings.weight)) /
+          1000,
       }
     : undefined;
 };

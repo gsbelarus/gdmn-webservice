@@ -30,7 +30,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     docnumber = getNextDocNumber(appState.documents),
     tocontactId = -1,
     fromcontactId,
-    doctype = config.system[0].defaultDocType,
+    doctype = config.system[0].defaultDocType[0],
     status = 0,
   } = useMemo(() => {
     return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;

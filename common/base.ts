@@ -52,6 +52,7 @@ export interface IGood extends IRefData {
   alias?: string;
   barcode?: string;
   weightCode?: string;
+  idFrac?: boolean;
 }
 
 export interface IRem extends IGood {

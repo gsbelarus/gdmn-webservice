@@ -1,17 +1,21 @@
 import { useTheme } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { IResponse, IMessage, IReference, IContact, IGood, IRemain, IDocument, IRefData } from '../../../../common';
+import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
+import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
-const SettingsScreen = () => {
+type Props = StackScreenProps<SettingsStackParamList, 'Settings'>;
+
+const SettingsScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state: AuthState } = useAuthStore();
@@ -106,26 +110,6 @@ const SettingsScreen = () => {
                   appActions.setReference(refObj);
                   break;
                 }
-                /* case 'documenttypes': {
-                  const documentTypes = (dataSet as unknown) as IReference<IRefData[]>;
-                  appActions.setReference(documentTypes);
-                  break;
-                }
-                case 'contacts': {
-                  const contacts = (dataSet as unknown) as IReference<IContact[]>;
-                  appActions.setReference(contacts);
-                  break;
-                }
-                case 'goods': {
-                  const goods = (dataSet as unknown) as IReference<IGood[]>;
-                  appActions.setReference(goods);
-                  break;
-                }
-                case 'remains': {
-                  const remains = (dataSet as unknown) as IReference<IRemain[]>;
-                  appActions.setReference(remains);
-                  break;
-                } */
                 default:
                   break;
               }
@@ -220,18 +204,19 @@ const SettingsScreen = () => {
         <View>
           <Button
             mode="text"
-            icon={'update'}
-            style={localStyles.refreshButton}
-            disabled={isLoading}
-            loading={isLoading}
-            onPress={sendGetReferencesRequest}
+            style={localStyles.button}
+            onPress={() => {
+              navigation.navigate('CompanyConfig');
+            }}
           >
-            Проверить обновления
+            Настройки организации
           </Button>
+          <Divider />
           {__DEV__ && (
             <>
               <Button
                 mode="text"
+                style={localStyles.button}
                 onPress={async () => {
                   const log = await appStorage.getItem(`${AuthState.userID}/${AuthState.companyID}/REFERENCES`);
                   Reactotron.display({
@@ -246,6 +231,7 @@ const SettingsScreen = () => {
               </Button>
               <Button
                 mode="text"
+                style={localStyles.button}
                 onPress={async () => {
                   Reactotron.display({
                     name: 'settings',
@@ -275,16 +261,17 @@ const SettingsScreen = () => {
               >
                 Проверить стейт
               </Button>
+              <Divider />
             </>
           )}
         </View>
-        <Divider />
-        <SettingsItem
+        {/* <SettingsItem
           label="Синхронизировать"
           value={settings?.synchronization}
           onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
         />
         <Divider />
+        */}
         <SettingsItem
           label="Удалять документы после обработки на сервере"
           value={settings?.autodeletingDocument}
@@ -292,12 +279,27 @@ const SettingsScreen = () => {
             appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
           }
         />
+        <Divider />
       </ScrollView>
+      <Button
+        mode="contained"
+        icon="update"
+        style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
+        disabled={isLoading}
+        loading={isLoading}
+        onPress={sendGetReferencesRequest}
+      >
+        Проверить обновления
+      </Button>
     </>
   );
 };
 
 const localStyles = StyleSheet.create({
+  button: {
+    height: 40,
+    justifyContent: 'center',
+  },
   content: {
     flex: 1,
   },
@@ -322,7 +324,9 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   refreshButton: {
-    margin: 20,
+    height: 50,
+    justifyContent: 'center',
+    margin: 10,
   },
 });
 

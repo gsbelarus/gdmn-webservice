@@ -91,10 +91,10 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
     const weightObj = getWeightCode(barcode);
     const goodObj = goodRemains?.find((item) =>
-      weightObj ? item.weightCode === weightObj.code : item.barcode === barcode,
+      weightObj ? item.weightCode === weightObj?.code : item.barcode === barcode,
     );
 
-    setGoodItem({ ...goodObj, weight: weightObj.weight });
+    setGoodItem({ ...goodObj, weight: weightObj?.weight });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode, scanned, goodRemains]);
 
@@ -197,7 +197,13 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <Text style={localStyles.text}>{goodItem?.name}</Text>
+                  <View style={localStyles.goodInfo}>
+                    <Text style={localStyles.goodName} numberOfLines={3}>
+                      {goodItem?.name}
+                    </Text>
+                    {/*<Text style={localStyles.barcode}>{goodItem?.barcode}</Text>
+                    <Text style={localStyles.barcode}>Цена: {goodItem?.price || 0}</Text> */}
+                  </View>
                 </TouchableOpacity>
               </View>
             )}
@@ -219,6 +225,11 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 export { ScanBarcodeScreen };
 
 const localStyles = StyleSheet.create({
+  barcode: {
+    color: '#fff',
+    fontSize: 16,
+    opacity: 0.5,
+  },
   border: {
     height: 50,
     width: 50,
@@ -248,7 +259,8 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonsContainer: {
-    height: 100,
+    minHeight: 100,
+    // flex: 1,
     padding: 10,
   },
   camera: {
@@ -264,6 +276,14 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#0008',
     height: 100,
     justifyContent: 'center',
+  },
+  goodInfo: {
+    // marginHorizontal: 10,
+  },
+  goodName: {
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
   },
   header: {
     alignItems: 'center',

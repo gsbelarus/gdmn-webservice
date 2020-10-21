@@ -12,7 +12,12 @@ export default {
   },
   system: [{
     name: "InvDocuments",
-    defaultDocType: 147160592,
+    defaultDocType: [147160592],
+    weightSettings: {
+      weightCode: "2",
+      code: 5,
+      weight: 5,
+    },
     component: "DocumentsNavigator",
     options: {
       title: 'Документы',
