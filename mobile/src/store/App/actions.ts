@@ -1,4 +1,5 @@
-import { IHead, ILine, IDocument, IRemain, IDocumentType, IGood, IContact } from '../../../../common';
+import { IHead, ILine, IDocument, IRemain, IGood, IContact } from '../../../../common';
+import { IDocumentType } from '../../../../common/base';
 import { ISellHead, ISellDocument, ISellLine, IAppSettings, ITara, ILineTara } from '../../model';
 import { IFormParams, IDocumentParams, IWeighedGoods } from '../../model/sell';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';

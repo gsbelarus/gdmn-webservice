@@ -1,8 +1,8 @@
 import { AsyncStorage } from 'react-native';
 
-import { IMessage } from '../../../common';
+import { IDocument, ILine, IMessage } from '../../../common';
 //import config from '../config';
-import { ISellDocument } from '../model';
+import { ISellDocument, ISellLine } from '../model';
 
 // export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
 
@@ -81,9 +81,9 @@ export const getDateString = (_date: string) => {
   )}.${date.getFullYear()}`;
 };
 
-export const getNextDocLineId = (document: ISellDocument) => {
+export const getNextDocLineId = (document: ISellDocument | IDocument) => {
   return (
-    document.lines
+    (document.lines as (ILine | ISellLine)[])
       .map((item: { id: string }) => Number(item.id))
       .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 1
   );

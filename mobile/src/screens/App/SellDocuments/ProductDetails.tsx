@@ -11,7 +11,7 @@ import { IDocument, IGood } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString } from '../../../helpers/utils';
+import { getDateString, getNextDocLineId } from '../../../helpers/utils';
 import { ISellLine, ISellDocument } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
@@ -198,7 +198,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                 line: {
                   goodId: route.params.prodId,
                   ...(state.formParams as ISellLine),
-                  id: '0',
+                  id: getNextDocLineId(document),
                   barcodes: route.params.barcode
                     ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)]
                     : [],

@@ -7,6 +7,7 @@ import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
+import { getNextDocLineId } from '../../../helpers/utils';
 import { ISellDocument, ISellLine, IWeighedGoods } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
@@ -133,7 +134,7 @@ const ScanBarCodeScreen = () => {
       actions.addLine({
         docId: route.params.docId,
         line: {
-          id: '0',
+          id: getNextDocLineId(document).toString(),
           goodId: weighedGood.goodkey,
           tara: [],
           manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
