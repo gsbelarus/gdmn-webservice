@@ -90,5 +90,7 @@ export const getNextDocLineId = (document: ISellDocument) => {
 };
 
 export const getNextDocId = (documents: ISellDocument[]) => {
-  return documents?.map((item) => item.id).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1;
+  return (
+    documents?.map((item) => Number(item.id)).reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+  );
 };
