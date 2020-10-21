@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
 
 import { IDocument, IMessage } from '../../../common';
+import config from '../config';
 
 // export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
 
@@ -130,4 +131,13 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
     default:
       return value;
   }
+};
+
+export const getWeightCode = (barcode: string) => {
+  return barcode.substring(0, 1) === config.system[0].weightSettings.weightCode
+    ? {
+        code: barcode.substring(2, config.system[0].weightSettings.code),
+        weight: Number(barcode.substring(7, config.system[0].weightSettings.weight)) / 1000,
+      }
+    : undefined;
 };

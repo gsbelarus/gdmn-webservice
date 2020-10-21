@@ -51,11 +51,13 @@ export interface IContact extends IRefData {
 export interface IGood extends IRefData {
   alias?: string;
   barcode?: string;
+  weightCode?: string;
 }
 
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
+  weight?: number;
 }
 
  export interface IRemains {

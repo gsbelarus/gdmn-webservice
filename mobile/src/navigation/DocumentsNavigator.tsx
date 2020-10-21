@@ -19,7 +19,14 @@ export type DocumentStackParamList = {
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
-  DocumentLineEdit: { docId: number; prodId: number; lineId?: number; price?: number; remains?: number };
+  DocumentLineEdit: {
+    docId: number;
+    prodId: number;
+    weight?: number;
+    lineId?: number;
+    price?: number;
+    remains?: number;
+  };
   GoodList: { docId: number };
   RemainsList: { docId: number };
   DocumentRequest: undefined;
@@ -29,7 +36,7 @@ export type DocumentStackParamList = {
     title: string;
     isMulti?: boolean;
     list: IListItem[];
-    value: number | number[];
+    value: number[];
   };
   SelectDate: {
     formName: string;

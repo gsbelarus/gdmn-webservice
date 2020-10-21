@@ -10,6 +10,7 @@ import { Text, IconButton } from 'react-native-paper';
 
 import { IGood, IReference } from '../../../../../../common';
 import { IRem, IRemains } from '../../../../../../common/base';
+import { getWeightCode } from '../../../../helpers/utils';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
@@ -88,9 +89,12 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
     vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
 
-    const goodObj = goodRemains?.find((item) => item.barcode === barcode);
+    const weightObj = getWeightCode(barcode);
+    const goodObj = goodRemains?.find((item) =>
+      weightObj ? item.weightCode === weightObj.code : item.barcode === barcode,
+    );
 
-    setGoodItem(goodObj);
+    setGoodItem({ ...goodObj, weight: weightObj.weight });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode, scanned, goodRemains]);
 
@@ -185,6 +189,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                   onPress={() => {
                     navigation.navigate('DocumentLineEdit', {
                       prodId: goodItem.id,
+                      weight: goodItem.weight,
                       docId,
                       price: goodItem.price,
                       remains: goodItem.remains,

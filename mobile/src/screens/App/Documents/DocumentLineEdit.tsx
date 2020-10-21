@@ -19,7 +19,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const { docId, lineId, prodId, price, remains } = route.params;
+  const { docId, lineId, prodId, weight, price, remains } = route.params;
 
   const [document, setDocument] = useState<IDocument>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
@@ -27,13 +27,18 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
-  const productName = useMemo(() => {
-    return (
-      ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.name ||
-      'товар не найден'
-    );
+  const product = useMemo(() => {
+    return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, state.references?.goods?.data]);
+
+  // const productName = useMemo(() => {
+  //   return (
+  //     ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.name ||
+  //     'товар не найден'
+  //   );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [prodId, state.references?.goods?.data]);
 
   // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
 
@@ -48,7 +53,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setLine({
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
-      quantity: docLine?.quantity || 1,
+      quantity: docLine?.quantity || weight,
       price: docLine?.price || price,
       remains: docLine?.remains || remains,
     });
@@ -177,7 +182,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             },
           ]}
         >
-          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
+          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
+            {product?.name || ''}
+          </SubTitle>
           <View style={localStyles.item}>
             <Text style={localStyles.label}>Цена</Text>
             <View>

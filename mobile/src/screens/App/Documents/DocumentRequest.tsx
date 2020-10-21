@@ -78,7 +78,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   //   appActions.setFormParams(route.params);
   // }, [appActions, route]);
 
-  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
+  const selectedItem = useCallback((listItems: IListItem[], id: number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 

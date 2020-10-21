@@ -260,7 +260,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   fieldName: 'doctype',
                   title: 'Тип документа',
                   list: listDocumentType,
-                  value: doctype,
+                  value: [doctype],
                 })
               }
             />
@@ -277,7 +277,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   title: 'Подразделение',
                   fieldName: 'fromcontactId',
                   list: listDepartments,
-                  value: fromcontactId,
+                  value: [fromcontactId],
                 })
               }
             />
