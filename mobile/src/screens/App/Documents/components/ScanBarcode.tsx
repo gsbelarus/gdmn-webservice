@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
@@ -8,9 +7,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
-import { IGood, IReference } from '../../../../../../common';
+import { IGood } from '../../../../../../common';
 import { IRem, IRemains } from '../../../../../../common/base';
-import { getWeightCode } from '../../../../helpers/utils';
+import config from '../../../../config';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
@@ -18,6 +17,8 @@ import styles from '../../../../styles/global';
 const ONE_SECOND_IN_MS = 1000;
 
 type Props = StackScreenProps<DocumentStackParamList, 'ScanBarcode'>;
+
+type ScannedObject = IRem & { quantity: number };
 
 const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -28,7 +29,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const { state } = useAppStore();
 
   const [barcode, setBarcode] = useState('');
-  const [goodItem, setGoodItem] = useState<IRem>(undefined);
+  const [goodItem, setGoodItem] = useState<ScannedObject>(undefined);
 
   const docId = route.params?.docId;
 
@@ -74,7 +75,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   };
 
   useEffect(() => {
-    vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
   useEffect(() => {
@@ -87,14 +88,33 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
       return;
     }
 
-    vibroMode && Vibration.vibrate(10 * ONE_SECOND_IN_MS);
+    const getScannedObject = (brc: string): ScannedObject => {
+      let goodObj: IRem;
+      let charFrom = 0;
+      let charTo = config.system[0].weightSettings.weightCode.length;
+      if (brc.substring(charFrom, charTo) !== config.system[0].weightSettings.weightCode) {
+        goodObj = goodRemains?.find((item) => item.barcode === brc);
+        return goodObj ? { ...goodObj, quantity: 1 } : undefined;
+      }
 
-    const weightObj = getWeightCode(barcode);
-    const goodObj = goodRemains?.find((item) =>
-      weightObj ? item.weightCode === weightObj?.code : item.barcode === barcode,
-    );
+      charFrom = charTo;
+      charTo = charFrom + config.system[0].weightSettings.code;
+      const code = Number(barcode.substring(charFrom, charTo)).toString();
 
-    setGoodItem({ ...goodObj, weight: weightObj?.weight });
+      charFrom = charTo;
+      charTo = charFrom + config.system[0].weightSettings.weight;
+
+      const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
+
+      goodObj = goodRemains?.find((item) => item.weightCode === code);
+      return goodObj ? { ...goodObj, quantity: qty } : undefined;
+    };
+
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
+
+    const scannedObj: ScannedObject = getScannedObject(barcode);
+
+    setGoodItem(scannedObj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode, scanned, goodRemains]);
 
@@ -114,7 +134,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
         }}
         // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={false}
+        // autoFocus={false}
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
@@ -201,8 +221,10 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                     <Text style={localStyles.goodName} numberOfLines={3}>
                       {goodItem?.name}
                     </Text>
-                    {/*<Text style={localStyles.barcode}>{goodItem?.barcode}</Text>
-                    <Text style={localStyles.barcode}>Цена: {goodItem?.price || 0}</Text> */}
+                    <Text style={localStyles.barcode}>
+                      цена: {goodItem?.price || 0}, кол-во: {goodItem?.quantity}
+                    </Text>
+                    <Text style={localStyles.barcode}>{goodItem?.barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

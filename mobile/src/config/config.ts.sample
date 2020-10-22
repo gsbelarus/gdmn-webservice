@@ -12,12 +12,6 @@ export default {
   },
   system: [{
     name: "InvDocuments",
-    defaultDocType: [147160592],
-    weightSettings: {
-      weightCode: "2",
-      code: 5,
-      weight: 5,
-    },
     component: "DocumentsNavigator",
     options: {
       title: 'Документы',
@@ -25,6 +19,7 @@ export default {
       tabBarIcon: 'file-document-box',
       tabBarColor: '#CEE7E3',
     },
+    defaultDocType: [147160592],
     weightSettings: {
       weightCode: '27',
       code: 5,
