@@ -2,8 +2,10 @@
 import React, { useEffect } from 'react';
 
 import { IDocument } from '../../../../common';
+import { ICompanySetting, IWeightCodeSettings } from '../../../../common/base';
+import config from '../../config';
 import { appStorage } from '../../helpers/utils';
-import { IAppContextProps, IAppState, IAppSettings, IReferences } from '../../model/types';
+import { IAppContextProps, IAppState, IAppSettings, IReferences, ICompanySettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
@@ -16,6 +18,7 @@ const defaultAppState: IAppContextProps = {
 
 const sections = {
   SETTINGS: 'SETTINGS',
+  COMPANYSETTINGS: 'COMPANYSETTINGS',
   REFERENCES: 'REFERENCES',
   DOCUMENTS: 'DOCUMENTS',
 };
@@ -38,6 +41,19 @@ const createStoreContext = () => {
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
         actions.setSettings(storageSettings);
+        // настройки компании
+        const storageCompanySettings: ICompanySettings = await appStorage.getItem(
+          `${storagePath}/${sections.COMPANYSETTINGS}`,
+        );
+        const weightCode = storageCompanySettings?.weightCode ?? config.system[0].weightSettings;
+        actions.setCompanySettings(
+          storageCompanySettings
+            ? {
+                ...storageCompanySettings,
+                weightCode,
+              }
+            : { weightCode },
+        );
         // Справочники
         const references = (await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`)) as IReferences;
         actions.setReferences(references);
@@ -73,6 +89,17 @@ const createStoreContext = () => {
         saveSettings();
       }
     }, [state.settings, storagePath]);
+
+    /*  Сохранение настроек компании в storage при их изменении */
+    useEffect(() => {
+      const saveCompanySettings = async () => {
+        await appStorage.setItem(`${storagePath}/${sections.COMPANYSETTINGS}`, state.companySettings);
+      };
+
+      if (state.companySettings && storagePath && !isLoading) {
+        saveCompanySettings();
+      }
+    }, [state.companySettings, storagePath]);
 
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {

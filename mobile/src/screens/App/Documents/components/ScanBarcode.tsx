@@ -8,7 +8,7 @@ import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
-import { IRem, IRemains } from '../../../../../../common/base';
+import { IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
 import config from '../../../../config';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
@@ -40,6 +40,11 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const weightCodeSettings = useMemo(() => (state.companySettings?.weightCode as unknown) as IWeightCodeSettings, [
+    state.companySettings?.weightCode,
+  ]);
 
   const remains = useMemo(
     () =>
@@ -91,18 +96,19 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
     const getScannedObject = (brc: string): ScannedObject => {
       let goodObj: IRem;
       let charFrom = 0;
-      let charTo = config.system[0].weightSettings.weightCode.length;
-      if (brc.substring(charFrom, charTo) !== config.system[0].weightSettings.weightCode) {
+
+      let charTo = weightCodeSettings?.weightCode.length;
+      if (brc.substring(charFrom, charTo) !== weightCodeSettings?.weightCode) {
         goodObj = goodRemains?.find((item) => item.barcode === brc);
         return goodObj ? { ...goodObj, quantity: 1 } : undefined;
       }
 
       charFrom = charTo;
-      charTo = charFrom + config.system[0].weightSettings.code;
+      charTo = charFrom + weightCodeSettings?.code;
       const code = Number(barcode.substring(charFrom, charTo)).toString();
 
       charFrom = charTo;
-      charTo = charFrom + config.system[0].weightSettings.weight;
+      charTo = charFrom + weightCodeSettings?.weight;
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
 
@@ -133,7 +139,6 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13],
         }}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
         // autoFocus={false}
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
@@ -209,10 +214,10 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                   onPress={() => {
                     navigation.navigate('DocumentLineEdit', {
                       prodId: goodItem.id,
-                      weight: goodItem.weight,
                       docId,
                       price: goodItem.price,
                       remains: goodItem.remains,
+                      quantity: goodItem.quantity,
                     });
                   }}
                 >

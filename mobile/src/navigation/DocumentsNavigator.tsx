@@ -22,7 +22,7 @@ export type DocumentStackParamList = {
   DocumentLineEdit: {
     docId: number;
     prodId: number;
-    weight?: number;
+    quantity?: number;
     lineId?: number;
     price?: number;
     remains?: number;

@@ -19,7 +19,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const { docId, lineId, prodId, weight, price, remains } = route.params;
+  const { docId, lineId, prodId, price, remains, quantity } = route.params;
 
   const [document, setDocument] = useState<IDocument>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
@@ -53,7 +53,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setLine({
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
-      quantity: docLine?.quantity || weight,
+      quantity: docLine?.quantity || quantity || 1,
       price: docLine?.price || price,
       remains: docLine?.remains || remains,
     });

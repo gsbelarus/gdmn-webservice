@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IHead, ILine, IDocument, IReference, IForm } from '../../../../common';
-import { IAppSettings, IForms } from '../../model/types';
+import { IAppSettings, ICompanySettings, IForms } from '../../model/types';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 // eslint-disable-next-line no-shadow
@@ -14,6 +14,7 @@ export enum ActionAppTypes {
   DOCUMENT_DELETE_LINE = 'DOCUMENT_DELETE_LINE',
   DOCUMENT_UPDATE_LINE = 'DOCUMENT_UPDATE_LINE',
   SET_SETTINGS = 'SET_SETTINGS',
+  SET_COMPANY_SETTINGS = 'SET_COMPANY_SETTINGS',
   SET_REFERENCE = 'SET_REFERENCE',
   SET_REFERENCES = 'SET_REFERENCES',
   SET_DOCUMENTS = 'SET_DOCUMENTS',
@@ -41,6 +42,9 @@ export const AppActions = {
     ActionAppTypes.DOCUMENT_UPDATE_LINE,
   ),
   setSettings: createActionPayload<ActionAppTypes.SET_SETTINGS, IAppSettings>(ActionAppTypes.SET_SETTINGS),
+  setCompanySettings: createActionPayload<ActionAppTypes.SET_COMPANY_SETTINGS, ICompanySettings>(
+    ActionAppTypes.SET_COMPANY_SETTINGS,
+  ),
   setReference: createActionPayload<ActionAppTypes.SET_REFERENCE, IReference<any>>(ActionAppTypes.SET_REFERENCE),
   setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, { [name: string]: IReference }>(
     ActionAppTypes.SET_REFERENCES,

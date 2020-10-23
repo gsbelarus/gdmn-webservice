@@ -1,5 +1,5 @@
 import { IDocument, IBaseUrl, IReference } from '../../../common';
-import { IForm } from '../../../common/base';
+import { ICompanySetting, IForm } from '../../../common/base';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
@@ -82,6 +82,10 @@ export interface IAppSettings {
   darkTheme?: boolean;
 }
 
+export interface ICompanySettings {
+  [name: string]: ICompanySetting;
+}
+
 export interface IReferences {
   [name: string]: IReference;
 }
@@ -91,6 +95,7 @@ export interface IForms<T = IForm> {
 }
 export interface IAppState {
   settings?: IAppSettings;
+  companySettings?: ICompanySettings;
   documents?: IDocument[];
   references?: IReferences;
   forms?: IForms;

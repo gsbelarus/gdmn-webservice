@@ -32,6 +32,16 @@ export interface IForm {
   [name: string]: unknown;
 }
 
+export interface ICompanySetting {
+  [name: string]: unknown;
+}
+
+export interface IWeightCodeSettings {
+  weightCode: string;
+  code: number;
+  weight: number;
+}
+
 export interface IReference<T = IRefData> {
   id: number;
   name: string;
@@ -58,7 +68,6 @@ export interface IGood extends IRefData {
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
-  weight?: number;
 }
 
  export interface IRemains {

@@ -7,6 +7,7 @@ import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
   settings: undefined,
+  companySettings: undefined,
   documents: undefined,
   references: undefined,
   forms: undefined,
@@ -92,6 +93,8 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     }
     case ActionAppTypes.SET_SETTINGS:
       return { ...state, settings: action.payload };
+    case ActionAppTypes.SET_COMPANY_SETTINGS:
+      return { ...state, companySettings: action.payload };
     case ActionAppTypes.SET_DOCUMENTS:
       return { ...state, documents: action.payload };
     case ActionAppTypes.SET_REFERENCES:
