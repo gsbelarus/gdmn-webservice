@@ -34,6 +34,7 @@
     "react-native-input-spinner": "^1.2.18",
     "react-native-paper": "^4.2.0",
     "react-native-safe-area-context": "3.1.4",
+    "react-native-scan-device": "git+https://github.com/mediaburg/react-native-scan-device",
     "react-native-screens": "~2.10.1",
     "react-navigation": "^4.4.0",
     "reactotron-react-native": "^5.0.0"
@@ -46,6 +47,7 @@
     "@types/expo": "^33.0.1",
     "@types/react": "~16.9.49",
     "@types/react-native": "~0.63.23",
+    "@types/react-native-honeywell-scanner": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",

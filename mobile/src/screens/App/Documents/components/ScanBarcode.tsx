@@ -1,10 +1,12 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable react-native/no-inline-styles */
 import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration, Clipboard, Keyboard, TextInput } from 'react-native';
+import HoneywellScanner from 'react-native-honeywell-scanner';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
@@ -28,6 +30,8 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const [scanned, setScanned] = useState(false);
   const { state } = useAppStore();
 
+  const ref = useRef<TextInput>(null);
+
   const [barcode, setBarcode] = useState('');
   const [goodItem, setGoodItem] = useState<ScannedObject>(undefined);
 
@@ -43,9 +47,18 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const weightCodeSettings = useMemo(() => (state.companySettings?.weightCode as unknown) as IWeightCodeSettings, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     state.companySettings?.weightCode,
   ]);
 
+  /*   HoneywellScanner.on('barcodeReadSuccess', (event) => {
+    console.log('Received data', event);
+  });
+
+  HoneywellScanner.on('barcodeReadFail', () => {
+    console.log('Barcode read failed');
+  });
+ */
   const remains = useMemo(
     () =>
       ((state.references?.remains?.data as unknown) as IRemains[])?.find(
@@ -78,6 +91,13 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
     setScanned(true);
     setBarcode(data);
   };
+
+  useEffect(() => {
+    if (!scanned && ref?.current) {
+      ref.current.focus();
+      ref.current.clear();
+    }
+  }, [scanned, ref]);
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
@@ -151,6 +171,13 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
             size={30}
             style={localStyles.transparent}
             onPress={() => navigation.goBack()}
+          />
+          <TextInput
+            style={{ width: 0 }}
+            autoFocus={true}
+            ref={ref}
+            onFocus={() => Keyboard.dismiss()}
+            onChangeText={(text) => handleBarCodeScanned(text)}
           />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}

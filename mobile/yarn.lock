@@ -1605,6 +1605,11 @@
     "@types/react-native" "*"
     "@types/xdate" "*"
 
+"@types/react-native-honeywell-scanner@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-native-honeywell-scanner/-/react-native-honeywell-scanner-1.0.0.tgz#dff9eacafcf0834a27b68cb03687080a0a1bd3ac"
+  integrity sha512-OtjTocTOGNieCBZnAa2Zy430JWH4V5TCnfCeDrxOwxxx5GI1l+aQTTcvmBCbxiehGKXy4e/5uKxCn+x55nlYtQ==
+
 "@types/react-native@*":
   version "0.63.8"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.8.tgz#73ec087122c64c309eeaf150b565b8d755f0fb1f"
@@ -6380,6 +6385,10 @@ react-native-safe-area-view@^0.14.9:
   integrity sha512-WII/ulhpVyL/qbYb7vydq7dJAfZRBcEhg4/UWt6F6nAKpLa3gAceMOxBxI914ppwSP/TdUsandFy6lkJQE0z4A==
   dependencies:
     hoist-non-react-statics "^2.3.1"
+
+"react-native-scan-device@git+https://github.com/mediaburg/react-native-scan-device":
+  version "1.0.0"
+  resolved "git+https://github.com/mediaburg/react-native-scan-device#ee3514dabea8e05cbc11c40e9ea5ba1ab8b8eeaa"
 
 react-native-screens@~2.10.1:
   version "2.10.1"
