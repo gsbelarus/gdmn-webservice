@@ -32,9 +32,6 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
         </Text>
-        {item.numreceive ? (
-          <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
-        ) : undefined}
         {item.tara ? (
           <View>
             {item.tara.map((boxing) => {
@@ -52,11 +49,16 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.orderQuantity ?? 0}
+          {item.numreceive ?? ''}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
+          {item.orderQuantity ?? 0}
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfo}>
+        <Text numberOfLines={5} style={(localStyles.productBarcodeView, { color: colors.text })}>
           {item.quantity}
         </Text>
       </View>
@@ -237,6 +239,9 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <View style={localStyles.avatarRow} />
           <View style={localStyles.goodInfo}>
             <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
+          </View>
+          <View style={localStyles.remainsInfo}>
+            <Text style={localStyles.productBarcodeView}>Партия</Text>
           </View>
           <View style={localStyles.remainsInfo}>
             <Text style={localStyles.productBarcodeView}>Заявка</Text>

@@ -28,8 +28,12 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
       </View>
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
+          {item.alias ?? ''}
+        </Text>
+        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
+          {item.barcode ?? ''}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -43,7 +47,7 @@ const WeighedGoodItem = React.memo(
     const [nameGood, setNameGood] = useState('');
 
     useEffect(() => {
-      const findGood = state.goods.find((good) => good.id === item.goodkey);
+      const findGood = state.goods?.find((good) => good.id === item.goodkey);
       findGood ? setNameGood(findGood.name) : undefined;
     }, [item, state]);
 
@@ -151,9 +155,9 @@ const SellProductsListScreen = () => {
         ) : (
           <FlatList
             ref={ref}
-            data={state.goods.filter(
+            data={state.goods?.filter(
               (item) =>
-                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                (item.barcode ?? '').toLowerCase().includes(text.toLowerCase()) ||
                 item.name.toLowerCase().includes(text.toLowerCase()),
             )}
             keyExtractor={(_, i) => String(i)}

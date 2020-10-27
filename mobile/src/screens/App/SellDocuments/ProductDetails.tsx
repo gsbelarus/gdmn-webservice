@@ -50,21 +50,21 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     setDocument(state.documents.find((item) => item.id === route.params.docId));
     const lineDocuments = document
       ? document instanceof Object && (document as IDocument)
-        ? (document as IDocument).lines
-        : (document as ISellDocument).lines
+        ? (document as IDocument)?.lines ?? []
+        : (document as ISellDocument)?.lines ?? []
       : undefined;
     lineDocuments ? setLine(lineDocuments.find((item) => item.id === route.params.lineId)) : undefined;
   }, [route.params, state.goods, state.documents]);
 
   useEffect(() => {
-    if (route.params.weighedGood) {
+    if (route.params?.weighedGood) {
       const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
       const good = weighedGood ? state.goods.find((item) => item.id === weighedGood.goodkey) : undefined;
       const date = weighedGood.datework.split('.').reverse();
       good
         ? actions.setFormParams({
-            id: route.params.lineId,
-            goodId: route.params.prodId,
+            id: route.params?.lineId,
+            goodId: route.params?.prodId,
             quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
             manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
               .toISOString()
@@ -76,7 +76,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           })
         : undefined;
     }
-  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.goods, state.weighedGoods]);
+  }, [actions, route.params?.lineId, route.params?.prodId, route.params?.weighedGood, state.goods, state.weighedGoods]);
 
   useEffect(() => {
     if (document) {
@@ -84,23 +84,23 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         document instanceof Object && (document as IDocument)
           ? (document as IDocument).lines
           : (document as ISellDocument).lines;
-      setLine(lineDocuments.find((item) => item.id === route.params.lineId));
+      setLine(lineDocuments.find((item) => item.id === route.params?.lineId));
     }
-  }, [document, route.params.lineId]);
+  }, [document, route.params?.lineId]);
 
   useEffect(() => {
     if (!document || !product) {
       return;
     }
 
-    if (route.params.weighedGood) {
+    if (route.params?.weighedGood) {
       return;
     }
 
     if (!route.params?.modeCor) {
       actions.setFormParams({
-        id: route.params.lineId,
-        goodId: route.params.prodId,
+        id: route.params?.lineId,
+        goodId: route.params?.prodId,
         quantity: 1,
         manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
         tara: [],
@@ -163,7 +163,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           onPress={() => {
             const editLine = (document as ISellDocument)?.lines.find(
               (item) =>
-                item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params.prodId,
+                item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params?.prodId,
             );
             setSaved(true);
             if ((line?.id && route?.params?.modeCor) || editLine) {
@@ -183,24 +183,24 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   : (state.formParams as ISellLine).tara ?? [],
                 barcodes: [
                   ...(editLine ? editLine.barcodes ?? [] : line ? line.barcodes ?? [] : []),
-                  ...(route.params.barcode
-                    ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)]
+                  ...(route.params?.barcode
+                    ? [route.params?.barcode.length === 12 ? route.params?.barcode : route.params?.barcode.slice(1)]
                     : []),
                 ],
               };
               actions.editLine({
-                docId: route.params.docId,
+                docId: route.params?.docId,
                 line: newLine,
               });
             } else {
               actions.addLine({
-                docId: route.params.docId,
+                docId: route.params?.docId,
                 line: {
-                  goodId: route.params.prodId,
+                  goodId: route.params?.prodId,
                   ...(state.formParams as ISellLine),
-                  id: getNextDocLineId(document),
+                  id: getNextDocLineId(document).toString(),
                   barcodes: route.params.barcode
-                    ? [route.params.barcode.length === 12 ? route.params.barcode : route.params.barcode.slice(1)]
+                    ? [route.params?.barcode.length === 12 ? route.params?.barcode : route.params?.barcode.slice(1)]
                     : [],
                 },
               });
@@ -220,10 +220,10 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
 
     navigation.navigate('SelectBoxingsScreen', {
-      lineId: route.params.lineId,
-      prodId: route.params.prodId,
-      docId: route.params.docId,
-      modeCor: route.params.modeCor,
+      lineId: route.params?.lineId,
+      prodId: route.params?.prodId,
+      docId: route.params?.docId,
+      modeCor: route.params?.modeCor,
     });
   };
 

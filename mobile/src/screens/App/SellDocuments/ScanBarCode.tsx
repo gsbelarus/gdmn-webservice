@@ -38,7 +38,7 @@ const ScanBarCodeScreen = () => {
   }, []);
 
   useEffect(() => {
-    setDocument(state.documents?.find((item) => item.id === route.params.docId) as ISellDocument);
+    setDocument(state.documents?.find((item) => item.id === route.params?.docId) as ISellDocument);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.docId, state.documents]);
 
@@ -113,11 +113,11 @@ const ScanBarCodeScreen = () => {
   }, [barcode, document?.lines, findGood]);
 
   const editLineDocument = useCallback(() => {
-    if (!weighedGood) {
+    if (!weighedGood || route.params?.docId === undefined || !document) {
       return;
     }
 
-    const editLine = document?.lines?.find(
+    const editLine = document.lines?.find(
       (item) => item.numreceive === weighedGood.numreceive && item.goodId === weighedGood.goodkey,
     );
     if (editLine) {
