@@ -13,7 +13,7 @@ const defaultAppState: IAppContextProps = {
   actions: AppActions,
 };
 
-const sections = {
+export const sections = {
   SETTINGS: 'SETTINGS',
   CONTACTS: 'CONTACTS',
   DOCUMENTTYPES: 'DOCUMENTTYPES',
