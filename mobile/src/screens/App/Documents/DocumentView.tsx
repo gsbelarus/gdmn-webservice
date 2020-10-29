@@ -1,9 +1,8 @@
-/* eslint-disable jsx-a11y/no-autofocus */
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert, Keyboard, TextInput } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Button, Avatar } from 'react-native-paper';
 
 import { ILine, IReference, IGood, IContact, IRefData } from '../../../../../common';
@@ -80,14 +79,6 @@ const DocumentViewScreen = ({ route }: Props) => {
   const [barcode, setBarcode] = useState('');
 
   const docId = route.params?.docId;
-
-  const ref = useRef<TextInput>(null);
-
-  useEffect(() => {
-    if (!scanned && ref?.current) {
-      ref.current.focus();
-    }
-  }, [scanned, ref]);
 
   const handleBarcode = (text: string) => {
     setScanned(true);
@@ -205,13 +196,6 @@ const DocumentViewScreen = ({ route }: Props) => {
           ItemSeparatorComponent={ItemSeparator}
         />
         <ItemSeparator />
-        {/*         <TextInput
-          style={{ width: 0 }}
-          autoFocus={true}
-          ref={ref}
-          onFocus={() => Keyboard.dismiss()}
-          onChangeText={(text) => handleBarcode(text)}
-        /> */}
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Общее количество:</Text>
           <Text style={localStyles.fontWeightBold}>{totalQuantity}</Text>

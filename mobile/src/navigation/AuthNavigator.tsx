@@ -174,12 +174,7 @@ const AuthNavigator = () => {
       const response = await apiService.auth.getUserStatus();
       // authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
 
-      if (
-        !!savedCompany &&
-        response.result &&
-        response.data?.companies &&
-        response.data.companies.some((company) => company === savedCompany)
-      ) {
+      if (!!savedCompany && response.result && response.data?.companies?.some((company) => company === savedCompany)) {
         authActions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
       } else {
         authActions.setCompanyID({ companyId: null, companyName: undefined });
