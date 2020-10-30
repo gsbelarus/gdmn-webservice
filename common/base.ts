@@ -69,6 +69,7 @@ export interface IGood extends IRefData {
 
 // справочник групп товаров
 export interface IGoodGroup extends IRefData {
+  parent?: number; // родитель
 }
 
 export interface IRemain {
