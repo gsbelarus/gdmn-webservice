@@ -31,7 +31,7 @@ const DocumentEditScreen = ({ route }: Props) => {
   const {
     date = today.toISOString().slice(0, 10),
     docnumber = Math.floor(Math.random() * 10000).toString(),
-    doctype,
+    doctype = appState.references?.documenttypes?.data[0].id,
     contactId,
     outletId,
     roadId,
@@ -90,7 +90,7 @@ const DocumentEditScreen = ({ route }: Props) => {
     }
 
     return res;
-  }, [date, docnumber, contactId, ondate, outletId]);
+  }, [date, docnumber, contactId, ondate, outletId, doctype]);
 
   const updateDocument = useCallback(() => {
     appActions.updateDocument({
@@ -353,6 +353,23 @@ const DocumentEditScreen = ({ route }: Props) => {
                   fieldName: 'roadId',
                   list: listRoads,
                   value: roadId,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localeStyles.fieldContainer}>
+            <Text style={localeStyles.inputCaption}>Тип документа:</Text>
+            <ReferenceItem
+              value={selectedItem(listDocumentType, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItem', {
+                  formName: 'documentParams',
+                  title: 'Тип документа',
+                  fieldName: 'doctype',
+                  list: listDocumentType,
+                  value: doctype,
                 })
               }
             />
