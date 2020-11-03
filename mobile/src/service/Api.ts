@@ -7,7 +7,7 @@ import {
   IMessage,
   IDocument,
   IReference,
-  IRemain,
+  IRem,
   IGood,
   IUserCredentials,
 } from '../../../common';
@@ -58,8 +58,7 @@ export default class Api {
   };
 
   data = {
-    getData: async (): Promise<IResponse<(IDocument | IReference | IRemain | IGood)[]>> =>
-      get(this.getUrl(), '/test/all'),
+    getData: async (): Promise<IResponse<(IDocument | IReference | IRem | IGood)[]>> => get(this.getUrl(), '/test/all'),
 
     sendMessages: async (
       companyId: string,
