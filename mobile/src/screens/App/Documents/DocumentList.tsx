@@ -59,15 +59,15 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
-            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
+            <Text style={[localStyles.number, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
               {status ? status.name : ''}
             </Text>
           </View>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+          <Text style={[localStyles.name, localStyles.field, { color: colors.text }]}>
             Организация: {fromContact?.name || ''}
           </Text>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+          <Text style={[localStyles.name, localStyles.field, { color: colors.text }]}>
             Магазин: {toContact?.name || ''}
           </Text>
         </View>
@@ -309,7 +309,7 @@ const localStyles = StyleSheet.create({
     // right: 80,
   }, */
   field: {
-    opacity: 0.5,
+    opacity: 0.7,
   },
   flex1: {
     flex: 1,

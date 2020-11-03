@@ -36,6 +36,11 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
+          {good?.pricefsn || ''}
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfo}>
+        <Text numberOfLines={5} style={localStyles.productBarcodeView}>
           {item.quantity}
         </Text>
       </View>
@@ -103,9 +108,9 @@ const DocumentViewScreen = ({ route }: Props) => {
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const contact = useMemo(
-    () => contacts?.find((item: { id: number }) => item.id === document?.head?.tocontactId),
+    () => contacts?.find((item: { id: number }) => item.id === document?.head?.contactId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [contacts, document?.head?.tocontactId],
+    [contacts, document?.head?.contactId],
   );
 
   const totalQuantity = useMemo(() => {
@@ -170,6 +175,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         </View>
         <View style={[localStyles.header, { borderColor: colors.border }]}>
           <Text>Наименование ТМЦ</Text>
+          <Text>Цена</Text>
           <Text>Кол-во</Text>
         </View>
         <FlatList
