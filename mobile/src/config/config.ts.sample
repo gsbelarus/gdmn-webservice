@@ -11,7 +11,7 @@ export default {
     useMockup: false,
   },
   system: [{
-    name: "InvDocuments",
+    name: "Inventory",
     component: "DocumentsNavigator",
     options: {
       title: 'Документы',

@@ -267,7 +267,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
           <View style={localStyles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
+              {/* <Text style={localStyles.text}>Наведите рамку на штрихкод</Text> */}
             </>
           </View>
         )}
