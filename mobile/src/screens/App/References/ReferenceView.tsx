@@ -50,7 +50,9 @@ const ReferenceViewScreen = ({ route }) => {
     }
     setFilteredList({
       ...refItem,
-      data: refItem?.data?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+      data: refItem?.data
+        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
     });
   }, [refItem, searchQuery]);
 

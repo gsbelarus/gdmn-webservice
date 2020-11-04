@@ -56,7 +56,9 @@ const RemainsContactListViewScreen = () => {
     }
 
     setFilteredList(
-      contacts?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+      contacts
+        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
     );
   }, [contacts, searchQuery]);
 
