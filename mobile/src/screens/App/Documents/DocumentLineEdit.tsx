@@ -1,27 +1,35 @@
 import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo } from 'react';
-import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
+import { TextInput,  Text } from 'react-native-paper';
 
-import { IDocument, IGood, ILine } from '../../../../../common';
+import { IDocument, IGood, ILine, IRefData } from '../../../../../common';
+import { IPackage, IGoodPackage } from '../../../../../common/base';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
+import { IListItem, IDocumentLineParams } from '../../../model/types';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentLineEdit'>;
 
 const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-
   const { docId, lineId, prodId } = route.params;
 
-  const [document, setDocument] = useState<IDocument>(undefined);
-  const [line, setLine] = useState<ILine>(undefined);
+  const {
+    quantity,
+    packagekey,
+  } = useMemo(() => {
+    return ((state.forms?.documentLineParams as unknown) || {}) as IDocumentLineParams;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.forms?.documentLineParams]);
 
+  const [document, setDocument] = useState<IDocument>(undefined);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
@@ -33,6 +41,79 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, state.references?.goods?.data]);
 
+  const priceFSN = useMemo(() => {
+    return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.pricefsn || 0;
+  }, [prodId, state.references?.goods?.data]); 
+
+  const packageGoods = useMemo(() => (state.references?.packageGoods?.data as IGoodPackage[]).filter((item) => item.goodkey === prodId), [
+    prodId, state.references?.packageTypes?.data, 
+  ]);
+
+  const packageTypes = useMemo(() => (state.references?.packageTypes?.data as IPackage[]).filter(
+    (item) => packageGoods.find((i) => i.packagekey === item.id) ? item : undefined
+  ), [
+    packageGoods, state.references?.packageTypes?.data, 
+  ]);
+  
+  const updateDocumentLine = useCallback(() => {
+    actions.editLine({
+      docId: docId,
+      line: {
+        id: lineId,
+        goodId: prodId,
+        quantity: quantity || 1,
+        packagekey: packagekey || undefined,
+      }
+    });
+    return lineId;
+  }, [actions, docId, lineId, prodId, quantity, packagekey]);
+
+  const addDocumentLine = useCallback(() => {
+    const id = lineId || 1;
+    actions.addLine({
+      docId: docId,
+      line: {
+        id: id,
+        goodId: prodId,
+        quantity: quantity || 1,
+        packagekey: packagekey || undefined,
+      }
+    });
+    return id;
+  }, [actions, docId, lineId, prodId, quantity, packagekey]);
+
+  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
+    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+  }, []);
+  
+  const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
+    con?.map((item) => ({ id: item.id, value: item.name }));
+
+  const listPackageTypes = useMemo(() => getListItems(packageTypes), [packageTypes]); 
+
+  const ReferenceItem = useCallback(
+    (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
+      return (
+        <TouchableOpacity
+          {...item}
+          onPress={item.disabled ? null : item.onPress}
+          style={[localeStyles.picker, { borderColor: colors.border }]}
+        >
+          <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+          {!item.disabled && (
+            <MaterialCommunityIcons
+              style={localeStyles.pickerButton}
+              name="menu-right"
+              size={30}
+              color={colors.primary}
+            />
+          )}
+        </TouchableOpacity>
+      );
+    },
+    [colors.border, colors.primary, colors.text],
+  );
+
   // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
 
   // useEffect(() => {
@@ -41,17 +122,26 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   // }, [document, route.params?.lineId]);
 
   useEffect(() => {
-    const docLine: ILine = document?.lines.find((item) => item.id === lineId);
-
-    setLine({
-      goodId: docLine?.goodId || prodId,
-      id: docLine?.id || 1,
-      quantity: docLine?.quantity || 1,
-    });
-
     setDocument(state.documents.find((item) => item.id === docId));
+  }, [state.documents, docId]);
+
+  useEffect(() => {
+    if (state.forms?.documentLineParams) {
+      return;
+    }
+    const docLine = lineId !== undefined && ((state.documents.find((item) => item.id === docId))?.lines?.find((i) => i.id === lineId) as ILine);
+    // Инициализируем параметры
+    lineId !== undefined
+      ? actions.setForm({
+          name: 'documentLineParams',
+          id: docLine?.id,
+          ...(docLine as IDocumentLineParams),
+        })
+      : actions.setForm({
+          name: 'documentLineParams',
+        });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.documents, prodId, document?.lines, lineId, docId]);
+  }, [actions, state.documents, prodId, document?.lines, lineId, docId]);
 
   /*   useEffect(() => {
     if (route.params.weighedGood) {
@@ -110,7 +200,10 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       actions.setProducParams({ ...state.productParams, manufacturingDate: route.params.manufacturingDate });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document, product, route.params]); */
+  }, [actions, document, product, route.params]);
+
+  
+  */
 
   useEffect(() => {
     if (isFocused) {
@@ -132,8 +225,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
+            actions.clearForm('documentLineParams');
             navigation.navigate('DocumentView', { docId: document?.id });
-            // actions.clearProductParams();
           }}
         />
       ),
@@ -141,25 +234,18 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            if (lineId) {
-              actions.editLine({
-                docId: route.params?.docId,
-                line,
-              });
-            } else {
-              actions.addLine({
-                docId: route.params?.docId,
-                line,
-              });
+            const id = lineId !== undefined ? updateDocumentLine() : addDocumentLine();
+            if (!id) {
+              return;
             }
+            actions.clearForm('documentLineParams');
             navigation.navigate('DocumentView', { docId: document?.id });
-            // actions.clearProductParams();
           }}
         />
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document?.id, line, navigation, route.params?.docId, route.params?.prodId]);
+  }, [actions, document?.id, navigation, route.params?.docId, route.params?.prodId, addDocumentLine, updateDocumentLine]);
 
   return (
     <SafeAreaView>
@@ -179,16 +265,28 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            onChangeText={(text) => {
-              setLine((prev) => ({
-                ...prev,
-                quantity: Number(!Number.isNaN(text) ? text : '1'),
-              }));
-            }}
+            onChangeText={
+              (text) => actions.setForm({ ...state.forms?.documentLineParams, quantity: Number(!Number.isNaN(text) ? text : '1') })
+            }
             returnKeyType="done"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
+
             autoFocus={isFocused}
-            value={(line?.quantity ?? 1).toString()}
+           // value={(line?.quantity ?? 1).toString()}
+            value={(quantity ?? 1).toString()}
+            theme={{
+              colors: {
+                placeholder: colors.primary,
+              },
+            }}
+            style={{
+              backgroundColor: colors.card,
+            }}
+          />
+           <TextInput
+            mode={'flat'}
+            label={'Цена'}
+            editable={false}
+            value={(priceFSN).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -199,6 +297,23 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             }}
           />
         </View>
+        <View style={localeStyles.fieldContainer}>
+          <Text style={localeStyles.inputCaption}>Упаковка:</Text>
+          <ReferenceItem
+            value={selectedItem(listPackageTypes, packagekey)?.value}
+            disabled={false}
+            onPress={() =>
+              navigation.navigate('SelectItem', {
+                formName: 'documentLineParams',
+                title: 'Упаковка',
+                fieldName: 'packagekey',
+                list: listPackageTypes,
+                value: [packagekey],
+              })
+            }
+          />
+        </View>
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -213,5 +328,32 @@ const localeStyles = StyleSheet.create({
   },
   title: {
     padding: 10,
+  },
+  picker: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    flexDirection: 'row',
+    flex: 1,
+  },
+  pickerButton: {
+    alignSelf: 'center',
+    padding: 0,
+    textAlign: 'right',
+  },
+  pickerText: {
+    alignSelf: 'center',
+    flexGrow: 1,
+    padding: 10,
+  },
+  inputCaption: {
+    width: 70,
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
   },
 });
