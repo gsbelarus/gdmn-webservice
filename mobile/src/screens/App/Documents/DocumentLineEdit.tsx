@@ -124,15 +124,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   useEffect(() => {
     if (state.forms?.documentLineParams) {
-      console.log('form');
       return;
     }
     const docLine =
       lineId !== undefined &&
       (state.documents.find((item) => item.id === docId)?.lines?.find((i) => i.id === lineId) as ILine);
 
-    console.log('line', docLine);
-    console.log('lineId', lineId);
     // Инициализируем параметры
     lineId !== undefined
       ? actions.setForm({
@@ -145,10 +142,6 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId]);
-
-  useEffect(() => {
-    //console.log(quantity);
-  }, [quantity]);
 
   useEffect(() => {
     if (isFocused) {

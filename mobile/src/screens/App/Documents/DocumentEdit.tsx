@@ -299,7 +299,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                   title: 'Организация',
                   fieldName: 'contactId',
                   list: listContacts,
-                  value: contactId,
+                  value: [contactId],
                 })
               }
             />
@@ -318,7 +318,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                   list: listOutlets.filter(
                     (item) => outlets.find((outlet) => outlet.id === item.id)?.parent === contactId,
                   ),
-                  value: outletId,
+                  value: [outletId],
                 })
               }
             />
@@ -335,7 +335,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                   title: 'Склад',
                   fieldName: 'departId',
                   list: listDepartments,
-                  value: departId,
+                  value: [departId],
                 })
               }
             />
@@ -352,7 +352,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                   title: 'Маршрут',
                   fieldName: 'roadId',
                   list: listRoads,
-                  value: roadId,
+                  value: [roadId],
                 })
               }
             />
@@ -369,7 +369,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                   title: 'Тип документа',
                   fieldName: 'doctype',
                   list: listDocumentType,
-                  value: doctype,
+                  value: [doctype],
                 })
               }
             />
