@@ -40,6 +40,11 @@ export interface IDocumentParams {
   ondate?: string;
 }
 
+export interface IDocumentLineParams {
+  quantity?: number;
+  packagekey?: number;
+}
+
 export interface IFilterParams {
   fieldSearch: string[];
 }
