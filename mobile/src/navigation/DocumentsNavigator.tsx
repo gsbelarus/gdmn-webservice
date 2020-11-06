@@ -7,6 +7,7 @@ import {
   DocumentViewScreen,
   DocumentListScreen,
   DocumentLineEditScreen,
+  GoodGroupListScreen,
   GoodListScreen,
   DocumentRequestScreen,
   FilterEditScreen,
@@ -24,7 +25,8 @@ export type DocumentStackParamList = {
   DocumentView: { docId: number };
   FilterEdit: undefined;
   DocumentLineEdit: { docId: number; prodId: number; lineId: number };
-  GoodList: { docId: number };
+  GoodGroupList: { docId: number };
+  GoodList: { docId: number; group: number };
   DocumentRequest: undefined;
   SelectItem: {
     formName: string;
@@ -67,6 +69,12 @@ const DocumentsNavigator = () => {
         options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
+      <Stack.Screen
+        key="GoodGroupList"
+        name="GoodGroupList"
+        component={GoodGroupListScreen}
+        options={{ title: 'Группа товаров' }}
+      />
       <Stack.Screen key="GoodList" name="GoodList" component={GoodListScreen} options={{ title: '' }} />
       <Stack.Screen
         key="DocumentLineEdit"

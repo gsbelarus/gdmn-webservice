@@ -4,7 +4,7 @@ import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { IResponse, IMessage, IReference, IContact, IGood, IRemain, IDocument, IRefData } from '../../../../common';
+import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
@@ -102,8 +102,8 @@ const SettingsScreen = () => {
                 case 'outlets':
                 case 'debts':
                 case 'departments':
-                case 'packageTypes' :
-                case 'packageGoods' :
+                case 'packageTypes':
+                case 'packageGoods':
                 case 'roads': {
                   // TODO: преобразовывать json данные в модель данных
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,26 +111,6 @@ const SettingsScreen = () => {
                   appActions.setReference(refObj);
                   break;
                 }
-                /* case 'documenttypes': {
-                  const documentTypes = (dataSet as unknown) as IReference<IRefData[]>;
-                  appActions.setReference(documentTypes);
-                  break;
-                }
-                case 'contacts': {
-                  const contacts = (dataSet as unknown) as IReference<IContact[]>;
-                  appActions.setReference(contacts);
-                  break;
-                }
-                case 'goods': {
-                  const goods = (dataSet as unknown) as IReference<IGood[]>;
-                  appActions.setReference(goods);
-                  break;
-                }
-                case 'remains': {
-                  const remains = (dataSet as unknown) as IReference<IRemain[]>;
-                  appActions.setReference(remains);
-                  break;
-                } */
                 default:
                   break;
               }
@@ -166,9 +146,7 @@ const SettingsScreen = () => {
           isUpdated = true;
           // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
-        isUpdated
-          ? Alert.alert('Запрос обработан', 'Справочники обновлены', [{ text: 'Закрыть' }])
-          : Alert.alert('Запрос обработан', 'Обновлений нет', [{ text: 'Закрыть' }]);
+        Alert.alert('Запрос обработан', isUpdated ? 'Справочники обновлены' : 'Обновлений нет', [{ text: 'Закрыть' }]);
       } catch (err) {
         Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {

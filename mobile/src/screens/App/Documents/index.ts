@@ -1,6 +1,7 @@
 export { DocumentListScreen } from './DocumentList';
 export { DocumentViewScreen } from './DocumentView';
 export { DocumentEditScreen } from './DocumentEdit';
+export { GoodGroupListScreen } from './GoodGroupList';
 export { GoodListScreen } from './GoodList';
 export { DocumentLineEditScreen } from './DocumentLineEdit';
 export { DocumentRequestScreen } from './DocumentRequest';

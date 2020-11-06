@@ -82,6 +82,7 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const docId = route.params?.docId;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
     docId,
     state.documents,
@@ -96,6 +97,7 @@ const DocumentViewScreen = ({ route }: Props) => {
   const docTitle = useMemo(() => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString('BY-ru', options)}`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [document]);
 
   const documentTypeName = useMemo(
@@ -194,14 +196,9 @@ const DocumentViewScreen = ({ route }: Props) => {
       {isEditable && (
         <>
           <FAB
-            style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
-            icon="barcode-scan"
-            onPress={() => navigation.navigate('ScanBarcode2', { docId: document.id })}
-          />
-          <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="plus"
-            onPress={() => navigation.navigate('GoodList', { docId: document.id })}
+            onPress={() => navigation.navigate('GoodGroupList', { docId: document.id })}
           />
         </>
       )}
@@ -238,13 +235,6 @@ const localStyles = StyleSheet.create({
     margin: 20,
     position: 'absolute',
     right: 0,
-  },
-  fabScan: {
-    backgroundColor: Colors.blue600,
-    bottom: 35,
-    left: 0,
-    margin: 20,
-    position: 'absolute',
   },
   flexDirectionRow: {
     flexDirection: 'row',

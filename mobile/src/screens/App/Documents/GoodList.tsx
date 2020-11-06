@@ -29,8 +29,18 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
       </View>
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
+        <View style={localStyles.addationaly}>
+          <View>
+            <Text style={[localStyles.fieldDesciption, { color: colors.text }]}>{item.pricefsn} p.</Text>
+            <Text style={[localStyles.fieldDesciption, { color: colors.text }]}>{item.valuename}</Text>
+          </View>
+          <View>
+            <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.alias}</Text>
+            <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
+              {item.barcode}
+            </Text>
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -151,40 +161,13 @@ const GoodListScreen = () => {
             />
           </View>
           <ItemSeparator />
-          {/*  <View style={[localStyles.filter, { borderColor: colors.border }]}>
-            <TextInput
-              style={[
-                styles.input,
-                localStyles.textInput,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
-              ]}
-              onChangeText={onChangeText}
-              value={text}
-              clearButtonMode={'always'}
-              placeholder="Введите шрих-код или название"
-              placeholderTextColor={colors.border}
-              autoCapitalize="sentences"
-              underlineColorAndroid="transparent"
-              selectionColor={'black'}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-            <TouchableOpacity onPress={() => onChangeText('')} style={localStyles.barcodeButton}>
-              <MaterialCommunityIcons name="eraser" size={35} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setDoScanned(true)} style={localStyles.barcodeButton}>
-              <MaterialCommunityIcons name="barcode-scan" size={35} color={colors.primary} />
-            </TouchableOpacity>
-          </View> */}
           <FlatList
             ref={ref}
             data={((state.references?.goods?.data as unknown) as IGood[]).filter(
               (item) =>
-                item.barcode.toLowerCase().includes(text.toLowerCase()) ||
-                item.name.toLowerCase().includes(text.toLowerCase()),
+                item.groupkey === route.params?.group &&
+                (item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                  item.name.toLowerCase().includes(text.toLowerCase())),
             )}
             keyExtractor={(_, i) => String(i)}
             renderItem={renderItem}
@@ -200,6 +183,10 @@ const GoodListScreen = () => {
 export { GoodListScreen };
 
 const localStyles = StyleSheet.create({
+  addationaly: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',

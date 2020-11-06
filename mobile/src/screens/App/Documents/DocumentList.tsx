@@ -113,12 +113,12 @@ const DocumentListScreen = ({ navigation }) => {
 
         return appState.forms?.filterParams?.fieldSearch
           ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
-              value === 'number'
-                ? item?.head.docnumber?.includes(searchText)
+              value === 'contactId' && toContact
+                ? toContact.name.includes(searchText)
                 : value === 'state' && status
                 ? status.name.includes(searchText)
-                : value === 'contactId' && toContact
-                ? toContact.name.includes(searchText)
+                : value === 'number'
+                ? item?.head.docnumber?.includes(searchText)
                 : value === 'outletId' && fromContact
                 ? fromContact.name.includes(searchText)
                 : true,
