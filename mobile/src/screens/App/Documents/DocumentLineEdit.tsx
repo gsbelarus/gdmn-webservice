@@ -1,18 +1,19 @@
-import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme, useIsFocused } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
-import { TextInput,  Text } from 'react-native-paper';
+import { TextInput, Text } from 'react-native-paper';
 
 import { IDocument, IGood, ILine, IRefData } from '../../../../../common';
 import { IPackage, IGoodPackage } from '../../../../../common/base';
 import { HeaderRight } from '../../../components/HeaderRight';
+import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { IListItem, IDocumentLineParams } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
-import { IListItem, IDocumentLineParams } from '../../../model/types';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentLineEdit'>;
 
@@ -21,10 +22,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { state, actions } = useAppStore();
   const { docId, lineId, prodId } = route.params;
 
-  const {
-    quantity,
-    packagekey,
-  } = useMemo(() => {
+  const { quantity, packagekey } = useMemo(() => {
     return ((state.forms?.documentLineParams as unknown) || {}) as IDocumentLineParams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.forms?.documentLineParams]);
@@ -43,27 +41,33 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const priceFSN = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.pricefsn || 0;
-  }, [prodId, state.references?.goods?.data]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prodId, state.references?.goods?.data]);
 
-  const packageGoods = useMemo(() => (state.references?.packageGoods?.data as IGoodPackage[]).filter((item) => item.goodkey === prodId), [
-    prodId, state.references?.packageTypes?.data, 
-  ]);
+  const packageGoods = useMemo(
+    () => (state.references?.packageGoods?.data as IGoodPackage[]).filter((item) => item.goodkey === prodId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prodId, state.references?.packageTypes?.data],
+  );
 
-  const packageTypes = useMemo(() => (state.references?.packageTypes?.data as IPackage[]).filter(
-    (item) => packageGoods.find((i) => i.packagekey === item.id) ? item : undefined
-  ), [
-    packageGoods, state.references?.packageTypes?.data, 
-  ]);
-  
+  const packageTypes = useMemo(
+    () =>
+      (state.references?.packageTypes?.data as IPackage[]).filter((item) =>
+        packageGoods.find((i) => i.packagekey === item.id) ? item : undefined,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [packageGoods, state.references?.packageTypes?.data],
+  );
+
   const updateDocumentLine = useCallback(() => {
     actions.editLine({
-      docId: docId,
+      docId,
       line: {
         id: lineId,
         goodId: prodId,
         quantity: quantity || 1,
         packagekey: packagekey || undefined,
-      }
+      },
     });
     return lineId;
   }, [actions, docId, lineId, prodId, quantity, packagekey]);
@@ -71,13 +75,13 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const addDocumentLine = useCallback(() => {
     const id = lineId || 1;
     actions.addLine({
-      docId: docId,
+      docId,
       line: {
-        id: id,
+        id,
         goodId: prodId,
         quantity: quantity || 1,
         packagekey: packagekey || undefined,
-      }
+      },
     });
     return id;
   }, [actions, docId, lineId, prodId, quantity, packagekey]);
@@ -85,11 +89,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
-  
+
   const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
     con?.map((item) => ({ id: item.id, value: item.name }));
 
-  const listPackageTypes = useMemo(() => getListItems(packageTypes), [packageTypes]); 
+  const listPackageTypes = useMemo(() => getListItems(packageTypes), [packageTypes]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -114,22 +118,21 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     [colors.border, colors.primary, colors.text],
   );
 
-  // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
-
-  // useEffect(() => {
-  //   // Поиск редактируемой позиции документа
-  //   document?.lines && setLine(document.lines.find((item) => item.id === route.params?.lineId));
-  // }, [document, route.params?.lineId]);
-
   useEffect(() => {
     setDocument(state.documents.find((item) => item.id === docId));
   }, [state.documents, docId]);
 
   useEffect(() => {
     if (state.forms?.documentLineParams) {
+      console.log('form');
       return;
     }
-    const docLine = lineId !== undefined && ((state.documents.find((item) => item.id === docId))?.lines?.find((i) => i.id === lineId) as ILine);
+    const docLine =
+      lineId !== undefined &&
+      (state.documents.find((item) => item.id === docId)?.lines?.find((i) => i.id === lineId) as ILine);
+
+    console.log('line', docLine);
+    console.log('lineId', lineId);
     // Инициализируем параметры
     lineId !== undefined
       ? actions.setForm({
@@ -141,69 +144,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           name: 'documentLineParams',
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, state.documents, prodId, document?.lines, lineId, docId]);
+  }, [actions, docId]);
 
-  /*   useEffect(() => {
-    if (route.params.weighedGood) {
-      const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
-      const date = good.datework.split('.').reverse();
-      good
-        ? actions.setProducParams({
-            id: route.params.lineId,
-            goodId: route.params.prodId,
-            quantity: good.weight,
-            manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-              .toISOString()
-              .slice(0, 10),
-            //timeWork: good.timework,
-            numreceive: good.numreceive,
-          })
-        : undefined;
-    }
-  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.weighedGoods]); */
-
-  /* useEffect(() => {
-    if (!document || !product) {
-      return;
-    }
-
-    if (!route.params?.modeCor) {
-      actions.setProducParams({
-        id: route.params.lineId,
-        goodId: route.params.prodId,
-        quantity: 1,
-        manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
-      });
-    } else {
-      if (!line) {
-        return;
-      }
-      route.params?.manufacturingDate
-        ? actions.setProducParams({ ...line, manufacturingDate: route.params.manufacturingDate })
-        : actions.setProducParams(line);
-    }
-  }, [
-    actions,
-    document,
-    line,
-    product,
-    route.params.lineId,
-    route.params.manufacturingDate,
-    route.params.modeCor,
-    route.params.prodId,
-    route.params.weighedGood,
-  ]); */
-
-  /*   useEffect(() => {
-    // TODO для чего этот эффект?
-    if (state.forms.productParams && route.params?.manufacturingDate) {
-      actions.setProducParams({ ...state.productParams, manufacturingDate: route.params.manufacturingDate });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document, product, route.params]);
-
-  
-  */
+  useEffect(() => {
+    //console.log(quantity);
+  }, [quantity]);
 
   useEffect(() => {
     if (isFocused) {
@@ -245,7 +190,18 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document?.id, navigation, route.params?.docId, route.params?.prodId, addDocumentLine, updateDocumentLine]);
+  }, [
+    actions,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    document?.id,
+    navigation,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    route.params?.docId,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    route.params?.prodId,
+    addDocumentLine,
+    updateDocumentLine,
+  ]);
 
   return (
     <SafeAreaView>
@@ -265,13 +221,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            onChangeText={
-              (text) => actions.setForm({ ...state.forms?.documentLineParams, quantity: Number(!Number.isNaN(text) ? text : '1') })
+            onChangeText={(text) =>
+              actions.setForm({
+                ...state.forms?.documentLineParams,
+                quantity: Number(!Number.isNaN(text) ? text : '1'),
+              })
             }
             returnKeyType="done"
-
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-           // value={(line?.quantity ?? 1).toString()}
+            // value={(line?.quantity ?? 1).toString()}
             value={(quantity ?? 1).toString()}
             theme={{
               colors: {
@@ -282,11 +241,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
               backgroundColor: colors.card,
             }}
           />
-           <TextInput
+          <TextInput
             mode={'flat'}
             label={'Цена'}
             editable={false}
-            value={(priceFSN).toString()}
+            value={priceFSN.toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -297,7 +256,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             }}
           />
         </View>
-        <View style={localeStyles.fieldContainer}>
+        <View style={[localeStyles.fieldContainer, { backgroundColor: colors.card }]}>
           <Text style={localeStyles.inputCaption}>Упаковка:</Text>
           <ReferenceItem
             value={selectedItem(listPackageTypes, packagekey)?.value}
@@ -313,7 +272,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             }
           />
         </View>
-        
+        <ItemSeparator />
       </ScrollView>
     </SafeAreaView>
   );
@@ -326,8 +285,15 @@ const localeStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     padding: 0,
   },
-  title: {
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
     padding: 10,
+  },
+  inputCaption: {
+    width: 70,
   },
   picker: {
     borderRadius: 4,
@@ -346,14 +312,7 @@ const localeStyles = StyleSheet.create({
     flexGrow: 1,
     padding: 10,
   },
-  inputCaption: {
-    width: 70,
-  },
-  fieldContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: 50,
-    justifyContent: 'space-between',
-    margin: 5,
+  title: {
+    padding: 10,
   },
 });
