@@ -333,7 +333,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 fieldName: 'fromContact',
                 title: 'Подразделение',
                 list: listDepartments,
-                value: documentParams?.fromContact,
+                value: [documentParams?.fromContact],
               })
             }
           />
@@ -347,7 +347,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 fieldName: 'toContact',
                 title: 'Подразделение',
                 list: listDepartments,
-                value: documentParams?.toContact,
+                value: [documentParams?.toContact],
               })
             }
           />

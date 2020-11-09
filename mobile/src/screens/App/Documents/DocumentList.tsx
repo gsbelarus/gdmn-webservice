@@ -214,7 +214,7 @@ const DocumentListScreen = ({ navigation }) => {
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
       <View style={localStyles.flexDirectionRow}>
         <Searchbar
-          placeholder="Поиск по номеру"
+          placeholder="Поиск"
           onChangeText={setSearchText}
           value={searchText}
           style={[localStyles.flexGrow, localStyles.searchBar]}

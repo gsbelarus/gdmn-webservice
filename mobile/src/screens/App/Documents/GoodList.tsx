@@ -3,7 +3,7 @@ import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@r
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
+import { Text, Button, Searchbar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -46,37 +46,6 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   );
 });
 
-/* const WeighedGoodItem = React.memo(({ item }: { item: IWeighedGoods }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-  const { state } = useAppStore();
-  const [nameGood, setNameGood] = useState('');
-
-  useEffect(() => {
-    const findGood = state.goods.find((good) => good.id === item.goodkey);
-    findGood ? setNameGood(findGood.name) : undefined;
-  }, [item, state]);
-
-  const docId = useRoute<RouteProp<RootStackParamList, 'SellProductsList'>>().params?.docId;
-
-  return (
-    <TouchableOpacity
-      style={[localStyles.item, { backgroundColor: colors.card }]}
-      onPress={() => {
-        navigation.navigate('SellProductDetail', { prodId: item.goodkey, docId, modeCor: false, weighedGood: item.id });
-      }}
-    >
-      <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-        <Feather name="box" size={20} color={'#FFF'} />
-      </View>
-      <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>{nameGood}</Text>
-        <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>{item.id}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}); */
-
 const GoodListScreen = () => {
   const route = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>();
   const { colors } = useTheme();
@@ -90,7 +59,6 @@ const GoodListScreen = () => {
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
-  // const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
@@ -148,17 +116,17 @@ const GoodListScreen = () => {
         <>
           <View style={localStyles.flexDirectionRow}>
             <Searchbar
-              placeholder="Штрих-код или название"
+              placeholder="Штрих-код, алиас или название"
               onChangeText={onChangeText}
               value={text}
               style={[localStyles.flexGrow, localStyles.searchBar]}
             />
-            <IconButton
+            {/*<IconButton
               icon="barcode-scan"
               size={26}
               style={localStyles.iconSettings}
               onPress={() => setDoScanned(true)}
-            />
+            />*/}
           </View>
           <ItemSeparator />
           <FlatList
@@ -167,6 +135,7 @@ const GoodListScreen = () => {
               (item) =>
                 item.groupkey === route.params?.group &&
                 (item.barcode.toLowerCase().includes(text.toLowerCase()) ||
+                  item.alias.toLowerCase().includes(text.toLowerCase()) ||
                   item.name.toLowerCase().includes(text.toLowerCase())),
             )}
             keyExtractor={(_, i) => String(i)}
