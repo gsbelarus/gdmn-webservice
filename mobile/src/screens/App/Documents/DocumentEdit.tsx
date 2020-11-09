@@ -192,7 +192,7 @@ const DocumentEditScreen = ({ route }: Props) => {
   }, [appActions, docId]);
 
   useEffect(() => {
-    if (!outlets) {
+    if (!outlets || !outletId) {
       return;
     }
 
@@ -201,6 +201,17 @@ const DocumentEditScreen = ({ route }: Props) => {
       contactId: outlets.find((item) => item.id === outletId)?.parent,
     });
   }, [appActions, outletId, outlets]);
+
+  useEffect(() => {
+    if (outlets.find((item) => item.id === outletId)?.parent === contactId) {
+      return;
+    }
+
+    appActions.setForm({
+      ...appState.forms?.documentParams,
+      outletId: undefined,
+    });
+  }, [appActions, contactId]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -333,9 +344,9 @@ const DocumentEditScreen = ({ route }: Props) => {
                   formName: 'documentParams',
                   title: 'Магазин',
                   fieldName: 'outletId',
-                  list: listOutlets.filter(
+                  list: contactId ? listOutlets.filter(
                     (item) => outlets.find((outlet) => outlet.id === item.id)?.parent === contactId,
-                  ),
+                  ) : listOutlets,
                   value: [outletId],
                 })
               }
