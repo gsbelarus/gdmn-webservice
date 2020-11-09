@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
 
 import { IDocument, IMessage } from '../../../common';
+import { IContact, IDebt } from '../../../common/base';
 import config from '../config';
 
 // export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;

@@ -12,6 +12,7 @@ import {
   DocumentRequestScreen,
   FilterEditScreen,
 } from '../screens/App/Documents';
+import { InfoContactScreen } from '../screens/App/Documents/InfoContact';
 import {
   ScanBarcodeScreen,
   ScanBarcodeScreen2,
@@ -24,6 +25,7 @@ export type DocumentStackParamList = {
   DocumentEdit: { docId: number };
   DocumentView: { docId: number };
   FilterEdit: undefined;
+  InfoContact: undefined;
   DocumentLineEdit: { docId: number; prodId: number; lineId: number };
   GoodGroupList: { docId: number };
   GoodList: { docId: number; group: number };
@@ -69,6 +71,7 @@ const DocumentsNavigator = () => {
         options={{ title: '', animationTypeForReplace: 'pop' }}
       />
       <Stack.Screen key="DocumentEdit" name="DocumentEdit" component={DocumentEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="InfoContact" name="InfoContact" component={InfoContactScreen} options={{ title: '' }} />
       <Stack.Screen
         key="GoodGroupList"
         name="GoodGroupList"

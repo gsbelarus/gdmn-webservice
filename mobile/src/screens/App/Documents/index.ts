@@ -6,3 +6,4 @@ export { GoodListScreen } from './GoodList';
 export { DocumentLineEditScreen } from './DocumentLineEdit';
 export { DocumentRequestScreen } from './DocumentRequest';
 export { FilterEditScreen } from './FilterEdit';
+export { InfoContactScreen } from './InfoContact';

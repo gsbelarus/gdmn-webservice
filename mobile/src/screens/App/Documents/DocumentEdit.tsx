@@ -289,7 +289,25 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Организация:</Text>
+            <View style={[localeStyles.inputCaption, localeStyles.fieldInfo]}>
+              <Text>Организация:</Text>
+              {
+                contactId
+                ? <TouchableOpacity
+                  style={localeStyles.info}
+                  onPress={() => {
+                    navigation.navigate('InfoContact');
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="information-outline"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                : undefined
+              }
+            </View>
             <ReferenceItem
               value={selectedItem(listContacts, contactId)?.value}
               disabled={isBlocked}
@@ -430,6 +448,12 @@ const localeStyles = StyleSheet.create({
     justifyContent: 'space-between',
     margin: 5,
   },
+  fieldInfo: {
+    flexDirection: 'row',
+  },
+  info: {
+    marginLeft: 5,
+  },
   input: {
     borderRadius: 4,
     borderStyle: 'solid',
@@ -439,7 +463,7 @@ const localeStyles = StyleSheet.create({
     padding: 10,
   },
   inputCaption: {
-    width: 70,
+    width: '25%',
   },
   picker: {
     borderRadius: 4,
