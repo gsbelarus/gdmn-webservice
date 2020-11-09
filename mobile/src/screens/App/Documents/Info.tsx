@@ -1,12 +1,11 @@
-import { useTheme } from '@react-navigation/native';
+import { RouteProp, useRoute, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useLayoutEffect, useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
-import { IContact, IDebt } from '../../../../../common/base';
+import { IContact, IDebt, IOutlet } from '../../../../../common/base';
 import { HeaderRight } from '../../../components/HeaderRight';
-import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -35,10 +34,17 @@ const Line = React.memo(({ field, title, value }: { field: string; title: string
   );
 });
 
-const InfoContactScreen = ({ navigation }: Props) => {
+const InfoScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
+  const route = useRoute<RouteProp<DocumentStackParamList, 'Info'>>();
   const { state } = useAppStore();
 
+  const outlet = useMemo(() => {
+    return (state.references?.outlets?.data as IOutlet[]).find(
+      (item) => item.id === state.forms?.documentParams?.outletId,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.references?.contacts, state.forms?.documentParams]);
   const contact = useMemo(() => {
     return (state.references?.contacts?.data as IContact[]).find(
       (item) => item.id === state.forms?.documentParams?.contactId,
@@ -55,7 +61,7 @@ const InfoContactScreen = ({ navigation }: Props) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: '',
+      title: 'Информация',
       headerLeft: () => (
         <HeaderRight
           text="Отмена"
@@ -78,21 +84,30 @@ const InfoContactScreen = ({ navigation }: Props) => {
       ]}
     >
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
-        Информация по организации
+        {route.params?.about === 'Contact' ? 'Об организации' : 'О магазине'}
       </SubTitle>
-      <Line field="number" title={'Дата договора'} value={contact?.contractDate || 'Нет информации'} />
-      <Line field="number" title={'Способ оплаты'} value={contact?.paycond || 'Нет информации'} />
-      <Line field="number" title={'Задолженность'} value={debt?.saldo ? debt.saldo.toString() : '0'} />
-      <Line
-        field="number"
-        title={'Просроченная задолженность'}
-        value={debt?.saldodebt ? debt.saldodebt.toString() : '0'}
-      />
+      {route.params?.about === 'Contact' ? (
+        <ScrollView>
+          <Line field="date" title={'Дата договора'} value={contact?.contractDate || 'Нет информации'} />
+          <Line field="paycond" title={'Способ оплаты'} value={contact?.paycond || 'Нет информации'} />
+          <Line field="saldo" title={'Задолженность'} value={debt?.saldo ? debt.saldo.toString() : '0'} />
+          <Line
+            field="saldodebt"
+            title={'Просроченная задолженность'}
+            value={debt?.saldodebt ? debt.saldodebt.toString() : '0'}
+          />
+        </ScrollView>
+      ) : (
+        <ScrollView>
+          <Line field="address" title={'Адрес'} value={outlet?.address || 'Нет информации'} />
+          <Line field="phone" title={'Телефон'} value={outlet?.phoneNumber || 'Нет информации'} />
+        </ScrollView>
+      )}
     </View>
   );
 };
 
-export { InfoContactScreen };
+export { InfoScreen };
 
 const localeStyles = StyleSheet.create({
   container: {

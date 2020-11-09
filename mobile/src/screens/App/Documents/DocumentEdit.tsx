@@ -307,7 +307,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                 ? <TouchableOpacity
                   style={localeStyles.info}
                   onPress={() => {
-                    navigation.navigate('InfoContact');
+                    navigation.navigate('Info', { about: 'Contact', id: contactId });
                   }}
                 >
                   <MaterialCommunityIcons
@@ -335,7 +335,25 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Магазин:</Text>
+          <View style={[localeStyles.inputCaption, localeStyles.fieldInfo]}>
+              <Text>Магазин:</Text>
+              {
+                outletId
+                ? <TouchableOpacity
+                  style={localeStyles.info}
+                  onPress={() => {
+                    navigation.navigate('Info', { about: 'Outlet', id: outletId });
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="information-outline"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                : undefined
+              }
+            </View>
             <ReferenceItem
               value={selectedItem(listOutlets, outletId)?.value}
               disabled={isBlocked}
