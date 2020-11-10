@@ -100,7 +100,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
-          name: 'get_InvDocuments',
+          name: 'get_TradeAgentDocuments',
           params: [
             {
               dateBegin: documentParams?.dateBegin
@@ -177,7 +177,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
           // Сообщение содержит данные
           ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
             switch (dataSet.type) {
-              case 'get_SellDocuments': {
+              case 'get_TradeAgentDocuments': {
                 const addDocuments = dataSet.data as IDocument[];
                 appActions.setDocuments([...appState.documents, ...addDocuments]);
                 break;
@@ -248,7 +248,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
           text="Отмена"
           onPress={() => {
             appActions.clearForm('DocumentRequest');
-            navigation.navigate('SellDocuments');
+            navigation.navigate('DocumentList');
           }}
         />
       ),
@@ -260,7 +260,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             sendDocumentRequest();
             sendSubscribe();
             appActions.clearForm('DocumentRequest');
-            navigation.navigate('SellDocuments');
+            navigation.navigate('DocumentList');
           }}
         />
       ),

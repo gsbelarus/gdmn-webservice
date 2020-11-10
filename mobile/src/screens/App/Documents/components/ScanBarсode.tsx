@@ -50,7 +50,7 @@ const ScanBarcodeScreen = () => {
     /*   const finded = state.weighedGoods.find((good) => Number(good.id) === Number(text.slice(0, -1)));
     if (finded) {
       //отправляем на заполнение позиции
-      navigation.navigate('SellProductDetail', {
+      navigation.navigate('DocumentLineEdit', {
         prodId: finded.goodkey,
         docId: route.params.docId,
         modeCor: false,
@@ -62,7 +62,7 @@ const ScanBarcodeScreen = () => {
     const findedFullCode = state.weighedGoods.find((good) => Number(good.id) === Number(text));
     if (findedFullCode) {
       //отправляем на заполнение позиции
-      navigation.navigate('SellProductDetail', {
+      navigation.navigate('DocumentLineEdit', {
         prodId: findedFullCode.goodkey,
         docId: route.params.docId,
         modeCor: false,

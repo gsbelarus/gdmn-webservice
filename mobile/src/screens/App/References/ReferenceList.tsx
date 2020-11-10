@@ -94,7 +94,7 @@ const ReferenceListScreen = () => {
           // Сообщение содержит данные
           ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
             switch (dataSet.type) {
-              case 'get_SellDocuments': {
+              case 'get_TradeAgentDocuments': {
                 const addDocuments = dataSet.data as IDocument[];
                 appActions.setDocuments([...AppState.documents, ...addDocuments]);
                 break;

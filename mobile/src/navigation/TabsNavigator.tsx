@@ -11,7 +11,6 @@ export type TabsStackParams = {
   Documents: undefined;
   References: undefined;
   Settings: undefined;
-  SellDocuments: undefined;
 };
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
