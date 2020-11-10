@@ -5,15 +5,21 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
-import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact } from '../../../../../common';
+import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact, IMessage } from '../../../../../common';
 import { IOutlet } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
-import { timeout } from '../../../helpers/utils';
+import { isMessagesArray, timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 // import { statusColors}
+
+interface IUpdateDocumentResponse {
+  id: number;
+  status: 'ok' | 'fail';
+  error?: string;
+}
 
 const Statuses: IDocumentStatus[] = statuses;
 
@@ -138,7 +144,7 @@ const DocumentListScreen = ({ navigation }) => {
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'data',
         payload: {
-          name: 'SellDocument',
+          name: 'tradeAgentDocuments',
           params: documents,
         },
       }),
@@ -162,6 +168,38 @@ const DocumentListScreen = ({ navigation }) => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [actions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
 
+  const checkUpdateRequest = useCallback(async () => {
+    const response = await timeout<IResponse<IMessage[]>>(
+      apiService.baseUrl.timeout,
+      apiService.data.getMessages(state.companyID),
+    );
+
+    if (!response.result) {
+      Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть', onPress: () => ({}) }]);
+      return;
+    }
+
+    if (!isMessagesArray(response.data)) {
+      Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть' }]);
+      return;
+    }
+
+    response.data?.forEach((message) => {
+      if (message.body.type === 'update_data') {
+        (message.body.payload as IUpdateDocumentResponse[]).forEach((result) => {
+          if (result.status === 'ok') {
+            actions.updateDocumentStatus({ id: result.id, status: 3 });
+          } else if (result.status === 'fail') {
+            //решить, будет ли показываться ошибка пользователю, если документ не был принят
+            //TODO: дать возможность пользователю выбрать статус документа
+            actions.updateDocumentStatus({ id: result.id, status: 1 });
+          }
+        });
+      }
+      apiService.data.deleteMessage(state.companyID, message.head.id);
+    });
+  }, [actions, state.companyID, apiService.data, apiService.baseUrl.timeout]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
@@ -184,6 +222,10 @@ const DocumentListScreen = ({ navigation }) => {
               {
                 title: 'Выгрузить документы',
                 onPress: sendUpdateRequest,
+              },
+              {
+                title: 'Проверить статус документов',
+                onPress: checkUpdateRequest,
               },
               {
                 title: 'Удалить документы',
