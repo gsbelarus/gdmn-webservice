@@ -221,10 +221,9 @@ const DocumentEditScreen = ({ route }: Props) => {
           onPress={item.disabled ? null : item.onPress}
           style={[localeStyles.picker, { borderColor: colors.border }]}
         >
-          <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+          <Text numberOfLines={2} style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
           {!item.disabled && (
             <MaterialCommunityIcons
-              style={localeStyles.pickerButton}
               name="menu-right"
               size={30}
               color={colors.primary}
@@ -243,7 +242,7 @@ const DocumentEditScreen = ({ route }: Props) => {
         <ScrollView>
           {(statusId === 0 || statusId === 1) && (
             <>
-              <View style={localeStyles.fieldContainer}>
+              <View style={localeStyles.fieldContainerRow}>
                 <Text>Черновик:</Text>
                 <Switch
                   value={status === 0}
@@ -253,7 +252,6 @@ const DocumentEditScreen = ({ route }: Props) => {
                   }}
                 />
               </View>
-              <ItemSeparator />
             </>
           )}
           <ItemSeparator />
@@ -463,6 +461,7 @@ const localeStyles = StyleSheet.create({
     elevation: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    marginTop: 10,
   },
   container: {
     flex: 1,
@@ -471,6 +470,10 @@ const localeStyles = StyleSheet.create({
     paddingBottom: 5,
   },
   fieldContainer: {
+    flexDirection: 'column',
+    margin: 5,
+  },
+  fieldContainerRow: {
     alignItems: 'center',
     flexDirection: 'row',
     height: 50,
@@ -492,7 +495,7 @@ const localeStyles = StyleSheet.create({
     padding: 10,
   },
   inputCaption: {
-    width: '25%',
+    paddingVertical: 5,
   },
   picker: {
     borderRadius: 4,
@@ -500,15 +503,11 @@ const localeStyles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     flex: 1,
-  },
-  pickerButton: {
-    alignSelf: 'center',
-    padding: 0,
-    textAlign: 'right',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   pickerText: {
-    alignSelf: 'center',
-    flexGrow: 1,
+    flex: 1,
     padding: 10,
   },
   title: {

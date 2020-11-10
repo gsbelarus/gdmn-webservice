@@ -2,10 +2,9 @@ import { RouteProp, useRoute, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useLayoutEffect, useMemo } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { IconButton, TextInput } from 'react-native-paper';
 
 import { IContact, IDebt, IOutlet } from '../../../../../common/base';
-import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -63,8 +62,9 @@ const InfoScreen = ({ navigation }: Props) => {
     navigation.setOptions({
       title: 'Информация',
       headerLeft: () => (
-        <HeaderRight
-          text="Отмена"
+        <IconButton
+          icon="chevron-left"
+          size={35}
           onPress={() => {
             navigation.goBack();
           }}

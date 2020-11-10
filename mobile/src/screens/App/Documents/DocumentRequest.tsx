@@ -2,7 +2,7 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -273,7 +273,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
         <TouchableOpacity {...props}>
           <View style={[localeStyles.picker, { borderColor: colors.border }]}>
             <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
-            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
+            <MaterialCommunityIcons name="menu-right" size={30} color="black" />
           </View>
         </TouchableOpacity>
       );
@@ -393,18 +393,13 @@ const localeStyles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     flexDirection: 'row',
-    margin: 5,
-    padding: 5,
-  },
-  pickerButton: {
     flex: 1,
-    marginRight: 10,
-    textAlign: 'right',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   pickerText: {
-    alignSelf: 'center',
-    flex: 10,
-    fontSize: 16,
+    flex: 1,
+    padding: 10,
   },
   subdivisionText: {
     marginBottom: 5,

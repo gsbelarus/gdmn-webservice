@@ -104,14 +104,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           style={[localeStyles.picker, { borderColor: colors.border }]}
         >
           <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
-          {!item.disabled && (
-            <MaterialCommunityIcons
-              style={localeStyles.pickerButton}
-              name="menu-right"
-              size={30}
-              color={colors.primary}
-            />
-          )}
+          {!item.disabled && <MaterialCommunityIcons name="menu-right" size={30} color={colors.primary} />}
         </TouchableOpacity>
       );
     },
@@ -294,15 +287,11 @@ const localeStyles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     flex: 1,
-  },
-  pickerButton: {
-    alignSelf: 'center',
-    padding: 0,
-    textAlign: 'right',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   pickerText: {
-    alignSelf: 'center',
-    flexGrow: 1,
+    flex: 1,
     padding: 10,
   },
   title: {
