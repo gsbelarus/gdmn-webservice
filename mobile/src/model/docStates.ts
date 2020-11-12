@@ -17,6 +17,10 @@ const docStates: IDocumentStatus[] = [
     id: 3,
     name: 'Обработано',
   },
+  {
+    id: 4,
+    name: 'Ошибка',
+  },
 ];
 
 export default docStates;

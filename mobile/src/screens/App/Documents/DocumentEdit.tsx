@@ -63,7 +63,7 @@ const DocumentEditScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
+  const isBlocked = useMemo(() => { return statusId !== 0 && statusId !== 4}, [statusId]);
 
   // const isEditable = useMemo(() => statusId === 0, [statusId]);
 
@@ -146,7 +146,7 @@ const DocumentEditScreen = ({ route }: Props) => {
         />
       ),
       headerRight: () =>
-        (statusId === 0 || statusId === 1) && (
+        (statusId === 0 || statusId === 1 || statusId === 4) && (
           <HeaderRight
             text="Готово"
             onPress={() => {
@@ -240,7 +240,7 @@ const DocumentEditScreen = ({ route }: Props) => {
       <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
       <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
-          {(statusId === 0 || statusId === 1) && (
+          {(statusId === 0 || statusId === 1 || statusId === 4) && (
             <>
               <View style={localeStyles.fieldContainerRow}>
                 <Text>Черновик:</Text>

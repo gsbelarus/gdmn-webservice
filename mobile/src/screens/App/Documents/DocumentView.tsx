@@ -1,9 +1,9 @@
-import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Colors, FAB, IconButton, Button, Avatar } from 'react-native-paper';
+import { Text, Colors, FAB, IconButton, Avatar } from 'react-native-paper';
 
 import { ILine, IReference, IGood, IContact } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
