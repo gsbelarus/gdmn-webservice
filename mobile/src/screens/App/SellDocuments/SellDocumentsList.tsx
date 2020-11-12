@@ -153,6 +153,11 @@ const SellDocumentsListScreen = ({ navigation }) => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [actions, apiService.data, appState.documents, state.companyID]);
 
+  const updateStatus = useCallback(() => {
+    const documents = appState.documents.filter((document) => document.head.status === 0);
+    documents.forEach((document) => actions.editStatusDocument({ id: document.id, status: 1 }));
+  }, [actions, appState.documents]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -170,6 +175,10 @@ const SellDocumentsListScreen = ({ navigation }) => {
                 onPress: sendUpdateRequest,
               },
               {
+                title: 'Черновики в готово',
+                onPress: updateStatus,
+              },
+              {
                 title: 'Удалить документы',
                 type: 'destructive',
                 onPress: actions.deleteAllDocuments,
@@ -183,7 +192,7 @@ const SellDocumentsListScreen = ({ navigation }) => {
         />
       ),
     });
-  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
+  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet, updateStatus]);
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
