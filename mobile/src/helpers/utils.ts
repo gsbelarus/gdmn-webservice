@@ -42,18 +42,25 @@ const ensureFileExists = async (dir: string) => {
   return dirInfo.exists;
 };
 
+const getDirectory = (path: string): string => {
+  const regex = /^(.+)\/([^/]+)$/;
+  const res = regex.exec(path);
+
+  return res ? res[1] : path;
+};
+
 const ensureDirExists = async (dir: string) => {
   const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
-  // console.log(`dir: ${dbDir}${dir}`)
+
   if (!dirInfo.exists) {
-    await FileSystem.makeDirectoryAsync(dbDir, { intermediates: true });
+    await FileSystem.makeDirectoryAsync(`${dbDir}${dir}`, { intermediates: true });
   }
 };
 
 export const appStorage = {
   setItem: async <T>(key: string, data: T) => {
     try {
-      key.split('/').forEach(async (el, i, j) => j.length - 1 !== i && (await ensureDirExists(el)));
+      await ensureDirExists(getDirectory(key));
       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
     } catch (e) {
       console.log('error', e);
@@ -62,10 +69,10 @@ export const appStorage = {
 
   getItem: async (key: string) => {
     try {
-      if (!ensureFileExists(`${key}.json`)) {
+      if (!(await ensureFileExists(`${key}.json`))) {
         return;
       }
-      key.split('/').forEach(async (el, i, j) => j.length - 1 !== i && (await ensureDirExists(el)));
+      await ensureDirExists(getDirectory(key));
       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
       return result ? JSON.parse(result) : null;
     } catch (e) {

@@ -124,7 +124,7 @@ const SettingsScreen = ({ navigation }: Props) => {
         });
 
         /* Обработка сообщений, которые связаны с документами */
-        const messagesForDocuments = response.data.filter(
+        const messagesForDocuments = response.data?.filter(
           (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
         );
 

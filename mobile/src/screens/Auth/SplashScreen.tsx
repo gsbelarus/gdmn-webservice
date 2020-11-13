@@ -4,6 +4,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Text, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
+import { appStorage } from '../../helpers/utils';
 import styles from '../../styles/global';
 
 type Props = {
