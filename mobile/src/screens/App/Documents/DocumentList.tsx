@@ -144,7 +144,7 @@ const DocumentListScreen = ({ navigation }) => {
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'data',
         payload: {
-          name: 'tradeAgentDocuments',
+          name: 'SellDocument',
           params: documents,
         },
       }),
