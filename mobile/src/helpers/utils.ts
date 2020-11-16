@@ -1,3 +1,4 @@
+import * as FileSystem from 'expo-file-system';
 import { AsyncStorage } from 'react-native';
 
 import { IDocument, ILine, IMessage } from '../../../common';
@@ -38,15 +39,49 @@ export function createCancellableSignal() {
   return p;
 }
 
+const dbDir = `${FileSystem.documentDirectory}db/`;
+
+const ensureFileExists = async (dir: string) => {
+  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
+  return dirInfo.exists;
+};
+
+const getDirectory = (path: string): string => {
+  const regex = /^(.+)\/([^/]+)$/;
+  const res = regex.exec(path);
+
+  return res ? res[1] : path;
+};
+
+const ensureDirExists = async (dir: string) => {
+  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
+
+  if (!dirInfo.exists) {
+    await FileSystem.makeDirectoryAsync(`${dbDir}${dir}`, { intermediates: true });
+  }
+};
+
 export const appStorage = {
   setItem: async <T>(key: string, data: T) => {
-    AsyncStorage.setItem(key, JSON.stringify(data));
+    try {
+      await ensureDirExists(getDirectory(key));
+      await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
+    } catch (e) {
+      console.log('error', e);
+    }
   },
 
   getItem: async (key: string) => {
-    const result = await AsyncStorage.getItem(key);
-
-    return result ? JSON.parse(result) : null;
+    try {
+      if (!(await ensureFileExists(`${key}.json`))) {
+        return;
+      }
+      await ensureDirExists(getDirectory(key));
+      const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
+      return result ? JSON.parse(result) : null;
+    } catch (e) {
+      console.log('error', e);
+    }
   },
 
   getItems: async (keys: string[]) => {
@@ -55,10 +90,34 @@ export const appStorage = {
   },
 
   removeItem: async (key: string) => {
-    await AsyncStorage.removeItem(key);
+    try {
+      await ensureDirExists('');
+      await FileSystem.deleteAsync(key);
+    } catch (e) {
+      console.log('error', e);
+    }
   },
 };
+// export const appStorage = {
+//   setItem: async <T>(key: string, data: T) => {
+//     AsyncStorage.setItem(key, JSON.stringify(data));
+//   },
 
+//   getItem: async (key: string) => {
+//     const result = await AsyncStorage.getItem(key);
+
+//     return result ? JSON.parse(result) : null;
+//   },
+
+//   getItems: async (keys: string[]) => {
+//     const result = await AsyncStorage.multiGet(keys);
+//     return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
+//   },
+
+//   removeItem: async (key: string) => {
+//     await AsyncStorage.removeItem(key);
+//   },
+// };
 export const isMessage = (obj: unknown): obj is IMessage =>
   obj instanceof Object &&
   'id' in obj &&
@@ -84,8 +143,8 @@ export const getDateString = (_date: string) => {
 export const getNextDocLineId = (document: ISellDocument | IDocument) => {
   return (
     (document.lines as (ILine | ISellLine)[])
-      .map((item: { id: string }) => Number(item.id))
-      .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 1
+    .map((item: { id: string }) => Number(item.id))
+    .reduce((lineId: number, currLineId: number) => (lineId > currLineId ? lineId : currLineId), -1) + 1 || 1
   );
 };
 
