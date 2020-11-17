@@ -6,6 +6,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-nativ
 import { Text, Colors, FAB, IconButton, Avatar } from 'react-native-paper';
 
 import { ILine, IReference, IGood, IContact } from '../../../../../common';
+import { IPackage } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -32,6 +33,11 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
+        </Text>
+        <Text style={localStyles.productBarcodeView}>
+          {`Упаковки: ${((state.references?.packageTypes as unknown) as IReference<IPackage>)?.data
+            .filter((pack) => pack.id === item.packagekey)
+            .map((pack) => `${pack.name || ''}, `)}`}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>

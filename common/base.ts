@@ -14,6 +14,7 @@ export interface IHead {
   roadId?: number; // 	Маршрут
   departId?: number; // Необязательное поле склад (подразделение предприятия-производителя)
   ondate: string; //  Дата отгрузки
+  error?: string;
 }
 
 export interface ILine {

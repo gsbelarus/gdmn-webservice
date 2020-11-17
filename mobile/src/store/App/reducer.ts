@@ -38,7 +38,9 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return {
         ...state,
         documents: state.documents.map((doc) =>
-          doc.id === action.payload.id ? { ...doc, head: { ...doc.head, status: action.payload.status } } : doc,
+          doc.id === action.payload.id
+            ? { ...doc, head: { ...doc.head, status: action.payload.status, error: action.payload.error } }
+            : doc,
         ),
       };
     }

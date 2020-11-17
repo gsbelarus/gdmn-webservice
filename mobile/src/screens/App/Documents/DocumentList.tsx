@@ -49,7 +49,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const fromContact = useMemo(() => getContact(docHead?.contactId), [docHead.contactId, getContact]);
   const toContact = useMemo(() => getOutlet(docHead?.outletId), [docHead.outletId, getOutlet]);
 
-  const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
+  const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('ru-RU'), [item?.head?.date]);
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
@@ -65,7 +65,9 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
-            <Text style={[localStyles.number, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
+            <Text style={[localStyles.number, localStyles.name, localStyles.field, { color: colors.text }]}>
+              {docDate}
+            </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
               {status ? status.name : ''}
             </Text>
@@ -76,6 +78,11 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
           <Text style={[localStyles.name, localStyles.field, { color: colors.text }]}>
             Магазин: {toContact?.name || ''}
           </Text>
+          {item?.head?.status === 4 ? (
+            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status || 0] }]}>
+              Причина: {item?.head?.error || 'не известна'}
+            </Text>
+          ) : undefined}
         </View>
       </View>
     </TouchableOpacity>
@@ -186,13 +193,13 @@ const DocumentListScreen = ({ navigation }) => {
 
     response.data?.forEach((message) => {
       if (message.body.type === 'update_data') {
-        //console.log(message.body.payload.params);
         (message.body.payload.params as IUpdateDocumentResponse[]).forEach((result) => {
-          if (result.status === 'ok') {
-            actions.updateDocumentStatus({ id: Number(result.id), status: 3 });
-          } else if (result.status === 'fail') {
-            //решить, будет ли показываться ошибка пользователю, если документ не был принят
-            actions.updateDocumentStatus({ id: Number(result.id), status: 4 });
+          if ((appState.documents as IDocument[])?.find((doc) => doc.id === Number(result.id))?.head.status === 2) {
+            actions.updateDocumentStatus({
+              id: Number(result.id),
+              status: result.status === 'ok' ? 3 : 4,
+              error: result.error,
+            });
           }
         });
       }

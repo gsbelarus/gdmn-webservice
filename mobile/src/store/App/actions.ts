@@ -37,9 +37,10 @@ export const AppActions = {
   updateDocument: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT_HEAD, { id: number; head: IHead }>(
     ActionAppTypes.UPDATE_DOCUMENT_HEAD,
   ),
-  updateDocumentStatus: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT_STATUS, { id: number; status: number }>(
+  updateDocumentStatus: createActionPayload<
     ActionAppTypes.UPDATE_DOCUMENT_STATUS,
-  ),
+    { id: number; status: number; error?: string }
+  >(ActionAppTypes.UPDATE_DOCUMENT_STATUS),
   deleteDocument: createActionPayload<ActionAppTypes.DELETE_DOCUMENT, number>(ActionAppTypes.DELETE_DOCUMENT),
   deleteAllDocuments: createAction<ActionAppTypes.DELETE_ALL_DOCUMENTS>(ActionAppTypes.DELETE_ALL_DOCUMENTS),
   addLine: createActionPayload<ActionAppTypes.DOCUMENT_ADD_LINE, { docId: number; line: ILine }>(
