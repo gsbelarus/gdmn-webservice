@@ -45,18 +45,15 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [prodId, state.references?.goods?.data]);
 
   const packageGoods = useMemo(
-    () => (state.references?.packageGoods?.data as IGoodPackage[]).filter((item) => item.goodkey === prodId),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => 
+      { if (item.goodkey === prodId) return  item.packagekey }),
     [prodId, state.references?.packageGoods?.data],
   );
 
   const packageTypes = useMemo(
     () =>
-      (state.references?.packageTypes?.data as IPackage[]).filter((item) =>
-        packageGoods.find((i) => i.packagekey === item.id) ? item : undefined,
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ state.references?.packageTypes?.data],
+      (state.references?.packageTypes?.data as IPackage[]).filter((item) => packageGoods.includes(item.id)),
+    [packageGoods, state.references?.packageTypes?.data],
   );
 
   const updateDocumentLine = useCallback(() => {
