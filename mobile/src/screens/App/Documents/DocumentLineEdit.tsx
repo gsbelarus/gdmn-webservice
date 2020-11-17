@@ -47,16 +47,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const packageGoods = useMemo(
     () => (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => 
       { if (item.goodkey === prodId) return  item.packagekey }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [prodId, state.references?.packageGoods?.data],
   );
 
   const packageTypes = useMemo(
     () =>
-      (state.references?.packageTypes?.data as IPackage[]).filter((item) =>
-        packageGoods.find((i) => i === item.id)
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      (state.references?.packageTypes?.data as IPackage[]).filter((item) => packageGoods.includes(item.id)),
     [packageGoods, state.references?.packageTypes?.data],
   );
 

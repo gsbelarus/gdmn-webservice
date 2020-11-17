@@ -34,7 +34,7 @@ const DocumentEditScreen = ({ route }: Props) => {
     doctype = appState.references?.documenttypes?.data[0].id,
     contactId,
     outletId,
-    roadId,
+    roadId = appState.references?.roads?.data[0].id,
     departId,
     ondate = tomorrow.toISOString().slice(0, 10),
     status = 0,
@@ -80,7 +80,7 @@ const DocumentEditScreen = ({ route }: Props) => {
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
   const listOutlets = useMemo(() => getListItems(outlets), [outlets]);
   const listRoads = useMemo(() => getListItems(roads), [roads]);
-  const listDocumentType = useMemo(() => getListItems(docTypes), [docTypes]);
+  //const listDocumentType = useMemo(() => getListItems(docTypes), [docTypes]);
 
   const checkDocument = useCallback(() => {
     const res = date && docnumber && outletId && contactId && ondate;
@@ -398,23 +398,6 @@ const DocumentEditScreen = ({ route }: Props) => {
                   fieldName: 'roadId',
                   list: listRoads,
                   value: [roadId],
-                })
-              }
-            />
-          </View>
-          <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Тип документа:</Text>
-            <ReferenceItem
-              value={selectedItem(listDocumentType, doctype)?.value}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  title: 'Тип документа',
-                  fieldName: 'doctype',
-                  list: listDocumentType,
-                  value: [doctype],
                 })
               }
             />
