@@ -17,6 +17,7 @@
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
+    "@types/bcrypt": "^3.0.0",
     "@koa/cors": "^3.1",
     "@types/jest": "^26.0.14",
     "@types/koa": "^2.11",
@@ -33,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
+    "bcrypt": "^5.0.0",
     "cross-env": "^7.0",
     "eslint": "^7.11.0",
     "eslint-config-airbnb": "^18.2.0",
