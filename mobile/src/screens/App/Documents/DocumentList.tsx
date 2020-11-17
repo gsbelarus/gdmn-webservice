@@ -16,7 +16,7 @@ import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 // import { statusColors}
 
 interface IUpdateDocumentResponse {
-  id: number;
+  id: string;
   status: 'ok' | 'fail';
   error?: string;
 }
@@ -186,12 +186,13 @@ const DocumentListScreen = ({ navigation }) => {
 
     response.data?.forEach((message) => {
       if (message.body.type === 'update_data') {
+        //console.log(message.body.payload.params);
         (message.body.payload.params as IUpdateDocumentResponse[]).forEach((result) => {
           if (result.status === 'ok') {
-            actions.updateDocumentStatus({ id: result.id, status: 3 });
+            actions.updateDocumentStatus({ id: Number(result.id), status: 3 });
           } else if (result.status === 'fail') {
             //решить, будет ли показываться ошибка пользователю, если документ не был принят
-            actions.updateDocumentStatus({ id: result.id, status: 4 });
+            actions.updateDocumentStatus({ id: Number(result.id), status: 4 });
           }
         });
       }
