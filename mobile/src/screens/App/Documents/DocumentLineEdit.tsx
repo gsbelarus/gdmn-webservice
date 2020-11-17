@@ -45,7 +45,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [prodId, state.references?.goods?.data]);
 
   const packageGoods = useMemo(
-    () => (state.references?.packageGoods?.data as IGoodPackage[]).filter((item) => item.goodkey === prodId),
+    () => (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => 
+      { if (item.goodkey === prodId) return  item.packagekey }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [prodId, state.references?.packageGoods?.data],
   );
@@ -53,10 +54,10 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const packageTypes = useMemo(
     () =>
       (state.references?.packageTypes?.data as IPackage[]).filter((item) =>
-        packageGoods.find((i) => i.packagekey === item.id) ? item : undefined,
+        packageGoods.find((i) => i === item.id)
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ state.references?.packageTypes?.data],
+    [packageGoods, state.references?.packageTypes?.data],
   );
 
   const updateDocumentLine = useCallback(() => {
