@@ -132,6 +132,22 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
+    if (state.formParams?.manufacturingDate) {
+      actions.setFormParams({
+        ...(state.formParams as ISellLine),
+        numreceive: state.weighedGoods.find((item) => {
+          const date = item.datework.split('.').reverse();
+          return (
+            item.goodkey === line.goodId &&
+            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
+              state.formParams.manufacturingDate
+          );
+        })?.numreceive,
+      });
+    }
+  }, [state.formParams?.manufacturingDate]);
+
+  useEffect(() => {
     if (isFocused) {
       const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
