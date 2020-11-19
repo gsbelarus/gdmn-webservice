@@ -6,6 +6,8 @@ import { devices, users, codes } from './dao/db';
 import { VerifyFunction } from 'passport-local';
 import { userService } from '.';
 import log from '../utils/logger';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
@@ -51,7 +53,7 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
     const gdmnUser = await users.insert({
       userName: 'gdmn',
       creatorId: user.userName,
-      password: 'gdmn',
+      password: await bcrypt.hash('gdmn', config.SALT4PASSWORD),
       companies: [],
     });
     await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
@@ -71,7 +73,7 @@ const validateAuthCreds: VerifyFunction = async (userName: string, password: str
   const user = await userService.findByName(userName);
 
   // TODO: use password hash
-  if (!user || user.password !== password) {
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     done(null, false);
   } else {
     done(null, user);

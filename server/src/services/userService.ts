@@ -1,6 +1,8 @@
 import { users, devices } from './dao/db';
 import { makeProfile } from '../controllers/user';
 import { IUser } from '../../../common';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const findOne = async (userId: string) => users.find(userId);
 
@@ -17,7 +19,10 @@ const addOne = async (user: IUser) => {
   if (await users.find(i => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
-  return await users.insert(user);
+  return await users.insert({
+    ...user,
+    password: await bcrypt.hash(user.password, config.SALT4PASSWORD),
+  });
 };
 
 /**
