@@ -6,6 +6,7 @@ import { devices, users, codes } from './dao/db';
 import { VerifyFunction } from 'passport-local';
 import { userService } from '.';
 import log from '../utils/logger';
+import bcrypt from 'bcrypt';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
@@ -37,9 +38,9 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
       throw new Error('неверный пользователь или пароль');
     }
 
-    // await ;
+    await ctx.login(user);
 
-    return ctx.login(user);
+    return user;
   })(ctx, next);
 };
 
@@ -47,20 +48,32 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
+
   if (!userCount) {
-    const gdmnUser = await users.insert({
+    // const gdmnUser = await users.insert({
+    //   userName: 'gdmn',
+    //   creatorId: user.userName,
+    //   password: passwordHash,
+    //   companies: [],
+    // });
+    // await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
+
+    const gdmnUserObj: IUser = {
       userName: 'gdmn',
       creatorId: user.userName,
       password: 'gdmn',
       companies: [],
-    });
+    };
+
+    const gdmnUser = await userService.addOne(gdmnUserObj);
+
     await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
   }
 
   const userid = await userService.addOne(user);
 
   //TODO: обработать поиск по передаваемой организации
-  if (deviceId === 'WEB' && !userCount) {
+  if (deviceId === 'WEB') {
     await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
   }
 
@@ -70,11 +83,12 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await userService.findByName(userName);
 
-  // TODO: use password hash using bcryptjs
-  if (!user || user.password !== password) {
-    done(null, false);
-  } else {
+  if (!user) done(null, false);
+
+  if (await bcrypt.compare(password, user.password)) {
     done(null, user);
+  } else {
+    done(null, false);
   }
 };
 

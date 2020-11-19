@@ -2,15 +2,12 @@ import { users, devices } from './dao/db';
 import { makeProfile } from '../controllers/user';
 import { IUser } from '../../../common';
 
+import { hashPassword } from '../utils/crypt';
+
 const findOne = async (userId: string) => users.find(userId);
 
-const findByName = async (userName: string) => {
-  const user = await users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
-  if (!user) {
-    throw new Error('пользователь с таким именем не найден');
-  }
-  return user;
-};
+const findByName = async (userName: string) =>
+  users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
 
@@ -23,7 +20,13 @@ const addOne = async (user: IUser) => {
   if (await users.find(i => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
-  return await users.insert(user);
+
+  const passwordHash = await hashPassword(user.password);
+
+  return await users.insert({
+    ...user,
+    password: passwordHash,
+  });
 };
 
 /**
@@ -40,10 +43,13 @@ const updateOne = async (user: IUser) => {
     throw new Error('пользователь не найден');
   }
 
-  // Удаляем поля которые нельзя перезаписывать
-  user.password = '';
+  if (!user.password) {
+    throw new Error('Не указан пароль');
+  }
 
-  await users.update({ ...oldUser, ...user });
+  const passwordHash = await hashPassword(user.password);
+
+  await users.update({ ...oldUser, ...user, password: passwordHash });
 
   return user.id;
 };

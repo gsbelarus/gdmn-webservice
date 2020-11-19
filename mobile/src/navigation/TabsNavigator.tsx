@@ -36,7 +36,7 @@ const TabsNavigator = () => {
         options={{
           tabBarLabel: 'Справочники',
           tabBarIcon: ({ color }) => <TabBarIcon name="view-list" color={color} />,
-          // tabBarBadge: true,
+          tabBarBadge: true,
         }}
       />
       <TabsStack.Screen
