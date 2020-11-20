@@ -50,12 +50,13 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
   if (!userCount) {
-    const gdmnUser = await users.insert({
+    const gdmnUserObj: IUser = {
       userName: 'gdmn',
       creatorId: user.userName,
-      password: await bcrypt.hash('gdmn', config.SALT4PASSWORD),
+      password: 'gdmn'
       companies: [],
-    });
+    };
+    const gdmnUser = await userService.addOne(gdmnUserObj);
     await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
   }
 
@@ -72,11 +73,12 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
 const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await userService.findByName(userName);
 
-  // TODO: use password hash
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    done(null, false);
-  } else {
+  if (!user) done(null, false);
+
+  if (await bcrypt.compare(password, user.password)) {
     done(null, user);
+  } else {
+    done(null, false);
   }
 };
 
