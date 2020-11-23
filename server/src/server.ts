@@ -79,7 +79,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
 
   log.info('Starting listener ...');
 
-  await new Promise(resolve => app.listen(config.PORT, () => resolve()));
+  await new Promise(resolve => app.listen(config.PORT, () => resolve('')));
 
   log.info(`Server is running on http://localhost:${config.PORT}`);
 

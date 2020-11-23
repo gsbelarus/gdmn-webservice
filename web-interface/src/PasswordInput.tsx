@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { ITextFieldProps, TextField } from 'office-ui-fabric-react/lib/components/TextField';
 import { FontIcon } from 'office-ui-fabric-react/lib/components/Icon';
 
-interface IPasswordInputState {
-  passwVisible?: boolean;
-}
+// interface IPasswordInputState {
+//   passwVisible?: boolean;
+// }
 
 export const PasswordInput = (props: ITextFieldProps) => {
   const [passwVisible, setPasswVisible] = useState(false);

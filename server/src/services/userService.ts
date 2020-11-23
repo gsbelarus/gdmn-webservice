@@ -94,11 +94,14 @@ const findDevices = async (userId: string) => {
 
 const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
+
   if (user.companies?.some(i => companyName === i)) {
     throw new Error('организация уже привязана к пользователю');
   }
 
-  return users.update({ ...user, companies: [...user.companies, companyName] });
+  const companies = [...(user.companies || []), companyName];
+
+  return users.update({ ...user, companies });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {
