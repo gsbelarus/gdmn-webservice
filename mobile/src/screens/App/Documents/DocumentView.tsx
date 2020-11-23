@@ -75,20 +75,8 @@ const DocumentViewScreen = ({ route }: Props) => {
   const { state, actions } = useAppStore();
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
-  const [scanned, setScanned] = useState(false);
-  const [barcode, setBarcode] = useState('');
 
   const docId = route.params?.docId;
-
-  const handleBarcode = (text: string) => {
-    setScanned(true);
-    setBarcode(barcode);
-    setScanned(false);
-  };
-
-  useEffect(() => {
-    console.log(barcode);
-  }, [barcode]);
 
   const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
     docId,
@@ -206,11 +194,15 @@ const DocumentViewScreen = ({ route }: Props) => {
           <FAB
             style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
             icon="barcode-scan"
-            onPress={() => navigation.navigate('ScanBarcode', { docId: document?.id })}
+            onPress={() =>
+              navigation.navigate(state.settings.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+                docId: document?.id,
+              })
+            }
           />
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-            icon="plus"
+            icon="feature-search-outline"
             onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
           />
         </>

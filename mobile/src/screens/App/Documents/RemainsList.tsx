@@ -115,11 +115,15 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
         <IconButton
           icon="barcode-scan"
           size={24}
-          onPress={() => navigation.navigate('ScanBarcode', { docId: document.id })}
+          onPress={() =>
+            navigation.navigate(state.settings.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+              docId: document.id,
+            })
+          }
         />
       ),
     });
-  }, [document.id, navigation]);
+  }, [document.id, navigation, state.settings.barcodeReader]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

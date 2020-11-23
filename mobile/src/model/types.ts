@@ -79,6 +79,7 @@ export interface IAuthState {
 export interface IAppSettings {
   synchronization?: boolean;
   autodeletingDocument?: boolean;
+  barcodeReader?: boolean;
   darkTheme?: boolean;
 }
 

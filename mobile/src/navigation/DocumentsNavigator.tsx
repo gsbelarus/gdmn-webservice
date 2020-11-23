@@ -12,7 +12,12 @@ import {
   FilterEditScreen,
   RemainsListScreen,
 } from '../screens/App/Documents';
-import { ScanBarcodeScreen, SelectDateScreen, SelectItemScreen } from '../screens/App/Documents/components/';
+import {
+  ScanBarcodeScreen,
+  SelectDateScreen,
+  SelectItemScreen,
+  ScanBarcodeReaderScreen,
+} from '../screens/App/Documents/components/';
 
 export type DocumentStackParamList = {
   DocumentList: undefined;
@@ -45,6 +50,9 @@ export type DocumentStackParamList = {
     value: string;
   };
   ScanBarcode: {
+    docId: number;
+  };
+  ScanBarcodeReader: {
     docId: number;
   };
 };
@@ -100,6 +108,12 @@ const DocumentsNavigator = () => {
         key="ScanBarCodeScreen"
         name="ScanBarcode"
         component={ScanBarcodeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        key="ScanBarcodeReaderScreen"
+        name="ScanBarcodeReader"
+        component={ScanBarcodeReaderScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

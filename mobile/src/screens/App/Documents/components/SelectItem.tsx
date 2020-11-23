@@ -79,8 +79,8 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
               return;
             }
 
-            console.log('formName', formName);
-            console.log('isMulti', isMulti);
+            // console.log('formName', formName);
+            // console.log('isMulti', isMulti);
             actions.setForm({
               [formName]: {
                 ...state.forms[formName],

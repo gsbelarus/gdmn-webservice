@@ -1,4 +1,4 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme, StackActions } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
@@ -52,6 +52,8 @@ const SettingsScreen = ({ navigation }: Props) => {
             onPress: () => {
               appActions.setDocuments([]);
               appActions.setReferences({});
+
+              navigation.dispatch(StackActions.popToTop());
             },
           },
           {
@@ -59,7 +61,7 @@ const SettingsScreen = ({ navigation }: Props) => {
           },
         ]);
       })(),
-    [appActions],
+    [appActions, navigation],
   );
 
   const sendGetReferencesRequest = useCallback(() => {
@@ -229,6 +231,7 @@ const SettingsScreen = ({ navigation }: Props) => {
               >
                 Проверить хранилище
               </Button>
+              <Divider />
               <Button
                 mode="text"
                 style={localStyles.button}
@@ -272,6 +275,13 @@ const SettingsScreen = ({ navigation }: Props) => {
         />
         <Divider />
         */}
+        <Divider />
+        <SettingsItem
+          label="Использовать сканер штрихкодов"
+          value={settings?.barcodeReader}
+          onValueChange={() => appActions.setSettings({ ...settings, barcodeReader: !settings?.barcodeReader })}
+        />
+        <Divider />
         <SettingsItem
           label="Удалять документы после обработки на сервере"
           value={settings?.autodeletingDocument}
