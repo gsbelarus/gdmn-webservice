@@ -198,7 +198,7 @@ const DocumentListScreen = () => {
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      {!!data?.length && (
+      {/* {!!data?.length && (
         <>
           <View style={localStyles.flexDirectionRow}>
             <Searchbar
@@ -216,7 +216,7 @@ const DocumentListScreen = () => {
           </View>
           <ItemSeparator />
         </>
-      )}
+      )} */}
       <FlatList
         ref={ref}
         data={data}
@@ -291,15 +291,15 @@ const localStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  flexDirectionRow: {
-    flexDirection: 'row',
-  },
-  flexGrow: {
-    flexGrow: 10,
-  },
-  iconSettings: {
-    width: 36,
-  },
+  // flexDirectionRow: {
+  //   flexDirection: 'row',
+  // },
+  // flexGrow: {
+  //   flexGrow: 10,
+  // },
+  // iconSettings: {
+  //   width: 36,
+  // },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -312,8 +312,8 @@ const localStyles = StyleSheet.create({
   number: {
     fontSize: 12,
   },
-  searchBar: {
-    elevation: 0,
-    shadowOpacity: 0,
-  },
+  // searchBar: {
+  //   elevation: 0,
+  //   shadowOpacity: 0,
+  // },
 });

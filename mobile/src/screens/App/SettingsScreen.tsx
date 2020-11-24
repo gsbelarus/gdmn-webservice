@@ -53,7 +53,7 @@ const SettingsScreen = ({ navigation }: Props) => {
               appActions.setDocuments([]);
               appActions.setReferences({});
 
-              navigation.dispatch(StackActions.popToTop());
+              // navigation.dispatch(StackActions.popToTop());
             },
           },
           {
@@ -61,7 +61,7 @@ const SettingsScreen = ({ navigation }: Props) => {
           },
         ]);
       })(),
-    [appActions, navigation],
+    [appActions],
   );
 
   const sendGetReferencesRequest = useCallback(() => {

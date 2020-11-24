@@ -97,6 +97,13 @@ const CompaniesScreen = () => {
         <View style={localeStyles.buttonView}>
           <Button
             mode="contained"
+            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
+            onPress={logOut}
+          >
+            Выход
+          </Button>
+          <Button
+            mode="contained"
             style={[styles.rectangularButton, localeStyles.button]}
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={async () => {
@@ -105,13 +112,6 @@ const CompaniesScreen = () => {
             }}
           >
             ОК
-          </Button>
-          <Button
-            mode="contained"
-            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-            onPress={logOut}
-          >
-            Выход
           </Button>
         </View>
       </View>
