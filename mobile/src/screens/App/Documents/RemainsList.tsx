@@ -116,14 +116,15 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
           icon="barcode-scan"
           size={24}
           onPress={() =>
-            navigation.navigate(state.settings.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+            navigation.navigate(state.settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
               docId: document.id,
             })
           }
         />
       ),
     });
-  }, [document.id, navigation, state.settings.barcodeReader]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document.id, navigation, state.settings?.barcodeReader]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

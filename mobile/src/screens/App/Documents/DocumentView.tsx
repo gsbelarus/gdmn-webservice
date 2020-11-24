@@ -195,7 +195,7 @@ const DocumentViewScreen = ({ route }: Props) => {
             style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
             icon="barcode-scan"
             onPress={() =>
-              navigation.navigate(state.settings.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+              navigation.navigate(state.settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
                 docId: document?.id,
               })
             }
