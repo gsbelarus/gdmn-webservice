@@ -1,5 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
-import { AsyncStorage } from 'react-native';
 
 import { IDocument, IMessage } from '../../../common';
 
@@ -80,10 +80,10 @@ export const appStorage = {
     }
   },
 
-  getItems: async (keys: string[]) => {
-    const result = await AsyncStorage.multiGet(keys);
-    return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
-  },
+  /*   getItems: async (keys: string[]) => {
+      const result = await AsyncStorage.multiGet(keys);
+      return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
+    }, */
 
   removeItem: async (key: string) => {
     try {

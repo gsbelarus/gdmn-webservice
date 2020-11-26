@@ -97,27 +97,28 @@ const DocumentListScreen = () => {
       appState.documents?.filter((item) => {
         const docHead = item?.head;
 
-        const fromContact = getContact(docHead?.fromcontactId);
+        return docHead?.docnumber?.includes(searchText);
+        // const fromContact = getContact(docHead?.fromcontactId);
 
-        const toContact = getContact(docHead?.tocontactId);
+        // const toContact = getContact(docHead?.tocontactId);
 
-        const status = Statuses.find((type) => type.id === item?.head?.status);
+        // const status = Statuses.find((type) => type.id === item?.head?.status);
 
         // console.log('Вызов окна DocumentLst');
 
-        return appState.forms?.filterParams?.fieldSearch
-          ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
-              value === 'number'
-                ? item?.head.docnumber?.includes(searchText)
-                : value === 'state' && status
-                ? status.name.includes(searchText)
-                : value === 'toContact' && toContact
-                ? toContact.name.includes(searchText)
-                : value === 'fromContact' && fromContact
-                ? fromContact.name.includes(searchText)
-                : true,
-            )
-          : true;
+        // return appState.forms?.filterParams?.fieldSearch
+        //   ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
+        //       value === 'number'
+        //         ? item?.head.docnumber?.includes(searchText)
+        //         : value === 'state' && status
+        //         ? status.name.includes(searchText)
+        //         : value === 'toContact' && toContact
+        //         ? toContact.name.includes(searchText)
+        //         : value === 'fromContact' && fromContact
+        //         ? fromContact.name.includes(searchText)
+        //         : true,
+        //     )
+        //   : true;
       }) || [],
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,24 +199,26 @@ const DocumentListScreen = () => {
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      {/* {!!data?.length && (
-        <>
-          <View style={localStyles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск по номеру"
-              onChangeText={setSearchText}
-              value={searchText}
-              style={[localStyles.flexGrow, localStyles.searchBar]}
-            />
-            <IconButton
+      {/* {!!data?.length && (    */}
+      <>
+        <View style={localStyles.flexDirectionRow}>
+          <Searchbar
+            placeholder="Поиск по номеру"
+            onChangeText={setSearchText}
+            value={searchText}
+            style={[localStyles.flexGrow, localStyles.searchBar]}
+          />
+          {/* <IconButton
               icon="settings"
               size={24}
               style={localStyles.iconSettings}
               onPress={() => navigation.navigate('FilterEdit')}
             />
-          </View>
-          <ItemSeparator />
-        </>
+            */}
+        </View>
+        <ItemSeparator />
+      </>
+      {/*
       )} */}
       <FlatList
         ref={ref}
@@ -291,12 +294,12 @@ const localStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  // flexDirectionRow: {
-  //   flexDirection: 'row',
-  // },
-  // flexGrow: {
-  //   flexGrow: 10,
-  // },
+  flexDirectionRow: {
+    flexDirection: 'row',
+  },
+  flexGrow: {
+    flexGrow: 10,
+  },
   // iconSettings: {
   //   width: 36,
   // },
@@ -312,8 +315,8 @@ const localStyles = StyleSheet.create({
   number: {
     fontSize: 12,
   },
-  // searchBar: {
-  //   elevation: 0,
-  //   shadowOpacity: 0,
-  // },
+  searchBar: {
+    elevation: 0,
+    shadowOpacity: 0,
+  },
 });

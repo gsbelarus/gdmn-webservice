@@ -45,14 +45,14 @@ const createStoreContext = () => {
         const storageCompanySettings: ICompanySettings = await appStorage.getItem(
           `${storagePath}/${sections.COMPANYSETTINGS}`,
         );
-        const weightCode = storageCompanySettings?.weightCode ?? config.system[0].weightSettings;
+        const weightSettings = storageCompanySettings?.weightCode ?? config.system[0].weightSettings;
         actions.setCompanySettings(
           storageCompanySettings
             ? {
                 ...storageCompanySettings,
-                weightCode,
+                weightSettings,
               }
-            : { weightCode },
+            : { weightSettings },
         );
         // Справочники
         const references = (await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`)) as IReferences;

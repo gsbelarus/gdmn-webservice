@@ -1,21 +1,27 @@
 import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback } from 'react';
-import { ScrollView, View, StyleSheet, Alert } from 'react-native';
+import { ScrollView, View, StyleSheet, Alert, Text, TextInput } from 'react-native';
 import { FAB } from 'react-native-paper';
 
 import { IResponse } from '../../../../common';
+import { IWeightCodeSettings } from '../../../../common/base';
 import { IMessageInfo } from '../../../../common/models';
+import ItemSeparator from '../../components/ItemSeparator';
+import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
 import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
-import { useAuthStore, useServiceStore } from '../../store';
+import { useAppStore, useAuthStore, useServiceStore } from '../../store';
 
 type Props = StackScreenProps<SettingsStackParamList, 'CompanyConfig'>;
 
 const CompanyConfigScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
+  const { state: appState, actions: appActions } = useAppStore();
   const { state } = useAuthStore();
+
+  const weightCode = (appState.companySettings?.weightCode as unknown) as IWeightCodeSettings;
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
@@ -41,7 +47,66 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <ScrollView style={{ backgroundColor: colors.background }}>
-        <View />
+        <View style={[localStyles.container, { backgroundColor: colors.card }]}>
+          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Весовой товар</SubTitle>
+          <ItemSeparator />
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Идентификатор весового товара:</Text>
+            <TextInput
+              style={[localStyles.input, { borderColor: colors.border }]}
+              keyboardType={'number-pad'}
+              onChangeText={(value) =>
+                appActions.setCompanySettings({
+                  ...appState.companySettings,
+                  weightCode: {
+                    ...appState.companySettings?.weightCode,
+                    weightCode: value.trim(),
+                  },
+                })
+              }
+              value={weightCode?.weightCode || ''}
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Количество символов для кода товара :</Text>
+            <TextInput
+              style={[localStyles.input, { borderColor: colors.border }]}
+              keyboardType={'number-pad'}
+              onChangeText={(value) =>
+                appActions.setCompanySettings({
+                  ...appState.companySettings,
+                  weightCode: {
+                    ...appState.companySettings?.weightCode,
+                    code: value,
+                  },
+                })
+              }
+              value={weightCode?.code?.toString()}
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Количество символов для веса (в гр.):</Text>
+            <TextInput
+              style={[localStyles.input, { borderColor: colors.border }]}
+              keyboardType={'number-pad'}
+              onChangeText={(value) =>
+                appActions.setCompanySettings({
+                  ...appState.companySettings,
+                  weightCode: {
+                    ...appState.companySettings?.weightCode,
+                    weight: value,
+                  },
+                })
+              }
+              value={weightCode?.weight?.toString()}
+            />
+          </View>
+
+          {/* <Text style={localStyles.subdivisionText}>Выберите организацию: </Text> */}
+          {/* <TextInput>Test</TextInput> */}
+        </View>
       </ScrollView>
       <FAB
         style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
@@ -55,6 +120,9 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
 };
 
 const localStyles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 5,
+  },
   content: {
     flex: 1,
     height: '100%',
@@ -64,6 +132,27 @@ const localStyles = StyleSheet.create({
     margin: 20,
     position: 'absolute',
     right: 0,
+  },
+  fieldContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+    justifyContent: 'space-between',
+    margin: 5,
+  },
+  input: {
+    borderRadius: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    flexGrow: 1,
+    height: 40,
+    padding: 10,
+  },
+  inputCaption: {
+    width: 160,
+  },
+  title: {
+    padding: 10,
   },
 });
 

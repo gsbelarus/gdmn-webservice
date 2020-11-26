@@ -27,7 +27,6 @@ export interface IRefData {
   [fieldName: string]: unknown;
 }
 
-
 export interface IForm {
   [name: string]: unknown;
 }

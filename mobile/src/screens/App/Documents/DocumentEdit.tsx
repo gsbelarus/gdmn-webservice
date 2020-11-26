@@ -181,12 +181,12 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
         <TouchableOpacity
           {...item}
           onPress={item.disabled ? null : item.onPress}
-          style={[localeStyles.picker, { borderColor: colors.border }]}
+          style={[localStyles.picker, { borderColor: colors.border }]}
         >
-          <Text style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+          <Text style={[localStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
           {!item.disabled && (
             <MaterialCommunityIcons
-              style={localeStyles.pickerButton}
+              style={localStyles.pickerButton}
               name="menu-right"
               size={30}
               color={colors.primary}
@@ -200,12 +200,12 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   return (
     <>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
-      <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
+      <View style={[localStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
           {(statusId === 0 || statusId === 1) && (
             <>
-              <View style={localeStyles.fieldContainer}>
+              <View style={localStyles.fieldContainer}>
                 <Text>Черновик:</Text>
                 <Switch
                   value={status === 0}
@@ -221,11 +221,11 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             </>
           )}
           <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Номер:</Text>
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Номер:</Text>
             <TextInput
               editable={!isBlocked}
-              style={[localeStyles.input, { borderColor: colors.border }]}
+              style={[localStyles.input, { borderColor: colors.border }]}
               onChangeText={(text) =>
                 appActions.setForm({ documentParams: { ...appState.forms?.documentParams, docnumber: text.trim() } })
               }
@@ -233,8 +233,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             />
           </View>
           <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Дата: </Text>
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Дата: </Text>
             <ReferenceItem
               value={getDateString(date || new Date().toISOString())}
               disabled={isBlocked}
@@ -249,8 +249,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             />
           </View>
           <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Тип:</Text>
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Тип:</Text>
             <ReferenceItem
               value={selectedItem(listDocumentType, doctype)?.value}
               disabled={isBlocked}
@@ -266,8 +266,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             />
           </View>
           <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Место:</Text>
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Место:</Text>
             <ReferenceItem
               value={selectedItem(listDepartments, fromcontactId)?.value}
               disabled={isBlocked}
@@ -283,8 +283,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             />
           </View>
           {/*           <ItemSeparator />
-          <View style={localeStyles.fieldContainer}>
-            <Text style={localeStyles.inputCaption}>Куда:</Text>
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Куда:</Text>
             <ReferenceItem
               value={selectedItem(listDepartments, tocontactId)?.value}
               disabled={isBlocked}
@@ -315,9 +315,9 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   },
                 ]);
               }}
-              style={localeStyles.buttonContainer}
+              style={localStyles.buttonContainer}
             >
-              <Text style={localeStyles.button}>Удалить документ</Text>
+              <Text style={localStyles.button}>Удалить документ</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -328,7 +328,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
 export { DocumentEditScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   button: {
     alignSelf: 'center',
     color: '#fff',
