@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 
 import { IDocument } from '../../../../common';
-import { ICompanySetting, IWeightCodeSettings } from '../../../../common/base';
+// import { ICompanySetting, IWeightCodeSettings } from '../../../../common/base';
 import config from '../../config';
 import { appStorage } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings, IReferences, ICompanySettings } from '../../model/types';
@@ -45,7 +45,7 @@ const createStoreContext = () => {
         const storageCompanySettings: ICompanySettings = await appStorage.getItem(
           `${storagePath}/${sections.COMPANYSETTINGS}`,
         );
-        const weightSettings = storageCompanySettings?.weightCode ?? config.system[0].weightSettings;
+        const weightSettings = storageCompanySettings?.weightSettings ?? config.system[0].weightSettings;
         actions.setCompanySettings(
           storageCompanySettings
             ? {

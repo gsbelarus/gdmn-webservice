@@ -21,7 +21,7 @@ export default {
     },
     defaultDocType: [147160592],
     weightSettings: {
-      weightCode: '27',
+      weightCode: '22',
       code: 5,
       weight: 5
     }

@@ -18,10 +18,13 @@ type Props = StackScreenProps<SettingsStackParamList, 'CompanyConfig'>;
 const CompanyConfigScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
-  const { state: appState, actions: appActions } = useAppStore();
+  const {
+    state: { companySettings },
+    actions: appActions,
+  } = useAppStore();
   const { state } = useAuthStore();
 
-  const weightCode = (appState.companySettings?.weightCode as unknown) as IWeightCodeSettings;
+  const weightSettings = (companySettings?.weightSettings as unknown) as IWeightCodeSettings;
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
@@ -57,14 +60,14 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
               keyboardType={'number-pad'}
               onChangeText={(value) =>
                 appActions.setCompanySettings({
-                  ...appState.companySettings,
-                  weightCode: {
-                    ...appState.companySettings?.weightCode,
+                  ...companySettings,
+                  weightSettings: {
+                    ...companySettings?.weightSettings,
                     weightCode: value.trim(),
                   },
                 })
               }
-              value={weightCode?.weightCode || ''}
+              value={weightSettings?.weightCode || ''}
             />
           </View>
           <ItemSeparator />
@@ -75,14 +78,14 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
               keyboardType={'number-pad'}
               onChangeText={(value) =>
                 appActions.setCompanySettings({
-                  ...appState.companySettings,
-                  weightCode: {
-                    ...appState.companySettings?.weightCode,
+                  ...companySettings,
+                  weightSettings: {
+                    ...companySettings?.weightSettings,
                     code: value,
                   },
                 })
               }
-              value={weightCode?.code?.toString()}
+              value={weightSettings?.code?.toString()}
             />
           </View>
           <ItemSeparator />
@@ -93,14 +96,14 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
               keyboardType={'number-pad'}
               onChangeText={(value) =>
                 appActions.setCompanySettings({
-                  ...appState.companySettings,
-                  weightCode: {
-                    ...appState.companySettings?.weightCode,
+                  ...companySettings,
+                  weightSettings: {
+                    ...companySettings?.weightSettings,
                     weight: value,
                   },
                 })
               }
-              value={weightCode?.weight?.toString()}
+              value={weightSettings?.weight?.toString()}
             />
           </View>
 

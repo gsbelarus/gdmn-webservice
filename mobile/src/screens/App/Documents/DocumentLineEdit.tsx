@@ -1,6 +1,6 @@
 import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
 import { TextInput, Text, Colors } from 'react-native-paper';
 
@@ -24,14 +24,14 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<IDocument>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
 
+  const [goodQty, setGoodQty] = useState<string>('1');
+
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
-  /*   const ref = useRef<typeof TextInput>(null);
-
   useEffect(() => {
-    ref.current.propTypes.selection = {start: 0, end: 0};
-  }, []); */
+    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty.replace(',', '.')) }));
+  }, [goodQty]);
 
   const product = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
@@ -44,14 +44,33 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setLine({
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
-      quantity: docLine?.quantity || quantity || 1,
-      price: docLine?.price || price,
-      remains: docLine?.remains || remains,
+      quantity: docLine?.quantity ?? quantity ?? 1,
+      price: docLine?.price ?? price,
+      remains: docLine?.remains ?? remains,
     });
 
     setDocument(state.documents.find((item) => item.id === docId));
+
+    setGoodQty((docLine?.quantity ?? quantity ?? 1).toString());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.documents, prodId, document?.lines, lineId, docId, price, remains]);
+
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
+      // value = value.replace(',', '.');
+      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
+      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
+      let lastValid = prev;
+
+      const validNumber = new RegExp(/^\d*.?\d*$/); // for comma
+      if (validNumber.test(newValue)) {
+        lastValid = newValue;
+      } else {
+        value = prev;
+      }
+      return lastValid;
+    });
+  }, []);
 
   useEffect(() => {
     if (isFocused) {
@@ -136,17 +155,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             // ref={ref}
-            keyboardType="decimal-pad"
-            onChangeText={(text) => {
-              setLine((prev) => ({
-                ...prev,
-                quantity: Number(!Number.isNaN(text) ? text : '1'),
-              }));
-            }}
+            keyboardType="numeric"
+            onChangeText={handelQuantityChange}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={(line?.quantity ?? 1).toString()}
+            value={goodQty}
             theme={{
               colors: {
                 placeholder: colors.primary,
