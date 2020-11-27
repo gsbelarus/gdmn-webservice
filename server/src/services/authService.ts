@@ -44,7 +44,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   })(ctx, next);
 };
 
-const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) => {
+const signUp = async ({ user, deviceId }: { user: Omit<IUser, 'role'>; deviceId?: string }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
@@ -63,6 +63,7 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
       creatorId: user.userName,
       password: 'gdmn',
       companies: [],
+      role: 'Admin',
     };
 
     const gdmnUser = await userService.addOne(gdmnUserObj);
@@ -70,12 +71,16 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
     await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
   }
 
-  const userid = await userService.addOne(user);
+  const userid = await userService.addOne({ ...user, role: user.creatorId === user.userName ? 'Admin' : 'User' });
 
-  //TODO: обработать поиск по передаваемой организации
-  if (deviceId === 'WEB') {
+  if (user.creatorId === user.userName) {
     await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
   }
+
+  //TODO: обработать поиск по передаваемой организации
+  /*if (deviceId === 'WEB') {
+    await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
+  }*/
 
   return userid;
 };
