@@ -1,8 +1,9 @@
 import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo } from 'react';
-import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TextInputKeyPressEventData } from 'react-native';
 import { TextInput, Text, Colors } from 'react-native-paper';
+import { TextInputProps } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput';
 
 import { IDocument, IGood, ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
@@ -24,28 +25,19 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<IDocument>(undefined);
   const [line, setLine] = useState<ILine>(undefined);
 
+  const [goodQty, setGoodQty] = useState<string>('1');
+
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty.replace(',', '.')) }));
+  }, [goodQty]);
 
   const product = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, state.references?.goods?.data]);
-
-  // const productName = useMemo(() => {
-  //   return (
-  //     ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.name ||
-  //     'товар не найден'
-  //   );
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [prodId, state.references?.goods?.data]);
-
-  // const productParams = useMemo(() => (state.forms?.productParams as unknown) as ILine, [state.forms?.productParams]);
-
-  // useEffect(() => {
-  //   // Поиск редактируемой позиции документа
-  //   document?.lines && setLine(document.lines.find((item) => item.id === route.params?.lineId));
-  // }, [document, route.params?.lineId]);
 
   useEffect(() => {
     const docLine: ILine = document?.lines.find((item) => item.id === lineId);
@@ -53,73 +45,26 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setLine({
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
-      quantity: docLine?.quantity || quantity || 1,
-      price: docLine?.price || price,
-      remains: docLine?.remains || remains,
+      quantity: docLine?.quantity ?? quantity ?? 1,
+      price: docLine?.price ?? price,
+      remains: docLine?.remains ?? remains,
     });
 
     setDocument(state.documents.find((item) => item.id === docId));
+
+    setGoodQty((docLine?.quantity ?? quantity ?? 1).toString());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.documents, prodId, document?.lines, lineId, docId, price, remains]);
 
-  /*   useEffect(() => {
-    if (route.params.weighedGood) {
-      const good = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
-      const date = good.datework.split('.').reverse();
-      good
-        ? actions.setProducParams({
-            id: route.params.lineId,
-            goodId: route.params.prodId,
-            quantity: good.weight,
-            manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-              .toISOString()
-              .slice(0, 10),
-            //timeWork: good.timework,
-            numreceive: good.numreceive,
-          })
-        : undefined;
-    }
-  }, [actions, route.params.lineId, route.params.prodId, route.params.weighedGood, state.weighedGoods]); */
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
+      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
+      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
 
-  /* useEffect(() => {
-    if (!document || !product) {
-      return;
-    }
-
-    if (!route.params?.modeCor) {
-      actions.setProducParams({
-        id: route.params.lineId,
-        goodId: route.params.prodId,
-        quantity: 1,
-        manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
-      });
-    } else {
-      if (!line) {
-        return;
-      }
-      route.params?.manufacturingDate
-        ? actions.setProducParams({ ...line, manufacturingDate: route.params.manufacturingDate })
-        : actions.setProducParams(line);
-    }
-  }, [
-    actions,
-    document,
-    line,
-    product,
-    route.params.lineId,
-    route.params.manufacturingDate,
-    route.params.modeCor,
-    route.params.prodId,
-    route.params.weighedGood,
-  ]); */
-
-  /*   useEffect(() => {
-    // TODO для чего этот эффект?
-    if (state.forms.productParams && route.params?.manufacturingDate) {
-      actions.setProducParams({ ...state.productParams, manufacturingDate: route.params.manufacturingDate });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document, product, route.params]); */
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+      return validNumber.test(newValue) ? newValue : prev;
+    });
+  }, []);
 
   useEffect(() => {
     if (isFocused) {
@@ -203,17 +148,13 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             mode={'flat'}
             label={'Количество'}
             editable={true}
-            keyboardType="decimal-pad"
-            onChangeText={(text) => {
-              setLine((prev) => ({
-                ...prev,
-                quantity: Number(!Number.isNaN(text) ? text : '1'),
-              }));
-            }}
+            // ref={ref}
+            keyboardType="numeric"
+            onChangeText={handelQuantityChange}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={(line?.quantity ?? 1).toString()}
+            value={goodQty}
             theme={{
               colors: {
                 placeholder: colors.primary,

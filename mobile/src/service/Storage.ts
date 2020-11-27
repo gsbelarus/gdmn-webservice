@@ -3,12 +3,12 @@ import config from '../config';
 import { appStorage } from '../helpers/utils';
 
 export default class Sync {
-  private path: string;
+  /*   private path: string;
 
   setPath = (path: string) => {
     this.path = path;
   };
-
+ */
   setServer = async (serverUrl: IBaseUrl) => {
     await appStorage.setItem('pathServer', serverUrl);
   };

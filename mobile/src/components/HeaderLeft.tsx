@@ -9,7 +9,7 @@ interface IProps {
 
 const HeaderLeft = ({ text, onPress }: IProps) => {
   return (
-    <Button onPress={onPress} mode="text" style={localeStyles.marginLeft}>
+    <Button onPress={onPress} mode="text" style={localStyles.marginLeft}>
       {text}
     </Button>
   );
@@ -17,7 +17,7 @@ const HeaderLeft = ({ text, onPress }: IProps) => {
 
 export { HeaderLeft };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   marginLeft: {
     marginLeft: 15,
   },

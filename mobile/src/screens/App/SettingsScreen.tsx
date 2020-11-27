@@ -21,7 +21,7 @@ const SettingsScreen = ({ navigation }: Props) => {
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents, references, forms },
+    state: { settings, documents, references, forms, companySettings },
   } = useAppStore();
   const {
     state: { companyID, userID },
@@ -243,6 +243,12 @@ const SettingsScreen = ({ navigation }: Props) => {
                     important: true,
                   });
                   Reactotron.display({
+                    name: 'companySettings',
+                    preview: 'companySettings',
+                    value: companySettings,
+                    important: true,
+                  });
+                  Reactotron.display({
                     name: 'documents',
                     preview: 'documents',
                     value: documents,
@@ -283,7 +289,7 @@ const SettingsScreen = ({ navigation }: Props) => {
         />
         <Divider />
         <SettingsItem
-          label="Удалять документы после обработки на сервере"
+          label="Удалять документы после обработки учётной системой"
           value={settings?.autodeletingDocument}
           onValueChange={() =>
             appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })

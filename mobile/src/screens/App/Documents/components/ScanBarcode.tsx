@@ -42,9 +42,9 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const weightCodeSettings = useMemo(() => (state.companySettings?.weightCode as unknown) as IWeightCodeSettings, [
+  const weightCodeSettings = useMemo(() => (state.companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    state.companySettings?.weightCode,
+    state.companySettings?.weightSettings,
   ]);
 
   const remains = useMemo(

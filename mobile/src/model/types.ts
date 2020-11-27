@@ -94,6 +94,7 @@ export interface IReferences {
 export interface IForms<T = IForm> {
   [name: string]: T;
 }
+
 export interface IAppState {
   settings?: IAppSettings;
   companySettings?: ICompanySettings;

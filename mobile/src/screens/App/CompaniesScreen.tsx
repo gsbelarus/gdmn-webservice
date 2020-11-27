@@ -67,19 +67,19 @@ const CompaniesScreen = () => {
 
   return (
     <>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Организации</SubTitle>
-      <View style={localeStyles.container}>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localeStyles.subdivisionText}>Выберите организацию: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Организации</SubTitle>
+      <View style={localStyles.container}>
+        <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={1}>
+          <Text style={localStyles.subdivisionText}>Выберите организацию: </Text>
+          <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
             {companies && companies.length !== 0 ? (
               companies.map((item, idx) => (
                 <Chip
                   key={idx}
                   mode="outlined"
                   style={[
-                    localeStyles.margin,
-                    localeStyles.chip,
+                    localStyles.margin,
+                    localStyles.chip,
                     selectedCompany === item ? { backgroundColor: colors.primary } : {},
                   ]}
                   onPress={() => setSelectedCompany(item)}
@@ -94,17 +94,17 @@ const CompaniesScreen = () => {
             )}
           </ScrollView>
         </View>
-        <View style={localeStyles.buttonView}>
+        <View style={localStyles.buttonView}>
           <Button
             mode="contained"
-            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
+            style={[styles.rectangularButton, localStyles.button, localStyles.marginRight]}
             onPress={logOut}
           >
             Выход
           </Button>
           <Button
             mode="contained"
-            style={[styles.rectangularButton, localeStyles.button]}
+            style={[styles.rectangularButton, localStyles.button]}
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={async () => {
               actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
@@ -121,7 +121,7 @@ const CompaniesScreen = () => {
 
 export { CompaniesScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   areaChips: {
     alignItems: 'center',
     borderRadius: 4,
