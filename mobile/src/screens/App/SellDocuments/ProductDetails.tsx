@@ -2,7 +2,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, TextInput } from 'react-native-paper';
@@ -36,6 +36,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ISellLine | undefined>();
+  const [goodQty, setGoodQty] = useState<string>('1');
   const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -159,6 +160,10 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [state.formParams?.manufacturingDate]);
 
   useEffect(() => {
+    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty.replace(',', '.')) }));
+  }, [goodQty]);
+
+  useEffect(() => {
     if (isFocused) {
       const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
@@ -254,6 +259,23 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     });
   };
 
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
+      // value = value.replace(',', '.');
+      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
+      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
+      let lastValid = prev;
+
+      const validNumber = new RegExp(/^\d*.?\d*$/); // for comma
+      if (validNumber.test(newValue)) {
+        lastValid = newValue;
+      } else {
+        value = prev;
+      }
+      return lastValid;
+    });
+  }, []);
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -308,12 +330,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            onChangeText={(text) => {
-              actions.setFormParams({
-                ...(state.formParams as ISellLine),
-                quantity: Number(!Number.isNaN(text) ? text : '1'),
-              });
-            }}
+            onChangeText={handelQuantityChange}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
