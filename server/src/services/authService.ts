@@ -53,7 +53,7 @@ const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) =>
     const gdmnUserObj: IUser = {
       userName: 'gdmn',
       creatorId: user.userName,
-      password: 'gdmn'
+      password: 'gdmn',
       companies: [],
     };
     const gdmnUser = await userService.addOne(gdmnUserObj);
