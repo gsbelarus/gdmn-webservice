@@ -98,12 +98,20 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
 
     if (!route.params?.modeCor) {
+      console.log('2');
       actions.setFormParams({
         id: route.params?.lineId,
         goodId: route.params?.prodId,
         quantity: 1,
         manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
         tara: [],
+        numreceive: state.weighedGoods.find((item) => {
+          const date = item.datework.split('.').reverse();
+          return (
+            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
+              new Date(document.head.date).toISOString().slice(0, 10) && item.goodkey === route.params?.prodId
+          );
+        })?.numreceive,
       });
     } else {
       if (!line) {
@@ -127,18 +135,21 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   useEffect(() => {
     if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
+      console.log('4');
       actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
     }
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
-    if (state.formParams?.manufacturingDate && line) {
+    if (state.formParams?.manufacturingDate) {
+      console.log('5');
       actions.setFormParams({
         ...(state.formParams as ISellLine),
         numreceive: state.weighedGoods.find((item) => {
           const date = item.datework.split('.').reverse();
           return (
-            item.goodkey === line.goodId &&
+            //item.goodkey === line.goodId &&
+            item.goodkey === state.formParams?.goodId &&
             new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
               state.formParams.manufacturingDate
           );
