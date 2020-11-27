@@ -1,8 +1,9 @@
 import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TextInputKeyPressEventData } from 'react-native';
 import { TextInput, Text, Colors } from 'react-native-paper';
+import { TextInputProps } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput';
 
 import { IDocument, IGood, ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
@@ -57,18 +58,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
-      // value = value.replace(',', '.');
       value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
       const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
-      let lastValid = prev;
 
-      const validNumber = new RegExp(/^\d*.?\d*$/); // for comma
-      if (validNumber.test(newValue)) {
-        lastValid = newValue;
-      } else {
-        value = prev;
-      }
-      return lastValid;
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+      return validNumber.test(newValue) ? newValue : prev;
     });
   }, []);
 
