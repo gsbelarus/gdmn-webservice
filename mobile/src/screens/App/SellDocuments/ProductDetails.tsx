@@ -132,7 +132,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
-    if (state.formParams?.manufacturingDate) {
+    if (state.formParams?.manufacturingDate && line) {
       actions.setFormParams({
         ...(state.formParams as ISellLine),
         numreceive: state.weighedGoods.find((item) => {
