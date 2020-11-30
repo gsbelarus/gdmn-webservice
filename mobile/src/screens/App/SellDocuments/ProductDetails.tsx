@@ -157,7 +157,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [state.formParams?.manufacturingDate]);
 
   useEffect(() => {
-    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty.replace(',', '.')) }));
+    actions.setFormParams({ ...line, quantity: parseFloat(goodQty.replace(',', '.')) });
   }, [goodQty]);
 
   useEffect(() => {
