@@ -141,18 +141,21 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   useEffect(() => {
     if (state.formParams?.manufacturingDate) {
-      actions.setFormParams({
-        ...(state.formParams as ISellLine),
-        numreceive: state.weighedGoods.find((item) => {
-          const date = item.datework.split('.').reverse();
-          return (
-            //item.goodkey === line.goodId &&
-            item.goodkey === state.formParams?.goodId &&
-            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
-              state.formParams.manufacturingDate
-          );
-        })?.numreceive,
-      });
+      const numberReceive = state.weighedGoods.find((item) => {
+        const date = item.datework.split('.').reverse();
+        return (
+          //item.goodkey === line.goodId &&
+          item.goodkey === state.formParams?.goodId &&
+          new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
+            state.formParams.manufacturingDate
+        );
+      })?.numreceive;
+      if (numberReceive) {
+        actions.setFormParams({
+          ...(state.formParams as ISellLine),
+          numreceive: numberReceive,
+        });
+      }
     }
   }, [state.formParams?.manufacturingDate]);
 
