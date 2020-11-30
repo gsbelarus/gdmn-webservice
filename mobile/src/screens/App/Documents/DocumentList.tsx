@@ -146,33 +146,35 @@ const DocumentListScreen = ({ navigation }) => {
   const sendUpdateRequest = useCallback(async () => {
     const documents = appState.documents?.filter((document) => document?.head?.status === 1);
 
-    timeout(
-      apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
-        type: 'data',
-        payload: {
-          name: 'SellDocument',
-          params: documents,
-        },
-      }),
-    )
-      .then((response: IResponse<IMessageInfo>) => {
-        if (response.result) {
-          Alert.alert('Документы отправлены!', '', [
-            {
-              text: 'Закрыть',
-              onPress: () => {
-                documents?.forEach((item) => {
-                  actions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
-                });
+    if (documents.length > 0) {
+      timeout(
+        apiService.baseUrl.timeout,
+        apiService.data.sendMessages(state.companyID, 'gdmn', {
+          type: 'data',
+          payload: {
+            name: 'SellDocument',
+            params: documents,
+          },
+        }),
+      )
+        .then((response: IResponse<IMessageInfo>) => {
+          if (response.result) {
+            Alert.alert('Документы отправлены!', '', [
+              {
+                text: 'Закрыть',
+                onPress: () => {
+                  documents?.forEach((item) => {
+                    actions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
+                  });
+                },
               },
-            },
-          ]);
-        } else {
-          Alert.alert('Документы не были отправлены', '', [{ text: 'Закрыть' }]);
-        }
-      })
-      .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
+            ]);
+          } else {
+            Alert.alert('Документы не были отправлены', '', [{ text: 'Закрыть' }]);
+          }
+        })
+        .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
+    }
   }, [actions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
 
   const checkUpdateRequest = useCallback(async () => {
