@@ -195,6 +195,7 @@ const DocumentListScreen = ({ navigation }) => {
       if (message.body.type === 'update_data') {
         (message.body.payload.params as IUpdateDocumentResponse[]).forEach((result) => {
           if ((appState.documents as IDocument[])?.find((doc) => doc.id === Number(result.id))?.head.status === 2) {
+            console.log(result);
             actions.updateDocumentStatus({
               id: Number(result.id),
               status: result.status === 'ok' ? 3 : 4,
@@ -205,7 +206,7 @@ const DocumentListScreen = ({ navigation }) => {
       }
       apiService.data.deleteMessage(state.companyID, message.head.id);
     });
-  }, [actions, state.companyID, apiService.data, apiService.baseUrl.timeout]);
+  }, [actions, state.companyID, apiService.data, appState.documents, apiService.baseUrl.timeout]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
