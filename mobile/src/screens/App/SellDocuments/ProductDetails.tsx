@@ -99,7 +99,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
 
     if (!route.params?.modeCor) {
-      console.log('2');
       actions.setFormParams({
         id: route.params?.lineId,
         goodId: route.params?.prodId,
@@ -136,14 +135,12 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   useEffect(() => {
     if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
-      console.log('4');
       actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
     }
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
     if (state.formParams?.manufacturingDate) {
-      console.log('5');
       actions.setFormParams({
         ...(state.formParams as ISellLine),
         numreceive: state.weighedGoods.find((item) => {
