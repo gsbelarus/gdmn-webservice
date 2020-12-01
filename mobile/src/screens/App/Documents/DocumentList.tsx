@@ -57,9 +57,6 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             </Text>
           </View>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>{fromContact?.name || ''}</Text>
-          {/*           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            На подразделение: {toContact?.name || ''}
-          </Text> */}
         </View>
       </View>
     </TouchableOpacity>
@@ -74,7 +71,7 @@ const DocumentListScreen = () => {
 
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
-  const { state: appState, actions } = useAppStore();
+  const { state: appState, actions: appActions } = useAppStore();
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
@@ -146,7 +143,7 @@ const DocumentListScreen = () => {
               text: 'Закрыть',
               onPress: () => {
                 documents?.forEach((item) => {
-                  actions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
+                  appActions.updateDocumentStatus({ id: item?.id, status: item?.head?.status + 1 });
                 });
               },
             },
@@ -156,7 +153,7 @@ const DocumentListScreen = () => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [actions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
+  }, [appActions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -184,7 +181,7 @@ const DocumentListScreen = () => {
               {
                 title: 'Удалить документы',
                 type: 'destructive',
-                onPress: actions.deleteAllDocuments,
+                onPress: appActions.deleteAllDocuments,
               },
               {
                 title: 'Отмена',
@@ -195,7 +192,7 @@ const DocumentListScreen = () => {
         />
       ),
     });
-  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
+  }, [appActions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
@@ -233,7 +230,10 @@ const DocumentListScreen = () => {
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
         icon="file-document-box-plus"
-        onPress={() => navigation.navigate('DocumentEdit')}
+        onPress={() => {
+          // appActions.clearForm('DocumentEdit');
+          navigation.navigate('DocumentEdit');
+        }}
       />
     </View>
   );

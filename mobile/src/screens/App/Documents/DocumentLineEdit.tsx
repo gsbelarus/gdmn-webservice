@@ -1,9 +1,8 @@
-import { useTheme, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
+import { useTheme, useIsFocused } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TextInputKeyPressEventData } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
 import { TextInput, Text, Colors } from 'react-native-paper';
-import { TextInputProps } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput';
 
 import { IDocument, IGood, ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
@@ -31,7 +30,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty.replace(',', '.')) }));
+    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty) }));
   }, [goodQty]);
 
   const product = useMemo(() => {
@@ -58,11 +57,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
-      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
-      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
+      value = value.replace(',', '.');
+
+      value = !value.includes('.') ? parseFloat(value).toString() : value;
+      value = Number.isNaN(parseFloat(value)) ? '0' : value;
+
+      // const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
+      // console.log('3', newValue);
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(newValue) ? newValue : prev;
+      return validNumber.test(value) ? value : prev;
     });
   }, []);
 
@@ -149,7 +153,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             // ref={ref}
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
             onChangeText={handelQuantityChange}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
