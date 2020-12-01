@@ -45,8 +45,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [prodId, state.references?.goods?.data]);
 
   const packageGoods = useMemo(
-    () => (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => 
-      { if (item.goodkey === prodId) return  item.packagekey }),
+    () => (state.references?.packageGoods?.data as IGoodPackage[]).filter((i) => (i.goodkey === prodId)).map((item) => 
+      ({...item}.packagekey)),
     [prodId, state.references?.packageGoods?.data],
   );
 
