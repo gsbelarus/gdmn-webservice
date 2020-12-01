@@ -90,7 +90,7 @@ const SettingsScreen = () => {
             // Сообщение содержит данные
             ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
               switch (dataSet.type) {
-                case 'get_SellDocuments': {
+                case 'get_tradeAgentDocuments': {
                   const addDocuments = dataSet.data as IDocument[];
                   appActions.setDocuments([...documents, ...addDocuments]);
                   break;
@@ -125,11 +125,11 @@ const SettingsScreen = () => {
         });
 
         /* Обработка сообщений, которые связаны с документами */
-        const messagesForDocuments = response.data.filter(
+        const messagesForDocuments = response.data?.filter(
           (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
         );
 
-        if (messagesForDocuments.length > 0) {
+        if (messagesForDocuments?.length > 0) {
           messagesForDocuments?.forEach((message) => {
             if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
               message.body.payload?.params?.forEach((paramDoc) => {
@@ -155,7 +155,6 @@ const SettingsScreen = () => {
     };
 
     getMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService.data, appActions, companyID, documents]);
 
   return (
@@ -266,14 +265,14 @@ const SettingsScreen = () => {
           value={settings?.synchronization}
           onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
         />
-        <Divider />
+        {/*<Divider />
         <SettingsItem
           label="Удалять документы после обработки на сервере"
           value={settings?.autodeletingDocument}
           onValueChange={() =>
             appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
           }
-        />
+        />*/}
       </ScrollView>
     </>
   );

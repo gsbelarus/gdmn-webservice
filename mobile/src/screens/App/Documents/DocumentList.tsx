@@ -3,9 +3,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
+import { Text, Searchbar, FAB, IconButton } from 'react-native-paper';
 
-import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IHead, IContact, IMessage } from '../../../../../common';
+import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact, IMessage } from '../../../../../common';
 import { IOutlet } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
@@ -46,10 +46,11 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 
   const docHead = useMemo(() => item?.head, [item?.head]);
-  const fromContact = useMemo(() => getContact(docHead?.contactId), [docHead.contactId, getContact]);
-  const toContact = useMemo(() => getOutlet(docHead?.outletId), [docHead.outletId, getOutlet]);
+  const fromContact = useMemo(() => getContact(docHead?.contactId), [docHead?.contactId, getContact]);
+  const toContact = useMemo(() => getOutlet(docHead?.outletId), [docHead?.outletId, getOutlet]);
 
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('ru-RU'), [item?.head?.date]);
+  const docOnDate = useMemo(() => new Date(item?.head?.ondate).toLocaleDateString('ru-RU'), [item?.head?.ondate]);
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
@@ -65,8 +66,11 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
+            <Text style={[localStyles.number, localStyles.field, localStyles.field, { color: colors.text }]}>
+              Дата: {docDate}
+            </Text>
             <Text style={[localStyles.number, localStyles.name, localStyles.field, { color: colors.text }]}>
-              {docDate}
+              Дата отгрузки: {docOnDate}
             </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
               {status ? status.name : ''}
@@ -89,7 +93,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const DocumentListScreen = ({ navigation }) => {
+const DocumentListScreen = ({ navigation, route }) => {
   const { colors } = useTheme();
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
@@ -152,14 +156,14 @@ const DocumentListScreen = ({ navigation }) => {
         apiService.data.sendMessages(state.companyID, 'gdmn', {
           type: 'data',
           payload: {
-            name: 'SellDocument',
+            name: 'tradeAgentDocuments',
             params: documents,
           },
         }),
       )
         .then((response: IResponse<IMessageInfo>) => {
           if (response.result) {
-            Alert.alert('Документы отправлены!', '', [
+            Alert.alert('заявки отправлены!', '', [
               {
                 text: 'Закрыть',
                 onPress: () => {
@@ -170,12 +174,23 @@ const DocumentListScreen = ({ navigation }) => {
               },
             ]);
           } else {
-            Alert.alert('Документы не были отправлены', '', [{ text: 'Закрыть' }]);
+            Alert.alert('заявки не были отправлены', '', [{ text: 'Закрыть' }]);
           }
         })
         .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
     }
   }, [actions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
+
+  const deleteTrades = useCallback(async () => {
+    if (appState.documents) {
+      const deleteDocs = appState.documents.filter((document) => document?.head?.status === 3);
+      if (deleteDocs.length > 0) {
+        deleteDocs.forEach((document) => {
+          actions.deleteDocument(document.id);
+        });
+      }
+    }
+  }, [actions, appState.documents]);
 
   const checkUpdateRequest = useCallback(async () => {
     const response = await timeout<IResponse<IMessage[]>>(
@@ -192,12 +207,10 @@ const DocumentListScreen = ({ navigation }) => {
       Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть' }]);
       return;
     }
-
     response.data?.forEach((message) => {
       if (message.body.type === 'update_data') {
         (message.body.payload.params as IUpdateDocumentResponse[]).forEach((result) => {
           if ((appState.documents as IDocument[])?.find((doc) => doc.id === Number(result.id))?.head.status === 2) {
-            console.log(result);
             actions.updateDocumentStatus({
               id: Number(result.id),
               status: result.status === 'ok' ? 3 : 4,
@@ -211,7 +224,7 @@ const DocumentListScreen = ({ navigation }) => {
   }, [actions, state.companyID, apiService.data, appState.documents, apiService.baseUrl.timeout]);
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
+    navigation.dangerouslyGetParent()?.setOptions({
       headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
       headerRight: () => (
         <IconButton
@@ -219,28 +232,33 @@ const DocumentListScreen = ({ navigation }) => {
           size={28}
           onPress={() =>
             showActionSheet([
-              /*  {
+              /*{
                 title: 'Загрузить',
                 onPress: () => navigation.navigate('DocumentRequest'),
-              }, */
+              },*/
               {
-                title: 'Создать документ',
+                title: 'Создать заявка',
                 onPress: () => {
                   navigation.navigate('DocumentEdit');
                 },
               },
               {
-                title: 'Выгрузить документы',
+                title: 'Выгрузить заявки',
                 onPress: sendUpdateRequest,
               },
               {
-                title: 'Проверить статус документов',
+                title: 'Проверить статус заявок',
                 onPress: checkUpdateRequest,
               },
               {
-                title: 'Удалить документы',
+                title: 'Удалить заявки',
                 type: 'destructive',
                 onPress: actions.deleteAllDocuments,
+              },
+              {
+                title: 'Удалить заявки (для обработанных)',
+                type: 'destructive',
+                onPress: deleteTrades,
               },
               {
                 title: 'Отмена',
@@ -281,7 +299,11 @@ const DocumentListScreen = ({ navigation }) => {
       <ItemSeparator />
       <FlatList
         ref={ref}
-        data={data}
+        data={
+          route.params?.status !== undefined
+            ? data?.filter((item) => item.head?.status === route.params.status)
+            : data?.filter((item) => item.head?.status !== 5)
+        }
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -302,11 +324,13 @@ const DocumentListScreen = ({ navigation }) => {
         onPress={sendUpdateRequest}
       />
        */}
-      <FAB
-        style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-        icon="file-document-box-plus"
-        onPress={() => navigation.navigate('DocumentEdit')}
-      />
+      {route.params?.status === undefined ? (
+        <FAB
+          style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+          icon="file-document-box-plus"
+          onPress={() => navigation.navigate('DocumentEdit')}
+        />
+      ) : undefined}
     </View>
   );
 };

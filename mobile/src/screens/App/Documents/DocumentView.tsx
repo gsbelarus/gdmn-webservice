@@ -10,11 +10,12 @@ import { IPackage } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
+import { getNextDocId } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable: boolean }) => {
+const ContentItem = React.memo(({ item, isEditable, color }: { item: ILine; isEditable: boolean; color: string }) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
@@ -28,7 +29,7 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
   return (
     <>
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
+        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: color }} />
       </View>
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
@@ -88,7 +89,6 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   const docId = route.params?.docId;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
     docId,
     state.documents,
@@ -103,7 +103,6 @@ const DocumentViewScreen = ({ route }: Props) => {
   const docTitle = useMemo(() => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString('BY-ru', options)}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [document]);
 
   const documentTypeName = useMemo(
@@ -167,11 +166,12 @@ const DocumentViewScreen = ({ route }: Props) => {
             navigation.navigate('DocumentLineEdit', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
           }}
         >
-          <ContentItem item={item} isEditable={isEditable} />
+          <ContentItem item={item} isEditable={isEditable} color={statusColors[document?.head?.status]} />
         </TouchableOpacity>
       );
     },
-    [isEditable, navigation, docId],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isEditable, document?.head?.status, navigation, docId],
   );
 
   return document ? (
@@ -205,6 +205,41 @@ const DocumentViewScreen = ({ route }: Props) => {
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="plus"
             onPress={() => navigation.navigate('GoodGroupList', { docId: document.id })}
+          />
+        </>
+      )}
+      {document?.head?.status === 3 && (
+        <>
+          <FAB
+            style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+            icon="archive"
+            onPress={() => actions.updateDocumentStatus({ id: docId, status: 5 })}
+          />
+        </>
+      )}
+      {document?.head?.status === 5 && (
+        <>
+          <FAB
+            style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+            icon="folder-star"
+            onPress={async () => {
+              const id = getNextDocId(state.documents);
+              const today = new Date();
+              const tomorrow = new Date(today);
+              tomorrow.setDate(tomorrow.getDate() + 1);
+
+              await actions.addDocument({
+                id,
+                head: {
+                  ...document?.head,
+                  date: today.toISOString().slice(0, 10),
+                  ondate: tomorrow.toISOString().slice(0, 10),
+                  status: 0,
+                },
+                lines: document?.lines ?? [],
+              });
+              navigation.navigate('DocumentView', { docId: id });
+            }}
           />
         </>
       )}

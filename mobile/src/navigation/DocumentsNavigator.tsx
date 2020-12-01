@@ -19,6 +19,7 @@ import {
   SelectDateScreen,
   SelectItemScreen,
 } from '../screens/App/Documents/components/';
+import TopTabsNavigator from './TopTabsNavigator';
 
 export type DocumentStackParamList = {
   DocumentList: undefined;
@@ -60,7 +61,7 @@ const DocumentsNavigator = () => {
       <Stack.Screen
         key="DocumentList"
         name="DocumentList"
-        component={DocumentListScreen}
+        component={TopTabsNavigator}
         options={{ title: 'Документы' }}
       />
       <Stack.Screen
