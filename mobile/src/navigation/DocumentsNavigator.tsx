@@ -5,7 +5,6 @@ import { IListItem } from '../model/types';
 import {
   DocumentEditScreen,
   DocumentViewScreen,
-  DocumentListScreen,
   DocumentLineEditScreen,
   GoodGroupListScreen,
   GoodListScreen,

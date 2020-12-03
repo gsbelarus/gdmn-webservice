@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
@@ -63,7 +63,9 @@ const DocumentEditScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const isBlocked = useMemo(() => { return statusId !== 0 && statusId !== 4}, [statusId]);
+  const isBlocked = useMemo(() => {
+    return statusId !== 0 && statusId !== 4;
+  }, [statusId]);
 
   // const isEditable = useMemo(() => statusId === 0, [statusId]);
 
@@ -90,7 +92,7 @@ const DocumentEditScreen = ({ route }: Props) => {
     }
 
     return res;
-  }, [date, docnumber, contactId, ondate, outletId, doctype]);
+  }, [date, docnumber, contactId, ondate, outletId]);
 
   const updateDocument = useCallback(() => {
     appActions.updateDocument({
@@ -168,31 +170,45 @@ const DocumentEditScreen = ({ route }: Props) => {
     });
   }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (appState.forms?.documentParams) {
+        return;
+      }
+
+      const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
+
+      setStatusId(docObj?.head?.status || 0);
+
+      // Инициализируем параметры
+      appActions.setForm(
+        docId !== undefined
+          ? {
+              name: 'documentParams',
+              id: docObj?.id,
+              ...(docObj?.head as IDocumentParams),
+            }
+          : {
+              name: 'documentParams',
+              date,
+            },
+      );
+    }, [appActions, appState, date, docId]),
+  );
+
   useEffect(() => {
-    if (appState.forms?.documentParams) {
+    //если выбрать магазин, необходимо автоматически указать организацию
+    if (!appState.forms?.documentParams) {
       return;
     }
 
-    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
-
-    setStatusId(docObj?.head?.status || 0);
-
-    // Инициализируем параметры
-    docId !== undefined
-      ? appActions.setForm({
-          name: 'documentParams',
-          id: docObj?.id,
-          ...(docObj?.head as IDocumentParams),
-        })
-      : appActions.setForm({
-          name: 'documentParams',
-          date,
-        });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, docId]);
-
-  useEffect(() => {
     if (!outlets || !outletId) {
+      return;
+    }
+
+    const newContactId = outlets.find((item) => item.id === outletId)?.parent;
+
+    if (newContactId === contactId) {
       return;
     }
 
@@ -200,10 +216,16 @@ const DocumentEditScreen = ({ route }: Props) => {
       ...appState.forms?.documentParams,
       contactId: outlets.find((item) => item.id === outletId)?.parent,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, outletId, outlets]);
 
   useEffect(() => {
-    if (outlets.find((item) => item.id === outletId)?.parent === contactId) {
+    //если изменилась организация, ранее выбранный магазин сбрасывается
+    if (!appState.forms?.documentParams || !outletId) {
+      return;
+    }
+
+    if (contactId && outlets.find((item) => item.id === outletId)?.parent === contactId) {
       return;
     }
 
@@ -211,6 +233,7 @@ const DocumentEditScreen = ({ route }: Props) => {
       ...appState.forms?.documentParams,
       outletId: undefined,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActions, contactId]);
 
   const ReferenceItem = useCallback(
@@ -221,14 +244,10 @@ const DocumentEditScreen = ({ route }: Props) => {
           onPress={item.disabled ? null : item.onPress}
           style={[localeStyles.picker, { borderColor: colors.border }]}
         >
-          <Text numberOfLines={2} style={[localeStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
-          {!item.disabled && (
-            <MaterialCommunityIcons
-              name="menu-right"
-              size={30}
-              color={colors.primary}
-            />
-          )}
+          <Text numberOfLines={2} style={[localeStyles.pickerText, { color: colors.text }]}>
+            {item.value || 'не выбрано'}
+          </Text>
+          {!item.disabled && <MaterialCommunityIcons name="menu-right" size={30} color={colors.primary} />}
         </TouchableOpacity>
       );
     },
@@ -300,22 +319,16 @@ const DocumentEditScreen = ({ route }: Props) => {
           <View style={localeStyles.fieldContainer}>
             <View style={[localeStyles.inputCaption, localeStyles.fieldInfo]}>
               <Text>Организация:</Text>
-              {
-                contactId
-                ? <TouchableOpacity
+              {contactId ? (
+                <TouchableOpacity
                   style={localeStyles.info}
                   onPress={() => {
                     navigation.navigate('Info', { about: 'Contact', id: contactId });
                   }}
                 >
-                  <MaterialCommunityIcons
-                    name="information-outline"
-                    size={24}
-                    color={colors.primary}
-                  />
+                  <MaterialCommunityIcons name="information-outline" size={24} color={colors.primary} />
                 </TouchableOpacity>
-                : undefined
-              }
+              ) : undefined}
             </View>
             <ReferenceItem
               value={selectedItem(listContacts, contactId)?.value}
@@ -333,24 +346,18 @@ const DocumentEditScreen = ({ route }: Props) => {
           </View>
           <ItemSeparator />
           <View style={localeStyles.fieldContainer}>
-          <View style={[localeStyles.inputCaption, localeStyles.fieldInfo]}>
+            <View style={[localeStyles.inputCaption, localeStyles.fieldInfo]}>
               <Text>Магазин:</Text>
-              {
-                outletId
-                ? <TouchableOpacity
+              {outletId ? (
+                <TouchableOpacity
                   style={localeStyles.info}
                   onPress={() => {
                     navigation.navigate('Info', { about: 'Outlet', id: outletId });
                   }}
                 >
-                  <MaterialCommunityIcons
-                    name="information-outline"
-                    size={24}
-                    color={colors.primary}
-                  />
+                  <MaterialCommunityIcons name="information-outline" size={24} color={colors.primary} />
                 </TouchableOpacity>
-                : undefined
-              }
+              ) : undefined}
             </View>
             <ReferenceItem
               value={selectedItem(listOutlets, outletId)?.value}
@@ -360,9 +367,11 @@ const DocumentEditScreen = ({ route }: Props) => {
                   formName: 'documentParams',
                   title: 'Магазин',
                   fieldName: 'outletId',
-                  list: contactId ? listOutlets.filter(
-                    (item) => outlets.find((outlet) => outlet.id === item.id)?.parent === contactId,
-                  ) : listOutlets,
+                  list: contactId
+                    ? listOutlets.filter(
+                        (item) => outlets.find((outlet) => outlet.id === item.id)?.parent === contactId,
+                      )
+                    : listOutlets,
                   value: [outletId],
                 })
               }
@@ -442,9 +451,9 @@ const localeStyles = StyleSheet.create({
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
     elevation: 8,
+    marginTop: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    marginTop: 10,
   },
   container: {
     flex: 1,
