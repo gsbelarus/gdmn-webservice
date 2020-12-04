@@ -69,11 +69,16 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
             <Text style={[localStyles.number, localStyles.field, localStyles.field, { color: colors.text }]}>
               Дата: {docDate}
             </Text>
-            <Text style={[localStyles.number, localStyles.name, localStyles.field, { color: colors.text }]}>
-              Дата отгрузки: {docOnDate}
-            </Text>
             <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
               {status ? status.name : ''}
+            </Text>
+          </View>
+          <View style={localStyles.flexDirectionRow}>
+            <Text style={[localStyles.number, localStyles.nameNotBold, localStyles.field, { color: colors.text }]}>
+              Дата отгрузки:  
+            </Text>
+            <Text style={[localStyles.number, localStyles.name, localStyles.field, { color: colors.text }]}>
+             {' ' + docOnDate}
             </Text>
           </View>
           <Text style={[localStyles.name, localStyles.field, { color: colors.text }]}>
@@ -156,7 +161,7 @@ const DocumentListScreen = ({ navigation, route }) => {
         apiService.data.sendMessages(state.companyID, 'gdmn', {
           type: 'data',
           payload: {
-            name: 'tradeAgentDocuments',
+            name: 'SellDocument',
             params: documents,
           },
         }),
@@ -407,6 +412,9 @@ const localStyles = StyleSheet.create({
   name: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  nameNotBold: {
+    fontSize: 14,
   },
   number: {
     fontSize: 12,
