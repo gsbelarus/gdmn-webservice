@@ -22,6 +22,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { state, actions } = useAppStore();
   const { docId, lineId, prodId } = route.params;
 
+  const [goodQty, setGoodQty] = useState<string>('1');
+
   const { quantity, packagekey } = useMemo(() => {
     return ((state.forms?.documentLineParams as unknown) || {}) as IDocumentLineParams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,14 +47,17 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [prodId, state.references?.goods?.data]);
 
   const packageGoods = useMemo(
-    () => (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => 
-      { if (item.goodkey === prodId) return  item.packagekey }),
+    () =>
+      (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => {
+        if (item.goodkey === prodId) return item.packagekey;
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [prodId, state.references?.packageGoods?.data],
   );
 
   const packageTypes = useMemo(
-    () =>
-      (state.references?.packageTypes?.data as IPackage[]).filter((item) => packageGoods.includes(item.id)),
+    () => (state.references?.packageTypes?.data as IPackage[]).filter((item) => packageGoods.includes(item.id)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [packageGoods, state.references?.packageTypes?.data],
   );
 
@@ -109,6 +114,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   );
 
   useEffect(() => {
+    actions.setForm({ ...state.forms?.documentLineParams, quantity: goodQty });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actions, goodQty]);
+
+  useEffect(() => {
     setDocument(state.documents.find((item) => item.id === docId));
   }, [state.documents, docId]);
 
@@ -121,15 +131,17 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       (state.documents.find((item) => item.id === docId)?.lines?.find((i) => i.id === lineId) as ILine);
 
     // Инициализируем параметры
-    lineId !== undefined
-      ? actions.setForm({
-          name: 'documentLineParams',
-          id: docLine?.id,
-          ...(docLine as IDocumentLineParams),
-        })
-      : actions.setForm({
-          name: 'documentLineParams',
-        });
+    actions.setForm(
+      lineId !== undefined
+        ? {
+            name: 'documentLineParams',
+            id: docLine?.id,
+            ...(docLine as IDocumentLineParams),
+          }
+        : {
+            name: 'documentLineParams',
+          },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId]);
 
@@ -145,6 +157,17 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       };
     }
   }, [isFocused]);
+
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
+      value = value.replace(',', '.');
+
+      value = !value.includes('.') ? parseFloat(value).toString() : value;
+      value = Number.isNaN(parseFloat(value)) ? '0' : value;
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+      return validNumber.test(value) ? value : prev;
+    });
+  }, []);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -204,17 +227,19 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            onChangeText={(text) =>
+            onChangeText={handelQuantityChange}
+            /*onChangeText={(text) =>
               actions.setForm({
                 ...state.forms?.documentLineParams,
                 quantity: Number(!Number.isNaN(text) ? text : '1'),
               })
-            }
+            }*/
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
             // value={(line?.quantity ?? 1).toString()}
-            value={(quantity ?? 1).toString()}
+            //value={(quantity ?? 1).toString()}
+            value={goodQty}
             theme={{
               colors: {
                 placeholder: colors.primary,
