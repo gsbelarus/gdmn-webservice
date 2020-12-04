@@ -64,6 +64,15 @@ export interface IGood extends IRefData {
   idFrac?: boolean;
 }
 
+export interface IModelRemGoods extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IModelRem {
+  price: number;
+  q: number;
+}
+
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
@@ -84,4 +93,16 @@ export interface IRemainsData {
 export interface IDocumentStatus {
   id: number;
   name: string;
+}
+
+export interface IModelData {
+  name?: string;
+  [id: string]: unknown;
+}
+
+export interface IModel<T = IModelData> {
+  //id: number;
+  name: string;
+  type: string;
+  data: T;
 }

@@ -21,6 +21,7 @@ const sections = {
   COMPANYSETTINGS: 'COMPANYSETTINGS',
   REFERENCES: 'REFERENCES',
   DOCUMENTS: 'DOCUMENTS',
+  MODELS: 'MODELS',
 };
 
 const createStoreContext = () => {

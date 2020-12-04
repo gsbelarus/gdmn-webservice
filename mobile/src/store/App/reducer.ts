@@ -11,6 +11,7 @@ export const initialState: IAppState = {
   documents: undefined,
   references: undefined,
   forms: undefined,
+  models: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -101,6 +102,10 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
       return { ...state, references: action.payload };
     case ActionAppTypes.SET_REFERENCE:
       return { ...state, references: { ...state.references, [action.payload.type]: action.payload } };
+    case ActionAppTypes.SET_MODELS:
+      return { ...state, models: action.payload };
+    case ActionAppTypes.SET_MODEL:
+      return { ...state, models: { ...state.models, [action.payload.type]: action.payload } };
     case ActionAppTypes.SET_FORM: {
       return {
         ...state,
