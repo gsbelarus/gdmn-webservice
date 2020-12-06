@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
-import { IDocument } from '../../../../common';
+import { IContact, IDocument, IGood, IRemains } from '../../../../common';
 // import { ICompanySetting, IWeightCodeSettings } from '../../../../common/base';
 import config from '../../config';
-import { appStorage } from '../../helpers/utils';
+import { appStorage, getRemainsModel } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings, IReferences, ICompanySettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
@@ -124,6 +124,16 @@ const createStoreContext = () => {
         }
       }
     }, [actions, state.documents, state.settings]);
+
+    useEffect(() => {
+      const remainsModel = getRemainsModel(
+        state.references?.contacts?.data as IContact[],
+        state.references?.goods?.data as IGood[],
+        (state.references?.remains?.data as unknown) as IRemains[],
+      );
+      //  console.log(remainsModel);
+      actions.setModel(remainsModel);
+    }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remins?.data]);
 
     return <StoreContext.Provider value={{ state, actions }}>{children}</StoreContext.Provider>;
   };

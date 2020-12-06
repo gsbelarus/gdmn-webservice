@@ -1,7 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 
-import { IDocument, IMessage } from '../../../common';
+import { IContact, IDocument, IGood, IMessage, IRemains } from '../../../common';
+import { IModel, IModelData, IModelRemGoods } from '../../../common/base';
+import { ModelTypes } from '../model/types';
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
@@ -188,4 +189,24 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
     default:
       return value;
   }
+};
+
+export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]): IModel => {
+  const remModelData: IModelData = {};
+  contacts?.forEach((c) => {
+    const remGoods: Omit<IModelRemGoods, 'id'> = {};
+    goods?.forEach((g) => {
+      remGoods[g.id] = {
+        ...g,
+        remains:
+          remains
+            ?.find((r) => r.contactId === c.id)
+            ?.data?.filter((i) => i.goodId === g.id)
+            ?.map((r) => ({ price: r.price, q: r.q })) || [],
+      };
+    });
+
+    remModelData[c.id] = { name: c.name, goods: remGoods };
+  });
+  return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
 };

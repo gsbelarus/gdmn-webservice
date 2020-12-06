@@ -1,11 +1,11 @@
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
-import { IRemains } from '../../../../../common/base';
+import { IModelData, IModelRem, IModelRemGoods, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
@@ -71,27 +71,43 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
     state.documents,
   ]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+  // const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
 
-  const remains = useMemo(
-    () =>
-      ((state.references?.remains?.data as unknown) as IRemains[])?.find(
-        (rem) => rem.contactId === document?.head?.fromcontactId,
-      )?.data || [],
+  // const remains = useMemo(
+  //   () =>
+  //     ((state.references?.remains?.data as unknown) as IRemains[])?.find(
+  //       (rem) => rem.contactId === document?.head?.fromcontactId,
+  //     )?.data || [],
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [state.references?.remains?.data],
+  // );
+
+  // //список остатков + поля из справочника тмц
+  // const goodRemains = useMemo(
+  //   () =>
+  //     remains?.map((item) => ({
+  //       ...goods.find((good) => good.id === item.goodId),
+  //       price: item.price,
+  //       remains: item.q,
+  //     })),
+  //   [goods, remains],
+  // );
+
+  const goodRemains: IField[] = useMemo(
+    () => {
+      const fields: IField[] = [];
+      Object.values(
+        (((state.models?.remains?.data as unknown) as IModelData)[document?.head?.fromcontactId] as IModelRemGoods)
+          ?.goods,
+      ).forEach((g: IModelRemGoods) =>
+        g.remains.length > 0
+          ? g.remains.forEach((r) => fields.push({ ...g, remains: r.q, price: r.price }))
+          : fields.push({ ...g, remains: 0, price: 0 }),
+      );
+      return fields?.sort((a, b) => (a.name < b.name ? -1 : 1));
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
-  );
-
-  //список остатков + поля из справочника тмц
-  const goodRemains = useMemo(
-    () =>
-      remains?.map((item) => ({
-        ...goods.find((good) => good.id === item.goodId),
-        price: item.price,
-        remains: item.q,
-      })),
-    [goods, remains],
+    [state.models?.remains?.data, document?.head?.fromcontactId],
   );
 
   useEffect(() => {

@@ -110,5 +110,5 @@ export interface IAppState {
 
 // eslint-disable-next-line no-shadow
 export enum ModelTypes {
-  REMAINS = 'REMAINS',
+  REMAINS = 'remains',
 }

@@ -5,13 +5,11 @@ import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { IResponse, IMessage, IReference, IDocument, IRemains, IGood, IContact } from '../../../../common';
-import { IModel, IModelData, IModelRemGoods, IRem } from '../../../../common/base';
+import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
-import { ModelTypes } from '../../model/types';
 import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 
@@ -34,6 +32,22 @@ const SettingsScreen = ({ navigation }: Props) => {
 
   const showActionSheet = useActionSheet();
 
+  // const setRemainsModel = useCallback(
+  //   () =>
+  //     (async () => {
+  //       console.log(references?.contacts?.data);
+  //       const remainsModel = getRemainsModel(
+  //         references?.contacts?.data as IContact[],
+  //         references?.goods?.data as IGood[],
+  //         (references?.remains?.data as unknown) as IRemains[],
+  //       );
+  //       console.log(remainsModel);
+  //       appActions.setModel(remainsModel);
+  //     })(),
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [references?.contacts?.data, references?.goods?.data, references?.remins?.data],
+  // );
+
   const logOut = useCallback(
     () =>
       (async () => {
@@ -54,7 +68,7 @@ const SettingsScreen = ({ navigation }: Props) => {
             onPress: () => {
               appActions.setDocuments([]);
               appActions.setReferences({});
-
+              appActions.setModels({});
               // navigation.dispatch(StackActions.popToTop());
             },
           },
@@ -93,24 +107,6 @@ const SettingsScreen = ({ navigation }: Props) => {
         }
 
         let isUpdated = false;
-
-        const getRemainsModel = (contacts: IContact[], remains: IRemains[], goods: IGood[]): IModel => {
-          const remModelData: IModelData | undefined = undefined;
-          contacts.forEach((c) => {
-            const remGoods: IModelRemGoods | undefined = undefined;
-            goods.forEach((g) => {
-              remGoods[g.id] = {
-                ...g,
-                remains: remains
-                  .find((r) => r.contactId === c.id)
-                  ?.data?.filter((i) => i.goodId === g.id)
-                  .map((r) => ({ price: r.price, q: r.q })),
-              };
-            });
-            remModelData[c.id] = { name: c.name, goods: remGoods };
-          });
-          return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
-        };
 
         response.data?.forEach((message) => {
           if (message.body.type === 'data') {
@@ -330,7 +326,10 @@ const SettingsScreen = ({ navigation }: Props) => {
         style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
         disabled={isLoading}
         loading={isLoading}
-        onPress={sendGetReferencesRequest}
+        onPress={() => {
+          sendGetReferencesRequest();
+          //await setRemainsModel();
+        }}
       >
         Проверить обновления
       </Button>
