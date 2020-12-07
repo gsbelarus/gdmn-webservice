@@ -5,7 +5,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
-import { IModelData, IModelRem, IModelRemGoods, IRemains } from '../../../../../common/base';
+import { IModelData, IModelRem, IModelRemGoods, IRem, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
@@ -93,18 +93,38 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
   //   [goods, remains],
   // );
 
+  // const goodRemains: IField[] = useMemo(
+  //   () => {
+  //     const fields: IField[] = [];
+  //     Object.values(
+  //       (((state.models?.remains?.data as unknown) as IModelData)[document?.head?.fromcontactId] as IModelRemGoods)
+  //         ?.goods,
+  //     ).forEach((g: IModelRemGoods) =>
+  //       g.remains.length > 0
+  //         ? g.remains.forEach((r) => fields.push({ ...g, remains: r.q, price: r.price }))
+  //         : fields.push({ ...g, remains: 0, price: 0 }),
+  //     );
+  //     return fields?.sort((a, b) => (a.name < b.name ? -1 : 1));
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [state.models?.remains?.data, document?.head?.fromcontactId],
+  // );
+
   const goodRemains: IField[] = useMemo(
     () => {
-      const fields: IField[] = [];
-      Object.values(
+      return Object.values(
         (((state.models?.remains?.data as unknown) as IModelData)[document?.head?.fromcontactId] as IModelRemGoods)
           ?.goods,
-      ).forEach((g: IModelRemGoods) =>
-        g.remains.length > 0
-          ? g.remains.forEach((r) => fields.push({ ...g, remains: r.q, price: r.price }))
-          : fields.push({ ...g, remains: 0, price: 0 }),
-      );
-      return fields?.sort((a, b) => (a.name < b.name ? -1 : 1));
+      )
+        .reduce((r: IRem[], g: IModelRemGoods) => {
+          if (g.remains.length > 0) {
+            g.remains.forEach((rem) => r.push({ ...g, remains: rem.q, price: rem.price }));
+          } else {
+            r.push({ ...g, remains: 0, price: 0 });
+          }
+          return r;
+        }, [])
+        .sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.models?.remains?.data, document?.head?.fromcontactId],
