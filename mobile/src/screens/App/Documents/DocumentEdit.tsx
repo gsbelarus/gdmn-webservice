@@ -35,7 +35,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   } = useMemo(() => {
     return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.forms?.documentParams]);
+  }, [appState.forms?.documentParams, docId]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
@@ -153,6 +153,14 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
 
   useEffect(() => {
+    return () => {
+      console.log('clear');
+      appActions.clearForm('documentParams');
+    };
+  }, [appActions]);
+
+  useEffect(() => {
+    console.log('documentParams', appState.forms?.documentParams);
     if (appState.forms?.documentParams) {
       return;
     }
