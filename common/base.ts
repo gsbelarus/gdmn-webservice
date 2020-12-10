@@ -64,15 +64,6 @@ export interface IGood extends IRefData {
   idFrac?: boolean;
 }
 
-export interface IModelRemGoods extends IGood {
-  remains?: IModelRem[];
-}
-
-export interface IModelRem {
-  price: number;
-  q: number;
-}
-
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
@@ -95,9 +86,26 @@ export interface IDocumentStatus {
   name: string;
 }
 
-export interface IModelData {
-  name?: string;
-  [id: string]: unknown;
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IModelRem {
+  price: number;
+  q: number;
+}
+
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IMGoodRemain>;
+}
+
+export interface IModelData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
 }
 
 export interface IModel<T = IModelData> {
@@ -106,3 +114,6 @@ export interface IModel<T = IModelData> {
   type: string;
   data: T;
 }
+
+
+//{ name: 'Модель остатков', type: ModelTypes.REMAINS, data: {[1234]: {contactname, goods: {[111]: {name, alias, remains: []} }, [12345]: {}} }

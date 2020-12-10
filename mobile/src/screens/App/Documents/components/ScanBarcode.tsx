@@ -57,15 +57,14 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   );
 
   //список остатков + поля из справочника тмц
-  const goodRemains = useMemo(
-    () =>
-      remains?.map((item) => ({
-        ...goods.find((good) => good.id === item.goodId),
-        price: item.price,
-        remains: item.q,
-      })),
-    [goods, remains],
-  );
+  const goodRemains = useMemo(() => {
+    console.log('111');
+    return remains?.map((item) => ({
+      ...goods.find((good) => good.id === item.goodId),
+      price: item.price,
+      remains: item.q,
+    }));
+  }, [goods, remains]);
 
   useEffect(() => {
     const permission = async () => {

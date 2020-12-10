@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 
 import { IContact, IDocument, IGood, IMessage, IRemains } from '../../../common';
-import { IModel, IModelData, IModelRemGoods } from '../../../common/base';
+import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModel, IModelData } from '../../../common/base';
 import { ModelTypes } from '../model/types';
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
@@ -192,21 +192,26 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
 };
 
 export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]): IModel => {
-  const remModelData: IModelData = {};
-  contacts?.forEach((c) => {
-    const remGoods: Omit<IModelRemGoods, 'id'> = {};
-    goods?.forEach((g) => {
-      remGoods[g.id] = {
-        ...g,
-        remains:
-          remains
-            ?.find((r) => r.contactId === c.id)
-            ?.data?.filter((i) => i.goodId === g.id)
-            ?.map((r) => ({ price: r.price, q: r.q })) || [],
-      };
-    });
-
-    remModelData[c.id] = { name: c.name, goods: remGoods };
-  });
+  console.log('Начало формирования модели');
+  const remModelData: IModelData<IMDGoodRemain> = contacts?.reduce(
+    (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
+      const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+        goodsprev[g.id] = {
+          ...g,
+          remains:
+            remains
+              ?.find((r) => r.contactId === c.id)
+              ?.data?.filter((i) => i.goodId === g.id)
+              ?.map((r) => ({ price: r.price, q: r.q })) || [],
+        };
+        return goodsprev;
+      }, {});
+      contsprev[c.id] = { contactName: c.name, goods: remGoods };
+      return contsprev;
+    },
+    {},
+  );
+  console.log({ name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData });
+  console.log('Окончание формирования модели');
   return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
 };
