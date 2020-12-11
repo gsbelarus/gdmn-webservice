@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
@@ -10,7 +10,7 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
-import { useAppStore } from '../../../store';
+import { AppActions, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
@@ -119,6 +119,8 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
   const [docId, setDocId] = useState<number>(undefined);
+  const [netto, setNetto] = useState<number>(0);
+  const [tarsWeight, setTarsWeight] = useState<number>(0);
 
   useEffect(() => {
     if (!route.params?.docId) {
@@ -131,6 +133,36 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const document: IDocument | ISellDocument | undefined = useMemo(() => {
     return state.documents.find((item) => item.id === docId);
   }, [docId, state.documents]);
+
+  useEffect(() => {
+    setNetto(
+      (documentLines ?? []).reduce((total, line) => {
+        const goodLine = state.goods.find((item) => item.id === line.goodId);
+        return Number.parseFloat(
+          ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
+        );
+      }, 0),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.lines]);
+
+  useEffect(() => {
+    setNetto(
+      boxings.length !== 0
+        ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
+        : 0,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.lines]);
+
+  const setQuantity = useCallback(() => {
+    if (document?.lines && document.lines !== []) {
+      (document.lines as ISellLine[]).forEach((line) => {
+        actions.editLine({ docId: document.id, line: { ...line, quantity: line.orderQuantity ?? 0 } });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.id, document?.lines]);
 
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const refList = React.useRef<FlatList<ISellLine>>(null);
@@ -176,6 +208,10 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                     id: docId,
                     status: document?.head?.status + (document?.head?.status === 0 ? 1 : -1),
                   }),
+              },
+              {
+                title: 'Количество как заявлено',
+                onPress: setQuantity,
               },
               {
                 title: 'Удалить',
@@ -266,27 +302,16 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Итого:</Text>
           <Text style={localStyles.fontWeightBold}>
-            вес прод.{' '}
-            {(documentLines ?? []).reduce((total, line) => {
-              const goodLine = state.goods.find((item) => item.id === line.goodId);
-              return Number.parseFloat(
-                ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
-              );
-            }, 0)}{' '}
+            вес прод. {netto}
+            {' / '}
+            брутто {netto + tarsWeight}
           </Text>
         </View>
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Тара:</Text>
           <Text style={localStyles.fontWeightBold}>
-            кол-во{' '}
-            {boxings.length !== 0
-              ? boxings.reduce(
-                  (total, boxing) => Number.parseFloat((total + (Number(boxing.quantity) ?? 0)).toFixed(3)),
-                  0.0,
-                )
-              : 0}{' '}
-            / вес{' '}
+            кол-во {boxings.length !== 0 ? tarsWeight : 0} / вес{' '}
             {boxings.length !== 0
               ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
               : 0}
