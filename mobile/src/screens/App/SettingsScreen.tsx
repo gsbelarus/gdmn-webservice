@@ -5,7 +5,7 @@ import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
+import { IResponse, IMessage, IReference, IDocument, IGood, IRefData } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
@@ -123,6 +123,7 @@ const SettingsScreen = ({ navigation }: Props) => {
                 case 'goodgroups':
                 case 'remains':
                 case 'goods': {
+                  // const a = assertTypeof<'IGood'>('IGood', dataSet.data);
                   // TODO: преобразовывать json данные в модель данных
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const refObj = (dataSet as unknown) as IReference<any[]>;

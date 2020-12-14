@@ -61,9 +61,6 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
-      // const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
-      // console.log('3', newValue);
-
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       return validNumber.test(value) ? value : prev;
     });
