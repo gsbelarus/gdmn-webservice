@@ -1,4 +1,4 @@
-import { useTheme, StackActions } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
@@ -21,7 +21,7 @@ const SettingsScreen = ({ navigation }: Props) => {
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents, references, forms, companySettings },
+    state: { settings, documents, references, forms, companySettings, models },
   } = useAppStore();
   const {
     state: { companyID, userID },
@@ -31,6 +31,22 @@ const SettingsScreen = ({ navigation }: Props) => {
   const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
+
+  // const setRemainsModel = useCallback(
+  //   () =>
+  //     (async () => {
+  //       console.log(references?.contacts?.data);
+  //       const remainsModel = getRemainsModel(
+  //         references?.contacts?.data as IContact[],
+  //         references?.goods?.data as IGood[],
+  //         (references?.remains?.data as unknown) as IRemains[],
+  //       );
+  //       console.log(remainsModel);
+  //       appActions.setModel(remainsModel);
+  //     })(),
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [references?.contacts?.data, references?.goods?.data, references?.remins?.data],
+  // );
 
   const logOut = useCallback(
     () =>
@@ -52,7 +68,7 @@ const SettingsScreen = ({ navigation }: Props) => {
             onPress: () => {
               appActions.setDocuments([]);
               appActions.setReferences({});
-
+              appActions.setModels({});
               // navigation.dispatch(StackActions.popToTop());
             },
           },
@@ -164,7 +180,7 @@ const SettingsScreen = ({ navigation }: Props) => {
     <>
       <View style={[localStyles.profileContainer, { backgroundColor: colors.primary }]}>
         <View style={localStyles.profileIcon}>
-          <Avatar.Icon size={50} icon="account-badge" style={{ backgroundColor: colors.primary }} />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={[localStyles.profileInfoTextUser, { color: colors.background }]}>
@@ -268,6 +284,12 @@ const SettingsScreen = ({ navigation }: Props) => {
                     value: forms,
                     important: true,
                   });
+                  Reactotron.display({
+                    name: 'models',
+                    preview: 'models',
+                    value: models,
+                    important: true,
+                  });
                 }}
               >
                 Проверить стейт
@@ -305,7 +327,10 @@ const SettingsScreen = ({ navigation }: Props) => {
         style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
         disabled={isLoading}
         loading={isLoading}
-        onPress={sendGetReferencesRequest}
+        onPress={() => {
+          sendGetReferencesRequest();
+          //await setRemainsModel();
+        }}
       >
         Проверить обновления
       </Button>

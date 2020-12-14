@@ -38,12 +38,9 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
     state.documents,
   ]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const weightCodeSettings = useMemo(() => (state.companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     state.companySettings?.weightSettings,
   ]);
 
@@ -57,15 +54,14 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   );
 
   //список остатков + поля из справочника тмц
-  const goodRemains = useMemo(
-    () =>
-      remains?.map((item) => ({
-        ...goods.find((good) => good.id === item.goodId),
-        price: item.price,
-        remains: item.q,
-      })),
-    [goods, remains],
-  );
+  const goodRemains = useMemo(() => {
+    console.log('111');
+    return remains?.map((item) => ({
+      ...goods.find((good) => good.id === item.goodId),
+      price: item.price,
+      remains: item.q,
+    }));
+  }, [goods, remains]);
 
   useEffect(() => {
     const permission = async () => {

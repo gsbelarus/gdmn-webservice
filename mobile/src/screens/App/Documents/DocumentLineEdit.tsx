@@ -33,9 +33,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty) }));
   }, [goodQty]);
 
-  const product = useMemo(() => {
+  const good = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, state.references?.goods?.data]);
 
   useEffect(() => {
@@ -129,7 +128,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           ]}
         >
           <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-            {product?.name || 'Товар не найден'}
+            {good?.name || 'Товар не найден'}
           </SubTitle>
           <View style={localStyles.item}>
             <Text style={localStyles.label}>Цена</Text>

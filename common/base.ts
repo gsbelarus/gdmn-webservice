@@ -69,7 +69,7 @@ export interface IRem extends IGood {
   price?: number;
 }
 
- export interface IRemains {
+export interface IRemains {
   contactId: number;
   date: Date;
   data: IRemainsData[];
@@ -85,3 +85,36 @@ export interface IDocumentStatus {
   id: number;
   name: string;
 }
+
+/** Model */
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IModelRem {
+  price: number;
+  q: number;
+}
+
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IMGoodRemain>;
+}
+
+export interface IModelData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IModel<T = IModelData> {
+  //id: number;
+  name: string;
+  type: string;
+  data: T;
+}
+
+
+//{ name: 'Модель остатков', type: ModelTypes.REMAINS, data: {[1234]: {contactname, goods: {[111]: {name, alias, remains: []} }, [12345]: {}} }

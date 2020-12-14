@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IHead, ILine, IDocument, IReference, IForm } from '../../../../common';
+import { IModel } from '../../../../common/base';
 import { IAppSettings, ICompanySettings, IForms } from '../../model/types';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
@@ -20,6 +21,8 @@ export enum ActionAppTypes {
   SET_DOCUMENTS = 'SET_DOCUMENTS',
   SET_FORM = 'SET_FORM',
   CLEAR_FORM = 'CLEAR_FORM',
+  SET_MODEL = 'SET_MODEL',
+  SET_MODELS = 'SET_MODELS',
 }
 
 export const AppActions = {
@@ -49,6 +52,8 @@ export const AppActions = {
   setReferences: createActionPayload<ActionAppTypes.SET_REFERENCES, { [name: string]: IReference }>(
     ActionAppTypes.SET_REFERENCES,
   ),
+  setModel: createActionPayload<ActionAppTypes.SET_MODEL, IModel<any>>(ActionAppTypes.SET_MODEL),
+  setModels: createActionPayload<ActionAppTypes.SET_MODELS, { [name: string]: IModel }>(ActionAppTypes.SET_MODELS),
   setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
   setForm: createActionPayload<ActionAppTypes.SET_FORM, IForms>(ActionAppTypes.SET_FORM),
   clearForm: createActionPayload<ActionAppTypes.CLEAR_FORM, string>(ActionAppTypes.CLEAR_FORM),

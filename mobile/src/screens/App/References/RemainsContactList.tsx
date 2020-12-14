@@ -44,9 +44,7 @@ const RemainsContactListViewScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     appState.references?.contacts?.data,
   ]);
 

@@ -1,5 +1,5 @@
 import { IDocument, IBaseUrl, IReference } from '../../../common';
-import { ICompanySetting, IForm } from '../../../common/base';
+import { ICompanySetting, IForm, IModel } from '../../../common/base';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
@@ -95,10 +95,20 @@ export interface IForms<T = IForm> {
   [name: string]: T;
 }
 
+export interface IModels {
+  [name: string]: IModel;
+}
+
 export interface IAppState {
   settings?: IAppSettings;
   companySettings?: ICompanySettings;
   documents?: IDocument[];
   references?: IReferences;
   forms?: IForms;
+  models?: IModels;
+}
+
+// eslint-disable-next-line no-shadow
+export enum ModelTypes {
+  REMAINS = 'remains',
 }
