@@ -48,6 +48,7 @@ const ReferenceViewScreen = ({ route }) => {
     if (!refItem) {
       return;
     }
+
     setFilteredList({
       ...refItem,
       data: refItem?.data

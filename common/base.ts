@@ -60,6 +60,7 @@ export interface IContact extends IRefData {
 export interface IGood extends IRefData {
   alias?: string;
   barcode?: string;
+  value?: string;
   weightCode?: string;
   idFrac?: boolean;
 }

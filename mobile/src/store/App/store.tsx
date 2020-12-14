@@ -2,8 +2,8 @@
 import React, { useEffect } from 'react';
 
 import { IContact, IDocument, IGood, IRemains } from '../../../../common';
-// import { ICompanySetting, IWeightCodeSettings } from '../../../../common/base';
 import config from '../../config';
+import { rlog } from '../../helpers/log';
 import { appStorage, getRemainsModel } from '../../helpers/utils';
 import { IAppContextProps, IAppState, IAppSettings, IReferences, ICompanySettings } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
@@ -38,7 +38,8 @@ const createStoreContext = () => {
     /* TODO Предотвратить выполнение сохранения в момент выполнения loadData */
     useEffect(() => {
       const loadData = async () => {
-        console.log('loadData');
+        rlog('Load data', 'Начало загрузки данных из Storage');
+        // console.log('loadData');
         setLoading(true);
         // настройки приложения
         const storageSettings: IAppSettings = await appStorage.getItem(`${storagePath}/${sections.SETTINGS}`);
@@ -60,19 +61,20 @@ const createStoreContext = () => {
         const references = (await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`)) as IReferences;
         actions.setReferences(references);
 
-        console.log('getRemainsModel');
+        rlog('getRemainsModel', 'Начало построения модели');
         const remainsModel = getRemainsModel(
           references?.contacts?.data as IContact[],
           references?.goods?.data as IGood[],
           (references?.remains?.data as unknown) as IRemains[],
         );
+        rlog('getRemainsModel', 'Окончание построения модели');
         actions.setModel(remainsModel);
-
         // документы
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents);
 
         setLoading(false);
+        rlog('Load data', 'Окончание загрузки данных из Storage');
       };
 
       if (storagePath) {
@@ -83,10 +85,12 @@ const createStoreContext = () => {
     /*  Сохранение справочников в storage при их изменении */
     useEffect(() => {
       const saveReferences = async () => {
-        console.log('saveReferences');
-        console.log('Начало сохранения справочников в Storage');
+        // console.log('saveReferences');
+        rlog('Save references', 'Начало сохранения справочников в Storage');
+        // console.log('Начало сохранения справочников в Storage');
         await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
-        console.log('Окончание сохранения справочников в Storage');
+        rlog('Save references', 'Окончание сохранения справочников в Storage');
+        // console.log('Окончание сохранения справочников в Storage');
       };
 
       if (state.references && storagePath && !isLoading) {
@@ -97,8 +101,10 @@ const createStoreContext = () => {
     /*  Сохранение настроек в storage при их изменении */
     useEffect(() => {
       const saveSettings = async () => {
-        console.log('saveSettings');
+        // console.log('saveSettings');
+        rlog('Save setting', 'Начало сохранения настроек в Storage');
         await appStorage.setItem(`${storagePath}/${sections.SETTINGS}`, state.settings);
+        rlog('Save setting', 'Окончание сохранения настроек в Storage');
       };
 
       if (state.settings && storagePath && !isLoading) {
@@ -109,8 +115,10 @@ const createStoreContext = () => {
     /*  Сохранение настроек компании в storage при их изменении */
     useEffect(() => {
       const saveCompanySettings = async () => {
-        console.log('saveCompanySettings');
+        // console.log('saveCompanySettings');
+        rlog('Save CompanySettings', 'Начало сохранения настроек компании в Storage');
         await appStorage.setItem(`${storagePath}/${sections.COMPANYSETTINGS}`, state.companySettings);
+        rlog('Save CompanySettings', 'Окончание сохранения настроек компании в Storage');
       };
 
       if (state.companySettings && storagePath && !isLoading) {
@@ -121,8 +129,10 @@ const createStoreContext = () => {
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {
       const saveDocuments = async () => {
-        console.log('saveDocuments');
+        // console.log('saveDocuments');
+        rlog('Save Documents', 'Окончание сохранения документов в Storage');
         await appStorage.setItem(`${storagePath}/${sections.DOCUMENTS}`, state.documents);
+        rlog('Save Documents', 'Окончание сохранения настроек документов в Storage');
       };
 
       if (state.documents && storagePath && !isLoading) {

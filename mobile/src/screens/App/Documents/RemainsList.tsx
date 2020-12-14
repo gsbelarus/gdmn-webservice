@@ -41,7 +41,8 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
       <View style={localStyles.details}>
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <Text style={localStyles.itemInfo}>
-          цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}, остаток: {item.remains}
+          {item.remains} {item.value} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+          {/* цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}, остаток: {item.remains} */}
         </Text>
         {barcode && (
           <View style={localStyles.barcode}>
@@ -71,31 +72,25 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
     state.documents,
   ]);
 
-  const goodRemains: IField[] = useMemo(
-    () => {
-      console.log('Формирования остатков по подразделению');
-      console.log(state.models?.remains?.data);
-      //return [{ name: 'good1', id: 111, price: 1.2, remains: 23 }];
-      const goodList = Object.values(
-        ((state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>)[document?.head?.fromcontactId]?.goods,
-      );
-      console.log(goodList);
-      return [{ id: 11, name: '111', remains: 1, price: 3 }];
-      // return goodList?.reduce((r: IRem[], g: IMGoodRemain) => {
-      //   console.log(g);
-      //   const { remains, ...goodInfo } = g;
-      //   if (remains.length > 0) {
-      //     remains.forEach((rem) => r.push({ ...goodInfo, remains: rem.q, price: rem.price }));
-      //   } else {
-      //     r.push({ ...goodInfo, remains: 0, price: 0 });
-      //   }
-      //   return r;
-      // }, []);
-      //?.sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.models?.remains?.data, document?.head?.fromcontactId],
-  );
+  const goodRemains: IField[] = useMemo(() => {
+    const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
+    const goods = data[document?.head?.fromcontactId].goods;
+
+    return Object.keys(goods)
+      ?.reduce((r: IRem[], e) => {
+        const { remains, ...goodInfo } = goods[e];
+        const goodPos: IRem = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+
+        // eslint-disable-next-line @babel/no-unused-expressions
+        remains.length > 0
+          ? remains.forEach((re) => {
+              r.push({ ...goodPos, price: re.price, remains: re.q });
+            })
+          : r.push(goodPos);
+        return r;
+      }, [])
+      .sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1));
+  }, [state.models?.remains?.data, document?.head?.fromcontactId]);
 
   useEffect(() => {
     setList(
@@ -126,7 +121,6 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [document.id, navigation, state.settings?.barcodeReader]);
 
   return (

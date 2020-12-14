@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IContact, IRefData } from '../../../../../common/base';
+import { IMDGoodRemain, IRefData } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { useAppStore } from '../../../store';
@@ -44,21 +44,21 @@ const RemainsContactListViewScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();
 
-  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    appState.references?.contacts?.data,
-  ]);
-
+  //TODO непонятно откуда задержка при отображении списка подразделений
   useEffect(() => {
-    if (!contacts) {
+    const { remains } = appState.models;
+
+    if (!remains) {
       return;
     }
 
-    setFilteredList(
-      contacts
-        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
-    );
-  }, [contacts, searchQuery]);
+    const contactList: IRefData[] = Object.keys(remains.data)
+      .map((el) => ({ id: Number(el), name: (remains.data[el] as IMDGoodRemain).contactName }))
+      .filter((el) => el.name.includes(searchQuery.toUpperCase()))
+      .sort((a, b) => (a.name < b.name ? -1 : 1));
+
+    setFilteredList(contactList);
+  }, [appState.models, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);

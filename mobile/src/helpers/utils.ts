@@ -3,6 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import { IContact, IDocument, IGood, IMessage, IRemains } from '../../../common';
 import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModel, IModelData } from '../../../common/base';
 import { ModelTypes } from '../model/types';
+import { rlog } from './log';
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
@@ -192,7 +193,7 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
 };
 
 export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]): IModel => {
-  console.log('Начало формирования модели');
+  // console.log('Начало формирования модели');
   const remModelData: IModelData<IMDGoodRemain> = contacts?.reduce(
     (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
       const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
@@ -211,7 +212,8 @@ export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: I
     },
     {},
   );
-  console.log({ name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData });
-  console.log('Окончание формирования модели');
+  rlog('Модель остатков', JSON.stringify(remModelData));
+  // console.log({ name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData });
+  // console.log('Окончание формирования модели');
   return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
 };

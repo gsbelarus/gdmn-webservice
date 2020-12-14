@@ -35,7 +35,7 @@ const TabsNavigator = () => {
         component={ReferencesNavigator}
         options={{
           tabBarLabel: 'Справочники',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="view-list-outline" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="book-multiple-outline" color={color} />,
           tabBarBadge: false,
         }}
       />
