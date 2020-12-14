@@ -6,16 +6,7 @@ import React, { useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
-import {
-  IResponse,
-  IMessageInfo,
-  IContact,
-  IRemain,
-  IGood,
-  IDocument,
-  IDataMessage,
-  IReference,
-} from '../../../../../common';
+import { IResponse, IMessageInfo, IContact, IDocument, IDataMessage, IReference } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
 import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils';

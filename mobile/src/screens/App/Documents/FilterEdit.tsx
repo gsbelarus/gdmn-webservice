@@ -38,7 +38,6 @@ const FilterEditScreen = ({ navigation }: Props) => {
 
   const { fieldSearch } = useMemo(() => {
     return ((state.forms?.filterParams as unknown) || {}) as IFilterParams;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.forms?.filterParams]);
 
   const setFieldSearch = (field: string) =>
@@ -56,7 +55,6 @@ const FilterEditScreen = ({ navigation }: Props) => {
       return;
     }
     actions.setForm({ filterParams: { fieldSearch: [] } });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, state.forms?.filterParams]);
 
   useLayoutEffect(() => {

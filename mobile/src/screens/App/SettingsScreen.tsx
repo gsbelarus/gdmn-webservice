@@ -1,4 +1,4 @@
-import { useTheme, StackActions } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
@@ -179,7 +179,7 @@ const SettingsScreen = ({ navigation }: Props) => {
     <>
       <View style={[localStyles.profileContainer, { backgroundColor: colors.primary }]}>
         <View style={localStyles.profileIcon}>
-          <Avatar.Icon size={50} icon="account-badge" style={{ backgroundColor: colors.primary }} />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={[localStyles.profileInfoTextUser, { color: colors.background }]}>

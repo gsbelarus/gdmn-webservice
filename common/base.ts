@@ -69,7 +69,7 @@ export interface IRem extends IGood {
   price?: number;
 }
 
- export interface IRemains {
+export interface IRemains {
   contactId: number;
   date: Date;
   data: IRemainsData[];
@@ -86,6 +86,7 @@ export interface IDocumentStatus {
   name: string;
 }
 
+/** Model */
 export interface IMGoodRemain extends IGood {
   remains?: IModelRem[];
 }

@@ -74,7 +74,6 @@ const RemainsViewScreen = ({ route }) => {
         )
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remains, searchQuery, goods, contactItem?.id]);
 
   const ref = React.useRef<FlatList<IField>>(null);

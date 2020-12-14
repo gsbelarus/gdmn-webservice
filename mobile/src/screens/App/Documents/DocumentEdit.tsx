@@ -37,10 +37,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.forms?.documentParams, docId]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docTypes = useMemo(() => appState.references?.documenttypes?.data, [appState.references?.documenttypes?.data]);
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {

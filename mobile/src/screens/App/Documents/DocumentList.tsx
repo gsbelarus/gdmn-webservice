@@ -19,7 +19,6 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const navigation = useNavigation();
   const { state } = useAppStore();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const getContact = useCallback(
@@ -28,15 +27,12 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     [contacts],
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docHead = useMemo(() => item?.head, [item?.head]);
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
   const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
   return (
@@ -47,7 +43,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status || 0] }]}>
-          <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
+          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
@@ -77,9 +73,7 @@ const DocumentListScreen = () => {
 
   const showActionSheet = useActionSheet();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     appState.references?.contacts?.data,
   ]);
 
@@ -118,7 +112,6 @@ const DocumentListScreen = () => {
         //   : true;
       }) || [],
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.documents, searchText, getContact, appState.forms?.filterParams?.fieldSearch]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
@@ -229,7 +222,7 @@ const DocumentListScreen = () => {
       />
       <FAB
         style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-        icon="file-document-box-plus"
+        icon="file-plus"
         onPress={() => {
           // appActions.clearForm('DocumentEdit');
           navigation.navigate('DocumentEdit');

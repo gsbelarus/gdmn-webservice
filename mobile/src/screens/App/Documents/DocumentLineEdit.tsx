@@ -35,7 +35,6 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const good = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, state.references?.goods?.data]);
 
   useEffect(() => {

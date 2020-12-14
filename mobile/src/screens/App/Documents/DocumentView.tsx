@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
@@ -22,7 +22,6 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
 
   const good: IGood = useMemo(() => {
     return ((state.references?.goods as unknown) as IReference<IGood>)?.data.find((i) => i.id === item.goodId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item?.goodId, state.references?.goods]);
 
   return (
@@ -83,10 +82,8 @@ const DocumentViewScreen = ({ route }: Props) => {
     state.documents,
   ]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const isEditable = useMemo(() => document?.head?.status === 0, [document?.head?.status]);
 
   const docTitle = useMemo(() => {
@@ -100,14 +97,12 @@ const DocumentViewScreen = ({ route }: Props) => {
     [state.references?.contacts?.data, document?.head],
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
-  const contact = useMemo(
-    () => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [contacts, document?.head?.fromcontactId],
-  );
+  const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId), [
+    contacts,
+    document?.head?.fromcontactId,
+  ]);
 
   const totalQuantity = useMemo(() => {
     return (documentLines ?? []).reduce(
@@ -125,8 +120,8 @@ const DocumentViewScreen = ({ route }: Props) => {
       title: documentTypeName || '',
       headerLeft: () => (
         <IconButton
-          icon="file-document-box-multiple"
-          size={24}
+          icon="arrow-left-circle-outline"
+          size={25}
           onPress={() => {
             navigation.setOptions({ animationTypeForReplace: 'push' });
             navigation.navigate('DocumentList');
@@ -135,7 +130,7 @@ const DocumentViewScreen = ({ route }: Props) => {
       ),
       headerRight: () => (
         <IconButton
-          icon="file-document-edit"
+          icon="file-document-edit-outline"
           size={24}
           onPress={() => {
             navigation.navigate('DocumentEdit', { docId });

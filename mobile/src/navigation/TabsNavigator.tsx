@@ -27,7 +27,7 @@ const TabsNavigator = () => {
         options={{
           title: 'Документы',
           tabBarLabel: 'Документы',
-          tabBarIcon: ({ color }) => <TabBarIcon name="file-document-box-multiple" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="file-document-outline" color={color} />,
         }}
       />
       <TabsStack.Screen
@@ -35,7 +35,7 @@ const TabsNavigator = () => {
         component={ReferencesNavigator}
         options={{
           tabBarLabel: 'Справочники',
-          tabBarIcon: ({ color }) => <TabBarIcon name="view-list" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="view-list-outline" color={color} />,
           tabBarBadge: false,
         }}
       />
@@ -44,16 +44,12 @@ const TabsNavigator = () => {
         component={SettingsNavigator}
         options={{
           tabBarLabel: 'Настройки',
-          tabBarIcon: ({ color }) => <TabBarIcon name="settings-box" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="cog-outline" color={color} />,
         }}
       />
     </TabsStack.Navigator>
   );
 };
-
-function TabBarIcon(props: { name: string; color: string }) {
-  return <MaterialCommunityIcons size={26} {...props} />;
-}
 
 const styles = StyleSheet.create({
   tabBar: {
