@@ -16,6 +16,7 @@ interface IField extends IGood {
   price?: number;
 }
 
+//TODO переделать в useMemo
 const RemainsItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
