@@ -74,7 +74,7 @@ const AuthNavigator = () => {
   } = useAuthStore();
 
   const {
-    state: { serverUrl },
+    state: { serverUrl, isLoading: isAppDataLoading },
     actions,
     apiService,
   } = useServiceStore();

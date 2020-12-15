@@ -118,4 +118,4 @@ export interface IModel<T = IModelData> {
 }
 
 
-//{ name: 'Модель остатков', type: ModelTypes.REMAINS, data: {[1234]: {contactname, goods: {[111]: {name, alias, remains: []} }, [12345]: {}} }
+//{ name: 'Модель остатков', type: ModelTypes.REMAINS, data: {[1234]: {contactname, goods: {[111]: {name, alias, remains: []} }, [12346]: {}} }

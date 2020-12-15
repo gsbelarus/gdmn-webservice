@@ -192,7 +192,7 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
   }
 };
 
-export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]): IModel => {
+export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]) => {
   // console.log('Начало формирования модели');
   const remModelData: IModelData<IMDGoodRemain> = contacts?.reduce(
     (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {

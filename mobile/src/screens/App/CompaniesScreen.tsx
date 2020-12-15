@@ -1,7 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, Alert } from 'react-native';
-import { Text, Chip, Button } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { Text, RadioButton, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 import { appStorage } from '../../helpers/utils';
@@ -10,7 +10,7 @@ import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
-  const [companies, setCompanies] = useState<string[]>([]);
+  const [companies, setCompanies] = useState<string[]>();
 
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
@@ -23,7 +23,7 @@ const CompaniesScreen = () => {
     const request = async () => {
       const response = await apiService.auth.getUserStatus();
       if (response.result) {
-        setCompanies(response.data.companies || []);
+        setCompanies(response.data?.companies || []);
       }
     };
     request();
@@ -31,8 +31,7 @@ const CompaniesScreen = () => {
 
   useEffect(() => {
     const getCompanyId = async () => {
-      const savedCompany = await appStorage.getItem(`${userID}/companyId`);
-
+      // const savedCompany = await appStorage.getItem(`${userID}/companyId`);
       /*
         Автоматический вход:
           Когда получим список организаций пользователя, проверим,
@@ -42,9 +41,9 @@ const CompaniesScreen = () => {
         TODO Если хотим сменить то происходит снова автоматический вход
       */
       // console.log(savedCompany, savedCompany);
-      !!savedCompany &&
-        companies.some((company) => company === savedCompany) &&
-        actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+      // !!savedCompany &&
+      //   companies.some((company) => company === savedCompany) &&
+      //   actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
     };
 
     if (userID !== null && companies) {
@@ -67,43 +66,27 @@ const CompaniesScreen = () => {
 
   return (
     <>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Организации</SubTitle>
-      <View style={localStyles.container}>
-        <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localStyles.subdivisionText}>Выберите организацию: </Text>
-          <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
-            {companies && companies.length !== 0 ? (
-              companies.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[
-                    localStyles.margin,
-                    localStyles.chip,
-                    selectedCompany === item ? { backgroundColor: colors.primary } : {},
-                  ]}
-                  onPress={() => setSelectedCompany(item)}
-                  selected={selectedCompany === item}
-                  selectedColor={selectedCompany === item ? colors.card : colors.text}
-                >
-                  {item}
-                </Chip>
-              ))
-            ) : (
-              <Text>Вы не состоите ни в одной Организации</Text>
-            )}
-          </ScrollView>
-        </View>
+      <View style={styles.container}>
+        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Выбор организации</SubTitle>
+        <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
+          <RadioButton.Group onValueChange={(newValue) => setSelectedCompany(newValue)} value={selectedCompany}>
+            {companies?.length > 0 &&
+              companies.map((el) => {
+                return (
+                  <TouchableOpacity onPress={() => setSelectedCompany(el)} key={el}>
+                    <View style={localStyles.row}>
+                      <RadioButton value={el} />
+                      <Text>{el}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+          </RadioButton.Group>
+        </ScrollView>
         <View style={localStyles.buttonView}>
           <Button
             mode="contained"
-            style={[styles.rectangularButton, localStyles.button, localStyles.marginRight]}
-            onPress={logOut}
-          >
-            Выход
-          </Button>
-          <Button
-            mode="contained"
+            icon="location-enter"
             style={[styles.rectangularButton, localStyles.button]}
             disabled={companies === undefined || companies.length === 0 || !selectedCompany}
             onPress={async () => {
@@ -111,9 +94,22 @@ const CompaniesScreen = () => {
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}
           >
-            ОК
+            Войти
           </Button>
         </View>
+      </View>
+      <View style={styles.bottomButtons}>
+        <IconButton
+          icon="account"
+          size={30}
+          onPress={logOut}
+          style={{
+            ...styles.circularButton,
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
+          }}
+          color={colors.background}
+        />
       </View>
     </>
   );
@@ -122,14 +118,6 @@ const CompaniesScreen = () => {
 export { CompaniesScreen };
 
 const localStyles = StyleSheet.create({
-  areaChips: {
-    alignItems: 'center',
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 5,
-  },
   button: {
     flex: 1,
     marginLeft: 7,
@@ -137,33 +125,20 @@ const localStyles = StyleSheet.create({
   buttonView: {
     flexDirection: 'row',
   },
-  chip: {
+  row: {
     alignItems: 'center',
-    fontSize: 20,
-    height: 45,
-  },
-  container: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     margin: 10,
   },
-  margin: {
-    margin: 2,
-  },
-  marginRight: {
-    marginRight: 10,
-  },
   scroll: {
-    maxHeight: 150,
+    marginVertical: 10,
+    maxHeight: 200,
   },
   scrollContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  subdivisionText: {
-    fontSize: 16,
-    marginBottom: 5,
-    textAlign: 'left',
   },
   title: {
     padding: 10,

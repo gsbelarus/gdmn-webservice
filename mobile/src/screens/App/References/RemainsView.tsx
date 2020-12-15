@@ -1,106 +1,123 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  RefreshControl,
+} from 'react-native';
 import { Text, Searchbar, Avatar } from 'react-native-paper';
 
-import { IGood, IReference, IRem, IRemains } from '../../../../../common/base';
+import { IGood, IMDGoodRemain, IModelData, IReference, IRem } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
 import { useAppStore } from '../../../store';
 
-interface IField {
-  id: number;
-  name?: string;
-  [fieldName: string]: unknown;
+interface IField extends IGood {
+  remains?: number;
+  price?: number;
 }
-
-const LineItem = React.memo(({ item }: { item: IField }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-
-  return (
-    <TouchableOpacity
-      style={localStyles.item}
-      onPress={() => {
-        navigation.navigate('ReferenceDetail', { item });
-      }}
-    >
-      <View style={{ backgroundColor: colors.card }}>
-        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
-      </View>
-      <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
-        <View style={localStyles.itemInfo}>
-          <Text>
-            Цена: {formatValue({ type: 'number', decimals: 2 }, (item.price as number) ?? 0)} Остаток: {item.remains}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-});
 
 const RemainsViewScreen = ({ route }) => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IRem[]>();
+  const [filteredList, setFilteredList] = useState<IField[]>();
+
+  const [goodRemains, setGoodRemains] = useState<IField[]>(undefined);
 
   const { item: contactItem }: { item: IReference } = route.params;
 
   const { state } = useAppStore();
 
-  const remains = useMemo(
-    () =>
-      ((state.references?.remains?.data as unknown) as IRemains[])?.find((itm) => itm.contactId === contactItem?.id)
-        ?.data || [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
-  );
+  useEffect(() => {
+    const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
+    const goods = data[contactItem?.id]?.goods;
+
+    const goodList =
+      Object.keys(goods)
+        ?.reduce((r: IRem[], e) => {
+          const { remains, ...goodInfo } = goods[e];
+          const goodPos: IRem = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+
+          remains.forEach((re) => {
+            r.push({ ...goodPos, price: re.price, remains: re.q });
+          });
+          return r;
+        }, [])
+        .sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1)) || [];
+
+    setGoodRemains(goodList);
+  }, [state.models?.remains?.data, contactItem?.id]);
+
+  const LineItem = useCallback(
+    ({ item }: { item: IField }) => {
+      return (
+        <TouchableOpacity
+          style={localStyles.item}
+          onPress={() => {
+            navigation.navigate('ReferenceDetail', { item });
+          }}
+        >
+          <View style={{ backgroundColor: colors.card }}>
+            <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} />
+          </View>
+          <View style={localStyles.details}>
+            <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
+            <Text style={localStyles.itemInfo}>
+              {item.remains} {item.value} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    [colors.card, colors.primary, colors.text, navigation],
+  );
 
   useEffect(() => {
     setFilteredList(
-      remains
-        ?.map((rem) => ({ ...goods?.find((good) => good.id === rem.goodId), price: rem.price, remains: rem.q }))
-        ?.filter(
-          (item) =>
-            item.barcode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
+      goodRemains?.filter(
+        (item) =>
+          item.barcode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
-  }, [remains, searchQuery, goods, contactItem?.id]);
+  }, [goodRemains, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
 
   useScrollToTop(ref);
-
-  const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
         <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{contactItem?.name}</SubTitle>
         <ItemSeparator />
-        <View style={localStyles.flexDirectionRow}>
-          <Searchbar
-            placeholder="Поиск"
-            onChangeText={setSearchQuery}
-            value={searchQuery}
-            style={[localStyles.flexGrow, localStyles.searchBar]}
-          />
-        </View>
-        <ItemSeparator />
+        {!!goodRemains && (
+          <>
+            <View style={localStyles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск"
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+        )}
         <FlatList
           ref={ref}
           data={filteredList}
+          refreshControl={<RefreshControl refreshing={!goodRemains} title="Идёт загрузка остатков..." />}
           keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
+          renderItem={({ item }) => <LineItem item={item} />}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>
@@ -115,7 +132,10 @@ const localStyles = StyleSheet.create({
     height: '100%',
   },
   details: {
-    margin: 10,
+    flexDirection: 'column',
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 3,
   },
   flexDirectionRow: {
     flexDirection: 'row',
@@ -127,8 +147,10 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginHorizontal: 4,
+    minHeight: 50,
   },
   itemInfo: {
+    fontSize: 12,
     opacity: 0.5,
   },
   name: {

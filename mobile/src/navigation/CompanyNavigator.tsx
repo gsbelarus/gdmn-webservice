@@ -12,7 +12,15 @@ const Stack = createStackNavigator<CompanyStackParamList>();
 const CompanyNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen key="SelecteCompany" name="SelecteCompany" component={CompaniesScreen} options={{ title: '' }} />
+      <Stack.Screen
+        key="SelecteCompany"
+        name="SelecteCompany"
+        component={CompaniesScreen}
+        options={{
+          headerShown: false,
+          // title: 'Выбор организации',
+        }}
+      />
     </Stack.Navigator>
   );
 };

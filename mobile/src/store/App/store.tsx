@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 
 import { IContact, IDocument, IGood, IRemains } from '../../../../common';
+import { IMDGoodRemain, IModel, IModelData } from '../../../../common/base';
 import config from '../../config';
 import { rlog } from '../../helpers/log';
 import { appStorage, getRemainsModel } from '../../helpers/utils';
@@ -62,7 +63,7 @@ const createStoreContext = () => {
         actions.setReferences(references);
 
         rlog('getRemainsModel', 'Начало построения модели');
-        const remainsModel = getRemainsModel(
+        const remainsModel: IModel<IModelData<IMDGoodRemain>> = getRemainsModel(
           references?.contacts?.data as IContact[],
           references?.goods?.data as IGood[],
           (references?.remains?.data as unknown) as IRemains[],
@@ -73,8 +74,8 @@ const createStoreContext = () => {
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents);
 
-        setLoading(false);
         rlog('Load data', 'Окончание загрузки данных из Storage');
+        setLoading(false);
       };
 
       if (storagePath) {

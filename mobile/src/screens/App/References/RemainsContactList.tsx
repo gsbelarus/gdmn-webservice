@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
@@ -15,38 +15,38 @@ interface IField {
   [fieldName: string]: unknown;
 }
 
-const LineItem = React.memo(({ item }: { item: IField }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('RemainsView', { item });
-      }}
-    >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
-        </View>
-        <View style={localStyles.details}>
-          <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-});
-
 const RemainsContactListViewScreen = () => {
   const { colors } = useTheme();
   const { state: appState } = useAppStore();
+  const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();
 
-  //TODO непонятно откуда задержка при отображении списка подразделений
+  const LineItem = useCallback(
+    ({ item }: { item: IField }) => {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('RemainsView', { item });
+          }}
+        >
+          <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+            <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
+              <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+            </View>
+            <View style={localStyles.details}>
+              <Text style={[localStyles.name, { color: colors.text }]}>{item.name ?? item.id}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    [colors.card, colors.primary, colors.text, navigation],
+  );
+
   useEffect(() => {
-    const { remains } = appState.models;
+    const remains = appState.models?.remains;
 
     if (!remains) {
       return;
@@ -58,7 +58,7 @@ const RemainsContactListViewScreen = () => {
       .sort((a, b) => (a.name < b.name ? -1 : 1));
 
     setFilteredList(contactList);
-  }, [appState.models, searchQuery]);
+  }, [appState.models?.remains, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);

@@ -6,7 +6,7 @@ import { Text, TextInput, Button, IconButton, ActivityIndicator } from 'react-na
 import { IResponse, IUserCredentials, IUser } from '../../../../common';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
-import { IDataFetch } from '../../model';
+import { IDataFetch } from '../../model/types';
 import { useAuthStore, useServiceStore } from '../../store';
 import styles from '../../styles/global';
 

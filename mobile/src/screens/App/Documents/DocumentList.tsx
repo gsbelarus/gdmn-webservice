@@ -29,7 +29,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
   const docHead = useMemo(() => item?.head, [item?.head]);
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
-  const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
+  // const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 
@@ -65,7 +65,10 @@ const DocumentListScreen = () => {
   const ref = React.useRef<FlatList<IDocument>>(null);
   useScrollToTop(ref);
 
-  const { apiService } = useServiceStore();
+  const {
+    apiService,
+    state: { isLoading },
+  } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
   const [searchText, setSearchText] = useState('');
@@ -189,45 +192,40 @@ const DocumentListScreen = () => {
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      {/* {!!data?.length && (    */}
-      <>
-        <View style={localStyles.flexDirectionRow}>
-          <Searchbar
-            placeholder="Поиск по номеру"
-            onChangeText={setSearchText}
-            value={searchText}
-            style={[localStyles.flexGrow, localStyles.searchBar]}
+      {!isLoading && (
+        <>
+          <>
+            <View style={localStyles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск по номеру"
+                onChangeText={setSearchText}
+                value={searchText}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+          <FlatList
+            ref={ref}
+            data={data}
+            keyExtractor={(_, i) => String(i)}
+            renderItem={renderItem}
+            ItemSeparatorComponent={ItemSeparator}
+            scrollEventThrottle={400}
+            onEndReached={() => ({})}
+            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
           />
-          {/* <IconButton
-              icon="settings"
-              size={24}
-              style={localStyles.iconSettings}
-              onPress={() => navigation.navigate('FilterEdit')}
-            />
-            */}
-        </View>
-        <ItemSeparator />
-      </>
-      {/*
-      )} */}
-      <FlatList
-        ref={ref}
-        data={data}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-        scrollEventThrottle={400}
-        onEndReached={() => ({})}
-        ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
-      />
-      <FAB
-        style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-        icon="file-plus"
-        onPress={() => {
-          // appActions.clearForm('DocumentEdit');
-          navigation.navigate('DocumentEdit');
-        }}
-      />
+
+          <FAB
+            style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+            icon="file-plus"
+            onPress={() => {
+              // appActions.clearForm('DocumentEdit');
+              navigation.navigate('DocumentEdit');
+            }}
+          />
+        </>
+      )}
     </View>
   );
 };
