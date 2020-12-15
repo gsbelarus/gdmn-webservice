@@ -38,7 +38,7 @@ const SplashScreen = (props: Props) => {
         {!isLoading ? (
           <Button
             onPress={connection}
-            icon="autorenew"
+            icon="apps"
             mode="contained"
             style={[styles.rectangularButton, localStyles.buttons]}
           >

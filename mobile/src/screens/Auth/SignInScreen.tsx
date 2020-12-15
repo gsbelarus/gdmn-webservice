@@ -165,7 +165,7 @@ const SignInScreen = () => {
             <Button
               mode="contained"
               disabled={loginState.isLoading}
-              icon={'login'}
+              icon="login"
               onPress={logIn}
               style={styles.rectangularButton}
             >

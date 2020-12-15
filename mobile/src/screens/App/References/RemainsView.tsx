@@ -115,7 +115,7 @@ const RemainsViewScreen = ({ route }) => {
         <FlatList
           ref={ref}
           data={filteredList}
-          refreshControl={<RefreshControl refreshing={!goodRemains} title="Идёт загрузка остатков..." />}
+          refreshControl={<RefreshControl refreshing={!goodRemains} title="загрузка данных..." />}
           keyExtractor={(_, i) => String(i)}
           renderItem={({ item }) => <LineItem item={item} />}
           ItemSeparatorComponent={ItemSeparator}

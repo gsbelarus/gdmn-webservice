@@ -90,7 +90,7 @@ export const appStorage = {
   removeItem: async (key: string) => {
     try {
       await ensureDirExists('');
-      await FileSystem.deleteAsync(key);
+      await FileSystem.deleteAsync(`${dbDir}${key}.json`);
     } catch (e) {
       console.log('error', e);
     }

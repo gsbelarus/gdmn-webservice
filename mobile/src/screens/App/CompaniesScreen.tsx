@@ -10,7 +10,7 @@ import styles from '../../styles/global';
 
 const CompaniesScreen = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>();
-  const [companies, setCompanies] = useState<string[]>();
+  const [companies, setCompanies] = useState<string[]>([]);
 
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
@@ -20,18 +20,18 @@ const CompaniesScreen = () => {
   } = useAuthStore();
 
   useEffect(() => {
-    const request = async () => {
+    const loadCompanies = async () => {
       const response = await apiService.auth.getUserStatus();
       if (response.result) {
         setCompanies(response.data?.companies || []);
       }
     };
-    request();
+    loadCompanies();
   }, [apiService.auth]);
 
   useEffect(() => {
     const getCompanyId = async () => {
-      // const savedCompany = await appStorage.getItem(`${userID}/companyId`);
+      const savedCompany = await appStorage.getItem(`${userID}/companyId`);
       /*
         Автоматический вход:
           Когда получим список организаций пользователя, проверим,
@@ -40,13 +40,15 @@ const CompaniesScreen = () => {
 
         TODO Если хотим сменить то происходит снова автоматический вход
       */
-      // console.log(savedCompany, savedCompany);
-      // !!savedCompany &&
-      //   companies.some((company) => company === savedCompany) &&
-      //   actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+      if (!!savedCompany && companies.some((company) => company === savedCompany)) {
+        setSelectedCompany(savedCompany);
+        //   actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+      } else {
+        setSelectedCompany(companies[0]);
+      }
     };
 
-    if (userID !== null && companies) {
+    if (userID !== null && companies?.length > 0) {
       getCompanyId();
     }
   }, [userID, companies, actions]);
@@ -73,10 +75,17 @@ const CompaniesScreen = () => {
             {companies?.length > 0 &&
               companies.map((el) => {
                 return (
-                  <TouchableOpacity onPress={() => setSelectedCompany(el)} key={el}>
+                  <TouchableOpacity
+                    onPress={() => setSelectedCompany(el)}
+                    key={el}
+                    style={[
+                      { backgroundColor: selectedCompany === el ? colors.primary : colors.background },
+                      localStyles.item,
+                    ]}
+                  >
                     <View style={localStyles.row}>
-                      <RadioButton value={el} />
-                      <Text>{el}</Text>
+                      <RadioButton value={el} color={colors.background} />
+                      <Text style={{ color: selectedCompany === el ? colors.background : colors.text }}>{el}</Text>
                     </View>
                   </TouchableOpacity>
                 );
@@ -86,9 +95,9 @@ const CompaniesScreen = () => {
         <View style={localStyles.buttonView}>
           <Button
             mode="contained"
-            icon="location-enter"
+            icon="login"
             style={[styles.rectangularButton, localStyles.button]}
-            disabled={companies === undefined || companies.length === 0 || !selectedCompany}
+            disabled={!companies?.length || !selectedCompany}
             onPress={async () => {
               actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
@@ -120,25 +129,27 @@ export { CompaniesScreen };
 const localStyles = StyleSheet.create({
   button: {
     flex: 1,
-    marginLeft: 7,
   },
   buttonView: {
     flexDirection: 'row',
   },
+  item: {
+    borderRadius: 4,
+    justifyContent: 'center',
+  },
   row: {
     alignItems: 'center',
+    borderRadius: 15,
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    margin: 10,
+    paddingVertical: 5,
   },
   scroll: {
     marginVertical: 10,
-    maxHeight: 200,
+    maxHeight: 150,
   },
   scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
   },
   title: {
     padding: 10,
