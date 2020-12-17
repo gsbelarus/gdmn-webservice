@@ -1,10 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar, FAB, IconButton } from 'react-native-paper';
+import { Text, Searchbar, FAB, IconButton, Button } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
+import BottomSheetComponent from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -62,7 +63,11 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 const DocumentListScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const ref = React.useRef<FlatList<IDocument>>(null);
+  // const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const ref = useRef<FlatList<IDocument>>(null);
+
+  const showActionSheet = useActionSheet();
   useScrollToTop(ref);
 
   const {
@@ -74,7 +79,29 @@ const DocumentListScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
-  const showActionSheet = useActionSheet();
+  const [sortModal, setSortModal] = useState(false);
+
+  const handelApplyFilter = useCallback(() => {
+    console.log('что-то выбрано');
+    // bottomSheetRef?.current?.close();
+    setSortModal(false);
+  }, []);
+
+  const handleDismissFilter = useCallback(() => {
+    // bottomSheetRef?.current?.close();
+    setSortModal(false);
+  }, []);
+
+  const handleExpandPress = useCallback(() => {
+    // bottomSheetRef.current?.present();
+    // sortModal ? bottomSheetRef.current?.close() : bottomSheetRef.current?.present();
+
+    setSortModal((prev) => !prev);
+  }, []);
+
+  // useEffect(() => {
+  //   // sortModal ? bottomSheetRef.current?.present() : bottomSheetRef.current?.close();
+  // }, [sortModal]);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
     appState.references?.contacts?.data,
@@ -191,7 +218,7 @@ const DocumentListScreen = () => {
   }, [appActions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
 
   return (
-    <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
+    <View style={[localStyles.container, { backgroundColor: colors.card }]}>
       {!isLoading && (
         <>
           <>
@@ -201,6 +228,12 @@ const DocumentListScreen = () => {
                 onChangeText={setSearchText}
                 value={searchText}
                 style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+              <IconButton
+                icon="filter-outline"
+                size={24}
+                style={localStyles.iconSettings}
+                onPress={handleExpandPress}
               />
             </View>
             <ItemSeparator />
@@ -226,6 +259,12 @@ const DocumentListScreen = () => {
           />
         </>
       )}
+      <BottomSheetComponent
+        data={['Вариант 1', 'Вариант 2', 'Вариант 3']}
+        visible={sortModal}
+        onApply={handelApplyFilter}
+        onDismiss={handleDismissFilter}
+      />
     </View>
   );
 };
@@ -241,10 +280,9 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 36,
   },
-  /*   company: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  }, */
+  container: {
+    flex: 1,
+  },
   details: {
     margin: 8,
     marginRight: 0,
@@ -264,26 +302,8 @@ const localStyles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  /*
-  fabImport: {
-    bottom: 0,
-    margin: 20,
-    position: 'absolute',
-    right: 160,
-  },
-  fabSync: {
-    backgroundColor: Colors.blue600,
-    bottom: 0,
-    left: 0,
-    margin: 20,
-    position: 'absolute',
-    // right: 80,
-  }, */
   field: {
     opacity: 0.5,
-  },
-  flex1: {
-    flex: 1,
   },
   flexDirectionRow: {
     flexDirection: 'row',
@@ -291,13 +311,30 @@ const localStyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
-  // iconSettings: {
-  //   width: 36,
-  // },
+  headerContainer: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderWidth: 1,
+    flex: 1,
+    margin: 1,
+    paddingVertical: 10,
+  },
+  iconSettings: {
+    width: 36,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
+  },
+  line: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 45,
+    justifyContent: 'flex-start',
+    paddingHorizontal: 15,
   },
   name: {
     fontSize: 14,
@@ -309,5 +346,9 @@ const localStyles = StyleSheet.create({
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 10,
   },
 });

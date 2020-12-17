@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
@@ -24,34 +25,34 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   const {
-    state: { serverUrl, isLoading: isAppDataLoading },
-    actions,
-    apiService,
+    state: { isLoading: isAppDataLoading },
   } = useServiceStore();
 
   return (
     <AppStoreProvider>
-      <Stack.Navigator>
-        {isAppDataLoading ? (
-          <Stack.Screen
-            key="LoadingScreen"
-            name="LoadingScreen"
-            component={LoadingScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-        ) : (
-          <Stack.Screen
-            key="BottomTabs"
-            name="BottomTabs"
-            component={TabsNavigator}
-            options={{
-              headerShown: false,
-            }}
-          />
-        )}
-      </Stack.Navigator>
+      <BottomSheetModalProvider>
+        <Stack.Navigator>
+          {isAppDataLoading ? (
+            <Stack.Screen
+              key="LoadingScreen"
+              name="LoadingScreen"
+              component={LoadingScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+          ) : (
+            <Stack.Screen
+              key="BottomTabs"
+              name="BottomTabs"
+              component={TabsNavigator}
+              options={{
+                headerShown: false,
+              }}
+            />
+          )}
+        </Stack.Navigator>
+      </BottomSheetModalProvider>
     </AppStoreProvider>
   );
 };

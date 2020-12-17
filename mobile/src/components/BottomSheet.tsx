@@ -1,39 +1,26 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef, useMemo } from 'react';
+import React, { useCallback, useRef, useMemo, useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 
 import Handle from './Handle';
 
 interface IProps {
   data: unknown[];
+  visible: boolean;
+  onApply: () => void;
+  onDismiss: () => void;
 }
 
-const BottomSheetComponent = ({ data }: IProps) => {
-  // hooks
+const BottomSheetComponent = ({ data, visible, onApply, onDismiss }: IProps) => {
   const sheetRef = useRef<BottomSheet>(null);
 
-  // variables
-  // const data = useMemo(
-  //   () =>
-  //     Array(50)
-  //       .fill(0)
-  //       .map((_, index) => `index-${index}`),
-  //   [],
-  // );
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+  const snapPoints = useMemo(() => ['70%', '90%'], []);
 
-  // callbacks
-  const handleSheetChange = useCallback((index) => {
-    console.log('handleSheetChange', index);
-  }, []);
-  const handleSnapPress = useCallback((index) => {
-    sheetRef.current?.snapTo(index);
-  }, []);
-  const handleClosePress = useCallback(() => {
-    sheetRef.current?.close();
-  }, []);
+  useEffect(() => {
+    // eslint-disable-next-line @babel/no-unused-expressions
+    visible ? sheetRef.current?.collapse() : sheetRef.current?.close();
+  }, [visible]);
 
-  // render
   const renderItem = useCallback(
     ({ item }) => (
       <View style={styles.itemContainer}>
@@ -42,27 +29,28 @@ const BottomSheetComponent = ({ data }: IProps) => {
     ),
     [],
   );
+
   const renderHeader = useCallback(() => {
     return (
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Backdrop Example</Text>
+        <Text style={styles.title}>Настройка фильтра</Text>
       </View>
     );
   }, []);
 
   return (
     <View style={styles.container}>
-      <Button title="Snap To 90%" onPress={() => handleSnapPress(2)} />
-      <Button title="Snap To 50%" onPress={() => handleSnapPress(1)} />
-      <Button title="Snap To 25%" onPress={() => handleSnapPress(0)} />
-      <Button title="Close" onPress={() => handleClosePress()} />
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
-        onChange={handleSheetChange}
+        // onChange={handleSheetChange}
         handleComponent={Handle}
         backdropComponent={BottomSheetBackdrop}
       >
+        <View style={styles.buttons}>
+          <Button title="Применить" onPress={onDismiss} />
+          <Button title="Сбросить" onPress={onDismiss} />
+        </View>
         <BottomSheetFlatList
           data={data}
           keyExtractor={(i: string) => i}
@@ -75,6 +63,10 @@ const BottomSheetComponent = ({ data }: IProps) => {
 };
 
 const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     paddingTop: 200,
@@ -87,7 +79,6 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   itemContainer: {
-    backgroundColor: '#eee',
     margin: 6,
     padding: 6,
   },
