@@ -6,6 +6,7 @@ import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from
 import { Text, Switch } from 'react-native-paper';
 
 import { IContact, IDocument, IRefData } from '../../../../../common';
+import BottomSheetComponent from '../../../components/BottomSheet';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
@@ -22,6 +23,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const { state: appState, actions: appActions } = useAppStore();
 
   const [statusId, setStatusId] = useState(0);
+  const [dataBottomSheet, setDataBottomSheet] = useState([]);
 
   const docId = route.params?.docId;
 
@@ -260,15 +262,16 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             <ReferenceItem
               value={selectedItem(listDocumentType, doctype)?.value}
               disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  fieldName: 'doctype',
-                  title: 'Тип документа',
-                  list: listDocumentType,
-                  value: [doctype],
-                })
-              }
+              onPress={() => setDataBottomSheet(listDocumentType.map((d) => d.value))}
+              // {() =>
+              //   navigation.navigate('SelectItem', {
+              //     formName: 'documentParams',
+              //     fieldName: 'doctype',
+              //     title: 'Тип документа',
+              //     list: listDocumentType,
+              //     value: [doctype],
+              //   })
+              // }
             />
           </View>
           <ItemSeparator />
@@ -277,15 +280,16 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             <ReferenceItem
               value={selectedItem(listDepartments, fromcontactId)?.value}
               disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  title: 'Подразделение',
-                  fieldName: 'fromcontactId',
-                  list: listDepartments,
-                  value: [fromcontactId],
-                })
-              }
+              onPress={() => setDataBottomSheet(listDepartments.map((d) => d.value))}
+              // {() =>
+              //   navigation.navigate('SelectItem', {
+              //     formName: 'documentParams',
+              //     title: 'Подразделение',
+              //     fieldName: 'fromcontactId',
+              //     list: listDepartments,
+              //     value: [fromcontactId],
+              //   })
+              // }
             />
           </View>
           {/*           <ItemSeparator />
@@ -327,6 +331,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             </TouchableOpacity>
           )}
         </ScrollView>
+        {dataBottomSheet?.length > 0 && <BottomSheetComponent data={dataBottomSheet} />}
       </View>
     </>
   );
