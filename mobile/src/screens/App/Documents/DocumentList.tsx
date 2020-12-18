@@ -7,6 +7,7 @@ import { Text, Searchbar, FAB, IconButton, Button } from 'react-native-paper';
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheetComponent from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
+import RadioGroup, { IOption } from '../../../components/RadioGroup';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
@@ -78,6 +79,8 @@ const DocumentListScreen = () => {
   const { state: appState, actions: appActions } = useAppStore();
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
+
+  const [selectedOption, setSelectedOption] = useState<IOption>();
 
   const [sortModal, setSortModal] = useState(false);
 
@@ -259,6 +262,17 @@ const DocumentListScreen = () => {
           />
         </>
       )}
+      <RadioGroup
+        options={radiogroup_options}
+        onChange={(option) => {
+          console.log('onChange RadioGroup: ');
+          console.log(option);
+          setSelectedOption(option);
+        }}
+        activeButtonId={selectedOption?.id}
+        // eslint-disable-next-line react-native/no-inline-styles
+        circleStyle={{ fillColor: 'blue' }}
+      />
       <BottomSheetComponent
         data={['Вариант 1', 'Вариант 2', 'Вариант 3']}
         visible={sortModal}
@@ -268,6 +282,13 @@ const DocumentListScreen = () => {
     </View>
   );
 };
+
+const radiogroup_options = [
+  { id: 0, label: 'Button1' },
+  { id: 1, label: 'Button2' },
+  { id: 2, label: 'Button3' },
+  { id: 3, label: 'Button4' },
+];
 
 export { DocumentListScreen };
 

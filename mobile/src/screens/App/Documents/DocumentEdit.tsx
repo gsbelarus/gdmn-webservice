@@ -331,7 +331,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             </TouchableOpacity>
           )}
         </ScrollView>
-        {dataBottomSheet?.length > 0 && <BottomSheetComponent data={dataBottomSheet} />}
+        {/* {dataBottomSheet?.length > 0 && <BottomSheetComponent data={dataBottomSheet} />} */}
       </View>
     </>
   );
