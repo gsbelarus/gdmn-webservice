@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useMemo, useState, useEffect, ReactNode } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 
 import Handle from './Handle';
@@ -9,9 +9,10 @@ interface IProps {
   visible: boolean;
   onApply: () => void;
   onDismiss: () => void;
+  children?: ReactNode;
 }
 
-const BottomSheetComponent = ({ data, visible, onApply, onDismiss }: IProps) => {
+const BottomSheetComponent = ({ data, visible, onApply, onDismiss, children }: IProps) => {
   const sheetRef = useRef<BottomSheet>(null);
 
   const snapPoints = useMemo(() => ['70%', '90%'], []);
@@ -47,16 +48,19 @@ const BottomSheetComponent = ({ data, visible, onApply, onDismiss }: IProps) => 
         handleComponent={Handle}
         backdropComponent={BottomSheetBackdrop}
       >
-        <View style={styles.buttons}>
-          <Button title="Применить" onPress={onDismiss} />
-          <Button title="Сбросить" onPress={onDismiss} />
-        </View>
-        <BottomSheetFlatList
+        <View style={styles.contentContainer}>
+          <View style={styles.buttons}>
+            <Button title="Применить" onPress={onDismiss} />
+            <Button title="Сбросить" onPress={onDismiss} />
+          </View>
+          {children}
+          {/* <BottomSheetFlatList
           data={data}
           keyExtractor={(i: string) => i}
           renderItem={renderItem}
           contentContainerStyle={styles.contentContainer}
-        />
+        /> */}
+        </View>
       </BottomSheet>
     </View>
   );
@@ -73,6 +77,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     backgroundColor: 'white',
+    marginHorizontal: 10,
   },
   headerContainer: {
     backgroundColor: 'white',

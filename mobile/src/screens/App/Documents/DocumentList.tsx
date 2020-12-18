@@ -1,13 +1,13 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Text, Searchbar, FAB, IconButton, Button } from 'react-native-paper';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Searchbar, FAB, IconButton, Button } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheetComponent from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
-import RadioGroup, { IOption } from '../../../components/RadioGroup';
+import { RadioGroup, IOption } from '../../../components/RadioGroup';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
@@ -64,7 +64,6 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 const DocumentListScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  // const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const ref = useRef<FlatList<IDocument>>(null);
 
@@ -80,31 +79,21 @@ const DocumentListScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
-  const [selectedOption, setSelectedOption] = useState<IOption>();
+  const [selectedOption, setSelectedOption] = useState<IOption>(radiogroup_options[0]);
 
   const [sortModal, setSortModal] = useState(false);
 
   const handelApplyFilter = useCallback(() => {
-    console.log('что-то выбрано');
-    // bottomSheetRef?.current?.close();
     setSortModal(false);
   }, []);
 
   const handleDismissFilter = useCallback(() => {
-    // bottomSheetRef?.current?.close();
     setSortModal(false);
   }, []);
 
   const handleExpandPress = useCallback(() => {
-    // bottomSheetRef.current?.present();
-    // sortModal ? bottomSheetRef.current?.close() : bottomSheetRef.current?.present();
-
     setSortModal((prev) => !prev);
   }, []);
-
-  // useEffect(() => {
-  //   // sortModal ? bottomSheetRef.current?.present() : bottomSheetRef.current?.close();
-  // }, [sortModal]);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
     appState.references?.contacts?.data,
@@ -262,32 +251,32 @@ const DocumentListScreen = () => {
           />
         </>
       )}
-      <RadioGroup
-        options={radiogroup_options}
-        onChange={(option) => {
-          console.log('onChange RadioGroup: ');
-          console.log(option);
-          setSelectedOption(option);
-        }}
-        activeButtonId={selectedOption?.id}
-        // eslint-disable-next-line react-native/no-inline-styles
-        circleStyle={{ fillColor: 'blue' }}
-      />
       <BottomSheetComponent
         data={['Вариант 1', 'Вариант 2', 'Вариант 3']}
         visible={sortModal}
         onApply={handelApplyFilter}
         onDismiss={handleDismissFilter}
-      />
+      >
+        <RadioGroup
+          options={radiogroup_options}
+          onChange={(option) => {
+            // console.log('onChange RadioGroup: ');
+            // console.log(option);
+            setSelectedOption(option);
+          }}
+          activeButtonId={selectedOption?.id}
+          circleStyle={{ fillColor: colors.primary }}
+        />
+      </BottomSheetComponent>
     </View>
   );
 };
 
 const radiogroup_options = [
-  { id: 0, label: 'Button1' },
-  { id: 1, label: 'Button2' },
-  { id: 2, label: 'Button3' },
-  { id: 3, label: 'Button4' },
+  { id: 0, label: 'По дате (по убыванию)' },
+  { id: 1, label: 'По дате (по возрастанию)' },
+  { id: 2, label: 'По номеру (по убыванию)' },
+  { id: 3, label: 'По номеру (по возрастанию)' },
 ];
 
 export { DocumentListScreen };

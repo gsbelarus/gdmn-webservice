@@ -34,7 +34,7 @@
     "react-native-calendars": "^1.846.0",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-input-spinner": "^1.3.2",
-    "react-native-paper": "^4.4.1",
+    "react-native-paper": "^4.5.0",
     "react-native-reanimated": "^1.13.2",
     "react-native-safe-area-context": "3.1.9",
     "react-native-scan-device": "git+https://github.com/mediaburg/react-native-scan-device",
@@ -48,10 +48,10 @@
     "@react-navigation/stack": "^5.12.8",
     "@types/expo": "^33.0.1",
     "@types/react": "~17.0.0",
-    "@types/react-native": "~0.63.37",
-    "@typescript-eslint/eslint-plugin": "^4.9.1",
-    "@typescript-eslint/eslint-plugin-tslint": "^4.9.1",
-    "@typescript-eslint/parser": "^4.9.1",
+    "@types/react-native": "^0.63.42",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
     "babel-preset-expo": "8.3.0",
     "eslint": "^7.15.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -64,7 +64,7 @@
     "prettier": "^2.2.1",
     "tslint": "^6.1.3",
     "tslint-config-airbnb": "^5.11.2",
-    "typescript": "~4.1.2"
+    "typescript": "~4.1.3"
   },
   "private": true
 }

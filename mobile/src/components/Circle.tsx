@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, LayoutChangeEvent } from 'react-native';
 
 type Props = {
   active: boolean;
-  circleStyle: any;
+  circleStyle: { [name: string]: string };
 };
 
 const Circle = ({ active, circleStyle }: Props) => {
@@ -16,13 +16,14 @@ const Circle = ({ active, circleStyle }: Props) => {
     (event: LayoutChangeEvent) => {
       const height = event.nativeEvent.layout.height;
       const width = event.nativeEvent.layout.width;
-      console.log(active);
+
       return Animated.parallel([
         Animated.timing(state.animatedHeight, {
           toValue: active ? height - 6 : 0,
           duration: 200,
           useNativeDriver: true,
         }),
+
         Animated.timing(state.animatedWidth, {
           toValue: active ? width - 6 : 0,
           duration: 200,
@@ -34,16 +35,12 @@ const Circle = ({ active, circleStyle }: Props) => {
   );
 
   return (
-    <View
-      key={+active}
-      style={[styles.circle, circleStyle]}
-      onLayout={(event: LayoutChangeEvent) => setWidthHeight(event)}
-    >
+    <View key={+active} style={[styles.circle, circleStyle]} onLayout={setWidthHeight}>
       <Animated.View
         style={[
           styles.fill,
-          { backgroundColor: circleStyle.fillColor },
           {
+            backgroundColor: circleStyle.fillColor,
             transform: [{ scaleY: state.animatedHeight }, { scaleX: state.animatedWidth }],
           },
         ]}
@@ -61,12 +58,13 @@ const styles = StyleSheet.create({
     height: 22,
     justifyContent: 'center',
     marginRight: 10,
-    // customizable properties are as follows...
     width: 22,
   },
   fill: {
     backgroundColor: '#279315',
     borderRadius: 20,
+    height: 1,
+    width: 1,
   },
 });
 

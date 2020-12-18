@@ -12,9 +12,9 @@ export interface IOption {
 type Props = {
   options: IOption[];
   horizontal?: boolean;
-  circleStyle?: any;
+  circleStyle?: { [name: string]: string };
   activeButtonId?: number | string;
-  onChange?: (option: IOption) => void;
+  onChange: (option: IOption) => void;
 };
 
 export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange, activeButtonId }: Props) => {
@@ -22,13 +22,13 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
 
   const onPress = useCallback(
     (option) => {
-      console.log('onPress');
-      console.log(option);
+      // console.log('onPress');
+      // console.log(option);
       if (option.id === activeButtonId) {
         return;
       }
       //setSelectedOptionId(option.id);
-      onChange?.(option);
+      onChange(option);
     },
     [onChange, activeButtonId],
   );
@@ -39,6 +39,7 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
       {options.map((option) => (
         <TouchableOpacity key={option.id} style={styles.radio} onPress={() => onPress(option)}>
           <Circle active={activeButtonId === option.id} circleStyle={circleStyle} />
+          {/* activeButtonId === option.id */}
           {option.label && <Text>{option.label}</Text>}
           {!option.label && option.labelView}
         </TouchableOpacity>
