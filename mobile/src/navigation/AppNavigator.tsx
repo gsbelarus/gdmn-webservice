@@ -8,7 +8,6 @@ import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
   SellProductsListScreen,
-  BoxingDetailScreen,
   SettingsGettingDocumentScreen,
   SettingsSearchScreen,
   SelectBoxingsScreen,
@@ -48,13 +47,6 @@ export type RootStackParamList = {
     [fieldName: string]: unknown;
   };
   SellProductsList: { docId: number; weighedGood?: boolean };
-  BoxingDetail: {
-    boxingId: number;
-    lineId: string;
-    docId: number;
-    prodId: number;
-    modeCor: boolean;
-  };
   SettingsSearchScreen: undefined;
   SettingsGettingDocument: {
     [fieldName: string]: number[] | Date | number | string;
@@ -150,7 +142,6 @@ const AppNavigator = () => {
             ),
           })}
         />
-        <Stack.Screen key="BoxingDetail" name="BoxingDetail" component={BoxingDetailScreen} />
         <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"

@@ -36,7 +36,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ISellLine | undefined>();
-  const [goodQty, setGoodQty] = useState<string>('1');
+  const [goodQty, setGoodQty] = useState<string>('0');
   const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);

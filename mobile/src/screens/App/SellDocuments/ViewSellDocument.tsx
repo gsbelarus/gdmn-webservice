@@ -147,7 +147,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   }, [document?.lines]);
 
   useEffect(() => {
-    setNetto(
+    setTarsWeight(
       boxings.length !== 0
         ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
         : 0,
@@ -158,7 +158,10 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const setQuantity = useCallback(() => {
     if (document?.lines && document.lines !== []) {
       (document.lines as ISellLine[]).forEach((line) => {
-        actions.editLine({ docId: document.id, line: { ...line, quantity: line.orderQuantity ?? 0 } });
+        actions.editLine({
+          docId: document.id,
+          line: { ...line, quantity: line.quantity > 0 ? line.quantity : line.orderQuantity ?? 0 },
+        });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
