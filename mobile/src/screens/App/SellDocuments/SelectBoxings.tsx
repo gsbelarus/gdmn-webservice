@@ -1,6 +1,6 @@
 import { useTheme, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, FlatList, View } from 'react-native';
 import { Searchbar, Text, TextInput } from 'react-native-paper';
 
@@ -10,8 +10,8 @@ import { ILineTara, ITara, ISellLine } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 
-type SelectBoxingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'BoxingDetail'>;
-type SelectBoxingsScreenRouteProp = RouteProp<RootStackParamList, 'BoxingDetail'>;
+type SelectBoxingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SelectBoxingsScreen'>;
+type SelectBoxingsScreenRouteProp = RouteProp<RootStackParamList, 'SelectBoxingsScreen'>;
 
 type Props = {
   route: SelectBoxingsScreenRouteProp;
@@ -74,7 +74,7 @@ const Line = React.memo(
 
     return (
       <View style={{ backgroundColor: colors.card }}>
-        <Text style={[localeStyles.fontSize18, localeStyles.boxingName]}>{boxing.name}</Text>
+        <Text style={[localeStyles.fontSize16, localeStyles.boxingName]}>{boxing.name}</Text>
         <View style={localeStyles.line}>
           {boxing.type === 'paper' ? undefined : (
             <TextInput
@@ -171,8 +171,8 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
       return boxingsLine ? (
         <Line
           boxing={item}
-          quantity={boxing ? boxing.quantity : undefined}
-          weight={boxing ? boxing.weight : undefined}
+          quantity={boxing?.quantity}
+          weight={boxing?.weight}
           onPress={(newQuantity: number | undefined, newWeight: number | undefined) => {
             setBoxingsLine([
               ...(boxingsLine ?? []).filter((box) => box.tarakey !== item.id),
@@ -185,6 +185,21 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
     [boxingsLine],
   );
 
+  const keyExtractor = useCallback((box: ITara) => box.id.toString(), []);
+
+  const listEmptyComponent = useCallback(
+    () => <Text style={[localeStyles.title, localeStyles.emptyList]}>Тар нет</Text>,
+    [],
+  );
+
+  const data = useMemo(
+    () =>
+      (state.boxings as ITara[])
+        .sort((curr, prev) => curr.type.localeCompare(prev.type))
+        .filter((boxing) => boxing.name.toUpperCase().includes(searchText.toUpperCase())),
+    [searchText, state.boxings],
+  );
+
   return (
     <>
       <Searchbar placeholder="Поиск" onChangeText={setSearchText} value={searchText} style={localeStyles.searchBar} />
@@ -193,12 +208,10 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         key="boxingSelected"
         style={{ backgroundColor: colors.card }}
         ref={refList}
-        data={(state.boxings as ITara[])
-          .sort((curr, prev) => curr.type.localeCompare(prev.type))
-          .filter((boxing) => boxing.name.toUpperCase().includes(searchText.toUpperCase()))}
-        keyExtractor={(_, i) => String(i)}
+        data={data}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        ListEmptyComponent={<Text style={[localeStyles.title, localeStyles.emptyList]}>Тар нет</Text>}
+        ListEmptyComponent={listEmptyComponent}
       />
     </>
   );
@@ -215,8 +228,8 @@ const localeStyles = StyleSheet.create({
   emptyList: {
     paddingLeft: 15,
   },
-  fontSize18: {
-    fontSize: 18,
+  fontSize16: {
+    fontSize: 16,
   },
   inputQuantity: {
     flex: 1,
