@@ -22,8 +22,6 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
 
   const onPress = useCallback(
     (option) => {
-      // console.log('onPress');
-      // console.log(option);
       if (option.id === activeButtonId) {
         return;
       }
@@ -34,12 +32,10 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
   );
 
   return (
-    // eslint-disable-next-line react-native/no-inline-styles
-    <View style={[styles.container, horizontal && { flexDirection: 'row' }]}>
+    <View style={[styles.container, horizontal && styles.horizontalRow]}>
       {options.map((option) => (
         <TouchableOpacity key={option.id} style={styles.radio} onPress={() => onPress(option)}>
           <Circle active={activeButtonId === option.id} circleStyle={circleStyle} />
-          {/* activeButtonId === option.id */}
           {option.label && <Text>{option.label}</Text>}
           {!option.label && option.labelView}
         </TouchableOpacity>
@@ -51,6 +47,9 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
 const styles = StyleSheet.create({
   container: {
     flexWrap: 'wrap',
+  },
+  horizontalRow: {
+    flexDirection: 'row',
   },
   radio: {
     alignItems: 'center',

@@ -1,13 +1,13 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Searchbar, FAB, IconButton, Button } from 'react-native-paper';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
+import { Searchbar, FAB, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheetComponent from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { RadioGroup, IOption } from '../../../components/RadioGroup';
+import { RadioGroup, IOption } from '../../../components/RadioGroup/RadioGroup';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
@@ -251,19 +251,14 @@ const DocumentListScreen = () => {
           />
         </>
       )}
-      <BottomSheetComponent
-        data={['Вариант 1', 'Вариант 2', 'Вариант 3']}
-        visible={sortModal}
-        onApply={handelApplyFilter}
-        onDismiss={handleDismissFilter}
-      >
+      <BottomSheetComponent visible={sortModal}>
+        <View style={localStyles.buttons}>
+          <Button title="Применить" onPress={handelApplyFilter} />
+          <Button title="Сбросить" onPress={handleDismissFilter} />
+        </View>
         <RadioGroup
           options={radiogroup_options}
-          onChange={(option) => {
-            // console.log('onChange RadioGroup: ');
-            // console.log(option);
-            setSelectedOption(option);
-          }}
+          onChange={setSelectedOption}
           activeButtonId={selectedOption?.id}
           circleStyle={{ fillColor: colors.primary }}
         />
@@ -289,6 +284,10 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   container: {
     flex: 1,
@@ -321,16 +320,6 @@ const localStyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
-  headerContainer: {
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderWidth: 1,
-    flex: 1,
-    margin: 1,
-    paddingVertical: 10,
-  },
   iconSettings: {
     width: 36,
   },
@@ -338,13 +327,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  line: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    height: 45,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 15,
   },
   name: {
     fontSize: 14,
