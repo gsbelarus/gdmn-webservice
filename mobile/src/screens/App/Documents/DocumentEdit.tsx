@@ -419,6 +419,7 @@ const DocumentEditScreen = ({ route }: Props) => {
                     text: 'OK',
                     onPress: async () => {
                       appActions.deleteDocument(docId);
+                      appActions.clearForm('documentParams');
                       navigation.navigate('DocumentList');
                     },
                   },

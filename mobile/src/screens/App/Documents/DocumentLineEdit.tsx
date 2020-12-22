@@ -142,6 +142,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             name: 'documentLineParams',
           },
     );
+    if (docLine) {
+      setGoodQty(docLine.quantity.toString());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId]);
 
@@ -162,10 +165,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
 
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
+      //value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
+
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(value) ? value : prev;
+      return parseFloat(validNumber.test(value) ? value : prev).toString();
     });
   }, []);
 
