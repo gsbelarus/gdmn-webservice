@@ -1,12 +1,10 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
-import { TextInput, Text } from 'react-native-paper';
+import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
+import { TextInput, List, Checkbox } from 'react-native-paper';
 
-import { IDocument, IGood, ILine, IRefData } from '../../../../../common';
-import { IPackage, IGoodPackage } from '../../../../../common/base';
+import { IDocument, IGood, ILine, IRefData, IPackage, IGoodPackage } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
@@ -49,7 +47,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const packageGoods = useMemo(
     () =>
       (state.references?.packageGoods?.data as IGoodPackage[]).map((item) => {
-        if (item.goodkey === prodId) return item.packagekey;
+        if (item.goodkey === prodId) {
+          return item.packagekey;
+        }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [prodId, state.references?.packageGoods?.data],
@@ -88,16 +88,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     return id;
   }, [actions, docId, lineId, prodId, quantity, packagekey]);
 
-  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
+  /*const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
-  }, []);
+  }, []);*/
 
   const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
     con?.map((item) => ({ id: item.id, value: item.name }));
 
   const listPackageTypes = useMemo(() => getListItems(packageTypes), [packageTypes]);
 
-  const ReferenceItem = useCallback(
+  /*const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
       return (
         <TouchableOpacity
@@ -111,7 +111,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       );
     },
     [colors.border, colors.primary, colors.text],
-  );
+  );*/
 
   useEffect(() => {
     actions.setForm({ ...state.forms?.documentLineParams, quantity: goodQty });
@@ -214,17 +214,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   ]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={[localeStyles.area, { backgroundColor: colors.card }]}>
       <ScrollView>
-        <View
-          style={[
-            styles.container,
-            localeStyles.container,
-            {
-              backgroundColor: colors.card,
-            },
-          ]}
-        >
+        <View style={[styles.container, localeStyles.container]}>
           <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{productName || ''}</SubTitle>
           <TextInput
             mode={'flat'}
@@ -232,17 +224,9 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             editable={true}
             keyboardType="decimal-pad"
             onChangeText={handelQuantityChange}
-            /*onChangeText={(text) =>
-              actions.setForm({
-                ...state.forms?.documentLineParams,
-                quantity: Number(!Number.isNaN(text) ? text : '1'),
-              })
-            }*/
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            // value={(line?.quantity ?? 1).toString()}
-            //value={(quantity ?? 1).toString()}
             value={goodQty}
             theme={{
               colors: {
@@ -268,7 +252,29 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             }}
           />
         </View>
-        <View style={[localeStyles.fieldContainer, { backgroundColor: colors.card }]}>
+        {
+          <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
+            {listPackageTypes.map((packege) => {
+              return (
+                <List.Item
+                  key={packege.id ?? '1'}
+                  title={packege.value ?? ''}
+                  onPress={() =>
+                    actions.setForm({
+                      ...state.forms?.documentLineParams,
+                      packagekey: packege.id,
+                    })
+                  }
+                  right={() => (
+                    <Checkbox color={colors.primary} status={packagekey === packege.id ? 'checked' : 'unchecked'} />
+                  )}
+                  style={localeStyles.item}
+                />
+              );
+            })}
+          </List.Accordion>
+        }
+        {/*<View style={[localeStyles.fieldContainer, { backgroundColor: colors.card }]}>
           <Text style={localeStyles.inputCaption}>Упаковка:</Text>
           <ReferenceItem
             value={selectedItem(listPackageTypes, packagekey)?.value}
@@ -283,7 +289,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
               })
             }
           />
-        </View>
+        </View>*/}
         <ItemSeparator />
       </ScrollView>
     </SafeAreaView>
@@ -293,11 +299,14 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 export { DocumentLineEditScreen };
 
 const localeStyles = StyleSheet.create({
+  area: {
+    flex: 1,
+  },
   container: {
     justifyContent: 'flex-start',
     padding: 0,
   },
-  fieldContainer: {
+  /*fieldContainer: {
     alignItems: 'center',
     flexDirection: 'row',
     height: 50,
@@ -306,19 +315,9 @@ const localeStyles = StyleSheet.create({
   },
   inputCaption: {
     width: 70,
-  },
-  picker: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  pickerText: {
-    flex: 1,
-    padding: 10,
+  },*/
+  item: {
+    marginLeft: 15,
   },
   title: {
     padding: 10,
