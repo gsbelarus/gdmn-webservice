@@ -35,21 +35,16 @@ const Line = React.memo(
     const validNumber = (value: string, prev: string) => {
       value = value.replace(',', '.');
 
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
+      //value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
       const validValue = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validValue.test(value) ? value : prev;
+      return parseFloat(validValue.test(value) ? value : prev).toString();
     };
 
     const setQuantity2 = useCallback(
       (value: string) => {
         const validQuantity = validNumber(value, (quantity ?? 0).toString());
-        console.log(
-          boxing.type === 'box'
-            ? (boxing.weight ?? 0) * Number(validQuantity !== '0' ? validQuantity : '1')
-            : boxing.weight ?? 0,
-        );
         const newWeight = (boxing.type === 'box'
           ? ((boxing.weight ?? 0) * Number(validQuantity !== '0' ? validQuantity : '1')).toFixed(3)
           : weight ?? boxing.weight ?? 0

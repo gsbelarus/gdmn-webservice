@@ -54,7 +54,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         ? (document as IDocument)?.lines ?? []
         : (document as ISellDocument)?.lines ?? []
       : undefined;
-    lineDocuments ? setLine(lineDocuments.find((item) => item.id === route.params.lineId)) : undefined;
+    if (lineDocuments) {
+      setLine(lineDocuments.find((item) => item.id === route.params.lineId));
+    }
   }, [route.params, state.goods, state.documents]);
 
   useEffect(() => {
@@ -62,20 +64,20 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
       const good = weighedGood ? state.goods.find((item) => item.id === weighedGood.goodkey) : undefined;
       const date = weighedGood.datework.split('.').reverse();
-      good
-        ? actions.setFormParams({
-            id: route.params?.lineId,
-            goodId: route.params?.prodId,
-            quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
-            manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-              .toISOString()
-              .slice(0, 10),
-            //timeWork: good.timework,
-            numreceive: weighedGood.numreceive,
-            tara: [],
-            //barcodes: route.params.barcode ? [route.params.barcode] : [],
-          })
-        : undefined;
+      if (good) {
+        actions.setFormParams({
+          id: route.params?.lineId,
+          goodId: route.params?.prodId,
+          quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
+          manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
+            .toISOString()
+            .slice(0, 10),
+          //timeWork: good.timework,
+          numreceive: weighedGood.numreceive,
+          tara: [],
+          //barcodes: route.params.barcode ? [route.params.barcode] : [],
+        });
+      }
     }
   }, [actions, route.params?.lineId, route.params?.prodId, route.params?.weighedGood, state.goods, state.weighedGoods]);
 
@@ -117,9 +119,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       if (!line) {
         return;
       }
-      route.params?.manufacturingDate
-        ? actions.setFormParams({ ...line, manufacturingDate: route.params.manufacturingDate })
-        : actions.setFormParams(line);
+      actions.setFormParams(
+        route.params?.manufacturingDate ? { ...line, manufacturingDate: route.params.manufacturingDate } : line,
+      );
     }
   }, [
     actions,
@@ -140,14 +142,14 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [actions, document, product, route.params]);
 
   useEffect(() => {
-    if (state.formParams?.manufacturingDate) {
+    if ((state.formParams as ISellLine)?.manufacturingDate) {
       const numberReceive = state.weighedGoods.find((item) => {
         const date = item.datework.split('.').reverse();
         return (
           //item.goodkey === line.goodId &&
-          item.goodkey === state.formParams?.goodId &&
+          item.goodkey === (state.formParams as ISellLine)?.goodId &&
           new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
-            state.formParams.manufacturingDate
+            (state.formParams as ISellLine).manufacturingDate
         );
       })?.numreceive;
       if (numberReceive) {
@@ -261,18 +263,13 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
-      // value = value.replace(',', '.');
-      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
-      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
-      let lastValid = prev;
+      value = value.replace(',', '.');
 
-      const validNumber = new RegExp(/^\d*.?\d*$/); // for comma
-      if (validNumber.test(newValue)) {
-        lastValid = newValue;
-      } else {
-        value = prev;
-      }
-      return lastValid;
+      //value = !value.includes('.') ? parseFloat(value).toString() : value;
+      value = Number.isNaN(parseFloat(value)) ? '0' : value;
+
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+      return parseFloat(validNumber.test(value) ? value : prev).toString();
     });
   }, []);
 
