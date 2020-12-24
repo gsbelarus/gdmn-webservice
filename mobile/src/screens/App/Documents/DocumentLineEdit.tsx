@@ -165,13 +165,17 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
 
-      //value = !value.includes('.') ? parseFloat(value).toString() : value;
+      value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       return parseFloat(validNumber.test(value) ? value : prev).toString();
     });
   }, []);
+
+  /*useEffect(() => {
+    setGoodQty(parseFloat(goodQty).toString());
+  }, [goodQty]);*/
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
