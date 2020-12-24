@@ -163,13 +163,24 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
-      value = value.replace(',', '.');
+      /*value = value.replace(',', '.');
 
       value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return parseFloat(validNumber.test(value) ? value : prev).toString();
+      return parseFloat(validNumber.test(value) ? value : prev).toString();*/
+      value = Number.isNaN(parseFloat(value.replace(',', '.'))) ? '0' : value;
+      const newValue = !value.includes(',') ? parseFloat(value.replace(',', '.')).toString() : value;
+      let lastValid = prev;
+
+      const validNumber = new RegExp(/^\d*.?\d*$/); // for comma
+      if (validNumber.test(newValue)) {
+        lastValid = newValue;
+      } else {
+        value = prev;
+      }
+      return lastValid;
     });
   }, []);
 
