@@ -4,12 +4,14 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import DocumentsNavigator from './DocumentsNavigator';
+import LocationNavigator from './LocationNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {
   Documents: undefined;
   References: undefined;
+  Location: undefined;
   Settings: undefined;
 };
 
@@ -33,6 +35,15 @@ const TabsNavigator = () => {
         options={{
           tabBarLabel: 'Справочники',
           tabBarIcon: ({ color }) => <TabBarIcon name="view-list" color={color} />,
+          // tabBarBadge: true,
+        }}
+      />
+      <TabsStack.Screen
+        name="Location"
+        component={LocationNavigator}
+        options={{
+          tabBarLabel: 'Геолокация',
+          tabBarIcon: ({ color }) => <TabBarIcon name="compass-outline" color={color} />,
           // tabBarBadge: true,
         }}
       />
