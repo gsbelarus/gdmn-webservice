@@ -1,4 +1,4 @@
-import { useTheme, useIsFocused } from '@react-navigation/native';
+import { useTheme, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View } from 'react-native';
@@ -22,7 +22,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const [goodQty, setGoodQty] = useState<string>('1');
 
-  const { quantity, packagekey } = useMemo(() => {
+  const { packagekey } = useMemo(() => {
     return ((state.forms?.documentLineParams as unknown) || {}) as IDocumentLineParams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.forms?.documentLineParams]);
@@ -67,12 +67,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       line: {
         id: lineId,
         goodId: prodId,
-        quantity: quantity || 1,
+        quantity: parseFloat(goodQty) || 1,
         packagekey: packagekey || undefined,
       },
     });
     return lineId;
-  }, [actions, docId, lineId, prodId, quantity, packagekey]);
+  }, [actions, docId, lineId, prodId, goodQty, packagekey]);
 
   const addDocumentLine = useCallback(() => {
     const id = lineId || 1;
@@ -81,12 +81,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       line: {
         id,
         goodId: prodId,
-        quantity: quantity || 1,
+        quantity: parseFloat(goodQty) || 1,
         packagekey: packagekey || undefined,
       },
     });
     return id;
-  }, [actions, docId, lineId, prodId, quantity, packagekey]);
+  }, [actions, docId, lineId, prodId, goodQty, packagekey]);
 
   /*const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
@@ -122,7 +122,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     setDocument(state.documents.find((item) => item.id === docId));
   }, [state.documents, docId]);
 
-  useEffect(() => {
+  useFocusEffect(() => {
     if (state.forms?.documentLineParams || !document) {
       return;
     }
@@ -144,8 +144,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     if (docLine) {
       setGoodQty(docLine.quantity.toString());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, document]);
+  });
 
   useEffect(() => {
     setGoodQty(parseFloat(goodQty).toString());
@@ -195,7 +194,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
           text="Отмена"
           onPress={() => {
             actions.clearForm('documentLineParams');
-            navigation.navigate('DocumentView', { docId: document?.id });
+            navigation.goBack();
+            //navigation.navigate('DocumentView', { docId: document?.id });
           }}
         />
       ),
@@ -208,7 +208,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
               return;
             }
             actions.clearForm('documentLineParams');
-            navigation.navigate('DocumentView', { docId: document?.id });
+            navigation.goBack();
+            //navigation.navigate('DocumentView', { docId: document?.id });
           }}
         />
       ),
