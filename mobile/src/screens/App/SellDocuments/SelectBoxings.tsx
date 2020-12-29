@@ -23,11 +23,13 @@ const Line = React.memo(
     boxing,
     quantity,
     weight,
+    selected,
     onPress,
   }: {
     boxing: ITara;
     quantity?: number;
     weight?: number;
+    selected: boolean;
     onPress: (newQuantity: number | undefined, newWeight: number | undefined) => void;
   }) => {
     const { colors } = useTheme();
@@ -68,7 +70,7 @@ const Line = React.memo(
     );
 
     return (
-      <View style={{ backgroundColor: colors.card }}>
+      <View style={{ backgroundColor: !selected ? colors.card : colors.border }}>
         <Text style={[localeStyles.fontSize16, localeStyles.boxingName]}>{boxing.name}</Text>
         <View style={localeStyles.line}>
           {boxing.type === 'paper' ? undefined : (
@@ -83,7 +85,7 @@ const Line = React.memo(
                   placeholder: colors.primary,
                 },
               }}
-              style={[localeStyles.inputQuantity, { backgroundColor: colors.card }]}
+              style={[localeStyles.inputQuantity, { backgroundColor: !selected ? colors.card : colors.border }]}
             />
           )}
           <TextInput
@@ -100,7 +102,7 @@ const Line = React.memo(
                 placeholder: colors.primary,
               },
             }}
-            style={[localeStyles.inputWeight, { backgroundColor: colors.card }]}
+            style={[localeStyles.inputWeight, { backgroundColor: !selected ? colors.card : colors.border }]}
           />
         </View>
       </View>
@@ -168,6 +170,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
           boxing={item}
           quantity={boxing?.quantity}
           weight={boxing?.weight}
+          selected={!!(boxingsLine ?? []).find((box) => box.tarakey === item.id)}
           onPress={(newQuantity: number | undefined, newWeight: number | undefined) => {
             setBoxingsLine([
               ...(boxingsLine ?? []).filter((box) => box.tarakey !== item.id),
