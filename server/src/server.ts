@@ -61,9 +61,9 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(session(CONFIG, app))
     .use(
       bodyParser({
-        formLimit: '10mb',
-        jsonLimit: '10mb',
-        textLimit: '10mb',
+        formLimit: '15mb',
+        jsonLimit: '15mb',
+        textLimit: '15mb',
         enableTypes: ['json', 'form', 'text'],
       }),
     )
@@ -83,7 +83,9 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   });
 
   log.info('Starting listener ...');
-  await new Promise(resolve => app.listen(config.PORT, () => resolve()));
+
+  await new Promise(resolve => app.listen(config.PORT, () => resolve('')));
+
   log.info(`Server is running on http://localhost:${config.PORT}`);
   return app;
 }

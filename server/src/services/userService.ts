@@ -4,7 +4,8 @@ import { IUser } from '../../../common';
 
 const findOne = async (userId: string) => users.find(userId);
 
-const findByName = async (userName: string) => users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
+const findByName = async (userName: string) =>
+  users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
 
 const findAll = async () => (await users.read()).map(el => makeProfile(el));
 
@@ -86,7 +87,7 @@ const addCompanyToUser = async (userId: string, companyName: string) => {
     throw new Error('организация уже привязана к пользователю');
   }
 
-  return users.update({ ...user, companies: [...user.companies, companyName] });
+  return users.update({ ...user, companies: user.companies?.concat(companyName) });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {

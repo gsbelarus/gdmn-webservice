@@ -9,7 +9,7 @@ import log from '../utils/logger';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
-  const { userName } = ctx.request.body;
+  const { userName }: { userName: string } = ctx.request.body;
 
   const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
 
