@@ -41,14 +41,14 @@ const DropdownList = ({
   ]);
 
   return (
-    <View style={localeStyles.containerHome}>
-      <View style={[localeStyles.picker, { borderColor: colors.border }]}>
+    <View style={localStyles.containerHome}>
+      <View style={[localStyles.picker, { borderColor: colors.border }]}>
         <TouchableOpacity onPress={openDropdown}>
-          <View style={localeStyles.containerMain}>
-            <View style={localeStyles.containerLabel}>
-              <Text style={localeStyles.text}> {label} </Text>
+          <View style={localStyles.containerMain}>
+            <View style={localStyles.containerLabel}>
+              <Text style={localStyles.text}> {label} </Text>
             </View>
-            <View style={localeStyles.containerDropdownButton}>
+            <View style={localStyles.containerDropdownButton}>
               <Ionicons name="md-arrow-dropdown" size={24} color="black" />
             </View>
           </View>
@@ -67,7 +67,7 @@ const DropdownList = ({
 
 export default DropdownList;
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   button: {
     alignItems: 'center',
     height: 50,

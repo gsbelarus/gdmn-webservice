@@ -39,13 +39,13 @@ const MyListItem = ({ item, isSelected, onPressItem }: IPropsItem) => {
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={localeStyles.containerItem}>
-        <View style={localeStyles.subContainerItem}>
+      <View style={localStyles.containerItem}>
+        <View style={localStyles.subContainerItem}>
           <View style={{ flex: 0.13 }}>
             <Checkbox status={checked} color={textColor} onPress={onPress} />
           </View>
           <View style={{ flex: 0.87 }}>
-            <Text style={localeStyles.textItem}>{item.value}</Text>
+            <Text style={localStyles.textItem}>{item.value}</Text>
           </View>
         </View>
       </View>
@@ -85,7 +85,7 @@ export const ModalList = ({ list, selectedValue, onOk, onCancel, visible }: IPro
   );
 
   // /*Seperator between items */
-  const listViewItemSeparator = useCallback(() => <View style={localeStyles.itemSeparator} />, []);
+  const listViewItemSeparator = useCallback(() => <View style={localStyles.itemSeparator} />, []);
 
   // /*Submit selected item and goes back to parent activity */
   const submitSelectItems = useCallback(() => {
@@ -112,13 +112,13 @@ export const ModalList = ({ list, selectedValue, onOk, onCancel, visible }: IPro
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Modal animationType="fade" transparent={true} visible={visible}>
-        <View style={localeStyles.container}>
-          <View style={localeStyles.modalView}>
-            <View style={localeStyles.filter}>
+        <View style={localStyles.container}>
+          <View style={localStyles.modalView}>
+            <View style={localStyles.filter}>
               <TextInput
                 style={[
-                  localeStyles.input,
-                  localeStyles.textInput,
+                  localStyles.input,
+                  localStyles.textInput,
                   {
                     backgroundColor: colors.card,
                     color: colors.text,
@@ -137,8 +137,8 @@ export const ModalList = ({ list, selectedValue, onOk, onCancel, visible }: IPro
               />
             </View>
             {state.dataSource.length === 0 ? (
-              <View style={localeStyles.notFoundContaner}>
-                <Text style={localeStyles.notFoundText}>Не найдено {JSON.stringify(state.dataSource)}</Text>
+              <View style={localStyles.notFoundContaner}>
+                <Text style={localStyles.notFoundText}>Не найдено {JSON.stringify(state.dataSource)}</Text>
               </View>
             ) : (
               <FlatList
@@ -156,11 +156,11 @@ export const ModalList = ({ list, selectedValue, onOk, onCancel, visible }: IPro
                 submitSelectItems();
               }}
             > */}
-            <View style={[localeStyles.buttonView, { backgroundColor: colors.primary }]}>
-              <Button mode="contained" style={localeStyles.button} onPress={submitSelectItems}>
+            <View style={[localStyles.buttonView, { backgroundColor: colors.primary }]}>
+              <Button mode="contained" style={localStyles.button} onPress={submitSelectItems}>
                 Подтвердить
               </Button>
-              <Button mode="contained" style={localeStyles.button} onPress={onCancel}>
+              <Button mode="contained" style={localStyles.button} onPress={onCancel}>
                 Отменить
               </Button>
             </View>
@@ -171,7 +171,7 @@ export const ModalList = ({ list, selectedValue, onOk, onCancel, visible }: IPro
   );
 };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   button: {
     flex: 1,
     margin: 5,

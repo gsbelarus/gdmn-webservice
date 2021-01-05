@@ -91,7 +91,7 @@ const SignInScreen = () => {
       }
 
       try {
-        const res = await timeout<IResponse<string>>(5000, apiService.auth.login(credential));
+        const res = await timeout<IResponse<string>>(apiService.baseUrl.timeout, apiService.auth.login(credential));
 
         if (!res.result) {
           setLoginState({

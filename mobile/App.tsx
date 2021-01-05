@@ -10,7 +10,6 @@ import {
 } from 'react-native-paper';
 
 import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
-// import { rc } from './src/service/ReactotronConfig';
 import { AuthStoreProvider, ServiceStoreProvider } from './src/store';
 
 if (__DEV__) {

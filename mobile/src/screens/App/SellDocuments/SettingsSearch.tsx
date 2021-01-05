@@ -30,8 +30,8 @@ const Line = React.memo(
     return (
       <>
         <TouchableOpacity onPress={onPress}>
-          <View key={name} style={localeStyles.line}>
-            <Text style={localeStyles.fontSize18}>{title}</Text>
+          <View key={name} style={localStyles.line}>
+            <Text style={localStyles.fontSize18}>{title}</Text>
             {selected && <MaterialIcons name="check" size={30} color={colors.primary} />}
           </View>
         </TouchableOpacity>
@@ -74,13 +74,13 @@ const SettingsSearchScreen = ({ navigation }: Props) => {
     <View
       style={[
         styles.container,
-        localeStyles.container,
+        localStyles.container,
         {
           backgroundColor: colors.card,
         },
       ]}
     >
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Настройки фильтра</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Настройки фильтра</SubTitle>
       <Line
         name="number"
         title={'Номер документа'}
@@ -137,7 +137,7 @@ const SettingsSearchScreen = ({ navigation }: Props) => {
 
 export { SettingsSearchScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     padding: 0,

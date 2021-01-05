@@ -1,7 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { Text, Chip, Button } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { Text, RadioButton, Button, IconButton } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 import { appStorage } from '../../helpers/utils';
@@ -20,19 +20,18 @@ const CompaniesScreen = () => {
   } = useAuthStore();
 
   useEffect(() => {
-    const request = async () => {
+    const loadCompanies = async () => {
       const response = await apiService.auth.getUserStatus();
       if (response.result) {
-        setCompanies(response.data.companies || []);
+        setCompanies(response.data?.companies || []);
       }
     };
-    request();
+    loadCompanies();
   }, [apiService.auth]);
 
   useEffect(() => {
     const getCompanyId = async () => {
       const savedCompany = await appStorage.getItem(`${userID}/companyId`);
-
       /*
         Автоматический вход:
           Когда получим список организаций пользователя, проверим,
@@ -41,73 +40,85 @@ const CompaniesScreen = () => {
 
         TODO Если хотим сменить то происходит снова автоматический вход
       */
-
-      !!savedCompany && companies.some((company) => company === savedCompany)
-        ? actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany })
-        : undefined;
+      if (!!savedCompany && companies.some((company) => company === savedCompany)) {
+        setSelectedCompany(savedCompany);
+        //   actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
+      } else {
+        setSelectedCompany(companies[0]);
+      }
     };
 
-    if (userID !== null && companies) {
+    if (userID !== null && companies?.length > 0) {
       getCompanyId();
     }
   }, [userID, companies, actions]);
 
   const logOut = async () => {
-    const res = await apiService.auth.logout();
-    if (res.result) {
-      actions.logOut();
+    try {
+      const res = await apiService.auth.logout();
+      if (res.result) {
+        actions.logOut();
+        return;
+      }
+      Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
+    } catch (error) {
+      Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
     }
   };
 
   return (
     <>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Организации</SubTitle>
-      <View style={localeStyles.container}>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
-          <Text style={localeStyles.subdivisionText}>Выберите организацию: </Text>
-          <ScrollView contentContainerStyle={localeStyles.scrollContainer} style={localeStyles.scroll}>
-            {companies && companies.length !== 0 ? (
-              companies.map((item, idx) => (
-                <Chip
-                  key={idx}
-                  mode="outlined"
-                  style={[
-                    localeStyles.margin,
-                    localeStyles.chip,
-                    selectedCompany === item ? { backgroundColor: colors.primary } : {},
-                  ]}
-                  onPress={() => setSelectedCompany(item)}
-                  selected={selectedCompany === item}
-                  selectedColor={selectedCompany === item ? colors.card : colors.text}
-                >
-                  {item}
-                </Chip>
-              ))
-            ) : (
-              <Text>Вы не состоите ни в одной Организации</Text>
-            )}
-          </ScrollView>
-        </View>
-        <View style={localeStyles.buttonView}>
+      <View style={styles.container}>
+        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Выбор организации</SubTitle>
+        <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
+          <RadioButton.Group onValueChange={(newValue) => setSelectedCompany(newValue)} value={selectedCompany}>
+            {companies?.length > 0 &&
+              companies.map((el) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => setSelectedCompany(el)}
+                    key={el}
+                    style={[
+                      { backgroundColor: selectedCompany === el ? colors.primary : colors.background },
+                      localStyles.item,
+                    ]}
+                  >
+                    <View style={localStyles.row}>
+                      <RadioButton value={el} color={colors.background} />
+                      <Text style={{ color: selectedCompany === el ? colors.background : colors.text }}>{el}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+          </RadioButton.Group>
+        </ScrollView>
+        <View style={localStyles.buttonView}>
           <Button
             mode="contained"
-            style={[styles.rectangularButton, localeStyles.button]}
-            disabled={companies === undefined || companies.length === 0 || !selectedCompany}
+            icon="login"
+            style={[styles.rectangularButton, localStyles.button]}
+            disabled={!companies?.length || !selectedCompany}
             onPress={async () => {
               actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}
           >
-            ОК
-          </Button>
-          <Button
-            mode="contained"
-            style={[styles.rectangularButton, localeStyles.button, localeStyles.marginRight]}
-            onPress={logOut}
-          >
-            Выход
+            Войти
           </Button>
         </View>
+      </View>
+      <View style={styles.bottomButtons}>
+        <IconButton
+          icon="account"
+          size={30}
+          onPress={logOut}
+          style={{
+            ...styles.circularButton,
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
+          }}
+          color={colors.background}
+        />
       </View>
     </>
   );
@@ -115,49 +126,30 @@ const CompaniesScreen = () => {
 
 export { CompaniesScreen };
 
-const localeStyles = StyleSheet.create({
-  areaChips: {
-    alignItems: 'center',
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 5,
-  },
+const localStyles = StyleSheet.create({
   button: {
     flex: 1,
-    marginLeft: 7,
   },
   buttonView: {
     flexDirection: 'row',
   },
-  chip: {
-    fontSize: 18,
-    height: 50,
+  item: {
+    borderRadius: 4,
     justifyContent: 'center',
   },
-  container: {
+  row: {
+    alignItems: 'center',
+    borderRadius: 15,
     flex: 1,
-    justifyContent: 'center',
-    margin: 10,
-  },
-  margin: {
-    margin: 2,
-  },
-  marginRight: {
-    marginRight: 10,
+    flexDirection: 'row',
+    paddingVertical: 5,
   },
   scroll: {
+    marginVertical: 10,
     maxHeight: 150,
   },
   scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  subdivisionText: {
-    fontSize: 16,
-    marginBottom: 5,
-    textAlign: 'left',
+    justifyContent: 'flex-end',
   },
   title: {
     padding: 10,

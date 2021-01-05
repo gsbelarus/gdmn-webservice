@@ -223,13 +223,13 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         <View
           style={[
             styles.container,
-            localeStyles.container,
+            localStyles.container,
             {
               backgroundColor: colors.card,
             },
           ]}
         >
-          <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>
+          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
             {product?.name || 'товар не найден'}
           </SubTitle>
           <TextInput
@@ -290,11 +290,11 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               backgroundColor: colors.card,
             }}
           />
-          <View style={localeStyles.text}>
-            <Text style={[localeStyles.subdivisionText, { color: colors.primary }]}>Дата производства: </Text>
-            <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+          <View style={localStyles.text}>
+            <Text style={[localStyles.subdivisionText, { color: colors.primary }]}>Дата производства: </Text>
+            <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
               <TouchableOpacity
-                style={localeStyles.containerDate}
+                style={localStyles.containerDate}
                 onPress={() => {
                   if (isKeyboardVisible) {
                     return;
@@ -309,17 +309,17 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   });
                 }}
               >
-                <Text style={[localeStyles.textDate, { color: colors.text }]}>
+                <Text style={[localStyles.textDate, { color: colors.text }]}>
                   {getDateString((state.formParams as ISellLine)?.manufacturingDate || document?.head.date)}
                 </Text>
-                <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+                <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
               </TouchableOpacity>
             </View>
           </View>
           <ItemSeparator />
 
-          <TouchableOpacity style={localeStyles.boxingsLine} onPress={onPress}>
-            <View style={(localeStyles.paddingLeft10, { width: '80%' })}>
+          <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
+            <View style={(localStyles.paddingLeft10, { width: '80%' })}>
               <Text
                 style={
                   // eslint-disable-next-line react-native/no-inline-styles
@@ -355,7 +355,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
 export { SellProductDetailScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   areaChips: {
     borderRadius: 4,
     borderStyle: 'solid',

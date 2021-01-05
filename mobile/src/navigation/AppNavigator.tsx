@@ -3,7 +3,7 @@ import React from 'react';
 
 import { HeaderRight } from '../components/HeaderRight';
 import { IListItem } from '../model';
-import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
+// import { ProductDetailScreen, CreateDocumentScreen, ProductsListScreen } from '../screens/App/Documents';
 import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
@@ -92,7 +92,7 @@ const AppNavigator = () => {
             // title: 'Mobile inventory',
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           key="ProductDetail"
           name="ProductDetail"
           component={ProductDetailScreen}
@@ -115,7 +115,7 @@ const AppNavigator = () => {
               />
             ),
           })}
-        />
+        /> */}
         <Stack.Screen
           key="SellProductDetail"
           name="SellProductDetail"

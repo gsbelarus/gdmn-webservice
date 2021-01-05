@@ -16,18 +16,12 @@ import { IUser } from '../../common';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 
-/* export const PATH_LOCAL_DB_USERS = `${config.FILES_PATH}\\DB_USERS.json`;
-export const PATH_LOCAL_DB_ACTIVATION_CODES = `${config.FILES_PATH}\\DB_ACTIVATION_CODES.json`;
-export const PATH_LOCAL_DB_COMPANIES = `${config.FILES_PATH}\\DB_COMPANIES.json`;
-export const PATH_LOCAL_DB_DEVICES = `${config.FILES_PATH}\\DB_DEVICES.json`;
-export const PATH_LOCAL_DB_MESSAGES = `${config.FILES_PATH}\\DB_MESSAGES\\`; */
-
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
   const CONFIG = {
-    key: 'koa:sess3' /** (string) cookie key (default is koa:sess) */,
+    key: 'koa:sess' /** (string) cookie key (default is koa:sess) */,
     maxAge: 28800000 /** (number) maxAge in ms (default is 1 days) */,
     overwrite: true /** (boolean) can overwrite or not (default true) */,
     httpOnly: true /** (boolean) httpOnly or not (default true) */,

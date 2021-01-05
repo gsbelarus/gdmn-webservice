@@ -3,17 +3,10 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 
-import {
-  IResponse,
-  IMessage,
-  IContact,
-  IDocumentType,
-  IGood,
-  IRemain,
-  IDocument,
-} from '../../../../common';
+import { IResponse, IMessage, IContact, IDocumentType, IGood, IRemain, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
+import config from '../../config';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import { ITara, IWeighedGoods } from '../../model';
@@ -31,7 +24,8 @@ const SettingsScreen = () => {
     state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
-  const [isLoading, setLoading] = useState(false)
+
+  const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
 
@@ -71,7 +65,7 @@ const SettingsScreen = () => {
   );
 
   const sendGetReferencesRequest = useCallback(() => {
-    if (documents.some((document) => document.head?.status <= 1)) {
+    if (documents?.some((document) => document.head?.status <= 1)) {
       Alert.alert('Внимание!', 'Нельзя обновить справочники, если есть документы со статусами "Черновик" и "Готово".', [
         {
           text: 'OK',
@@ -81,29 +75,30 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         // const response = await apiService.data.subscribe(companyID);
-        const response = await timeout<IResponse<IMessage[]>>(10000, apiService.data.getMessages(companyID));
-        // console.log(response);
+        const response = await timeout<IResponse<IMessage[]>>(config.timeout, apiService.data.getMessages(companyID));
 
         if (!response.result) {
-          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
           return;
         }
         if (!isMessagesArray(response.data)) {
-          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть' }]);
           return;
         }
+
+        let isUpdated = false;
 
         response.data?.forEach((message) => {
           if (message.body.type === 'data') {
             // Сообщение содержит данные
-            ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+            ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
               switch (dataSet.type) {
                 case 'get_SellDocuments': {
-                  const newDocuments = dataSet.data as IDocument[];
-                  appActions.setDocuments([...documents, ...newDocuments]);
+                  const addDocuments = dataSet.data as IDocument[];
+                  appActions.setDocuments([...documents, ...addDocuments]);
                   break;
                 }
                 case 'documenttypes': {
@@ -146,20 +141,21 @@ const SettingsScreen = () => {
             // Сообщение содержит команду
             //apiService.data.deleteMessage(companyID, message.head.id);
           }
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+          isUpdated = true;
         });
 
         /* Обработка сообщений, которые связаны с документами */
-        const messagesForDocuments = response.data.filter(
+        const messagesForDocuments = response.data?.filter(
           (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
         );
+
         if (messagesForDocuments.length > 0) {
-          messagesForDocuments.forEach((message) => {
-            if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-              message.body.payload.params.forEach((paramDoc) => {
+          messagesForDocuments?.forEach((message) => {
+            if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
+              message.body.payload?.params?.forEach((paramDoc) => {
                 if (paramDoc.result) {
-                  const document = documents.find((doc) => doc.id === paramDoc.docId);
-                  if (document && document.head.status === 2) {
+                  const document = documents?.find((doc) => doc.id === paramDoc.docId);
+                  if (document?.head?.status === 2) {
                     appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
                   }
                 }
@@ -167,10 +163,12 @@ const SettingsScreen = () => {
             }
             apiService.data.deleteMessage(companyID, message.head.id);
           });
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          isUpdated = true;
+          //  Alert.alert('Запрос обработан', isUpdated ? 'Справочники обновлены' : 'Обновлений нет', [{ text: 'Закрыть' }]); // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
+        Alert.alert('Запрос обработан', isUpdated ? 'Справочники обновлены' : 'Обновлений нет', [{ text: 'Закрыть' }]);
       } catch (err) {
-        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {
         setLoading(false);
       }
@@ -180,10 +178,10 @@ const SettingsScreen = () => {
   }, [apiService.data, appActions, companyID, documents]);
 
   return (
-    <ScrollView style={{ backgroundColor: colors.background }}>
+    <>
       <View style={[localStyles.profileContainer, { backgroundColor: colors.primary }]}>
         <View style={localStyles.profileIcon}>
-          <Avatar.Icon size={50} icon="account-badge" style={{ backgroundColor: colors.primary }} />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={[localStyles.profileInfoTextUser, { color: colors.background }]}>
@@ -223,37 +221,48 @@ const SettingsScreen = () => {
           }
         />
       </View>
-      <View style={localStyles.content}>
-        <Button mode="text" icon={'update'} style={localStyles.refreshButton} disabled={isLoading} loading={isLoading} onPress={sendGetReferencesRequest}>
-          Проверить обновления
-        </Button>
-      </View>
-      <Divider />
-      <SettingsItem
-        label="Синхронизировать"
-        value={settings?.synchronization}
-        onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
-      />
-      <Divider />
-      <SettingsItem
-        label="Удалять документы после обработки на сервере"
-        value={settings?.autodeletingDocument}
-        onValueChange={() =>
-          appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
-        }
-      />
-    </ScrollView>
+      <ScrollView style={{ backgroundColor: colors.background }}>
+        <SettingsItem
+          label="Синхронизировать"
+          value={settings?.synchronization}
+          onValueChange={() => appActions.setSettings({ ...settings, synchronization: !settings?.synchronization })}
+        />
+        <Divider />
+        <SettingsItem
+          label="Удалять документы после обработки на сервере"
+          value={settings?.autodeletingDocument}
+          onValueChange={() =>
+            appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
+          }
+        />
+        <Divider />
+      </ScrollView>
+      <Button
+        mode="contained"
+        icon="update"
+        style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
+        disabled={isLoading}
+        loading={isLoading}
+        onPress={sendGetReferencesRequest}
+      >
+        Проверить обновления
+      </Button>
+    </>
   );
 };
 
 const localStyles = StyleSheet.create({
+  button: {
+    height: 40,
+    justifyContent: 'center',
+  },
   content: {
     flex: 1,
   },
   profileContainer: {
-    flex: 1,
+    alignItems: 'center',
     flexDirection: 'row',
-    height: 60,
+    height: 50,
   },
   profileIcon: {
     justifyContent: 'space-around',
@@ -271,8 +280,10 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   refreshButton: {
-    margin: 20,
-  }
+    height: 50,
+    justifyContent: 'center',
+    margin: 10,
+  },
 });
 
 export { SettingsScreen };

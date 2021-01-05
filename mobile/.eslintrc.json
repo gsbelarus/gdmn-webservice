@@ -9,15 +9,14 @@
     "eslint-config-prettier",
     "plugin:react/recommended",
     "plugin:react-native/all",
-    "plugin:jsx-a11y/strict",
+    "plugin:jsx-a11y/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "plugin:jest/recommended",
     "@react-native-community"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react-hooks"],
+  "plugins": ["react-hooks", "@typescript-eslint", "react", "jsx-a11y"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.d.ts"],

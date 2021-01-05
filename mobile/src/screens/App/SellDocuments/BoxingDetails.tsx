@@ -125,13 +125,13 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
     <View
       style={[
         styles.container,
-        localeStyles.container,
+        localStyles.container,
         {
           backgroundColor: colors.card,
         },
       ]}
     >
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>{boxing.name}</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{boxing.name}</SubTitle>
       {boxing.type === 'paper' ? undefined : (
         <TextInput
           mode={'flat'}
@@ -171,11 +171,11 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
         }}
       />
       {boxingLine ? (
-        <View style={localeStyles.buttons}>
+        <View style={localStyles.buttons}>
           <TouchableOpacity
             style={[
               styles.circularButton,
-              localeStyles.buttons,
+              localStyles.buttons,
               {
                 backgroundColor: colors.primary,
                 borderColor: colors.primary,
@@ -224,7 +224,7 @@ const BoxingDetailScreen = ({ route, navigation }: Props) => {
 
 export { BoxingDetailScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   buttons: {
     alignItems: 'center',
     margin: 10,

@@ -265,9 +265,9 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
     (props: { value: string; onPress: () => void; color?: string }) => {
       return (
         <TouchableOpacity {...props}>
-          <View style={[localeStyles.picker, { borderColor: colors.border }]}>
-            <Text style={[localeStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
-            <MaterialCommunityIcons style={localeStyles.pickerButton} name="menu-right" size={30} color="black" />
+          <View style={[localStyles.picker, { borderColor: colors.border }]}>
+            <Text style={[localStyles.pickerText, { color: colors.text }]}>{props.value || 'Выберите из списка'}</Text>
+            <MaterialCommunityIcons style={localStyles.pickerButton} name="menu-right" size={30} color="black" />
           </View>
         </TouchableOpacity>
       );
@@ -276,15 +276,15 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   );
 
   return (
-    <View style={[localeStyles.container, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
+    <View style={[localStyles.container, { backgroundColor: colors.card }]}>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
       <ScrollView>
-        <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={0}>
-          <Text style={localeStyles.subdivisionText}>Дата документа</Text>
-          <Text style={localeStyles.subdivisionText}>с: </Text>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]}>
+        <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={0}>
+          <Text style={localStyles.subdivisionText}>Дата документа</Text>
+          <Text style={localStyles.subdivisionText}>с: </Text>
+          <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
             <TouchableOpacity
-              style={localeStyles.containerDate}
+              style={localStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
                   parentScreen: 'SettingsGettingDocument',
@@ -294,16 +294,16 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                 })
               }
             >
-              <Text style={[localeStyles.textDate, { color: colors.text }]}>
+              <Text style={[localStyles.textDate, { color: colors.text }]}>
                 {getDateString((appState.formParams as IFormParams)?.dateBegin || yesterday.toISOString())}
               </Text>
-              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+              <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
-          <Text style={localeStyles.subdivisionText}>по: </Text>
-          <View style={[localeStyles.areaChips, { borderColor: colors.border }]} key={1}>
+          <Text style={localStyles.subdivisionText}>по: </Text>
+          <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={1}>
             <TouchableOpacity
-              style={localeStyles.containerDate}
+              style={localStyles.containerDate}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
                   parentScreen: 'SettingsGettingDocument',
@@ -313,15 +313,15 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
                 })
               }
             >
-              <Text style={[localeStyles.textDate, { color: colors.text }]}>
+              <Text style={[localStyles.textDate, { color: colors.text }]}>
                 {getDateString((appState.formParams as IFormParams)?.dateEnd || today.toUTCString())}
               </Text>
-              <MaterialIcons style={localeStyles.marginRight} size={30} color={colors.text} name="date-range" />
+              <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
         </View>
-        <View style={[localeStyles.area, { borderColor: colors.border }]} key={2}>
-          <Text style={localeStyles.subdivisionText}>Экспедитор:</Text>
+        <View style={[localStyles.area, { borderColor: colors.border }]} key={2}>
+          <Text style={localStyles.subdivisionText}>Экспедитор:</Text>
           <ReferenceItem
             value={selectedItem(listPeople, (appState.formParams as IFormParams)?.expiditor)?.value}
             onPress={() =>
@@ -335,8 +335,8 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
             }
           />
         </View>
-        <View style={[localeStyles.area, { borderColor: colors.border }]} key={4}>
-          <Text style={localeStyles.subdivisionText}>Организация:</Text>
+        <View style={[localStyles.area, { borderColor: colors.border }]} key={4}>
+          <Text style={localStyles.subdivisionText}>Организация:</Text>
           <ReferenceItem
             value={selectedItem(listCompanies, (appState.formParams as IFormParams)?.toContact)?.value}
             onPress={() =>
@@ -357,7 +357,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
 
 export { SettingsGettingDocumentScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   area: {
     borderRadius: 4,
     borderStyle: 'solid',

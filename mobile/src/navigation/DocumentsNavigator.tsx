@@ -31,7 +31,7 @@ const DocumentsNavigator = () => {
           title: '',
           headerLeft: () => (
             <TouchableOpacity
-              style={localeStyles.marginLeft}
+              style={localStyles.marginLeft}
               onPress={() => {
                 navigation.navigate('DocumentsListScreen');
               }}
@@ -48,7 +48,7 @@ const DocumentsNavigator = () => {
 
 export default DocumentsNavigator;
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   marginLeft: {
     marginLeft: 15,
   },

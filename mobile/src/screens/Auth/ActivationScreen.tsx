@@ -28,7 +28,10 @@ const ActivationScreen = () => {
     /* Запрос к серверу на проверку кода активации */
     setServerReq({ isError: false, isLoading: true, status: undefined });
     try {
-      const resp = await timeout<IResponse<string>>(5000, apiService.auth.verifyActivationCode(activationCode));
+      const resp = await timeout<IResponse<string>>(
+        apiService.baseUrl.timeout,
+        apiService.auth.verifyActivationCode(activationCode),
+      );
       if (!resp.result) {
         setActivationCode('');
         setServerReq({ isError: true, isLoading: false, status: resp.error });
@@ -40,7 +43,7 @@ const ActivationScreen = () => {
     } catch (err) {
       setServerReq({ isLoading: false, isError: true, status: err.message });
     }
-  }, [actions, activationCode, apiService.auth, serviceActions]);
+  }, [actions, activationCode, apiService.auth, apiService.baseUrl.timeout, serviceActions]);
 
   return (
     <>

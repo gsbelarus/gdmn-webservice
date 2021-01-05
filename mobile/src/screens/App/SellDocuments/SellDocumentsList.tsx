@@ -6,6 +6,7 @@ import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
 import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../mockData/Otves/documentStatuses.json';
@@ -16,7 +17,6 @@ const Statuses: IDocumentType[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
   const { colors } = useTheme();
-  const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
   const navigation = useNavigation();
   const { state } = useAppStore();
 
@@ -42,7 +42,7 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
     >
       <View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
-          <MaterialCommunityIcons name="file-document-box" size={20} color={'#FFF'} />
+          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={localStyles.details}>
           <View style={localStyles.directionRow}>
@@ -66,12 +66,16 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
   );
 });
 
-const SellDocumentsListScreen = ({ navigation }) => {
+const SellDocumentsListScreen = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const ref = React.useRef<FlatList<ISellDocument>>(null);
   useScrollToTop(ref);
 
-  const { apiService } = useServiceStore();
+  const {
+    apiService,
+    state: { isLoading },
+  } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
@@ -159,15 +163,21 @@ const SellDocumentsListScreen = ({ navigation }) => {
       headerRight: () => (
         <IconButton
           icon="menu"
-          size={24}
+          size={28}
           onPress={() =>
             showActionSheet([
               {
-                title: 'Загрузить',
+                title: 'Создать документ',
+                onPress: () => {
+                  navigation.navigate('CreateSellDocument');
+                },
+              },
+              {
+                title: 'Загрузить документы',
                 onPress: () => navigation.navigate('SettingsGettingDocument'),
               },
               {
-                title: 'Выгрузить',
+                title: 'Выгрузить документы',
                 onPress: sendUpdateRequest,
               },
               {
@@ -188,47 +198,45 @@ const SellDocumentsListScreen = ({ navigation }) => {
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
-      <View style={localStyles.flexDirectionRow}>
-        <Searchbar
-          placeholder="Поиск по номеру"
-          onChangeText={setSearchText}
-          value={searchText}
-          style={[localStyles.flexGrow, localStyles.searchBar]}
-        />
-        <IconButton
-          icon="settings"
-          size={24}
-          style={localStyles.iconSettings}
-          onPress={() => navigation.navigate('SettingsSearchScreen')}
-        />
-      </View>
-      <ItemSeparator />
-      <FlatList
-        ref={ref}
-        data={data}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-        /*  refreshControl={
-          <RefreshControl refreshing={false} onRefresh={() => navigation.navigate('SettingsGettingDocument')} />
-        } */
-        ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
-      />
-      <FAB
-        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
-        icon="arrow-down-bold"
-        onPress={() => navigation.navigate('SettingsGettingDocument')}
-      />
-      <FAB
-        style={[localStyles.fabImport, { backgroundColor: colors.primary }]}
-        icon="arrow-up-bold"
-        onPress={sendUpdateRequest}
-      />
-      <FAB
-        style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
-        icon="plus"
-        onPress={() => navigation.navigate('CreateSellDocument')}
-      />
+      {!isLoading && (
+        <>
+          <>
+            <View style={localStyles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск по номеру"
+                onChangeText={setSearchText}
+                value={searchText}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+          <FlatList
+            ref={ref}
+            data={data}
+            keyExtractor={(_, i) => String(i)}
+            renderItem={renderItem}
+            ItemSeparatorComponent={ItemSeparator}
+            scrollEventThrottle={400}
+            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+          />
+          <FAB
+            style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
+            icon="arrow-down-bold"
+            onPress={() => navigation.navigate('SettingsGettingDocument')}
+          />
+          <FAB
+            style={[localStyles.fabImport, { backgroundColor: colors.primary }]}
+            icon="arrow-up-bold"
+            onPress={sendUpdateRequest}
+          />
+          <FAB
+            style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
+            icon="file-plus"
+            onPress={() => navigation.navigate('CreateSellDocument')}
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -236,9 +244,6 @@ const SellDocumentsListScreen = ({ navigation }) => {
 export { SellDocumentsListScreen };
 
 const localStyles = StyleSheet.create({
-  alignItems: {
-    alignItems: 'flex-end',
-  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -246,14 +251,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  button: {
-    alignItems: 'center',
-    margin: 10,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   company: {
     fontSize: 12,
@@ -303,9 +300,6 @@ const localStyles = StyleSheet.create({
   },
   flexGrow: {
     flexGrow: 10,
-  },
-  iconSettings: {
-    width: 36,
   },
   item: {
     alignItems: 'center',

@@ -33,8 +33,8 @@ const Line = React.memo(
     onPress: () => void;
   }) => {
     return (
-      <TouchableOpacity onPress={onPress} style={localeStyles.line}>
-        <Text style={localeStyles.fontSize18}>
+      <TouchableOpacity onPress={onPress} style={localStyles.line}>
+        <Text style={localStyles.fontSize18}>
           {boxing.name} {selected ? `- ${quantity ?? '0'}` : ''}
         </Text>
       </TouchableOpacity>
@@ -123,11 +123,11 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <ScrollView horizontal contentContainerStyle={[styles.container, localeStyles.container]}>
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Выбранная тара:</SubTitle>
+    <ScrollView horizontal contentContainerStyle={[styles.container, localStyles.container]}>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Выбранная тара:</SubTitle>
       <FlatList
         key="boxingSelected"
-        style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
+        style={[{ backgroundColor: colors.card }, localStyles.minHeight45]}
         ref={refList}
         data={
           boxingsLine && boxingsLine.length !== 0
@@ -137,12 +137,12 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         keyExtractor={(_, i) => String(i)}
         renderItem={({ item }) => renderItem({ item, selected: true })}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={<Text style={[localeStyles.title, localeStyles.emptyList]}>Ничего не выбрано</Text>}
+        ListEmptyComponent={<Text style={[localStyles.title, localStyles.emptyList]}>Ничего не выбрано</Text>}
       />
-      <SubTitle styles={[localeStyles.title, { backgroundColor: colors.background }]}>Новая тара:</SubTitle>
+      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Новая тара:</SubTitle>
       <FlatList
         key="boxingNoSelected"
-        style={[{ backgroundColor: colors.card }, localeStyles.minHeight45]}
+        style={[{ backgroundColor: colors.card }, localStyles.minHeight45]}
         ref={refList}
         data={
           boxingsLine && boxingsLine.length !== 0
@@ -160,7 +160,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
 
 export { SelectBoxingsScreen };
 
-const localeStyles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     padding: 0,

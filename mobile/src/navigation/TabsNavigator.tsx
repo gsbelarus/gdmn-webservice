@@ -2,11 +2,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
-/* import config from '../config';
-import DocumentsNavigator from './DocumentsNavigator'; */
-import ReferencesNavigator from './ReferencesNavigator';
 import SellDocumentsNavigator from './SellDocumentsNavigator';
+import ReferencesNavigator from './ReferencesNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {
@@ -19,34 +18,25 @@ export type TabsStackParams = {
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
 const TabsNavigator = () => {
+  const { colors } = useTheme();
   return (
-    <TabsStack.Navigator barStyle={styles.tabBar}>
+    <TabsStack.Navigator barStyle={[styles.tabBar, { backgroundColor: colors.background }]}>
       <TabsStack.Screen
         name="SellDocuments"
         component={SellDocumentsNavigator}
         options={{
-          title: 'Отвес-накладные',
-          tabBarLabel: 'Отвесы',
-          tabBarIcon: ({ color }) => <TabBarIcon name="file-document-box-multiple" color={color} />,
+          title: 'Документы',
+          tabBarLabel: 'Документы',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="file-document-outline" color={color} />,
         }}
       />
-      {/* <TabsStack.Screen
-        name="Documents"
-        component={config.system[0].component === 'DocumentsNavigator' ? DocumentsNavigator : undefined}
-        options={{
-          title: config.system[0].options.title,
-          tabBarLabel: config.system[0].options.tabBarLabel,
-          tabBarIcon: config.system[0].options.tabBarIcon,
-          tabBarColor: config.system[0].options.tabBarColor,
-        }}
-      /> */}
       <TabsStack.Screen
         name="References"
         component={ReferencesNavigator}
         options={{
           tabBarLabel: 'Справочники',
-          tabBarIcon: ({ color }) => <TabBarIcon name="view-list" color={color} />,
-          // tabBarBadge: true,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="book-multiple-outline" color={color} />,
+            tabBarBadge: false,
         }}
       />
       <TabsStack.Screen
@@ -54,25 +44,14 @@ const TabsNavigator = () => {
         component={SettingsNavigator}
         options={{
           tabBarLabel: 'Настройки',
-          tabBarIcon: ({ color }) => <TabBarIcon name="settings-box" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="cog-outline" color={color} />,
         }}
       />
     </TabsStack.Navigator>
   );
 };
 
-function TabBarIcon(props: { name: string; color: string }) {
-  return <MaterialCommunityIcons size={26} {...props} />;
-}
-
 const styles = StyleSheet.create({
-  button: {
-    margin: 8,
-  },
-  buttons: {
-    flexDirection: 'row',
-    padding: 10,
-  },
   tabBar: {
     backgroundColor: 'white',
   },
