@@ -178,6 +178,7 @@ const ReferenceListScreen = () => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService.data, state.companyID]);
 
   return (
@@ -188,14 +189,6 @@ const ReferenceListScreen = () => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-      />
-      <FAB
-        style={[localStyles.fabSync, { backgroundColor: colors.primary }]}
-        icon="sync"
-        onPress={() => {
-          sendUpdateRequest();
-          // sendSubscribe();
-        }}
       />
     </View>
   );
@@ -217,12 +210,6 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 8,
-  },
-  fabSync: {
-    bottom: 0,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
   },
   fieldDesciption: {
     opacity: 0.5,

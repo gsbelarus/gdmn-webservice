@@ -3,25 +3,38 @@ import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { TextInput, StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Chip, Text } from 'react-native-paper';
+import { Text, Switch } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { getDateString } from '../../../helpers/utils';
+import { getDateString, getNextDocId } from '../../../helpers/utils';
 import { IListItem } from '../../../model';
 import { IDocumentParams, ISellDocument } from '../../../model/sell';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
-import styles from '../../../styles/global';
 
 type Props = StackScreenProps<RootStackParamList, 'CreateSellDocument'>;
 
 const CreateSellDocumentScreen = ({ route }: Props) => {
+  const [selectedDocType, setSelectedDocType] = useState<number>();
+  const [selectedContact, setSelectedContact] = useState<number>();
+  const { state: appState, actions: appActions } = useAppStore();
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { state: appState, actions: appActions } = useAppStore();
+
+  const {
+    date = new Date().toISOString().slice(0, 10),
+    docnumber,
+    tocontactId,
+    fromcontactId,
+    expeditorId,
+    doctype,
+    status = 0,
+  } = useMemo(() => {
+    return ((appState.formParams as unknown) || {}) as IDocumentParams;
+  }, [appState.formParams]);
 
   const [statusId, setStatusId] = useState(0);
 
@@ -29,11 +42,17 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
 
   const docId = route.params?.docId;
 
-  const statusName = useMemo(() => (docId ? 'Редактирование Документа' : 'Создание документа'), [docId]);
-
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
-    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
+
+  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
+
+  const statusName = useMemo(
+    () =>
+      docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа',
+    [docId, isBlocked],
+  );
 
   const getListItems = (contacts: IContact[]) =>
     contacts.map((item) => {
@@ -47,63 +66,52 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   const departments: IContact[] = appState.contacts.filter((item) => item.type === '4');
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
-  const docTypes = useMemo(() => getListItems(appState.documentTypes), [appState.documentTypes]);
+  const docTypes = useMemo(() => getListItems(appState.documentTypes ?? []), [appState.documentTypes]);
 
   const checkDocument = useCallback(() => {
-    const res =
-      (appState.formParams as IDocumentParams)?.date &&
-      (appState.formParams as IDocumentParams)?.docnumber &&
-      (appState.formParams as IDocumentParams)?.expeditorId &&
-      (appState.formParams as IDocumentParams)?.tocontactId &&
-      (appState.formParams as IDocumentParams)?.fromcontactId &&
-      (appState.formParams as IDocumentParams)?.doctype;
+    const res = date && docnumber && tocontactId && fromcontactId && doctype;
 
     if (!res) {
       Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
     }
+
     return res;
-  }, [appState.formParams]);
+  }, [date, docnumber, doctype, fromcontactId, tocontactId]);
 
   const updateDocument = useCallback(() => {
     appActions.editDocument({
-      id: route.params?.docId,
+      id: docId,
       head: {
-        doctype: (appState.formParams as IDocumentParams)?.doctype,
-        fromcontactId: (appState.formParams as IDocumentParams)?.fromcontactId,
-        tocontactId: (appState.formParams as IDocumentParams)?.tocontactId,
-        date: (appState.formParams as IDocumentParams)?.date,
-        status: statusId,
-        docnumber: (appState.formParams as IDocumentParams)?.docnumber,
-        expeditorId: (appState.formParams as IDocumentParams)?.expeditorId,
+        doctype,
+        fromcontactId,
+        tocontactId,
+        date,
+        expeditorId,
+        status,
+        docnumber,
       },
     });
-    return route.params?.docId;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, route.params?.docId, appState.formParams, statusId]);
+    return docId;
+  }, [appActions, docId, doctype, fromcontactId, tocontactId, date, expeditorId, status, docnumber]);
 
   const addDocument = useCallback(() => {
-    const id =
-      appState.documents
-        .map((item) => item.id)
-        .reduce((newId, currId) => {
-          return newId > currId ? newId : currId;
-        }, 0) + 1;
+    const id = getNextDocId(appState.documents as ISellDocument[]);
 
     appActions.newDocument({
       id,
       head: {
-        doctype: (appState.formParams as IDocumentParams)?.doctype,
-        fromcontactId: (appState.formParams as IDocumentParams)?.fromcontactId[0],
-        tocontactId: (appState.formParams as IDocumentParams)?.tocontactId[0],
-        date: (appState.formParams as IDocumentParams)?.date,
-        status: statusId,
-        docnumber: (appState.formParams as IDocumentParams)?.docnumber,
-        expeditorId: (appState.formParams as IDocumentParams)?.expeditorId[0],
+        doctype,
+        fromcontactId,
+        tocontactId,
+        expeditorId,
+        date,
+        status,
+        docnumber,
       },
       lines: [],
     });
     return id;
-  }, [appActions, appState.formParams, appState.documents, statusId]);
+  }, [appActions, appState.documents, date, docnumber, doctype, expeditorId, fromcontactId, status, tocontactId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -112,16 +120,9 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.clearFormParams();
-            if (!route.params) {
-              navigation.navigate('SellDocumentsListScreen');
-              return;
-            }
-            // При нажатии 'отмена' если редактирование документа
-            // то возвращаемся к документу, иначе к списку документов
             // eslint-disable-next-line @babel/no-unused-expressions
-            route.params?.docId
-              ? navigation.navigate('ViewSellDocument', { docId: route.params?.docId })
+            docId !== undefined
+              ? navigation.navigate('ViewSellDocument', { docId })
               : navigation.navigate('SellDocumentsListScreen');
           }}
         />
@@ -134,7 +135,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
               return;
             }
 
-            const id = route.params?.docId ? updateDocument() : addDocument();
+            const id = docId !== undefined ? updateDocument() : addDocument();
 
             if (!id) {
               return;
@@ -146,33 +147,47 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [addDocument, appActions, navigation, route.params, checkDocument, updateDocument]);
+  }, [
+    addDocument,
+    appActions,
+    checkDocument,
+    date,
+    docId,
+    navigation,
+    selectedContact,
+    selectedDocType,
+    updateDocument,
+  ]);
 
   useEffect(() => {
+    if (route.params?.docId !== undefined) {
+      const documet = appState.documents.find((item) => item.id === route.params.docId);
+      setSelectedDocType(documet.head?.doctype);
+      setSelectedContact(documet.head?.fromcontactId);
+    }
+  }, [appState.documents, route.params]);
+
+  useEffect(() => {
+    if (appState.formParams) {
+      return;
+    }
+
     const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as ISellDocument);
 
     setStatusId(docObj?.head?.status || 0);
 
-    if (!appState.formParams && !route.params?.docId) {
-      // Инициализируем параметры
+    // Инициализируем параметры
+    if (docId) {
       appActions.setFormParams({
-        date: today.toISOString().slice(0, 10),
+        ...(docObj?.head as IDocumentParams),
+      });
+    } else {
+      appActions.setFormParams({
+        date,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, appState.formParams, route.params?.docId, today]);
-
-  useEffect(() => {
-    if (!route.params) {
-      return;
-    }
-
-    // eslint-disable-next-line @babel/no-unused-expressions
-    route.params.docId && !appState.formParams
-      ? appActions.setFormParams(appState.documents.find((i) => i.id === route.params.docId).head)
-      : appActions.setFormParams(route.params as IDocumentParams);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route.params, appActions, appState.documents]);
+  }, [appActions, docId]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -202,40 +217,58 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
       <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
       <View style={[localStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
-          {/*  {(statusId === 0 || statusId === 1) && (
+          {(statusId === 0 || statusId === 1) && (
             <>
               <View style={localStyles.fieldContainer}>
                 <Text>Черновик:</Text>
                 <Switch
-                  value={statusId === 0}
+                  value={status === 0}
                   disabled={docId === undefined}
                   onValueChange={() => {
-                    appActions.setFormParams({ status: statusId === 0 ? 1 : 0 });
+                    appActions.setFormParams({ ...appState.formParams, status: status === 0 ? 1 : 0 });
                   }}
                 />
               </View>
               <ItemSeparator />
             </>
-          )} */}
+          )}
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Номер:</Text>
             <TextInput
+              editable={!isBlocked}
               style={[localStyles.input, { borderColor: colors.border }]}
-              onChangeText={(text) => appActions.setFormParams({ docnumber: text.trim() })}
-              value={(appState.formParams as IDocumentParams)?.docnumber || ' '}
+              onChangeText={(text) => appActions.setFormParams({ ...appState.formParams, docnumber: text.trim() })}
+              value={docnumber || ' '}
             />
           </View>
+          <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Дата: </Text>
             <ReferenceItem
-              value={getDateString((appState.formParams as IDocumentParams)?.date || new Date().toISOString())}
+              value={getDateString(date || new Date().toISOString())}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'CreateSellDocument',
                   fieldName: 'date',
-                  title: 'Дата документа:',
-                  value: (appState.formParams as IDocumentParams)?.date,
+                  title: 'Дата документа',
+                  value: date,
+                })
+              }
+            />
+          </View>
+          <ItemSeparator />
+          <View style={localStyles.fieldContainer}>
+            <Text style={localStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem
+              value={selectedItem(docTypes, doctype)?.value}
+              disabled={isBlocked}
+              onPress={() =>
+                navigation.navigate('SelectItemScreen', {
+                  fieldName: 'doctype',
+                  title: 'Тип документа',
+                  list: docTypes,
+                  value: doctype,
                 })
               }
             />
@@ -244,14 +277,14 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Экспедитор:</Text>
             <ReferenceItem
-              value={selectedItem(listPeople, (appState.formParams as IDocumentParams)?.expeditorId)?.value}
+              value={selectedItem(listPeople, expeditorId)?.value}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
-                  fieldName: 'expeditorId',
                   title: 'Экспедитор',
+                  fieldName: 'expeditorId',
                   list: listPeople,
-                  value: (appState.formParams as IDocumentParams)?.expeditorId,
+                  value: expeditorId,
                 })
               }
             />
@@ -260,78 +293,54 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Подразделение:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, (appState.formParams as IDocumentParams)?.fromcontactId)?.value}
+              value={selectedItem(listDepartments, fromcontactId)?.value}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
                   title: 'Подразделение',
                   fieldName: 'fromcontactId',
                   list: listDepartments,
-                  value: (appState.formParams as IDocumentParams)?.fromcontactId,
+                  value: fromcontactId,
                 })
               }
             />
           </View>
-          <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Организация:</Text>
             <ReferenceItem
-              value={selectedItem(listCompanies, (appState.formParams as IDocumentParams)?.tocontactId)?.value}
+              value={selectedItem(listCompanies, tocontactId)?.value}
+              disabled={isBlocked}
               onPress={() =>
                 navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
                   title: 'Организация',
                   fieldName: 'tocontactId',
                   list: listCompanies,
-                  value: (appState.formParams as IDocumentParams)?.tocontactId,
+                  value: tocontactId,
                 })
               }
             />
           </View>
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Тип документа:</Text>
-            <ReferenceItem
-              value={selectedItem(docTypes, (appState.formParams as IDocumentParams)?.doctype)?.value}
-              onPress={() =>
-                navigation.navigate('SelectItemScreen', {
-                  parentScreen: 'CreateSellDocument',
-                  title: 'Тип документа',
-                  fieldName: 'doctype',
-                  list: docTypes,
-                  value: (appState.formParams as IDocumentParams)?.doctype,
-                })
-              }
-            />
-          </View>
-          {/*  <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Тип документа: </Text>
-            <ScrollView>
-              {appState.documentTypes && appState.documentTypes.length !== 0 ? (
-                appState.documentTypes.map((item, idx) => (
-                  <Chip
-                    key={idx}
-                    mode="outlined"
-                    style={[
-                      localStyles.fieldContainer,
-                      (appState.formParams as IDocumentParams)?.doctype === item.id
-                        ? { backgroundColor: colors.primary }
-                        : {},
-                    ]}
-                    onPress={() => appActions.setFormParams({ doctype: item.id })}
-                    selected={(appState.formParams as IDocumentParams)?.doctype === item.id}
-                    selectedColor={
-                      (appState.formParams as IDocumentParams)?.doctype === item.id ? colors.card : colors.text
-                    }
-                  >
-                    {item.name}
-                  </Chip>
-                ))
-              ) : (
-                <Text>Не найдено</Text>
-              )}
-            </ScrollView>
-          </View>*/}
+          {docId !== undefined && (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                  {
+                    text: 'OK',
+                    onPress: async () => {
+                      appActions.deleteDocument(docId);
+                      navigation.navigate('SellDocumentsListScreen');
+                    },
+                  },
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }}
+              style={localStyles.buttonContainer}
+            >
+              <Text style={localStyles.button}>Удалить документ</Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
     </>
@@ -341,6 +350,19 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
 export { CreateSellDocumentScreen };
 
 const localStyles = StyleSheet.create({
+  button: {
+    alignSelf: 'center',
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  buttonContainer: {
+    backgroundColor: '#FC3F4D',
+    borderRadius: 10,
+    elevation: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
   container: {
     paddingHorizontal: 5,
   },

@@ -8,12 +8,12 @@ import {
   SellProductDetailScreen,
   CreateSellDocumentScreen,
   SellProductsListScreen,
-  BoxingDetailScreen,
   SettingsGettingDocumentScreen,
   SettingsSearchScreen,
   SelectBoxingsScreen,
 } from '../screens/App/SellDocuments';
 import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
+//import { ScanBarCodeScreen } from '../screens/App/SellDocuments/ScanBarCode';
 import { SelectDateScreen } from '../screens/App/SellDocuments/SelectDate';
 import { SelectItemScreen } from '../screens/App/SellDocuments/SelectItem';
 import { AppStoreProvider } from '../store';
@@ -39,6 +39,7 @@ export type RootStackParamList = {
     batchNumber?: string;
     manufacturingDate?: string;
     weighedGood?: number;
+    barcode?: string;
   };
   CreateSellDocument: {
     docId: number;
@@ -46,13 +47,6 @@ export type RootStackParamList = {
     [fieldName: string]: unknown;
   };
   SellProductsList: { docId: number; weighedGood?: boolean };
-  BoxingDetail: {
-    boxingId: number;
-    lineId: string;
-    docId: number;
-    prodId: number;
-    modeCor: boolean;
-  };
   SettingsSearchScreen: undefined;
   SettingsGettingDocument: {
     [fieldName: string]: number[] | Date | number | string;
@@ -148,7 +142,6 @@ const AppNavigator = () => {
             ),
           })}
         />
-        <Stack.Screen key="BoxingDetail" name="BoxingDetail" component={BoxingDetailScreen} />
         <Stack.Screen
           key="SettingsGettingDocument"
           name="SettingsGettingDocument"

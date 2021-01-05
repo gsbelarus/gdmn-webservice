@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 
-import { IDocumentType, IResponse, IMessageInfo } from '../../../../../common';
+import { IResponse, IMessageInfo } from '../../../../../common';
+import { IDocumentType } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -51,14 +52,12 @@ const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
               {status ? status.name : ''}
             </Text>
           </View>
+          <Text style={[localStyles.name, { color: colors.text }]}>{toContact ? toContact.name : ''}</Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             Подразделение: {fromContact ? fromContact.name : ''}
           </Text>
           <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
             Экспедитор: {expeditor ? expeditor.name : ''}
-          </Text>
-          <Text style={[localStyles.company, localStyles.field, { color: colors.text }]}>
-            {toContact ? toContact.name : ''}
           </Text>
         </View>
       </View>
@@ -107,15 +106,15 @@ const SellDocumentsListScreen = () => {
             return appState.settingsSearch
               ? appState.settingsSearch.some((value) =>
                   value === 'number'
-                    ? item.head.docnumber?.includes(searchText)
+                    ? item.head.docnumber.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'state' && status
-                    ? status.name.includes(searchText)
+                    ? status.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'toContact' && toContact
-                    ? toContact.name.includes(searchText)
+                    ? toContact.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'fromContact' && fromContact
-                    ? fromContact.name.includes(searchText)
+                    ? fromContact.name.toUpperCase().includes(searchText.toUpperCase())
                     : value === 'expeditor' && expeditor
-                    ? expeditor.name.includes(searchText)
+                    ? expeditor.name.toUpperCase().includes(searchText.toUpperCase())
                     : true,
                 )
               : true;
@@ -158,6 +157,11 @@ const SellDocumentsListScreen = () => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [actions, apiService.data, appState.documents, state.companyID]);
 
+  const updateStatus = useCallback(() => {
+    const documents = appState.documents.filter((document) => document.head.status === 0);
+    documents.forEach((document) => actions.editStatusDocument({ id: document.id, status: 1 }));
+  }, [actions, appState.documents]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -181,6 +185,10 @@ const SellDocumentsListScreen = () => {
                 onPress: sendUpdateRequest,
               },
               {
+                title: 'Черновики в готово',
+                onPress: updateStatus,
+              },
+              {
                 title: 'Удалить документы',
                 type: 'destructive',
                 onPress: actions.deleteAllDocuments,
@@ -194,7 +202,7 @@ const SellDocumentsListScreen = () => {
         />
       ),
     });
-  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
+  }, [actions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet, updateStatus]);
 
   return (
     <View style={[localStyles.flex1, { backgroundColor: colors.card }]}>
@@ -251,10 +259,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  company: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   details: {
     margin: 8,

@@ -1,7 +1,8 @@
 import { useTheme } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
-import { ScrollView, View, StyleSheet, Alert } from 'react-native';
+import { ScrollView, View, StyleSheet, Alert, AsyncStorage } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
 import { IResponse, IMessage, IContact, IDocumentType, IGood, IRemain, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
@@ -11,20 +12,23 @@ import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import { ITara, IWeighedGoods } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
+import { sections } from '../../store/App/store';
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
-  const { apiService } = useServiceStore();
+  const {
+    state: { storagePath },
+    apiService,
+  } = useServiceStore();
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents },
+    state: { settings, documents, weighedGoods, contacts, goods, documentTypes, boxings, formParams },
   } = useAppStore();
   const {
     state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
-
   const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
@@ -63,6 +67,13 @@ const SettingsScreen = () => {
       })(),
     [appActions],
   );
+
+  const clearStorage = useCallback(async () => {
+    await AsyncStorage.removeItem(`${storagePath}/${sections.WEIGHEDGOODS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.BOXINGS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.GOODS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.CONTACTS}`);
+  }, [storagePath]);
 
   const sendGetReferencesRequest = useCallback(() => {
     if (documents?.some((document) => document.head?.status <= 1)) {
@@ -214,6 +225,11 @@ const SettingsScreen = () => {
                 onPress: deleteAllData,
               },
               {
+                title: 'Очистить хранилище',
+                type: 'destructive',
+                onPress: clearStorage,
+              },
+              {
                 title: 'Отмена',
                 type: 'cancel',
               },
@@ -222,6 +238,70 @@ const SettingsScreen = () => {
         />
       </View>
       <ScrollView style={{ backgroundColor: colors.background }}>
+        <View style={localStyles.content}>
+          <Button
+            mode="text"
+            icon={'update'}
+            style={localStyles.refreshButton}
+            disabled={isLoading}
+            loading={isLoading}
+            onPress={sendGetReferencesRequest}
+          >
+            Проверить обновления
+          </Button>
+          <Button
+            mode="text"
+            onPress={async () => {
+              const log = await appStorage.getItems([
+                `${AuthState.userID}/${AuthState.companyID}/${sections.DOCUMENTTYPES}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.CONTACTS}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.GOODS}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.BOXINGS}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.WEIGHEDGOODS}`,
+              ]);
+              Reactotron.display({
+                name: 'Mobile Storage',
+                preview: log,
+                value: log,
+                important: true,
+              });
+            }}
+          >
+            Проверить хранилище
+          </Button>
+          <Button
+            mode="text"
+            onPress={async () => {
+              Reactotron.display({
+                name: 'settings',
+                preview: 'settings',
+                value: settings,
+                important: true,
+              });
+              Reactotron.display({
+                name: 'documents',
+                preview: 'documents',
+                value: documents,
+                important: true,
+              });
+              Reactotron.display({
+                name: 'references',
+                preview: 'references',
+                value: { documentTypes, contacts, goods, boxings, weighedGoods },
+                important: true,
+              });
+              Reactotron.display({
+                name: 'formParams',
+                preview: 'formParams',
+                value: formParams,
+                important: true,
+              });
+            }}
+          >
+            Проверить стейт
+          </Button>
+        </View>
+        <Divider />
         <SettingsItem
           label="Синхронизировать"
           value={settings?.synchronization}
@@ -235,18 +315,7 @@ const SettingsScreen = () => {
             appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
           }
         />
-        <Divider />
       </ScrollView>
-      <Button
-        mode="contained"
-        icon="update"
-        style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
-        disabled={isLoading}
-        loading={isLoading}
-        onPress={sendGetReferencesRequest}
-      >
-        Проверить обновления
-      </Button>
     </>
   );
 };
