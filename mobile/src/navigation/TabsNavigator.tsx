@@ -36,7 +36,7 @@ const TabsNavigator = () => {
         options={{
           tabBarLabel: 'Справочники',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="book-multiple-outline" color={color} />,
-            tabBarBadge: false,
+          tabBarBadge: false,
         }}
       />
       <TabsStack.Screen
