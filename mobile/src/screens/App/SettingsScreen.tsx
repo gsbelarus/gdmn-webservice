@@ -1,40 +1,34 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useCallback } from 'react';
-import { ScrollView, View, StyleSheet, Alert } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ScrollView, View, StyleSheet, Alert, AsyncStorage } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
-import {
-  IResponse,
-  IMessage,
-  IReference,
-  IContact,
-  IDocumentType,
-  IGood,
-  IRemain,
-  IDocument,
-} from '../../../../common';
+import { IResponse, IMessage, IContact, IDocumentType, IGood, IRemain, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
-import config from '../../config';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
-import documentsRef from '../../mockData/Otves/Document.json';
-import referencesRef from '../../mockData/Otves/References.json';
 import { ITara, IWeighedGoods } from '../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
+import { sections } from '../../store/App/store';
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
-  const { apiService } = useServiceStore();
+  const {
+    state: { storagePath },
+    apiService,
+  } = useServiceStore();
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents },
+    state: { settings, documents, weighedGoods, contacts, goods, documentTypes, boxings, formParams },
   } = useAppStore();
   const {
     state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
+  const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
 
@@ -73,6 +67,13 @@ const SettingsScreen = () => {
     [appActions],
   );
 
+  const clearStorage = useCallback(async () => {
+    await AsyncStorage.removeItem(`${storagePath}/${sections.WEIGHEDGOODS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.BOXINGS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.GOODS}`);
+    await AsyncStorage.removeItem(`${storagePath}/${sections.CONTACTS}`);
+  }, [storagePath]);
+
   const sendGetReferencesRequest = useCallback(() => {
     if (documents.some((document) => document.head?.status <= 1)) {
       Alert.alert('Внимание!', 'Нельзя обновить справочники, если есть документы со статусами "Черновик" и "Готово".', [
@@ -84,111 +85,98 @@ const SettingsScreen = () => {
     }
 
     const getMessages = async () => {
-      if (config.debug.useMockup) {
-        const mockRef = referencesRef as IReference[];
-        const mockContacts = mockRef.find((itm) => itm.type === 'contacts')?.data as IContact[];
-        appActions.setContacts(mockContacts);
-        const mockDocumentsType = mockRef.find((itm) => itm.type === 'documentTypes')?.data as IDocumentType[];
-        appActions.setDocumentTypes(mockDocumentsType);
-        const mockGoods = mockRef.find((itm) => itm.type === 'goods')?.data as IGood[];
-        appActions.setGoods(mockGoods);
-        appActions.setDocuments(documentsRef);
-        const boxingsRef = (mockRef.find((itm) => itm.type === 'boxings')?.data as unknown) as ITara[];
-        appActions.setBoxings(boxingsRef);
-        const docWeighedRef = (mockRef.find((itm) => itm.type === 'weighedGoods')?.data as unknown) as IWeighedGoods[];
-        appActions.setWeighedGoods(docWeighedRef);
-      } else {
-        try {
-          // const response = await apiService.data.subscribe(companyID);
-          const response = await apiService.data.getMessages(companyID);
+      setLoading(true);
+      try {
+        // const response = await apiService.data.subscribe(companyID);
+        const response = await timeout<IResponse<IMessage[]>>(10000, apiService.data.getMessages(companyID));
+        // console.log(response);
 
-          // console.log(response);
+        if (!response.result) {
+          Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          return;
+        }
+        if (!isMessagesArray(response.data)) {
+          Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
+          return;
+        }
 
-          if (!response.result) {
-            Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
-            return;
+        response.data?.forEach((message) => {
+          if (message.body.type === 'data') {
+            // Сообщение содержит данные
+            ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
+              switch (dataSet.type) {
+                case 'get_SellDocuments': {
+                  const newDocuments = dataSet.data as IDocument[];
+                  appActions.setDocuments([...documents, ...newDocuments]);
+                  break;
+                }
+                case 'documenttypes': {
+                  const documentTypes = dataSet.data as IDocumentType[];
+                  appActions.setDocumentTypes(documentTypes);
+                  break;
+                }
+                case 'contacts': {
+                  const contacts = dataSet.data as IContact[];
+                  appActions.setContacts(contacts);
+                  break;
+                }
+                case 'goods': {
+                  const goods = dataSet.data as IGood[];
+                  appActions.setGoods(goods);
+                  break;
+                }
+                case 'remains': {
+                  const remains = dataSet.data as IRemain[];
+                  appActions.setRemains(remains);
+                  break;
+                }
+                case 'boxings': {
+                  const boxings = dataSet.data as ITara[];
+                  appActions.setBoxings(boxings);
+                  break;
+                }
+                case 'weighedGoods': {
+                  const weighedGoods = dataSet.data as IWeighedGoods[];
+                  appActions.setWeighedGoods(weighedGoods);
+                  break;
+                }
+                default:
+                  break;
+              }
+            });
+            apiService.data.deleteMessage(companyID, message.head.id);
           }
-          if (!isMessagesArray(response.data)) {
-            Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
-            return;
+          if (message.body.type === 'cmd') {
+            // Сообщение содержит команду
+            //apiService.data.deleteMessage(companyID, message.head.id);
           }
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+        });
 
-          response.data?.forEach((message) => {
-            if (message.body.type === 'data') {
-              // Сообщение содержит данные
-              ((message.body.payload as unknown) as IDataMessage[]).forEach((dataSet) => {
-                switch (dataSet.type) {
-                  case 'get_SellDocuments': {
-                    const newDocuments = dataSet.data as IDocument[];
-                    appActions.setDocuments([...documents, ...newDocuments]);
-                    break;
+        /* Обработка сообщений, которые связаны с документами */
+        const messagesForDocuments = response.data.filter(
+          (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
+        );
+        if (messagesForDocuments.length > 0) {
+          messagesForDocuments.forEach((message) => {
+            if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
+              message.body.payload.params.forEach((paramDoc) => {
+                if (paramDoc.result) {
+                  const document = documents.find((doc) => doc.id === paramDoc.docId);
+                  if (document && document.head.status === 2) {
+                    appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
                   }
-                  case 'documenttypes': {
-                    const documentTypes = dataSet.data as IDocumentType[];
-                    appActions.setDocumentTypes(documentTypes);
-                    break;
-                  }
-                  case 'contacts': {
-                    const contacts = dataSet.data as IContact[];
-                    appActions.setContacts(contacts);
-                    break;
-                  }
-                  case 'goods': {
-                    const goods = dataSet.data as IGood[];
-                    appActions.setGoods(goods);
-                    break;
-                  }
-                  case 'remains': {
-                    const remains = dataSet.data as IRemain[];
-                    appActions.setRemains(remains);
-                    break;
-                  }
-                  case 'boxings': {
-                    const boxings = dataSet.data as ITara[];
-                    appActions.setBoxings(boxings);
-                    break;
-                  }
-                  case 'weighedGoods': {
-                    const weighedGoods = dataSet.data as IWeighedGoods[];
-                    appActions.setWeighedGoods(weighedGoods);
-                    break;
-                  }
-                  default:
-                    break;
                 }
               });
-              apiService.data.deleteMessage(companyID, message.head.id);
             }
-            if (message.body.type === 'cmd') {
-              // Сообщение содержит команду
-              //apiService.data.deleteMessage(companyID, message.head.id);
-            }
-            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
+            apiService.data.deleteMessage(companyID, message.head.id);
           });
-
-          /* Обработка сообщений, которые связаны с документами */
-          const messagesForDocuments = response.data.filter(
-            (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
-          );
-          if (messagesForDocuments.length > 0) {
-            messagesForDocuments.forEach((message) => {
-              if (Array.isArray(message.body.payload.params) && message.body.payload.params.length > 0) {
-                message.body.payload.params.forEach((paramDoc) => {
-                  if (paramDoc.result) {
-                    const document = documents.find((doc) => doc.id === paramDoc.docId);
-                    if (document && document.head.status === 2) {
-                      appActions.editStatusDocument({ id: paramDoc.docId, status: 3 });
-                    }
-                  }
-                });
-              }
-              apiService.data.deleteMessage(companyID, message.head.id);
-            });
-            Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
-          }
-        } catch (err) {
-          Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
+      } catch (err) {
+        Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -232,6 +220,11 @@ const SettingsScreen = () => {
                 onPress: deleteAllData,
               },
               {
+                title: 'Очистить хранилище',
+                type: 'destructive',
+                onPress: clearStorage,
+              },
+              {
                 title: 'Отмена',
                 type: 'cancel',
               },
@@ -240,8 +233,66 @@ const SettingsScreen = () => {
         />
       </View>
       <View style={localStyles.content}>
-        <Button mode="text" onPress={sendGetReferencesRequest}>
+        <Button
+          mode="text"
+          icon={'update'}
+          style={localStyles.refreshButton}
+          disabled={isLoading}
+          loading={isLoading}
+          onPress={sendGetReferencesRequest}
+        >
           Проверить обновления
+        </Button>
+        <Button
+          mode="text"
+          onPress={async () => {
+            const log = await appStorage.getItems([
+              `${AuthState.userID}/${AuthState.companyID}/${sections.DOCUMENTTYPES}`,
+              `${AuthState.userID}/${AuthState.companyID}/${sections.CONTACTS}`,
+              `${AuthState.userID}/${AuthState.companyID}/${sections.GOODS}`,
+              `${AuthState.userID}/${AuthState.companyID}/${sections.BOXINGS}`,
+              `${AuthState.userID}/${AuthState.companyID}/${sections.WEIGHEDGOODS}`,
+            ]);
+            Reactotron.display({
+              name: 'Mobile Storage',
+              preview: log,
+              value: log,
+              important: true,
+            });
+          }}
+        >
+          Проверить хранилище
+        </Button>
+        <Button
+          mode="text"
+          onPress={async () => {
+            Reactotron.display({
+              name: 'settings',
+              preview: 'settings',
+              value: settings,
+              important: true,
+            });
+            Reactotron.display({
+              name: 'documents',
+              preview: 'documents',
+              value: documents,
+              important: true,
+            });
+            Reactotron.display({
+              name: 'references',
+              preview: 'references',
+              value: { documentTypes, contacts, goods, boxings, weighedGoods },
+              important: true,
+            });
+            Reactotron.display({
+              name: 'formParams',
+              preview: 'formParams',
+              value: formParams,
+              important: true,
+            });
+          }}
+        >
+          Проверить стейт
         </Button>
       </View>
       <Divider />
@@ -285,6 +336,9 @@ const localStyles = StyleSheet.create({
   profileInfoTextUser: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  refreshButton: {
+    margin: 20,
   },
 });
 

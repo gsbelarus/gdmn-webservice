@@ -1,6 +1,7 @@
 import { IBaseUrl } from '../../../../common';
 import { createActionPayload, ActionsUnion } from '../utils';
 
+// eslint-disable-next-line no-shadow
 export enum ActionServiceTypes {
   SET_LOADING = 'SET_LOADING',
   SET_SERVER_URL = 'SET_SERVER_URL',

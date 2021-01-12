@@ -8,6 +8,7 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { useAppStore } from '../../../store';
 
 LocaleConfig.locales.ru = {
   monthNames: [
@@ -38,7 +39,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
   const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
   const [fieldName, setFieldName] = useState('');
-  const [parentScreen, setParentScreen] = useState('');
+  const { state, actions: appActions } = useAppStore();
 
   useEffect(() => {
     if (!route.params?.fieldName) {
@@ -48,7 +49,6 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
     setTitle(newTitle);
     setFieldName(newFieldName);
-    setParentScreen(newParentScreen);
     setDate(newValue);
   }, [route.params]);
 
@@ -63,13 +63,13 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            // appActions.setFormParams({ [fieldName]: date });
-            parentScreen ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: date }) : null;
+            appActions.setFormParams({ [fieldName]: date });
+            navigation.goBack();
           }}
         />
       ),
     });
-  }, [colors.primary, date, fieldName, navigation, parentScreen]);
+  }, [appActions, colors.primary, date, fieldName, navigation]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

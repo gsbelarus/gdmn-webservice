@@ -1,4 +1,5 @@
-import { IDocument, IRemain, IGood, IDocumentType, IContact, IBaseUrl } from '../../../common';
+import { IDocument, IRemain, IGood, IContact, IBaseUrl } from '../../../common';
+import { IDocumentType } from '../../../common/base';
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';

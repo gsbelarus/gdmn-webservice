@@ -1,7 +1,7 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
@@ -10,7 +10,7 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
-import { useAppStore } from '../../../store';
+import { AppActions, useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
@@ -32,9 +32,6 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
         </Text>
-        {item.numreceive ? (
-          <Text style={[localStyles.productTitleView, localStyles.boxingText]}>№ партии: {item.numreceive}</Text>
-        ) : undefined}
         {item.tara ? (
           <View>
             {item.tara.map((boxing) => {
@@ -52,11 +49,16 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
-          {item.orderQuantity ?? 0}
+          {item.numreceive ?? ''}
         </Text>
       </View>
       <View style={localStyles.remainsInfo}>
         <Text numberOfLines={5} style={localStyles.productBarcodeView}>
+          {item.orderQuantity ?? 0}
+        </Text>
+      </View>
+      <View style={localStyles.remainsInfo}>
+        <Text numberOfLines={5} style={(localStyles.productBarcodeView, { color: colors.text })}>
           {item.quantity}
         </Text>
       </View>
@@ -117,6 +119,8 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
   const [docId, setDocId] = useState<number>(undefined);
+  const [netto, setNetto] = useState<number>(0);
+  const [tarsWeight, setTarsWeight] = useState<number>(0);
 
   useEffect(() => {
     if (!route.params?.docId) {
@@ -129,6 +133,39 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const document: IDocument | ISellDocument | undefined = useMemo(() => {
     return state.documents.find((item) => item.id === docId);
   }, [docId, state.documents]);
+
+  useEffect(() => {
+    setNetto(
+      (documentLines ?? []).reduce((total, line) => {
+        const goodLine = state.goods.find((item) => item.id === line.goodId);
+        return Number.parseFloat(
+          ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
+        );
+      }, 0),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.lines]);
+
+  useEffect(() => {
+    setTarsWeight(
+      boxings.length !== 0
+        ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
+        : 0,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.lines]);
+
+  const setQuantity = useCallback(() => {
+    if (document?.lines && document.lines !== []) {
+      (document.lines as ISellLine[]).forEach((line) => {
+        actions.editLine({
+          docId: document.id,
+          line: { ...line, quantity: line.quantity > 0 ? line.quantity : line.orderQuantity ?? 0 },
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document?.id, document?.lines]);
 
   const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
   const refList = React.useRef<FlatList<ISellLine>>(null);
@@ -176,6 +213,10 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                   }),
               },
               {
+                title: 'Количество как заявлено',
+                onPress: setQuantity,
+              },
+              {
                 title: 'Удалить',
                 type: 'destructive',
                 onPress: () => {
@@ -202,6 +243,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
 
   return document ? (
@@ -238,6 +280,9 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
             <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
           </View>
           <View style={localStyles.remainsInfo}>
+            <Text style={localStyles.productBarcodeView}>Партия</Text>
+          </View>
+          <View style={localStyles.remainsInfo}>
             <Text style={localStyles.productBarcodeView}>Заявка</Text>
           </View>
           <View style={localStyles.remainsInfo}>
@@ -260,27 +305,16 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Итого:</Text>
           <Text style={localStyles.fontWeightBold}>
-            вес прод.{' '}
-            {(documentLines ?? []).reduce((total, line) => {
-              const goodLine = state.goods.find((item) => item.id === line.goodId);
-              return Number.parseFloat(
-                ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
-              );
-            }, 0)}{' '}
+            вес прод. {netto}
+            {' / '}
+            брутто {netto + tarsWeight}
           </Text>
         </View>
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Тара:</Text>
           <Text style={localStyles.fontWeightBold}>
-            кол-во{' '}
-            {boxings.length !== 0
-              ? boxings.reduce(
-                  (total, boxing) => Number.parseFloat((total + (Number(boxing.quantity) ?? 0)).toFixed(3)),
-                  0.0,
-                )
-              : 0}{' '}
-            / вес{' '}
+            кол-во {boxings.length !== 0 ? tarsWeight : 0} / вес{' '}
             {boxings.length !== 0
               ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
               : 0}
@@ -297,23 +331,33 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ]}
         >
           {document?.head?.status === 0 && (
-            <>
+            <View style={localStyles.buttons}>
               <FAB
-                style={localStyles.fabScan}
+                style={localStyles.fab}
                 icon="barcode-scan"
-                onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document.id, weighedGood: true })}
+                onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document?.id, weighedGood: true })}
               />
               <FAB
-                style={localStyles.fabAddW}
+                style={localStyles.fab}
                 icon="barcode"
-                onPress={() => navigation.navigate('SellProductsList', { docId: document.id, weighedGood: true })}
+                onPress={() => navigation.navigate('SellProductsList', { docId: document?.id, weighedGood: true })}
               />
               <FAB
-                style={localStyles.fabAdd}
+                style={localStyles.fab}
                 icon="plus"
-                onPress={() => navigation.navigate('SellProductsList', { docId: document.id })}
+                onPress={() => navigation.navigate('SellProductsList', { docId: document?.id })}
               />
-            </>
+              <FAB
+                style={localStyles.fab}
+                icon="check"
+                onPress={() =>
+                  actions.editStatusDocument({
+                    id: docId,
+                    status: document?.head?.status + 1,
+                  })
+                }
+              />
+            </View>
           )}
         </View>
       </View>
@@ -345,8 +389,11 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttons: {
-    alignItems: 'center',
-    margin: 10,
+    flex: 1,
+    flexDirection: 'row',
+    position: 'relative',
+    justifyContent: 'space-evenly',
+    margin: 15,
   },
   container: {
     padding: 0,
@@ -361,37 +408,14 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
   },
-  fabAdd: {
+  fab: {
     backgroundColor: Colors.blue600,
-    bottom: 65,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
-  },
-  fabAddW: {
-    backgroundColor: Colors.blue600,
-    bottom: 65,
-    margin: 20,
-    position: 'absolute',
-    right: 75,
-  },
-  fabScan: {
-    backgroundColor: Colors.blue600,
-    bottom: 65,
-    left: 0,
-    margin: 20,
-    position: 'absolute',
   },
   flexDirectionRow: {
     flexDirection: 'row',
   },
   fontWeightBold: {
     fontWeight: 'bold',
-  },
-  goDetailsHeader: {
-    flex: 1,
-    justifyContent: 'center',
-    marginRight: 15,
   },
   goodInfo: {
     flexBasis: '30%',
@@ -417,9 +441,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
-  },
-  marginRight: {
-    marginRight: 15,
   },
   productBarcodeView: {
     fontSize: 12,

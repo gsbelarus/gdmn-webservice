@@ -1,62 +1,32 @@
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
-import Reactotron from 'reactotron-react-native';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-// import { IField } from '../../../model';
 import { IListItem } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-// import { useAppStore } from '../../../store';
+import { useAppStore } from '../../../store';
 
 type Props = StackScreenProps<RootStackParamList, 'SelectItemScreen'>;
 
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
-  const {
-    list: newList,
-    isMulti,
-    parentScreen: newParentScreen,
-    fieldName: newFieldName,
-    title: newTitle,
-    value: newValue,
-  } = route.params;
+  const { state, actions } = useAppStore();
 
-  // const { state: appState, actions: appActions } = useAppStore();
+  const { list, isMulti, fieldName, title, value } = route.params;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IListItem[]>(undefined);
   const [checkedItem, setCheckedItem] = useState<number[]>([]);
 
-  const [parentScreen, setParentScreen] = useState('');
-  const [title, setTitle] = useState('');
-  const [fieldName, setFieldName] = useState('');
-  const [isMultiSelect, setIsMultiSelect] = useState<boolean>(false);
-  const [list, setList] = useState<IListItem[]>(undefined);
-
   useEffect(() => {
-    if (!newList) {
-      return;
-    }
-
-    setTitle(newTitle);
-    setFieldName(newFieldName);
-    setParentScreen(newParentScreen);
-    setIsMultiSelect(isMulti || false);
-    setList(newList);
-    setCheckedItem(newValue);
-
-    // console.log('Params');
-    if (__DEV__) {
-      // console.log('Params: ', JSON.stringify(route.params));
-      Reactotron.log('params:', route.params);
-    }
-  }, [isMulti, newFieldName, newList, newParentScreen, newTitle, newValue, route.params, searchQuery]);
+    setCheckedItem(value);
+  }, [searchQuery, value]);
 
   useEffect(() => {
     if (!list) {
@@ -70,9 +40,9 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   const selectItem = useCallback(
     (id: number) => {
-      setCheckedItem((prev) => (isMultiSelect ? [...prev, id] : [id]));
+      setCheckedItem((prev) => (isMulti ? [...prev, id] : [id]));
     },
-    [isMultiSelect],
+    [isMulti],
   );
 
   const renderItem = useCallback(
@@ -84,19 +54,33 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <HeaderRight text="Отмена" onPress={() => navigation.goBack()} />,
+      headerLeft: () => (
+        <HeaderRight
+          text="Отмена"
+          onPress={() => {
+            navigation.setOptions({ animationTypeForReplace: 'push' });
+            navigation.goBack();
+          }}
+        />
+      ),
       headerRight: () => (
         <HeaderRight
           text="Готово"
           onPress={() => {
-            parentScreen
-              ? navigation.navigate(parentScreen as keyof RootStackParamList, { [fieldName]: checkedItem })
-              : null;
+            if (!checkedItem) {
+              Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
+              return;
+            }
+            actions.setFormParams({
+              ...state.formParams,
+              [fieldName]: isMulti ? checkedItem : checkedItem[0],
+            });
+            navigation.goBack();
           }}
         />
       ),
     });
-  }, [checkedItem, colors.primary, fieldName, navigation, parentScreen]);
+  }, [actions, checkedItem, fieldName, isMulti, navigation, state.formParams]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

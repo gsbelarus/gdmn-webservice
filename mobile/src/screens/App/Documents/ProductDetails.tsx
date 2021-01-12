@@ -7,6 +7,7 @@ import { TextInput } from 'react-native-paper';
 import { ILine } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import SubTitle from '../../../components/SubTitle';
+import { getNextDocLineId } from '../../../helpers/utils';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
@@ -70,7 +71,7 @@ const ProductDetailScreen = ({ route, navigation }: Props) => {
             } else {
               actions.addLine({
                 docId: route.params.docId,
-                line: { id: '0', goodId: product.id, quantity: Number.parseFloat(value) },
+                line: { id: getNextDocLineId(document), goodId: product.id, quantity: Number.parseFloat(value) },
               });
             }
             navigation.navigate('ViewDocument', { docId: route.params.docId });

@@ -1,8 +1,9 @@
 import { Reducer } from 'react';
 import Reactotron from 'reactotron-react-native';
 
-import { IDocument } from '../../../../common';
-import { IAppState } from '../../model';
+import { ILine } from '../../../../common';
+import { getNextDocLineId } from '../../helpers/utils';
+import { IAppState, ISellLine } from '../../model';
 import { TAppActions, ActionAppTypes } from './actions';
 
 export const initialState: IAppState = {
@@ -14,7 +15,7 @@ export const initialState: IAppState = {
   documentTypes: undefined,
   boxings: undefined,
   boxingsLine: undefined,
-  settingsSearch: ['number'],
+  settingsSearch: ['toContact'],
   weighedGoods: undefined,
 };
 
@@ -26,38 +27,22 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
 
   switch (action.type) {
     case ActionAppTypes.NEW_DOCUMENT: {
-      return { ...state, documents: [...state.documents, action.payload] };
+      return { ...state, documents: [...(state.documents || []), action.payload] };
     }
     case ActionAppTypes.EDIT_DOCUMENT: {
-      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
       return {
         ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...state.documents.find((document) => document.id === action.payload.id),
-            head: action.payload.head,
-          },
-          ...state.documents.slice(idx + 1),
-        ],
+        documents: state.documents.map((doc) =>
+          doc.id === action.payload.id ? { ...doc, head: action.payload.head } : doc,
+        ),
       };
     }
     case ActionAppTypes.EDIT_STATUS_DOCUMENT: {
-      const idx = state.documents.findIndex((document) => document.id === action.payload.id);
-      const document = state.documents[idx];
       return {
         ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            head: {
-              ...document.head,
-              status: action.payload.status,
-            },
-          },
-          ...state.documents.slice(idx + 1),
-        ],
+        documents: state.documents.map((doc) =>
+          doc.id === action.payload.id ? { ...doc, head: { ...doc.head, status: action.payload.status } } : doc,
+        ),
       };
     }
     case ActionAppTypes.DELETE_DOCUMENT:
@@ -71,65 +56,41 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         documents: [],
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
-      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-      const document = state.documents[idx];
-      const docLine = (document as IDocument).lines;
-      // document instanceof Object && (document as IDocument)
-      //   ? (document as IDocument).lines
-      //   : (document as ISellDocument).lines;
-      const id =
-        docLine
-          .map((item: { id: unknown }) => Number(item.id))
-          .reduce((lineId: number, currLineId: number) => {
-            return lineId > currLineId ? lineId : currLineId;
-          }, -1) + 1;
+      const nextId = getNextDocLineId(state.documents.find((doc) => doc.id === action.payload.docId));
+
       return {
         ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            lines: [...document.lines, { ...action.payload.line, id: id.toString() }],
-          },
-          ...state.documents.slice(idx + 1),
-        ],
+        documents: state.documents.map((doc) =>
+          doc.id === action.payload.docId ? { ...doc, lines: [...doc.lines, action.payload.line] } : doc,
+        ),
       };
     }
     case ActionAppTypes.DOCUMENT_DELETE_LINE: {
-      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-      const document = state.documents[idx];
       return {
         ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            lines: document.lines.filter((line) => line.id !== action.payload.lineId),
-          },
-          ...state.documents.slice(idx + 1),
-        ],
+        documents: state.documents.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc.lines.filter((line) => line.id !== action.payload.lineId),
+              }
+            : doc,
+        ),
       };
     }
     case ActionAppTypes.DOCUMENT_EDIT_LINE: {
-      const idx = state.documents.findIndex((document) => document.id === action.payload.docId);
-      const document = state.documents[idx];
-      const idxl = document.lines.findIndex((line) => line.id === action.payload.line.id);
       return {
         ...state,
-        documents: [
-          ...state.documents.slice(0, idx),
-          {
-            ...document,
-            lines: [
-              ...document.lines.slice(0, idxl),
-              {
-                ...action.payload.line,
-              },
-              ...document.lines.slice(idxl + 1),
-            ],
-          },
-          ...state.documents.slice(idx + 1),
-        ],
+        documents: state.documents.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: (doc.lines as (ILine | ISellLine)[]).map((line) =>
+                  line.id === action.payload.line.id ? action.payload.line : line,
+                ),
+              }
+            : doc,
+        ),
       };
     }
     case ActionAppTypes.SET_SETTINGS:

@@ -23,6 +23,7 @@ export interface ISellLine extends ILine {
   numreceive?: string;
   tara?: ILineTara[];
   manufacturingDate?: string;
+  barcodes?: string[];
 }
 
 export type TTypeTara = 'paper' | 'box' | 'pan';
@@ -60,4 +61,5 @@ export interface IDocumentParams {
   fromcontactId?: number;
   doctype?: number;
   docnumber?: string;
+  status?: number;
 }
