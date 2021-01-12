@@ -22,11 +22,13 @@ export const RadioGroup = ({ horizontal = false, options, circleStyle, onChange,
 
   const onPress = useCallback(
     (option) => {
+      console.log(option.id);
       if (option.id === activeButtonId) {
         return;
       }
       //setSelectedOptionId(option.id);
       onChange(option);
+      console.log(option.id);
     },
     [onChange, activeButtonId],
   );

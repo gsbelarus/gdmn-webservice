@@ -1,31 +1,29 @@
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import React, { useRef, useMemo, useEffect, ReactNode } from 'react';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import React, { useRef, useMemo, Ref, ReactNode } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import Handle from './Handle';
 import ItemSeparator from './ItemSeparator';
 
 interface IProps {
-  visible: boolean;
+  sheetRef: Ref<BottomSheetModal>;
   children?: ReactNode;
 }
 
-const BottomSheetComponent = ({ visible, children }: IProps) => {
-  const sheetRef = useRef<BottomSheet>(null);
-
+const BottomSheetComponent = ({ sheetRef, children }: IProps) => {
   const snapPoints = useMemo(() => ['50%', '90%'], []);
 
-  useEffect(() => {
-    // eslint-disable-next-line @babel/no-unused-expressions
-    visible ? sheetRef.current?.collapse() : sheetRef.current?.close();
-  }, [visible]);
+  // useEffect(() => {
+  //   // eslint-disable-next-line @babel/no-unused-expressions
+  //   visible ? sheetRef.current?.collapse() : sheetRef.current?.close();
+  // }, [visible]);
 
   return (
     <View style={styles.container}>
-      <BottomSheet
+      <BottomSheetModal
         ref={sheetRef}
         snapPoints={snapPoints}
-        handleComponent={Handle}
+        // handleComponent={Handle}
         backdropComponent={BottomSheetBackdrop}
       >
         <View style={styles.content}>
@@ -35,7 +33,7 @@ const BottomSheetComponent = ({ visible, children }: IProps) => {
           <ItemSeparator />
           <View style={styles.contentContainer}>{children}</View>
         </View>
-      </BottomSheet>
+      </BottomSheetModal>
     </View>
   );
 };

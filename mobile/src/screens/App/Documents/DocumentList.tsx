@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
@@ -91,8 +92,10 @@ const DocumentListScreen = () => {
     setSortModal(false);
   }, []);
 
-  const handleExpandPress = useCallback(() => {
-    setSortModal((prev) => !prev);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentPress = useCallback(() => {
+    bottomSheetRef.current?.present();
   }, []);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
@@ -225,7 +228,7 @@ const DocumentListScreen = () => {
                 icon="filter-outline"
                 size={24}
                 style={localStyles.iconSettings}
-                onPress={handleExpandPress}
+                onPress={handlePresentPress}
               />
             </View>
             <ItemSeparator />
@@ -240,7 +243,6 @@ const DocumentListScreen = () => {
             onEndReached={() => ({})}
             ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
           />
-
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="file-plus"
@@ -251,10 +253,10 @@ const DocumentListScreen = () => {
           />
         </>
       )}
-      <BottomSheetComponent visible={sortModal}>
+      <BottomSheetComponent sheetRef={bottomSheetRef}>
         <View style={localStyles.buttons}>
-          <Button title="Применить" onPress={handelApplyFilter} />
-          <Button title="Сбросить" onPress={handleDismissFilter} />
+          <Button title="Готово" onPress={handelApplyFilter} />
+          {/* <Button title="Сбросить" onPress={handleDismissFilter} /> */}
         </View>
         <RadioGroup
           options={radiogroup_options}

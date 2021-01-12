@@ -1,6 +1,7 @@
 import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import BackdropExample from '../components/BackdropExample';
 
 import { IListItem } from '../model/types';
 import {
@@ -55,6 +56,7 @@ export type DocumentStackParamList = {
   ScanBarcodeReader: {
     docId: number;
   };
+  BackdropExample: undefined;
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -66,6 +68,15 @@ const DocumentsNavigator = () => {
       initialRouteName="DocumentList"
       screenOptions={{ headerStyle: { backgroundColor: colors.background } }}
     >
+      <Stack.Screen
+        key="BackdropExample"
+        name="BackdropExample"
+        component={BackdropExample}
+        options={{
+          title: 'Test',
+          animationTypeForReplace: 'pop',
+        }}
+      />
       <Stack.Screen
         key="DocumentList"
         name="DocumentList"
