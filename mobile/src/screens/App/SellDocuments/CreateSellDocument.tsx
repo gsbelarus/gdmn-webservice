@@ -149,6 +149,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
       return;
     }
 
+    // eslint-disable-next-line @babel/no-unused-expressions
     route.params.docId && !appState.formParams
       ? appActions.setFormParams(appState.documents.find((i) => i.id === route.params.docId).head)
       : appActions.setFormParams(route.params as IDocumentParams);
