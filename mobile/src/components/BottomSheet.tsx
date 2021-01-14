@@ -1,51 +1,55 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import React, { useMemo, Ref, ReactNode } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Button } from 'react-native';
 
+import styles from '../styles/global';
 import ItemSeparator from './ItemSeparator';
 
 interface IProps {
   sheetRef: Ref<BottomSheetModal>;
   children?: ReactNode;
-  onClose: () => void;
+  title?: string;
+  handelDismissFilter: () => void;
+  handelApplyFilter: () => void;
 }
 
-const BottomSheet = ({ sheetRef, children, onClose }: IProps) => {
-  const snapPoints = useMemo(() => ['50%', '90%'], []);
+const BottomSheet = ({ sheetRef, children, title, handelDismissFilter, handelApplyFilter }: IProps) => {
+  const snapPoints = useMemo(() => ['40%', '90%'], []);
   console.log('BottomSheetComponent');
   return (
-    <View style={styles.container}>
-      <BottomSheetModal
-        ref={sheetRef}
-        snapPoints={snapPoints}
-        // handleComponent={Handle}
-        backdropComponent={BottomSheetBackdrop}
-      >
-        <View style={styles.content}>
-          <View style={styles.headerContainer}>
+    <View style={localStyles.container}>
+      <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
+        <View style={localStyles.content}>
+          <View style={localStyles.headerContainer}>
             <MaterialCommunityIcons
               name={'close'}
               color={'#000'}
-              size={26}
+              size={24}
               onPress={() => {
                 console.log('onPress');
-                onClose();
+                handelDismissFilter();
               }}
             />
-            <View style={styles.title}>
-              <Text style={styles.text}>Настройка фильтра</Text>
+            <View style={localStyles.title}>
+              <Text style={localStyles.text}>{title}</Text>
             </View>
           </View>
           <ItemSeparator />
-          <View style={styles.contentContainer}>{children}</View>
+          <View style={localStyles.contentContainer}>{children}</View>
+          <View style={[styles.rectangularButton, localStyles.buttons]}>
+            <Button title="Выбрать" onPress={handelApplyFilter} />
+          </View>
         </View>
       </BottomSheetModal>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
+  buttons: {
+    width: '100%',
+  },
   container: {
     // alignItems: 'center',
     // flexDirection: 'row',
@@ -62,8 +66,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   text: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 20,
+    // fontWeight: 'bold',
   },
   title: {
     alignItems: 'center',

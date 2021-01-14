@@ -297,16 +297,13 @@ const DocumentListScreen = () => {
           />
         </>
       )}
-      <BottomSheet sheetRef={bottomSheetRef} onClose={handelDismissFilter}>
-        <RadioGroup
-          options={filter_options}
-          onChange={setSelectedOption}
-          activeButtonId={selectedOption?.id}
-          // circleStyle={{ fillColor: colors.primary }}
-        />
-        <View style={[styles.rectangularButton, localStyles.buttons]}>
-          <Button title="Выбрать" onPress={handelApplyFilter} />
-        </View>
+      <BottomSheet
+        sheetRef={bottomSheetRef}
+        title={'Настройка фильтра'}
+        handelDismissFilter={handelDismissFilter}
+        handelApplyFilter={handelApplyFilter}
+      >
+        <RadioGroup options={filter_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
       </BottomSheet>
     </View>
   );
@@ -317,6 +314,7 @@ const filter_options = [
   { id: 1, label: 'По дате (по возрастанию)' },
   { id: 2, label: 'По номеру (по убыванию)' },
   { id: 3, label: 'По номеру (по возрастанию)' },
+  { id: 4, label: 'По дате (по убыванию)' },
 ];
 
 export { DocumentListScreen };
@@ -329,9 +327,6 @@ const localStyles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  buttons: {
-    width: '100%',
   },
   container: {
     flex: 1,
