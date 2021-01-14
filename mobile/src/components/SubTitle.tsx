@@ -9,7 +9,7 @@ interface IProps {
 const SubTitle = ({ children, styles }: IProps) => {
   return (
     <View style={[localStyles.titleContainer, styles]}>
-      <Text style={localStyles.titleText}>{children.toUpperCase()}</Text>
+      <Text style={localStyles.titleText}>{children?.toUpperCase()}</Text>
     </View>
   );
 };

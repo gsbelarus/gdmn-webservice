@@ -1,23 +1,19 @@
-import BottomSheet, { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
-import React, { useRef, useMemo, Ref, ReactNode } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import React, { useMemo, Ref, ReactNode } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import Handle from './Handle';
 import ItemSeparator from './ItemSeparator';
 
 interface IProps {
   sheetRef: Ref<BottomSheetModal>;
   children?: ReactNode;
+  onClose: () => void;
 }
 
-const BottomSheetComponent = ({ sheetRef, children }: IProps) => {
+const BottomSheet = ({ sheetRef, children, onClose }: IProps) => {
   const snapPoints = useMemo(() => ['50%', '90%'], []);
-
-  // useEffect(() => {
-  //   // eslint-disable-next-line @babel/no-unused-expressions
-  //   visible ? sheetRef.current?.collapse() : sheetRef.current?.close();
-  // }, [visible]);
-
+  console.log('BottomSheetComponent');
   return (
     <View style={styles.container}>
       <BottomSheetModal
@@ -28,7 +24,18 @@ const BottomSheetComponent = ({ sheetRef, children }: IProps) => {
       >
         <View style={styles.content}>
           <View style={styles.headerContainer}>
-            <Text style={styles.title}>Настройка фильтра</Text>
+            <MaterialCommunityIcons
+              name={'close'}
+              color={'#000'}
+              size={26}
+              onPress={() => {
+                console.log('onPress');
+                onClose();
+              }}
+            />
+            <View style={styles.title}>
+              <Text style={styles.text}>Настройка фильтра</Text>
+            </View>
           </View>
           <ItemSeparator />
           <View style={styles.contentContainer}>{children}</View>
@@ -38,20 +45,10 @@ const BottomSheetComponent = ({ sheetRef, children }: IProps) => {
   );
 };
 
-// eslint-disable-next-line no-lone-blocks
-{
-  /* <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i: string) => i}
-          renderItem={renderItem}
-          contentContainerStyle={styles.contentContainer}
-        /> */
-}
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // paddingTop: 0,
+    // alignItems: 'center',
+    // flexDirection: 'row',
   },
   content: {
     marginHorizontal: 10,
@@ -60,14 +57,18 @@ const styles = StyleSheet.create({
     // backgroundColor: 'white',
   },
   headerContainer: {
-    alignItems: 'center',
-    // paddingVertical: 24,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '800',
-    lineHeight: 46,
+    alignItems: 'center',
+    flex: 1,
   },
 });
 
-export default BottomSheetComponent;
+export default BottomSheet;

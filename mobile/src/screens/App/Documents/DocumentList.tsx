@@ -6,14 +6,15 @@ import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } fro
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
-import BottomSheetComponent from '../../../components/BottomSheet';
+import BottomSheet from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { RadioGroup, IOption } from '../../../components/RadioGroup/RadioGroup';
+import { IOption, RadioGroup } from '../../../components/RadioGroup';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
+import styles from '../../../styles/global';
 
 const Statuses: IDocumentStatus[] = statuses;
 
@@ -80,22 +81,36 @@ const DocumentListScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
-  const [selectedOption, setSelectedOption] = useState<IOption>(radiogroup_options[0]);
+  const [selectedOption, setSelectedOption] = useState<IOption>(filter_options[0]);
 
-  const [sortModal, setSortModal] = useState(false);
+  const [sortData, setSortData] = useState(false);
 
-  const handelApplyFilter = useCallback(() => {
-    setSortModal(false);
-  }, []);
+  // const [sortModal, setSortModal] = useState(false);
 
-  const handleDismissFilter = useCallback(() => {
-    setSortModal(false);
-  }, []);
+  // const handelApplyFilter = useCallback(() => {
+  //   setSortModal(false);
+  // }, []);
+
+  // const handleDismissFilter = useCallback(() => {
+  //   setSortModal(false);
+  // }, []);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.present();
+  }, []);
+
+  const handelApplyFilter = useCallback(() => {
+    console.log('handelApplyFilter');
+    setSortData(true);
+    bottomSheetRef.current?.dismiss();
+  }, []);
+
+  const handelDismissFilter = useCallback(() => {
+    console.log('handelDismissFilter');
+    setSortData(false);
+    bottomSheetRef.current?.dismiss();
   }, []);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
@@ -109,6 +124,35 @@ const DocumentListScreen = () => {
   );
 
   useEffect(() => {
+    if (sortData) {
+      console.log('sortData');
+      setData(
+        appState.documents?.sort((a, b) =>
+          selectedOption.id === 0
+            ? a.head.date > b.head.date
+              ? -1
+              : 1
+            : selectedOption.id === 1
+            ? a.head.date < b.head.date
+              ? -1
+              : 1
+            : selectedOption.id === 2
+            ? a.head.docnumber > b.head.docnumber
+              ? -1
+              : 1
+            : selectedOption.id === 3
+            ? a.head.docnumber < b.head.docnumber
+              ? -1
+              : 1
+            : 1,
+        ),
+      );
+      setSortData(false);
+    }
+  }, [appState.documents, sortData, selectedOption]);
+
+  useEffect(() => {
+    console.log('useEffect');
     setData(
       appState.documents?.filter((item) => {
         const docHead = item?.head;
@@ -253,23 +297,22 @@ const DocumentListScreen = () => {
           />
         </>
       )}
-      <BottomSheetComponent sheetRef={bottomSheetRef}>
-        <View style={localStyles.buttons}>
-          <Button title="Готово" onPress={handelApplyFilter} />
-          {/* <Button title="Сбросить" onPress={handleDismissFilter} /> */}
-        </View>
+      <BottomSheet sheetRef={bottomSheetRef} onClose={handelDismissFilter}>
         <RadioGroup
-          options={radiogroup_options}
+          options={filter_options}
           onChange={setSelectedOption}
           activeButtonId={selectedOption?.id}
-          circleStyle={{ fillColor: colors.primary }}
+          // circleStyle={{ fillColor: colors.primary }}
         />
-      </BottomSheetComponent>
+        <View style={[styles.rectangularButton, localStyles.buttons]}>
+          <Button title="Выбрать" onPress={handelApplyFilter} />
+        </View>
+      </BottomSheet>
     </View>
   );
 };
 
-const radiogroup_options = [
+const filter_options = [
   { id: 0, label: 'По дате (по убыванию)' },
   { id: 1, label: 'По дате (по возрастанию)' },
   { id: 2, label: 'По номеру (по убыванию)' },
@@ -288,8 +331,7 @@ const localStyles = StyleSheet.create({
     width: 36,
   },
   buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    width: '100%',
   },
   container: {
     flex: 1,

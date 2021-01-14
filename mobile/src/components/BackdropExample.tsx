@@ -11,6 +11,7 @@ import docStates from '../model/docStates';
 import { useAppStore, useServiceStore } from '../store';
 import ItemSeparator from './ItemSeparator';
 import { IOption, RadioGroup } from './RadioGroup';
+import RadioButton from './RadioGroup/RadioButton';
 
 // import ContactListContainer from '../../components/contactListContainer';
 import withModalProvider from './withModalProvider';
@@ -143,13 +144,12 @@ const BackdropExample = () => {
         onDismiss={handleDismiss}
         backdropComponent={BottomSheetBackdrop}
       >
-        <RadioGroup
+        <RadioButton
           options={radiogroup_options}
           onChange={setSelectedOption}
           activeButtonId={selectedOption?.id}
           circleStyle={{ fillColor: colors.primary }}
         />
-        {/* <ContactListContainer title="Modal FlatList" type="FlatList" /> */}
       </BottomSheetModal>
     </View>
   );
@@ -163,9 +163,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     width: 36,
-  },
-  buttonContainer: {
-    marginBottom: 6,
   },
   container: {
     flex: 1,
