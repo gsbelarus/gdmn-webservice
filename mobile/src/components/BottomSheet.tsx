@@ -1,7 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useTheme } from '@react-navigation/native';
 import React, { useMemo, Ref, ReactNode } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import { StyleSheet, View, Text, Button, ScrollView } from 'react-native';
 
 import styles from '../styles/global';
 import ItemSeparator from './ItemSeparator';
@@ -16,30 +17,20 @@ interface IProps {
 
 const BottomSheet = ({ sheetRef, children, title, handelDismissFilter, handelApplyFilter }: IProps) => {
   const snapPoints = useMemo(() => ['40%', '90%'], []);
+  const { colors } = useTheme();
   console.log('BottomSheetComponent');
   return (
-    <View style={localStyles.container}>
+    <View>
       <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
         <View style={localStyles.content}>
           <View style={localStyles.headerContainer}>
-            <MaterialCommunityIcons
-              name={'close'}
-              color={'#000'}
-              size={24}
-              onPress={() => {
-                console.log('onPress');
-                handelDismissFilter();
-              }}
-            />
-            <View style={localStyles.title}>
-              <Text style={localStyles.text}>{title}</Text>
-            </View>
+            <MaterialCommunityIcons name={'close'} color={'#000'} size={24} onPress={handelDismissFilter} />
+            <Text style={localStyles.text}>{title}</Text>
+            <MaterialCommunityIcons name={'check'} color={'#000'} size={24} onPress={handelApplyFilter} />
           </View>
           <ItemSeparator />
           <View style={localStyles.contentContainer}>{children}</View>
-          <View style={[styles.rectangularButton, localStyles.buttons]}>
-            <Button title="Выбрать" onPress={handelApplyFilter} />
-          </View>
+          <ItemSeparator />
         </View>
       </BottomSheetModal>
     </View>
@@ -47,31 +38,21 @@ const BottomSheet = ({ sheetRef, children, title, handelDismissFilter, handelApp
 };
 
 const localStyles = StyleSheet.create({
-  buttons: {
-    width: '100%',
-  },
-  container: {
-    // alignItems: 'center',
-    // flexDirection: 'row',
-  },
   content: {
     marginHorizontal: 10,
   },
   contentContainer: {
-    // backgroundColor: 'white',
+    //
   },
   headerContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 4,
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginHorizontal: 10,
   },
   text: {
     fontSize: 20,
     // fontWeight: 'bold',
-  },
-  title: {
-    alignItems: 'center',
-    flex: 1,
   },
 });
 
