@@ -7,7 +7,6 @@ import { VerifyFunction } from 'passport-local';
 import { userService } from '.';
 import log from '../utils/logger';
 import bcrypt from 'bcrypt';
-import config from '../../config';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;

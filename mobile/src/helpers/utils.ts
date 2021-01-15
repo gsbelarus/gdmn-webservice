@@ -61,53 +61,27 @@ const ensureDirExists = async (dir: string) => {
   }
 };
 
-export const appStorage = {
-  setItem: async <T>(key: string, data: T) => {
-    try {
-      await ensureDirExists(getDirectory(key));
-      await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
-    } catch (e) {
-      console.log('error', e);
-    }
-  },
-
-  getItem: async (key: string) => {
-    try {
-      if (!(await ensureFileExists(`${key}.json`))) {
-        return;
-      }
-      await ensureDirExists(getDirectory(key));
-      const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
-      return result ? JSON.parse(result) : null;
-    } catch (e) {
-      console.log('error', e);
-    }
-  },
-
-  getItems: async (keys: string[]) => {
-    const result = await AsyncStorage.multiGet(keys);
-    return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
-  },
-
-  removeItem: async (key: string) => {
-    try {
-      await ensureDirExists('');
-      await FileSystem.deleteAsync(key);
-    } catch (e) {
-      console.log('error', e);
-    }
-  },
-};
-
 // export const appStorage = {
 //   setItem: async <T>(key: string, data: T) => {
-//     AsyncStorage.setItem(key, JSON.stringify(data));
+//     try {
+//       await ensureDirExists(getDirectory(key));
+//       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
+//     } catch (e) {
+//       console.log('error', e);
+//     }
 //   },
 
 //   getItem: async (key: string) => {
-//     const result = await AsyncStorage.getItem(key);
-
-//     return result ? JSON.parse(result) : null;
+//     try {
+//       if (!(await ensureFileExists(`${key}.json`))) {
+//         return;
+//       }
+//       await ensureDirExists(getDirectory(key));
+//       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
+//       return result ? JSON.parse(result) : null;
+//     } catch (e) {
+//       console.log('error', e);
+//     }
 //   },
 
 //   getItems: async (keys: string[]) => {
@@ -116,9 +90,35 @@ export const appStorage = {
 //   },
 
 //   removeItem: async (key: string) => {
-//     await AsyncStorage.removeItem(key);
+//     try {
+//       await ensureDirExists('');
+//       await FileSystem.deleteAsync(key);
+//     } catch (e) {
+//       console.log('error', e);
+//     }
 //   },
 // };
+
+export const appStorage = {
+  setItem: async <T>(key: string, data: T) => {
+    AsyncStorage.setItem(key, JSON.stringify(data));
+  },
+
+  getItem: async (key: string) => {
+    const result = await AsyncStorage.getItem(key);
+
+    return result ? JSON.parse(result) : null;
+  },
+
+  getItems: async (keys: string[]) => {
+    const result = await AsyncStorage.multiGet(keys);
+    return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
+  },
+
+  removeItem: async (key: string) => {
+    await AsyncStorage.removeItem(key);
+  },
+};
 
 export const isMessage = (obj: unknown): obj is IMessage =>
   obj instanceof Object &&
