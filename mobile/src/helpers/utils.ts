@@ -84,15 +84,10 @@ export const appStorage = {
     }
   },
 
-  getItems: async (keys: string[]) => {
-    const result = await AsyncStorage.multiGet(keys);
-    return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
-  },
-
   removeItem: async (key: string) => {
     try {
-      await ensureDirExists('');
-      await FileSystem.deleteAsync(key);
+      await ensureDirExists(getDirectory(key));
+      await FileSystem.deleteAsync(`${dbDir}${key}.json`);
     } catch (e) {
       console.log('error', e);
     }
@@ -103,7 +98,10 @@ export const appStorage = {
 //   setItem: async <T>(key: string, data: T) => {
 //     AsyncStorage.setItem(key, JSON.stringify(data));
 //   },
-
+// getItems: async (keys: string[]) => {
+//   const result = await AsyncStorage.multiGet(keys);
+//   return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
+// },
 //   getItem: async (key: string) => {
 //     const result = await AsyncStorage.getItem(key);
 
