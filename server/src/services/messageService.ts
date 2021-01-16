@@ -18,10 +18,7 @@ const findAll = async () => {
  * */
 const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
   return (await messages.read()).filter(
-    i =>
-      i.head.appSystem === appSystem &&
-      i.head.companyid === companyId &&
-      (i.head.consumer === userId || i.head.consumer === 'gdmn'),
+    i => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
   );
 };
 
@@ -86,20 +83,18 @@ const deleteByUid = async ({
   uid: string;
   userId: string;
 }): Promise<void> => {
-  if (!(await messages.find(message => message.head.id === uid))) {
+  const messageObj = await messages.find(
+    message => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
+  );
+
+  if (!messageObj) {
     throw new Error('сообщение не найдено');
   }
 
-  await messages.delete(
-    message =>
-      message.head.companyid === companyId &&
-      (message.head.consumer === userId || message.head.consumer === 'gdmn') &&
-      message.head.id === uid,
-  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return messages.delete(messageObj.id!);
 };
 
-const deleteAll = async (): Promise<void> => {
-  await messages.deleteAll();
-};
+const deleteAll = async (): Promise<void> => messages.deleteAll();
 
 export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };

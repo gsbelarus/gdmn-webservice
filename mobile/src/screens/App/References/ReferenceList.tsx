@@ -111,7 +111,7 @@ const ReferenceListScreen = () => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.data, state.companyID]);
 
-  const sendSubscribe = useCallback(async () => {
+  /*   const sendSubscribe = useCallback(async () => {
     try {
       const response = await apiService.data.subscribe(state.companyID);
       console.log(response);
@@ -179,7 +179,7 @@ const ReferenceListScreen = () => {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiService.data, state.companyID]);
+  }, [apiService.data, state.companyID]); */
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

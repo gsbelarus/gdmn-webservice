@@ -17,7 +17,13 @@ class Database {
   }
 
   private ensureStorage() {
-    if (!fs.existsSync(this.dbPath)) fs.mkdirSync(this.dbPath);
+    if (!fs.existsSync(this.dbPath)) {
+      try {
+        fs.mkdirSync(this.dbPath);
+      } catch (err) {
+        console.log(err.name, err.message);
+      }
+    }
   }
 
   /**

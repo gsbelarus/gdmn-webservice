@@ -10,6 +10,8 @@ export interface IUserProfile {
   creatorId: string;
 }
 
+export type userRole = 'Admin' | 'User';
+
 export interface IUser {
   id?: string;
   externalId?: string;
@@ -21,6 +23,7 @@ export interface IUser {
   lastName?: string;
   phoneNumber?: string;
   creatorId: string;
+  role?: userRole;
 }
 
 export interface IBaseUrl {

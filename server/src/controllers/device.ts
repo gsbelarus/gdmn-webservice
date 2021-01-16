@@ -5,6 +5,7 @@ import { deviceService } from '../services';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
+  // const { userId }: { userId: string } = ctx.request.body;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');

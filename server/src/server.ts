@@ -16,21 +16,23 @@ import { IUser } from '../../common';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 
+// 7 days for session cookie lifetime
+const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
+const CONFIG = {
+  key: 'koa:sess1' /** (string) cookie key (default is koa:sess) */,
+  maxAge: SESSION_COOKIE_LIFETIME /** (number) maxAge in ms (default is 1 days) */,
+  overwrite: true /** (boolean) can overwrite or not (default true) */,
+  httpOnly: true /** (boolean) httpOnly or not (default true) */,
+  signed: true /** (boolean) signed or not (default true) */,
+  sameSite: true /** (string) lets require that a cookie shouldn't
+    be sent with cross-origin requests (default undefined) */,
+};
+
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
-  app.keys = ['super-secret-key'];
+  app.keys = ['super-secret-key-951753'];
 
-  const CONFIG = {
-    key: 'koa:sess1' /** (string) cookie key (default is koa:sess) */,
-    maxAge: 28800000 /** (number) maxAge in ms (default is 1 days) */,
-    overwrite: true /** (boolean) can overwrite or not (default true) */,
-    httpOnly: true /** (boolean) httpOnly or not (default true) */,
-    signed: true /** (boolean) signed or not (default true) */,
-    sameSite: true /** (string) lets require that a cookie shouldn't
-      be sent with cross-origin requests (default undefined) */,
-  };
-
-  passport.serializeUser((user: IUser, done) => done(null, user.id));
+  passport.serializeUser((user: Pick<IUser, 'id'>, done) => done(null, user.id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
@@ -55,9 +57,9 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(session(CONFIG, app))
     .use(
       bodyParser({
-        formLimit: '15mb',
-        jsonLimit: '15mb',
-        textLimit: '15mb',
+        formLimit: '10mb',
+        jsonLimit: '20mb',
+        textLimit: '10mb',
         enableTypes: ['json', 'form', 'text'],
       }),
     )
@@ -81,5 +83,6 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   await new Promise(resolve => app.listen(config.PORT, () => resolve('')));
 
   log.info(`Server is running on http://localhost:${config.PORT}`);
+
   return app;
 }

@@ -2,7 +2,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IMessage } from '../../../common';
-import { messageService, companyService } from '../services';
+import { messageService, companyService, userService } from '../services';
 
 let clients: ((result: IMessage[]) => void)[] = [];
 
@@ -57,6 +57,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId: companyName, appSystem } = ctx.params;
+  let userId = ctx.state.user.id;
 
   if (!companyName) {
     ctx.throw(400, 'не указана органиазция');
@@ -64,8 +65,14 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company = await companyService.findOneByName(companyName);
 
+  const userName = (await userService.findOne(userId)).userName;
+
+  if (userName === 'gdmn') {
+    // TODO переделать
+    userId = 'gdmn';
+  }
+
   try {
-    const userId = ctx.state.user.id;
     const messageList = await messageService.FindMany({ appSystem, companyId: company.id, userId });
 
     const result: IResponse<IMessage[]> = { result: true, data: messageList };
@@ -90,7 +97,15 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userId = ctx.state.user.id;
+    let userId = ctx.state.user.id;
+
+    const userName = (await userService.findOne(userId)).userName;
+
+    if (userName === 'gdmn') {
+      // TODO переделать
+      userId = 'gdmn';
+    }
+
     await messageService.deleteByUid({ companyId, uid, userId });
 
     const result: IResponse<void> = { result: true };

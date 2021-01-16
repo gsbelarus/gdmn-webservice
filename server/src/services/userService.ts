@@ -1,7 +1,8 @@
 import { users, devices } from './dao/db';
 import { makeProfile } from '../controllers/user';
 import { IUser } from '../../../common';
-import { hashPassword } from '../utils/cript';
+
+import { hashPassword } from '../utils/crypt';
 
 const findOne = async (userId: string) => users.find(userId);
 
@@ -93,11 +94,14 @@ const findDevices = async (userId: string) => {
 
 const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
+
   if (user.companies?.some(i => companyName === i)) {
     throw new Error('организация уже привязана к пользователю');
   }
 
-  return users.update({ ...user, companies: user.companies?.concat(companyName) });
+  const companies = [...(user.companies || []), companyName];
+
+  return users.update({ ...user, companies });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {

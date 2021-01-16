@@ -10,9 +10,9 @@ import bcrypt from 'bcrypt';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
-  const { userName }: { userName: string } = ctx.request.body;
+  const { userName } = ctx.request.body;
 
-  const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
+  const user = await users.find(i => i.userName.toUpperCase() === String(userName).toUpperCase());
 
   if (!user) {
     throw new Error(`пользователь не найден`);
@@ -44,27 +44,44 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   })(ctx, next);
 };
 
-const signUp = async ({ user, deviceId }: { user: IUser; deviceId?: string }) => {
+const signUp = async ({ user, deviceId }: { user: Omit<IUser, 'role'>; deviceId?: string }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
+  console.log('deviceId:', deviceId);
+
   if (!userCount) {
+    // const gdmnUser = await users.insert({
+    //   userName: 'gdmn',
+    //   creatorId: user.userName,
+    //   password: passwordHash,
+    //   companies: [],
+    // });
+    // await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
+
     const gdmnUserObj: IUser = {
       userName: 'gdmn',
       creatorId: user.userName,
       password: 'gdmn',
       companies: [],
+      role: 'Admin',
     };
+
     const gdmnUser = await userService.addOne(gdmnUserObj);
+
     await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
   }
 
-  const userid = await userService.addOne(user);
+  const userid = await userService.addOne({ ...user, role: user.creatorId === user.userName ? 'Admin' : 'User' });
 
-  //TODO: обработать поиск по передаваемой организации
-  if (deviceId === 'WEB' && !userCount) {
+  if (user.creatorId === user.userName) {
     await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
   }
+
+  //TODO: обработать поиск по передаваемой организации
+  /*if (deviceId === 'WEB') {
+    await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
+  }*/
 
   return userid;
 };
