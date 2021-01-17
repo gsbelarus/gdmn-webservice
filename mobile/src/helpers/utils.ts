@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 
 import { IDocument, ILine, IMessage } from '../../../common';
@@ -53,6 +53,8 @@ const getDirectory = (path: string): string => {
   return res ? res[1] : path;
 };
 
+const getSafePath = (path: string) => path.replace(/[&#,+()$~%.'":*?<>{} ]/g, '_');
+
 const ensureDirExists = async (dir: string) => {
   const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
 
@@ -63,6 +65,7 @@ const ensureDirExists = async (dir: string) => {
 
 export const appStorage = {
   setItem: async <T>(key: string, data: T) => {
+    key = getSafePath(key);
     try {
       await ensureDirExists(getDirectory(key));
       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
@@ -72,6 +75,7 @@ export const appStorage = {
   },
 
   getItem: async (key: string) => {
+    key = getSafePath(key);
     try {
       if (!(await ensureFileExists(`${key}.json`))) {
         return;
@@ -84,7 +88,23 @@ export const appStorage = {
     }
   },
 
+  getItems: async (keys: string[]) => {
+    try {
+      const result = [];
+
+      for await (const key of keys) {
+        const rec = await appStorage.getItem(key);
+        result.push([key, rec || '']);
+      }
+
+      return Object.fromEntries(result);
+    } catch (e) {
+      console.log('error', e);
+    }
+  },
+
   removeItem: async (key: string) => {
+    key = getSafePath(key);
     try {
       await ensureDirExists(getDirectory(key));
       await FileSystem.deleteAsync(`${dbDir}${key}.json`);

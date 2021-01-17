@@ -114,33 +114,33 @@ const SettingsScreen = () => {
                   break;
                 }
                 case 'documenttypes': {
-                  const documentTypes = dataSet.data as IDocumentType[];
-                  appActions.setDocumentTypes(documentTypes);
+                  const objDocumentTypes = dataSet.data as IDocumentType[];
+                  appActions.setDocumentTypes(objDocumentTypes);
                   break;
                 }
                 case 'contacts': {
-                  const contacts = dataSet.data as IContact[];
-                  appActions.setContacts(contacts);
+                  const objContacts = dataSet.data as IContact[];
+                  appActions.setContacts(objContacts);
                   break;
                 }
                 case 'goods': {
-                  const goods = dataSet.data as IGood[];
-                  appActions.setGoods(goods);
+                  const objGoods = dataSet.data as IGood[];
+                  appActions.setGoods(objGoods);
                   break;
                 }
                 case 'remains': {
-                  const remains = dataSet.data as IRemain[];
-                  appActions.setRemains(remains);
+                  const objRemains = dataSet.data as IRemain[];
+                  appActions.setRemains(objRemains);
                   break;
                 }
                 case 'boxings': {
-                  const boxings = dataSet.data as ITara[];
-                  appActions.setBoxings(boxings);
+                  const objBoxings = dataSet.data as ITara[];
+                  appActions.setBoxings(objBoxings);
                   break;
                 }
                 case 'weighedGoods': {
-                  const weighedGoods = dataSet.data as IWeighedGoods[];
-                  appActions.setWeighedGoods(weighedGoods);
+                  const objWeighedGoods = dataSet.data as IWeighedGoods[];
+                  appActions.setWeighedGoods(objWeighedGoods);
                   break;
                 }
                 default:
@@ -240,7 +240,7 @@ const SettingsScreen = () => {
       </View>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <View style={localStyles.content}>
-          <Button
+          {/*           <Button
             mode="text"
             icon={'update'}
             style={localStyles.refreshButton}
@@ -249,7 +249,7 @@ const SettingsScreen = () => {
             onPress={sendGetReferencesRequest}
           >
             Проверить обновления
-          </Button>
+          </Button >*/}
           <Button
             mode="text"
             onPress={async () => {
@@ -259,6 +259,8 @@ const SettingsScreen = () => {
                 `${AuthState.userID}/${AuthState.companyID}/${sections.GOODS}`,
                 `${AuthState.userID}/${AuthState.companyID}/${sections.BOXINGS}`,
                 `${AuthState.userID}/${AuthState.companyID}/${sections.WEIGHEDGOODS}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.SETTINGS}`,
+                `${AuthState.userID}/${AuthState.companyID}/${sections.REMAINS}`,
               ]);
               Reactotron.display({
                 name: 'Mobile Storage',
@@ -317,6 +319,16 @@ const SettingsScreen = () => {
           }
         />
       </ScrollView>
+      <Button
+        mode="contained"
+        icon="update"
+        style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
+        disabled={isLoading}
+        loading={isLoading}
+        onPress={sendGetReferencesRequest}
+      >
+        Проверить обновления
+      </Button>
     </>
   );
 };

@@ -39,7 +39,6 @@ const ScanBarCodeScreen = () => {
 
   useEffect(() => {
     setDocument(state.documents?.find((item) => item.id === route.params?.docId) as ISellDocument);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.docId, state.documents]);
 
   useLayoutEffect(() => {
@@ -109,7 +108,6 @@ const ScanBarCodeScreen = () => {
     const weighedGoodObj = findGood();
 
     setWeighedGood(weighedGoodObj);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode, document?.lines, findGood]);
 
   const editLineDocument = useCallback(() => {
@@ -151,13 +149,16 @@ const ScanBarCodeScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, barcode, document?.lines, good, route.params?.docId, weighedGood]);
 
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text style={styles.title}>Нет доступа к камере</Text>;
+  }
+
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      {hasPermission === null ? (
-        <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-      ) : hasPermission === false ? (
-        <Text style={styles.title}>Нет доступа к камере</Text>
-      ) : undefined}
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={

@@ -96,18 +96,21 @@ const ViewReferenceScreen = ({ route }) => {
     ]);
   };
 
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text style={styles.title}>Нет доступа к камере</Text>;
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <>
-        {hasPermission === null ? (
-          <Text style={styles.title}>Запрос на получение доступа к камере</Text>
-        ) : hasPermission === false ? (
-          <Text style={styles.title}>Нет доступа к камере</Text>
-        ) : undefined}
         {doScanned ? (
           <>
             <BarCodeScanner
-              onBarCodeScanned={({ _, data }) => (scanned ? undefined : handleBarCodeScanned(data))}
+              onBarCodeScanned={({ data }) => (scanned ? undefined : handleBarCodeScanned(data))}
               style={StyleSheet.absoluteFillObject}
             />
             <Button
