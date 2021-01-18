@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
@@ -14,7 +14,6 @@ import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
-import styles from '../../../styles/global';
 
 const Statuses: IDocumentStatus[] = statuses;
 
@@ -81,19 +80,15 @@ const DocumentListScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
-  const [selectedOption, setSelectedOption] = useState<IOption>(filter_options[0]);
+  const option = useMemo(() => {
+    return (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IOption;
+  }, [appState.viewParams?.InvDoc?.selectedOption]);
 
-  const [sortData, setSortData] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<IOption>(option);
 
-  // const [sortModal, setSortModal] = useState(false);
+  const [sortData, setSortData] = useState(!!option);
 
-  // const handelApplyFilter = useCallback(() => {
-  //   setSortModal(false);
-  // }, []);
-
-  // const handleDismissFilter = useCallback(() => {
-  //   setSortModal(false);
-  // }, []);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -102,16 +97,18 @@ const DocumentListScreen = () => {
   }, []);
 
   const handelApplyFilter = useCallback(() => {
-    console.log('handelApplyFilter');
     setSortData(true);
+    appActions.setViewParam({
+      InvDoc: { ...appState.viewParams?.InvDoc, selectedOption },
+    });
     bottomSheetRef.current?.dismiss();
-  }, []);
+  }, [appState.viewParams?.InvDoc, appActions, selectedOption]);
 
   const handelDismissFilter = useCallback(() => {
-    console.log('handelDismissFilter');
     setSortData(false);
+    setSelectedOption(option);
     bottomSheetRef.current?.dismiss();
-  }, []);
+  }, [option]);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
     appState.references?.contacts?.data,
@@ -125,22 +122,21 @@ const DocumentListScreen = () => {
 
   useEffect(() => {
     if (sortData) {
-      console.log('sortData');
       setData(
         appState.documents?.sort((a, b) =>
-          selectedOption.id === 0
+          option.id === 0
             ? a.head.date > b.head.date
               ? -1
               : 1
-            : selectedOption.id === 1
+            : option.id === 1
             ? a.head.date < b.head.date
               ? -1
               : 1
-            : selectedOption.id === 2
+            : option.id === 2
             ? a.head.docnumber > b.head.docnumber
               ? -1
               : 1
-            : selectedOption.id === 3
+            : option.id === 3
             ? a.head.docnumber < b.head.docnumber
               ? -1
               : 1
@@ -149,10 +145,9 @@ const DocumentListScreen = () => {
       );
       setSortData(false);
     }
-  }, [appState.documents, sortData, selectedOption]);
+  }, [appState.documents, sortData, option]);
 
   useEffect(() => {
-    console.log('useEffect');
     setData(
       appState.documents?.filter((item) => {
         const docHead = item?.head;
@@ -297,49 +292,25 @@ const DocumentListScreen = () => {
           />
         </>
       )}
+      {/* {modalVisible && <ModalComponent />} */}
       <BottomSheet
         sheetRef={bottomSheetRef}
         title={'Настройка фильтра'}
         handelDismissFilter={handelDismissFilter}
         handelApplyFilter={handelApplyFilter}
       >
-        <RadioGroup options={filter_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
+        <RadioGroup options={sort_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
       </BottomSheet>
     </View>
   );
 };
 
-const filter_options = [
+const sort_options = [
   { id: 0, label: 'По дате (по убыванию)' },
   { id: 1, label: 'По дате (по возрастанию)' },
   { id: 2, label: 'По номеру (по убыванию)' },
   { id: 3, label: 'По номеру (по возрастанию)' },
   { id: 4, label: 'По дате (по убыванию)' },
-  { id: 5, label: 'По дате (по убыванию)' },
-  { id: 6, label: 'По дате (по возрастанию)' },
-  { id: 7, label: 'По номеру (по убыванию)' },
-  { id: 8, label: 'По номеру (по возрастанию)' },
-  { id: 9, label: 'По дате (по убыванию)' },
-  { id: 10, label: 'По дате (по убыванию)' },
-  { id: 11, label: 'По дате (по возрастанию)' },
-  { id: 12, label: 'По номеру (по убыванию)' },
-  { id: 13, label: 'По номеру (по возрастанию)' },
-  { id: 14, label: 'По дате (по убыванию)' },
-  { id: 15, label: 'По дате (по убыванию)' },
-  { id: 16, label: 'По дате (по возрастанию)' },
-  { id: 17, label: 'По номеру (по убыванию)' },
-  { id: 18, label: 'По номеру (по возрастанию)' },
-  { id: 19, label: 'По дате (по убыванию)' },
-  { id: 20, label: 'По дате (по убыванию)' },
-  { id: 21, label: 'По дате (по возрастанию)' },
-  { id: 22, label: 'По номеру (по убыванию)' },
-  { id: 23, label: 'По номеру (по возрастанию)' },
-  { id: 24, label: 'По дате (по убыванию)' },
-  { id: 25, label: 'По дате (по убыванию)' },
-  { id: 26, label: 'По дате (по возрастанию)' },
-  { id: 27, label: 'По номеру (по убыванию)' },
-  { id: 28, label: 'По номеру (по возрастанию)' },
-  { id: 29, label: 'По дате (по убыванию)' },
 ];
 
 export { DocumentListScreen };

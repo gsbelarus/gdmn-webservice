@@ -1,8 +1,8 @@
 import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import BackdropExample from '../components/BackdropExample';
 
+import BackdropExample from '../components/ModalComponent';
 import { IListItem } from '../model/types';
 import {
   DocumentEditScreen,

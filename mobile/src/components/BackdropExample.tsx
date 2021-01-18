@@ -10,7 +10,7 @@ import { statusColors } from '../constants';
 import docStates from '../model/docStates';
 import { useAppStore, useServiceStore } from '../store';
 import ItemSeparator from './ItemSeparator';
-import { IOption, RadioGroup } from './RadioGroup';
+import { IOption } from './RadioGroup';
 import RadioButton from './RadioGroup/RadioButton';
 
 // import ContactListContainer from '../../components/contactListContainer';

@@ -12,6 +12,7 @@ export const initialState: IAppState = {
   references: undefined,
   forms: undefined,
   models: undefined,
+  viewParams: undefined,
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
@@ -115,6 +116,10 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.CLEAR_FORM: {
       return { ...state, forms: { ...state.forms, [action.payload]: undefined } };
     }
+    case ActionAppTypes.SET_VIEWPARAMS:
+      return { ...state, viewParams: action.payload };
+    case ActionAppTypes.SET_VIEWPARAM:
+      return { ...state, viewParams: { ...state.viewParams, ...action.payload } };
     default:
       return state;
   }

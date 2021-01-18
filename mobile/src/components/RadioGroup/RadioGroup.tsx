@@ -1,22 +1,23 @@
+import { TouchableHighlight } from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
-import React, { useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 export interface IOption {
   id: number;
   label: string;
-  labelView?: any;
 }
 
 type Props = {
   options: IOption[];
   horizontal?: boolean;
-  activeButtonId?: number | string;
+  activeButtonId?: number;
   onChange: (option: IOption) => void;
 };
 
 export const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: Props) => {
   const { colors } = useTheme();
+  // const [selectedRadio, setSelectedRadio] = useState<IOption>(activeButtonId);
 
   const onPress = useCallback(
     (option) => {
@@ -28,14 +29,14 @@ export const RadioGroup = ({ horizontal = false, options, onChange, activeButton
     [onChange, activeButtonId],
   );
 
-  console.log('RadioGroup');
-
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <View>
         {options.map((option) => {
           return (
-            <TouchableOpacity
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor={colors.background}
               key={option.id}
               style={[
                 styles.itemContainer,
@@ -57,10 +58,10 @@ export const RadioGroup = ({ horizontal = false, options, onChange, activeButton
                   )}
                 </View>
               </View>
-            </TouchableOpacity>
+            </TouchableHighlight>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -84,6 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     marginBottom: 10,
+    marginRight: 8,
   },
   radioCircle: {
     alignItems: 'center',

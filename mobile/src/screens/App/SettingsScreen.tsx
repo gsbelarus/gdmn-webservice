@@ -69,6 +69,7 @@ const SettingsScreen = ({ navigation }: Props) => {
               appActions.setDocuments([]);
               appActions.setReferences({});
               appActions.setModels({});
+              appActions.setViewParams({});
               // navigation.dispatch(StackActions.popToTop());
             },
           },
