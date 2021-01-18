@@ -9,22 +9,23 @@ interface IProps {
   sheetRef: Ref<BottomSheetModal>;
   children?: ReactNode;
   title?: string;
-  handelDismissFilter: () => void;
-  handelApplyFilter: () => void;
+  snapPoints: string[];
+  handelDismiss: () => void;
+  handelApply: () => void;
 }
 
-const BottomSheet = ({ sheetRef, children, title, handelDismissFilter, handelApplyFilter }: IProps) => {
-  const snapPoints = useMemo(() => ['40%', '90%'], []);
+const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply, snapPoints }: IProps) => {
+  //const snapPoints = useMemo(() => ['40%', '90%'], []);
   return (
     <View>
       <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
         <View style={localStyles.container}>
           <View style={localStyles.headerContainer}>
-            <TouchableOpacity onPress={handelDismissFilter}>
+            <TouchableOpacity onPress={handelDismiss}>
               <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
             </TouchableOpacity>
             <Text style={localStyles.text}>{title}</Text>
-            <TouchableOpacity onPress={handelApplyFilter}>
+            <TouchableOpacity onPress={handelApply}>
               <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
             </TouchableOpacity>
           </View>

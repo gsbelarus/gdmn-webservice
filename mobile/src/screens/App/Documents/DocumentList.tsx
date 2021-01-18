@@ -88,11 +88,9 @@ const DocumentListScreen = () => {
 
   const [sortData, setSortData] = useState(!!option);
 
-  const [modalVisible, setModalVisible] = useState(false);
-
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentPress = useCallback(() => {
+  const handlePresentFilter = useCallback(() => {
     bottomSheetRef.current?.present();
   }, []);
 
@@ -123,7 +121,7 @@ const DocumentListScreen = () => {
   useEffect(() => {
     if (sortData) {
       setData(
-        appState.documents?.sort((a, b) =>
+        data?.sort((a, b) =>
           option.id === 0
             ? a.head.date > b.head.date
               ? -1
@@ -145,7 +143,7 @@ const DocumentListScreen = () => {
       );
       setSortData(false);
     }
-  }, [appState.documents, sortData, option]);
+  }, [data, sortData, option]);
 
   useEffect(() => {
     setData(
@@ -267,7 +265,7 @@ const DocumentListScreen = () => {
                 icon="filter-outline"
                 size={24}
                 style={localStyles.iconSettings}
-                onPress={handlePresentPress}
+                onPress={handlePresentFilter}
               />
             </View>
             <ItemSeparator />
@@ -296,8 +294,9 @@ const DocumentListScreen = () => {
       <BottomSheet
         sheetRef={bottomSheetRef}
         title={'Настройка фильтра'}
-        handelDismissFilter={handelDismissFilter}
-        handelApplyFilter={handelApplyFilter}
+        snapPoints={['40%', '90%']}
+        handelDismiss={handelDismissFilter}
+        handelApply={handelApplyFilter}
       >
         <RadioGroup options={sort_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
       </BottomSheet>
