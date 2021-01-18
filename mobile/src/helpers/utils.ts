@@ -2,10 +2,7 @@
 import * as FileSystem from 'expo-file-system';
 
 import { IDocument, ILine, IMessage } from '../../../common';
-//import config from '../config';
 import { ISellDocument, ISellLine } from '../model';
-
-// export const baseUrl = `${config.server.protocol}${config.server.name}:${config.server.port}/${config.apiPath}`;
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
   return new Promise<T>((resolve, reject) => {

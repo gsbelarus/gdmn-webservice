@@ -73,8 +73,9 @@ const SellDocumentsListScreen = () => {
 
   const {
     apiService,
-    state: { isLoading },
+    state: { isLoading, serverUrl },
   } = useServiceStore();
+
   const { state } = useAuthStore();
   const { state: appState, actions } = useAppStore();
 
@@ -129,7 +130,7 @@ const SellDocumentsListScreen = () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);
 
     timeout(
-      5000,
+      serverUrl?.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'data',
         payload: {
@@ -155,7 +156,7 @@ const SellDocumentsListScreen = () => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [actions, apiService.data, appState.documents, state.companyID]);
+  }, [actions, apiService.data, appState.documents, serverUrl?.timeout, state.companyID]);
 
   const updateStatus = useCallback(() => {
     const documents = appState.documents.filter((document) => document.head.status === 0);

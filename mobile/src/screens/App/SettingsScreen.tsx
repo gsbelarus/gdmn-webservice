@@ -8,7 +8,6 @@ import Reactotron from 'reactotron-react-native';
 import { IResponse, IMessage, IContact, IDocumentType, IGood, IRemain, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
-import config from '../../config';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
 import { ITara, IWeighedGoods } from '../../model';
@@ -17,19 +16,24 @@ import { sections } from '../../store/App/store';
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
+
   const {
-    state: { storagePath },
+    state: { storagePath, serverUrl },
     apiService,
   } = useServiceStore();
+
   const { state: AuthState } = useAuthStore();
+
   const {
     actions: appActions,
     state: { settings, documents, weighedGoods, contacts, goods, documentTypes, boxings, formParams },
   } = useAppStore();
+
   const {
     state: { companyID, userID },
     actions: authActions,
   } = useAuthStore();
+
   const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
@@ -90,7 +94,10 @@ const SettingsScreen = () => {
       try {
         setLoading(true);
         // const response = await apiService.data.subscribe(companyID);
-        const response = await timeout<IResponse<IMessage[]>>(config.timeout, apiService.data.getMessages(companyID));
+        const response = await timeout<IResponse<IMessage[]>>(
+          serverUrl?.timeout,
+          apiService.data.getMessages(companyID),
+        );
 
         if (!response.result) {
           Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
@@ -187,7 +194,7 @@ const SettingsScreen = () => {
     };
 
     getMessages();
-  }, [apiService.data, appActions, companyID, documents]);
+  }, [apiService.data, appActions, companyID, documents, serverUrl?.timeout]);
 
   return (
     <>

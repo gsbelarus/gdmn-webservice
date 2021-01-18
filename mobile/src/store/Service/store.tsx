@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
+import config from '../../config';
 import { IServiceContextProps, IServiceState } from '../../model';
 import Api from '../../service/Api';
 import Storage from '../../service/Storage';
@@ -60,9 +61,13 @@ const createStoreContext = () => {
       const saveState = async () => {
         if (!state.isLoading) {
           // записываем путь к серверу в хранилище утройства
-          storageService.setServer(state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: 5000 });
+          storageService.setServer(
+            state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: config.timeout || 5000 },
+          );
         }
-        apiService.setUrl(state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: 5000 }); // в службе Service обновляем путь к серверу
+        apiService.setUrl(
+          state.serverUrl.timeout ? state.serverUrl : { ...state.serverUrl, timeout: config.timeout || 5000 },
+        ); // в службе Service обновляем путь к серверу
       };
       if (state.serverUrl) {
         saveState();

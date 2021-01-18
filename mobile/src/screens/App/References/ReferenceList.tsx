@@ -46,8 +46,11 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
-  const { state: AppState, actions: appActions } = useAppStore();
-  const { apiService } = useServiceStore();
+  const { state: AppState } = useAppStore();
+  const {
+    apiService,
+    state: { serverUrl },
+  } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);
   useScrollToTop(ref);
@@ -92,7 +95,7 @@ const ReferenceListScreen = () => {
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
-      5000,
+      serverUrl?.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -109,7 +112,7 @@ const ReferenceListScreen = () => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [apiService.data, state.companyID]);
+  }, [apiService.data, serverUrl?.timeout, state.companyID]);
 
   /*   const sendSubscribe = useCallback(async () => {
     try {

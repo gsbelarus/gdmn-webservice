@@ -1,3 +1,4 @@
+/* eslint-disable @babel/no-unused-expressions */
 import { Feather } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';

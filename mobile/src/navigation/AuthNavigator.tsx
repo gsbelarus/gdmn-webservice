@@ -1,9 +1,8 @@
+/* eslint-disable @babel/no-unused-expressions */
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useReducer, useCallback, useMemo } from 'react';
-import { LogBox } from 'react-native';
 
 import { IResponse, IUser, IDevice, IBaseUrl } from '../../../common';
-import config from '../config';
 import { createCancellableSignal, appStorage, timeout } from '../helpers/utils';
 import { IDataFetch } from '../model';
 import AppNavigator from '../navigation/AppNavigator';
@@ -102,7 +101,7 @@ const AuthNavigator = () => {
     const getDeviceStatus = async () => {
       try {
         // const response = await apiService.auth.getDevice();
-        const response = await timeout<IResponse<IDevice>>(5000, apiService.auth.getDevice());
+        const response = await timeout<IResponse<IDevice>>(serverUrl?.timeout, apiService.auth.getDevice());
         // const response: IResponse<IDevice> = await timeoutWithСancellation<IResponse<IDevice>>(
         //   signal,
         //   5000,
@@ -123,7 +122,7 @@ const AuthNavigator = () => {
     if (deviceRegistered === undefined && state.serverReq?.isLoading) {
       getDeviceStatus();
     }
-  }, [actions, apiService.auth, authActions, deviceRegistered, signal, state.serverReq]);
+  }, [actions, apiService.auth, authActions, deviceRegistered, serverUrl?.timeout, signal, state.serverReq]);
 
   useEffect(() => {
     /* 2. Если устройства найдено (deviceRegistered = true)

@@ -27,18 +27,21 @@ type Props = StackScreenProps<RootStackParamList, 'SettingsGettingDocument'>;
 
 const SettingsGettingDocumentScreen = ({ route }: Props) => {
   const { colors } = useTheme();
-  const { apiService } = useServiceStore();
+  const {
+    apiService,
+    state: { serverUrl },
+  } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
   const navigation = useNavigation();
 
-  const today = new Date();
-  const yesterday = new Date();
+  const today = useMemo(() => new Date(), []);
+  const yesterday = useMemo(() => new Date(), []);
   yesterday.setDate(yesterday.getDate() - 1);
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
-      5000,
+      serverUrl?.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -55,7 +58,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [apiService.data, state.companyID]);
+  }, [apiService.data, serverUrl?.timeout, state.companyID]);
 
   useEffect(() => {
     if (!appState.formParams) {
@@ -92,7 +95,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
 
   const sendDocumentRequest = useCallback(() => {
     timeout(
-      5000,
+      serverUrl?.timeout,
       apiService.data.sendMessages(state.companyID, 'gdmn', {
         type: 'cmd',
         payload: {
@@ -142,7 +145,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           },
         ]),
       );
-  }, [apiService.data, state.companyID, appState.formParams, yesterday, today, appActions]);
+  }, [serverUrl?.timeout, apiService.data, state.companyID, appState.formParams, yesterday, today, appActions]);
 
   const sendSubscribe = useCallback(async () => {
     try {
