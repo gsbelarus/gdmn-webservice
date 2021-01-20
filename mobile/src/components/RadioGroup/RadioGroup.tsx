@@ -3,16 +3,13 @@ import { useTheme } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export interface IOption {
-  id: number;
-  label: string;
-}
+import { IListItem } from '../../model/types';
 
 type Props = {
-  options: IOption[];
+  options: IListItem[];
   horizontal?: boolean;
   activeButtonId?: number;
-  onChange: (option: IOption) => void;
+  onChange: (option: IListItem) => void;
 };
 
 export const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: Props) => {
@@ -40,20 +37,20 @@ export const RadioGroup = ({ horizontal = false, options, onChange, activeButton
               key={option.id}
               style={[
                 styles.itemContainer,
-                { borderColor: options[activeButtonId].id === option.id ? colors.primary : 'transparent' },
+                { borderColor: activeButtonId === option.id ? colors.primary : 'transparent' },
                 horizontal && styles.horizontalRow,
               ]}
               onPress={() => onPress(option)}
             >
               <View style={[styles.item, { borderColor: colors.primary }]}>
-                <Text style={styles.radioText}>{option.label}</Text>
+                <Text style={styles.radioText}>{option.value}</Text>
                 <View
                   style={[
                     styles.radioCircle,
-                    { borderColor: options[activeButtonId].id === option.id ? colors.primary : colors.border },
+                    { borderColor: activeButtonId === option.id ? colors.primary : colors.border },
                   ]}
                 >
-                  {options[activeButtonId].id === option.id && (
+                  {activeButtonId === option.id && (
                     <View style={[styles.selectedRb, { backgroundColor: colors.primary }]} />
                   )}
                 </View>
@@ -94,10 +91,13 @@ const styles = StyleSheet.create({
     height: 20,
     justifyContent: 'center',
     width: 20,
+    // marginRight: 20,
   },
   radioText: {
     color: '#000',
+    flex: 1,
     fontSize: 16,
+    marginRight: 20,
   },
   selectedRb: {
     borderRadius: 50,

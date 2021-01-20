@@ -8,11 +8,12 @@ import { Searchbar, FAB, IconButton } from 'react-native-paper';
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheet from '../../../components/BottomSheet';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { IOption, RadioGroup } from '../../../components/RadioGroup';
+import { RadioGroup } from '../../../components/RadioGroup';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
+import { IListItem } from '../../../model/types';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const Statuses: IDocumentStatus[] = statuses;
@@ -81,20 +82,21 @@ const DocumentListScreen = () => {
   const [data, setData] = useState(appState.documents as IDocument[]);
 
   const option = useMemo(() => {
-    return (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IOption;
+    return (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IListItem;
   }, [appState.viewParams?.InvDoc?.selectedOption]);
 
-  const [selectedOption, setSelectedOption] = useState<IOption>(option);
+  const [selectedOption, setSelectedOption] = useState<IListItem>(option);
 
   const [sortData, setSortData] = useState(!!option);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handlePresentFilter = useCallback(() => {
+    setSelectedOption(option);
     bottomSheetRef.current?.present();
-  }, []);
+  }, [option]);
 
-  const handelApplyFilter = useCallback(() => {
+  const handleApplyFilter = useCallback(() => {
     setSortData(true);
     appActions.setViewParam({
       InvDoc: { ...appState.viewParams?.InvDoc, selectedOption },
@@ -102,11 +104,10 @@ const DocumentListScreen = () => {
     bottomSheetRef.current?.dismiss();
   }, [appState.viewParams?.InvDoc, appActions, selectedOption]);
 
-  const handelDismissFilter = useCallback(() => {
+  const handleDismissFilter = useCallback(() => {
     setSortData(false);
-    setSelectedOption(option);
     bottomSheetRef.current?.dismiss();
-  }, [option]);
+  }, []);
 
   const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
     appState.references?.contacts?.data,
@@ -294,9 +295,8 @@ const DocumentListScreen = () => {
       <BottomSheet
         sheetRef={bottomSheetRef}
         title={'Настройка фильтра'}
-        snapPoints={['40%', '90%']}
-        handelDismiss={handelDismissFilter}
-        handelApply={handelApplyFilter}
+        handelDismiss={handleDismissFilter}
+        handelApply={handleApplyFilter}
       >
         <RadioGroup options={sort_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
       </BottomSheet>
@@ -305,11 +305,10 @@ const DocumentListScreen = () => {
 };
 
 const sort_options = [
-  { id: 0, label: 'По дате (по убыванию)' },
-  { id: 1, label: 'По дате (по возрастанию)' },
-  { id: 2, label: 'По номеру (по убыванию)' },
-  { id: 3, label: 'По номеру (по возрастанию)' },
-  { id: 4, label: 'По дате (по убыванию)' },
+  { id: 0, value: 'По дате (по убыванию)' },
+  { id: 1, value: 'По дате (по возрастанию)' },
+  { id: 2, value: 'По номеру (по убыванию)' },
+  { id: 3, value: 'По номеру (по возрастанию)' },
 ];
 
 export { DocumentListScreen };

@@ -9,13 +9,12 @@ interface IProps {
   sheetRef: Ref<BottomSheetModal>;
   children?: ReactNode;
   title?: string;
-  snapPoints: string[];
   handelDismiss: () => void;
   handelApply: () => void;
 }
 
-const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply, snapPoints }: IProps) => {
-  //const snapPoints = useMemo(() => ['40%', '90%'], []);
+const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: IProps) => {
+  const snapPoints = useMemo(() => ['40%', '90%'], []);
   return (
     <View>
       <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
