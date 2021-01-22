@@ -14,6 +14,19 @@ export const makeProfile = (user: IUser) => ({
   creatorId: user.creatorId,
 });
 
+export const makeUser = (user: IUser) => ({
+  id: user.id,
+  externalId: user.externalId,
+  userName: user.userName,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  phoneNumber: user.phoneNumber,
+  password: user.password,
+  companies: user.companies,
+  creatorId: user.creatorId,
+  role: user.role,
+});
+
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
@@ -67,7 +80,7 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const id = await userService.updateOne({ ...user, id: userId });
+    const id = await userService.updateOne({ ...makeUser(user), id: userId });
 
     const result: IResponse<string> = { result: true, data: id };
 
