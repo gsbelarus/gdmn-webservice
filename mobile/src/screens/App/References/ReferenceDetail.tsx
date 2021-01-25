@@ -55,14 +55,6 @@ const ReferenceDetailScreen = ({ route }) => {
 export { ReferenceDetailScreen };
 
 const localStyles = StyleSheet.create({
-  avatar: {
-    alignItems: 'center',
-    backgroundColor: '#e91e63',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  },
   content: {
     height: '100%',
   },
@@ -76,10 +68,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
-  },
-  letter: {
-    color: 'white',
-    fontWeight: 'bold',
   },
   name: {
     fontSize: 16,

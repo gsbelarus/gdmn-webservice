@@ -7,10 +7,12 @@ import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import SubTitle from '../../../components/SubTitle';
 import { useActionSheet } from '../../../helpers/useActionSheet';
+import { formatValue } from '../../../helpers/utils';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
-import { AppActions, useAppStore } from '../../../store';
+import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
 const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
@@ -118,42 +120,42 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const { state, actions } = useAppStore();
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
-  const [docId, setDocId] = useState<number>(undefined);
-  const [netto, setNetto] = useState<number>(0);
-  const [tarsWeight, setTarsWeight] = useState<number>(0);
+  // const [netto, setNetto] = useState<number>(0);
+  // const [tarsWeight, setTarsWeight] = useState({ qty: 0, weight: 0 });
+  const refList = React.useRef<FlatList<ISellLine>>(null);
 
-  useEffect(() => {
-    if (!route.params?.docId) {
-      return;
-    }
-
-    setDocId(route.params.docId);
-  }, [route.params.docId]);
+  const docId = route.params?.docId;
 
   const document: IDocument | ISellDocument | undefined = useMemo(() => {
     return state.documents.find((item) => item.id === docId);
   }, [docId, state.documents]);
 
-  useEffect(() => {
-    setNetto(
-      (documentLines ?? []).reduce((total, line) => {
-        const goodLine = state.goods.find((item) => item.id === line.goodId);
-        return Number.parseFloat(
-          ((Number(line.quantity) ?? 0) * (goodLine ? goodLine.itemWeight ?? 1 : 1) + total).toFixed(3),
-        );
-      }, 0),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document?.lines]);
+  const contact: IContact = useMemo(
+    () => state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound,
+    [document?.head.tocontactId, state.contacts],
+  );
 
-  useEffect(() => {
-    setTarsWeight(
-      boxings.length !== 0
-        ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
-        : 0,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document?.lines]);
+  const documentLines = useMemo(() => document?.lines as ISellLine[], [document?.lines]);
+
+  const boxings = useMemo(
+    () => (documentLines ?? []).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]),
+    [documentLines],
+  );
+
+  const totalNetWeight = useMemo(() => {
+    return (documentLines ?? []).reduce((total, line) => {
+      const goodLine = state.goods.find((item) => item.id === line.goodId);
+      return (line.quantity ?? 0) * (goodLine?.itemWeight ?? 1) + total;
+    }, 0);
+  }, [documentLines, state.goods]);
+
+  const boxingTotals = useMemo(
+    () => ({
+      qty: (boxings ?? []).reduce((total, itm) => total + itm.quantity, 0),
+      weight: (boxings ?? []).reduce((total, itm) => total + itm.weight, 0),
+    }),
+    [boxings],
+  );
 
   const setQuantity = useCallback(() => {
     if (document?.lines && document.lines !== []) {
@@ -164,17 +166,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         });
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document?.id, document?.lines]);
-
-  const contact: IContact = state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound;
-  const refList = React.useRef<FlatList<ISellLine>>(null);
-
-  const documentLines = document?.lines as ISellLine[];
-  const boxings = (documentLines ?? []).reduce(
-    (totalLine, line) => [...totalLine, ...(line.tara ?? [])],
-    [] as ILineTara[],
-  );
+  }, [actions, document?.id, document?.lines]);
 
   useScrollToTop(refList);
 
@@ -263,16 +255,6 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               {contact.name}
             </Text>
           </View>
-          {/*  <TouchableOpacity style={localStyles.goDetailsHeader}>
-              <MaterialIcons
-                size={30}
-                color={colors.card}
-                name="chevron-right"
-                onPress={() => {
-                  navigation.navigate('HeadSellDocument', { docId });
-                }}
-              />
-            </TouchableOpacity> */}
         </View>
         <View style={localStyles.listContainer}>
           <View style={localStyles.avatarRow} />
@@ -302,22 +284,18 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ItemSeparatorComponent={ItemSeparator}
         />
         <ItemSeparator />
+        <SubTitle styles={[localStyles.totalsTitle, { backgroundColor: colors.background }]}>Итого</SubTitle>
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
-          <Text style={localStyles.fontWeightBold}>Итого:</Text>
+          <Text style={localStyles.fontWeightBold}>Товар:</Text>
           <Text style={localStyles.fontWeightBold}>
-            вес прод. {netto}
-            {' / '}
-            брутто {netto + tarsWeight}
+            {`нетто: ${formatValue(totalNetWeight)}  -  брутто: ${formatValue(totalNetWeight + boxingTotals.weight)}`}
           </Text>
         </View>
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Тара:</Text>
           <Text style={localStyles.fontWeightBold}>
-            кол-во {boxings.length !== 0 ? tarsWeight : 0} / вес{' '}
-            {boxings.length !== 0
-              ? boxings.reduce((total, boxing) => Number.parseFloat((total + (boxing.weight ?? 0)).toFixed(3)), 0)
-              : 0}
+            {`кол-во: ${formatValue(boxingTotals.qty)}  -  вес: ${formatValue(boxingTotals.weight)}`}
           </Text>
         </View>
         <ItemSeparator />
@@ -458,5 +436,8 @@ const localStyles = StyleSheet.create({
     flexBasis: 45,
     flexGrow: 1,
     marginRight: 5,
+  },
+  totalsTitle: {
+    padding: 10,
   },
 });

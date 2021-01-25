@@ -1,4 +1,5 @@
 import { Reducer } from 'react';
+import Reactotron from 'reactotron-react-native';
 
 import { IAuthState } from '../../model';
 import { TAuthActions, ActionAuthTypes } from './actions';
@@ -12,7 +13,12 @@ export const initialState: IAuthState = {
 
 export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState, action): IAuthState => {
   if (__DEV__) {
-    console.log('Auth action: ', JSON.stringify(action));
+    // console.log('Auth action: ', JSON.stringify(action));
+    Reactotron.display({
+      name: `App action ${action.type}`,
+      value: action,
+      important: false,
+    });
   }
 
   switch (action.type) {

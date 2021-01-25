@@ -150,7 +150,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   const sendSubscribe = useCallback(async () => {
     try {
       const response = await apiService.data.subscribe(state.companyID);
-      console.log(response);
+      // console.log(response);
       if (!response.result) {
         Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
         return;

@@ -124,7 +124,15 @@ const SignInScreen = () => {
       }
     };
     LoginUser();
-  }, [actions, apiService.auth, authActions, credential, credential.userName, loginState.isLoading]);
+  }, [
+    actions,
+    apiService.auth,
+    apiService.baseUrl.timeout,
+    authActions,
+    credential,
+    credential.userName,
+    loginState.isLoading,
+  ]);
 
   return (
     <>

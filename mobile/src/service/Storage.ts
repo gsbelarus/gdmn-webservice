@@ -24,7 +24,6 @@ export default class Sync {
         timeout: config.timeout,
         apiPath: config.apiPath,
       };
-      console.log(config);
       await this.setServer(pathSrv);
     }
 

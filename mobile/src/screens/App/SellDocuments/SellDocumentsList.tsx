@@ -7,10 +7,9 @@ import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
 import { IResponse, IMessageInfo } from '../../../../../common';
 import { IDocumentType } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { statusColors } from '../../../constants';
+import { statusColors, statuses } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { timeout } from '../../../helpers/utils';
-import statuses from '../../../mockData/Otves/documentStatuses.json';
 import { ISellDocument, ISellHead } from '../../../model';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 

@@ -6,6 +6,7 @@ import { Searchbar, Text, TextInput } from 'react-native-paper';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { formatValue } from '../../../helpers/utils';
 import { ILineTara, ITara, ISellLine } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
@@ -30,39 +31,38 @@ const Line = React.memo(
     quantity?: number;
     weight?: number;
     selected: boolean;
-    onPress: (newQuantity: number | undefined, newWeight: number | undefined) => void;
+    onPress: (newQuantity?: number, newWeight?: number) => void;
   }) => {
     const { colors } = useTheme();
 
-    const validNumber = (value: string, prev: string) => {
+    const validateNumber = (value: string, prev: string): string => {
       value = value.replace(',', '.');
-
-      //value = !value.includes('.') ? parseFloat(value).toString() : value;
+      value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
-      const validValue = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return parseFloat(validValue.test(value) ? value : prev).toString();
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+
+      return validNumber.test(value) ? value : prev;
     };
 
-    const setQuantity2 = useCallback(
+    const handleQuantityChange = useCallback(
       (value: string) => {
-        const validQuantity = validNumber(value, (quantity ?? 0).toString());
-        const newWeight = (boxing.type === 'box'
-          ? ((boxing.weight ?? 0) * Number(validQuantity !== '0' ? validQuantity : '1')).toFixed(3)
-          : weight ?? boxing.weight ?? 0
-        ).toString();
-        if (validQuantity !== '0') {
-          onPress(Number(validQuantity), Number(newWeight));
-        }
+        const newQuantity = parseFloat(validateNumber(value, (quantity ?? 0).toString()));
+
+        const newWeight =
+          Math.round((boxing.type === 'box' ? (boxing.weight ?? 0) * newQuantity : weight ?? 0) * 1000) / 1000;
+
+        onPress(newQuantity, newWeight);
       },
       [quantity, boxing?.type, boxing?.weight, weight, onPress],
     );
 
-    const setWeight2 = useCallback(
+    const handleWeightChange = useCallback(
       (value: string) => {
-        const validWeight = validNumber(value, (weight ?? 0).toString());
-        if (validWeight !== '0') {
-          onPress(Number(quantity ?? '1'), Number(validWeight));
+        const validWeight = parseFloat(validateNumber(value, (weight ?? 0).toString()));
+
+        if (validWeight !== 0) {
+          onPress(quantity ?? 1, validWeight);
         }
       },
       [weight, onPress, quantity],
@@ -78,7 +78,7 @@ const Line = React.memo(
               label={'Количество'}
               keyboardType="decimal-pad"
               value={(quantity ?? 0).toString()}
-              onChangeText={setQuantity2}
+              onChangeText={handleQuantityChange}
               theme={{
                 colors: {
                   placeholder: colors.primary,
@@ -92,10 +92,8 @@ const Line = React.memo(
             label={'Общий вес'}
             editable={boxing.type !== 'box'}
             keyboardType="decimal-pad"
-            onChangeText={(text) => {
-              setWeight2(text);
-            }}
-            value={(weight ?? boxing.weight ?? 0).toString()}
+            onChangeText={handleWeightChange}
+            value={(weight ?? 0).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
@@ -122,6 +120,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
     if (!state.formParams || !(state.formParams as ISellLine)) {
       return;
     }
+
     setBoxingsLine(
       (state.formParams as ISellLine)?.id === route.params.lineId ? (state.formParams as ISellLine).tara : [],
     );
@@ -153,8 +152,8 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
     boxingsLine,
     navigation,
     route.params,
-    route.params.docId,
-    route.params.modeCor,
+    route.params?.docId,
+    route.params?.modeCor,
     state.boxingsLine,
     state.documents,
     state.formParams,
@@ -162,21 +161,26 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
 
   const renderItem = useCallback(
     ({ item }: { item: ITara }) => {
-      const boxing = boxingsLine ? boxingsLine.find((box) => box.tarakey === item.id) : undefined;
-      return boxingsLine ? (
+      if (!boxingsLine) {
+        return;
+      }
+
+      const boxing = boxingsLine.find((box) => box.tarakey === item.id);
+
+      return (
         <Line
           boxing={item}
           quantity={boxing?.quantity}
           weight={boxing?.weight}
-          selected={!!(boxingsLine ?? []).find((box) => box.tarakey === item.id)}
-          onPress={(newQuantity: number | undefined, newWeight: number | undefined) => {
+          selected={!!(boxingsLine ?? []).find((box) => box.tarakey === item.id && (box.quantity ?? 0) > 0)}
+          onPress={(newQuantity?: number, newWeight?: number) => {
             setBoxingsLine([
               ...(boxingsLine ?? []).filter((box) => box.tarakey !== item.id),
               { tarakey: item.id, type: item.type, weight: newWeight, quantity: newQuantity },
             ]);
           }}
         />
-      ) : undefined;
+      );
     },
     [boxingsLine],
   );
@@ -184,7 +188,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
   const keyExtractor = useCallback((box: ITara) => box.id.toString(), []);
 
   const listEmptyComponent = useCallback(
-    () => <Text style={[localStyles.title, localStyles.emptyList]}>Тар нет</Text>,
+    () => <Text style={[localStyles.title, localStyles.emptyList]}>Список тары пуст</Text>,
     [],
   );
 

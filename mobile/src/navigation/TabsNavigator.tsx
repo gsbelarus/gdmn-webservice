@@ -4,8 +4,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import SellDocumentsNavigator from './SellDocumentsNavigator';
 import ReferencesNavigator from './ReferencesNavigator';
+import SellDocumentsNavigator from './SellDocumentsNavigator';
 import SettingsNavigator from './SettingsNavigator';
 
 export type TabsStackParams = {

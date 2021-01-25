@@ -67,7 +67,9 @@ export const appStorage = {
       await ensureDirExists(getDirectory(key));
       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
     }
   },
 
@@ -81,7 +83,9 @@ export const appStorage = {
       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
       return result ? JSON.parse(result) : null;
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
     }
   },
 
@@ -96,7 +100,9 @@ export const appStorage = {
 
       return Object.fromEntries(result);
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
     }
   },
 
@@ -165,11 +171,14 @@ interface INumberFormat {
   decimals: number;
 }
 
-export const formatValue = (format: NumberFormat | INumberFormat, value: number | string) => {
+export const formatValue = (
+  value: number | string = 0,
+  format: NumberFormat | INumberFormat = { decimals: 2, type: 'number' },
+): string => {
   const type = typeof format === 'string' ? format : format.type;
   const decimals = typeof format === 'string' ? 2 : format.decimals;
 
-  const transform = function (org: number, n: number, x: number, s: string, c: string) {
+  const transform = function (org: number, n: number, x: number, s: string, c: string): string {
     const re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : 'р') + ')',
       num = org.toFixed(Math.max(0, Math.floor(n)));
 
@@ -186,7 +195,7 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
     case 'percentage':
       return `${transform(value, decimals, 3, ' ', ',')} %`;
     default:
-      return value;
+      return value.toString();
   }
 };
 

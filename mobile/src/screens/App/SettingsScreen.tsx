@@ -247,71 +247,65 @@ const SettingsScreen = () => {
       </View>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <View style={localStyles.content}>
-          {/*           <Button
-            mode="text"
-            icon={'update'}
-            style={localStyles.refreshButton}
-            disabled={isLoading}
-            loading={isLoading}
-            onPress={sendGetReferencesRequest}
-          >
-            Проверить обновления
-          </Button >*/}
-          <Button
-            mode="text"
-            onPress={async () => {
-              const log = await appStorage.getItems([
-                `${AuthState.userID}/${AuthState.companyID}/${sections.DOCUMENTTYPES}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.CONTACTS}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.GOODS}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.BOXINGS}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.WEIGHEDGOODS}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.SETTINGS}`,
-                `${AuthState.userID}/${AuthState.companyID}/${sections.REMAINS}`,
-              ]);
-              Reactotron.display({
-                name: 'Mobile Storage',
-                preview: log,
-                value: log,
-                important: true,
-              });
-            }}
-          >
-            Проверить хранилище
-          </Button>
-          <Button
-            mode="text"
-            onPress={async () => {
-              Reactotron.display({
-                name: 'settings',
-                preview: 'settings',
-                value: settings,
-                important: true,
-              });
-              Reactotron.display({
-                name: 'documents',
-                preview: 'documents',
-                value: documents,
-                important: true,
-              });
-              Reactotron.display({
-                name: 'references',
-                preview: 'references',
-                value: { documentTypes, contacts, goods, boxings, weighedGoods },
-                important: true,
-              });
-              Reactotron.display({
-                name: 'formParams',
-                preview: 'formParams',
-                value: formParams,
-                important: true,
-              });
-            }}
-          >
-            Проверить стейт
-          </Button>
+          {__DEV__ && (
+            <>
+              <Button
+                mode="text"
+                onPress={async () => {
+                  const log = await appStorage.getItems([
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.DOCUMENTTYPES}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.CONTACTS}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.GOODS}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.BOXINGS}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.WEIGHEDGOODS}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.SETTINGS}`,
+                    `${AuthState.userID}/${AuthState.companyID}/${sections.REMAINS}`,
+                  ]);
+                  Reactotron.display({
+                    name: 'Mobile Storage',
+                    preview: log,
+                    value: log,
+                    important: true,
+                  });
+                }}
+              >
+                Проверить хранилище
+              </Button>
+              <Button
+                mode="text"
+                onPress={async () => {
+                  Reactotron.display({
+                    name: 'settings',
+                    preview: 'settings',
+                    value: settings,
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'documents',
+                    preview: 'documents',
+                    value: documents,
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'references',
+                    preview: 'references',
+                    value: { documentTypes, contacts, goods, boxings, weighedGoods },
+                    important: true,
+                  });
+                  Reactotron.display({
+                    name: 'formParams',
+                    preview: 'formParams',
+                    value: formParams,
+                    important: true,
+                  });
+                }}
+              >
+                Проверить стейт
+              </Button>
+              <Divider />
+            </>
+          )}
         </View>
-        <Divider />
         <SettingsItem
           label="Синхронизировать"
           value={settings?.synchronization}

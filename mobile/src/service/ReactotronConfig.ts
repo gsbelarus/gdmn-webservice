@@ -1,11 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Reactotron, { asyncStorage } from 'reactotron-react-native';
+
 import config from '../config';
 
-/* export const rc = Reactotron.configure()
-  .use(asyncStorage({ ignore: [] })) // <--- here we go!
-  .connect(); */
-// Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either come from `react-native` or `@react-native-community/async-storage` depending on where you get it from
 Reactotron.setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either come from `react-native` or `@react-native-community/async-storage` depending on where you get it from
   .configure({
     name: 'Demo App',

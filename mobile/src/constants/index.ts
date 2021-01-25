@@ -1,3 +1,4 @@
-const statusColors = ['#4575D4', '#FFA700', '#80B12C', '#06567D'];
+import { statuses } from './documentStatuses';
 
-export { statusColors };
+const statusColors = ['#4575D4', '#FFA700', '#80B12C', '#06567D'];
+export { statusColors, statuses };

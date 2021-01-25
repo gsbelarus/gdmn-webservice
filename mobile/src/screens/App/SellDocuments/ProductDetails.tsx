@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -36,7 +35,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ISellLine | undefined>();
-  const [goodQty, setGoodQty] = useState<string>('0');
+  const [goodQty, setGoodQty] = useState<string>('1');
   const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -57,7 +56,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     if (lineDocuments) {
       setLine(lineDocuments.find((item) => item.id === route.params.lineId));
     }
-  }, [route.params, state.goods, state.documents]);
+  }, [route.params, state.goods, state.documents, saved, document]);
 
   useEffect(() => {
     if (route.params?.weighedGood) {
@@ -129,17 +128,18 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     line,
     product,
     route.params?.lineId,
-    route.params?.manufacturingDate,
+    route.params.manufacturingDate,
     route.params?.modeCor,
     route.params?.prodId,
     route.params?.weighedGood,
+    state.weighedGoods,
   ]);
 
   useEffect(() => {
     if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
       actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
     }
-  }, [actions, document, product, route.params]);
+  }, [actions, document, product, route.params, state.formParams]);
 
   useEffect(() => {
     if ((state.formParams as ISellLine)?.manufacturingDate) {
@@ -159,11 +159,11 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         });
       }
     }
-  }, [state.formParams?.manufacturingDate]);
+  }, [actions, state.formParams, state.formParams?.manufacturingDate, state.weighedGoods]);
 
   useEffect(() => {
     actions.setFormParams({ ...line, quantity: parseFloat(goodQty.replace(',', '.')) });
-  }, [goodQty]);
+  }, [actions, goodQty, line]);
 
   useEffect(() => {
     if (isFocused) {
@@ -261,15 +261,14 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     });
   };
 
-  const handelQuantityChange = useCallback((value: string) => {
+  const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
-
-      //value = !value.includes('.') ? parseFloat(value).toString() : value;
-      value = Number.isNaN(parseFloat(value)) ? '0' : value;
+      value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return parseFloat(validNumber.test(value) ? value : prev).toString();
+      const res = parseFloat(validNumber.test(value) ? value : prev).toString();
+      return res;
     });
   }, []);
 
@@ -327,11 +326,11 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             label={'Количество'}
             editable={true}
             keyboardType="decimal-pad"
-            onChangeText={handelQuantityChange}
+            onChangeText={handleQuantityChange}
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={((state.formParams as ISellLine)?.quantity ?? 1).toString()}
+            value={((state.formParams as ISellLine)?.quantity ?? 0).toString()}
             theme={{
               colors: {
                 placeholder: colors.primary,
