@@ -603,7 +603,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({id: device.id, uid: device.deviceId, userId: user?.id, name: device.deviceName, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
+        blockDevice({id: device.id, uid: device.deviceId, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
@@ -648,7 +648,7 @@ const App: React.FC = () => {
           dispatch({ type: 'SET_ERROR', errorMessage: 'Устройство не найдено.' });
           return;
         }
-        blockDevice({id: device.id, uid: device.deviceId, userId: currentUser?.id, name: device.deviceName, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
+        blockDevice({id: device.id, uid: device.deviceId, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'})
         .then( data => {
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
