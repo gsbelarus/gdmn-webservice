@@ -3,10 +3,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, FlatList, View } from 'react-native';
 import { Searchbar, Text, TextInput } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { formatValue } from '../../../helpers/utils';
 import { ILineTara, ITara, ISellLine } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
@@ -141,7 +141,8 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            actions.setFormParams({ ...state.formParams, tara: boxingsLine });
+            Reactotron.log(boxingsLine);
+            actions.setFormParams({ ...state.formParams, tara: boxingsLine.filter((el) => el.quantity) });
             navigation.goBack();
           }}
         />

@@ -1,13 +1,15 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IDocument, IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { formatValue } from '../../../helpers/utils';
 import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
@@ -15,7 +17,7 @@ import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigat
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
+// const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
   const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
@@ -238,23 +240,20 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
 
+  const docTitle = useMemo(() => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return `№${(document?.head as ISellHead)?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString(
+      'BY-ru',
+      options,
+    )}`;
+  }, [document]);
+
   return document ? (
     <>
       <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
-        <View
-          style={[
-            localStyles.documentHeader,
-            { backgroundColor: document.head.status === 0 ? colors.primary : statusColors[1] },
-          ]}
-        >
-          <View style={localStyles.header}>
-            <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              №{(document?.head as ISellHead)?.docnumber} от {new Date(document?.head?.date)?.toLocaleDateString()} г.
-            </Text>
-            <Text numberOfLines={5} style={[localStyles.documentHeaderText, { color: colors.card }]}>
-              {contact.name}
-            </Text>
-          </View>
+        <View style={[localStyles.documentHeader, { backgroundColor: statusColors[document?.head?.status] }]}>
+          <Text style={[localStyles.documentHeaderText, { color: colors.card }]}>{docTitle}</Text>
+          <Text style={[localStyles.documentText, { color: colors.card }]}>{contact?.name}</Text>
         </View>
         <View style={localStyles.listContainer}>
           <View style={localStyles.avatarRow} />
@@ -377,14 +376,17 @@ const localStyles = StyleSheet.create({
     padding: 0,
   },
   documentHeader: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: 50,
+    justifyContent: 'space-around',
+    paddingVertical: 6,
   },
   documentHeaderText: {
-    flex: 1,
     fontWeight: 'bold',
     textAlign: 'center',
-    textAlignVertical: 'center',
+  },
+  documentText: {
+    textAlign: 'center',
   },
   fab: {
     backgroundColor: Colors.blue600,
@@ -399,13 +401,13 @@ const localStyles = StyleSheet.create({
     flexBasis: '30%',
     marginLeft: 15,
   },
-  header: {
+  /*   header: {
     alignItems: 'center',
     flexDirection: 'column',
     flex: 15,
     justifyContent: 'center',
     padding: 7,
-  },
+  }, */
   item: {
     alignItems: 'center',
     flexDirection: 'row',

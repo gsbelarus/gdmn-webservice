@@ -5,6 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, TextInput } from 'react-native-paper';
+// import Reactotron from 'reactotron-react-native';
 
 import { IDocument, IGood } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
@@ -35,7 +36,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [document, setDocument] = useState<ISellDocument | IDocument | undefined>();
   const [product, setProduct] = useState<IGood | undefined>();
   const [line, setLine] = useState<ISellLine | undefined>();
-  const [goodQty, setGoodQty] = useState<string>('1');
+  const [goodQty, setGoodQty] = useState<string | undefined>();
   const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -48,36 +49,41 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
     setProduct(state.goods.find((item) => item.id === route.params.prodId));
     setDocument(state.documents.find((item) => item.id === route.params.docId));
-    const lineDocuments = document
-      ? document instanceof Object && (document as IDocument)
-        ? (document as IDocument)?.lines ?? []
-        : (document as ISellDocument)?.lines ?? []
-      : undefined;
-    if (lineDocuments) {
-      setLine(lineDocuments.find((item) => item.id === route.params.lineId));
+
+    const docLine = (document as ISellDocument)?.lines?.find((item) => item.id === route.params.lineId);
+
+    if (!docLine) {
+      return;
     }
+
+    setLine(docLine);
   }, [route.params, state.goods, state.documents, saved, document]);
 
   useEffect(() => {
-    if (route.params?.weighedGood) {
-      const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
-      const good = weighedGood ? state.goods.find((item) => item.id === weighedGood.goodkey) : undefined;
-      const date = weighedGood.datework.split('.').reverse();
-      if (good) {
-        actions.setFormParams({
-          id: route.params?.lineId,
-          goodId: route.params?.prodId,
-          quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
-          manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
-            .toISOString()
-            .slice(0, 10),
-          //timeWork: good.timework,
-          numreceive: weighedGood.numreceive,
-          tara: [],
-          //barcodes: route.params.barcode ? [route.params.barcode] : [],
-        });
-      }
+    if (!route.params?.weighedGood) {
+      return;
     }
+    // Если передан route.params?.weighedGood
+
+    const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
+
+    const good = weighedGood ? state.goods.find((item) => item.id === weighedGood.goodkey) : undefined;
+    const date = weighedGood.datework.split('.').reverse();
+
+    if (!good) {
+      return;
+    }
+
+    actions.setFormParams({
+      id: route.params?.lineId,
+      goodId: route.params?.prodId,
+      quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
+      manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10),
+      //timeWork: good.timework,
+      numreceive: weighedGood.numreceive,
+      tara: [],
+      //barcodes: route.params.barcode ? [route.params.barcode] : [],
+    });
   }, [actions, route.params?.lineId, route.params?.prodId, route.params?.weighedGood, state.goods, state.weighedGoods]);
 
   useEffect(() => {
@@ -118,6 +124,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       if (!line) {
         return;
       }
+
+      // setGoodQty((line.quantity ?? 0).toString());
+
       actions.setFormParams(
         route.params?.manufacturingDate ? { ...line, manufacturingDate: route.params.manufacturingDate } : line,
       );
@@ -146,7 +155,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       const numberReceive = state.weighedGoods.find((item) => {
         const date = item.datework.split('.').reverse();
         return (
-          //item.goodkey === line.goodId &&
           item.goodkey === (state.formParams as ISellLine)?.goodId &&
           new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
             (state.formParams as ISellLine).manufacturingDate
@@ -162,6 +170,16 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   }, [actions, state.formParams, state.formParams?.manufacturingDate, state.weighedGoods]);
 
   useEffect(() => {
+    if (!line) {
+      return;
+    }
+    // Reactotron.log(line);
+
+    if (goodQty === undefined) {
+      setGoodQty((line.quantity ?? 0).toString());
+      return;
+    }
+
     actions.setFormParams({ ...line, quantity: parseFloat(goodQty.replace(',', '.')) });
   }, [actions, goodQty, line]);
 
@@ -199,7 +217,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
               (item) =>
                 item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params?.prodId,
             );
+
             setSaved(true);
+
             if ((line?.id && route?.params?.modeCor) || editLine) {
               const idLine = editLine ? editLine.id : line ? line.id : (state.formParams as ISellLine).id;
               const newLine = {
@@ -222,6 +242,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                     : []),
                 ],
               };
+
               actions.editLine({
                 docId: route.params?.docId,
                 line: newLine,
@@ -241,6 +262,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             }
             actions.setBoxingsLine([]);
             actions.clearFormParams();
+
             navigation.navigate('ViewSellDocument', { docId: document?.id });
           }}
         />
