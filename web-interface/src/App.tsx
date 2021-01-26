@@ -595,14 +595,7 @@ const App: React.FC = () => {
           else if (data.type === 'BLOCK_DEVICES') {
             const idx = devices?.findIndex(dev => dev.deviceId === uId);
             if (devices && idx !== undefined) {
-              const newDevices: IDeviceInfo[] = [
-                  ...devices.slice(0, idx),
-                  {
-                    ...device,
-                    state: !isUnBlock ? 'BLOCKED' : 'ACTIVE',
-                  },
-                  ...devices.slice(idx + 1),
-                ];
+              const newDevices: IDeviceInfo[] =  devices.map(dev => dev.id === device.id ? {...dev, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'} : dev);
                 dispatch({ type: 'SET_DEVICES', devices: newDevices });
               }
             }
@@ -647,14 +640,7 @@ const App: React.FC = () => {
           else if (data.type === 'BLOCK_DEVICES') {
             const idx = currentDevices?.findIndex(dev => dev.deviceId === uId);
             if (currentDevices && idx !== undefined) {
-              const newDevices: IDeviceInfo[] = [
-                  ...currentDevices.slice(0, idx),
-                  {
-                    ...device,
-                    state: !isUnBlock ? 'BLOCKED' : 'ACTIVE',
-                  },
-                  ...currentDevices.slice(idx + 1),
-                ];
+              const newDevices: IDeviceInfo[] = currentDevices.map(dev => dev.id === device.id ? {...dev, state: isUnBlock ? 'ACTIVE' : 'BLOCKED'} : dev);
                 dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices });
               }
             }
