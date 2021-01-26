@@ -51,6 +51,7 @@ interface IState {
 
 type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_USER', user?: IUser, needReReadCompanies?: boolean, needReReadUserData?: boolean }
+  | { type: 'UPDATE_USER', user: Partial<IUser> }
   | { type: 'SET_ACTIVATION_CODE', code?: string }
   | { type: 'SET_COMPANY_USERS', companyUsers?: IUser[] }
   | { type: 'SET_ALL_USERS', allUsers?: IUser[] }
@@ -59,6 +60,7 @@ type Action = { type: 'SET_STATE', appState: AppState }
   | { type: 'SET_COMPANIES', companies?: IUserCompany[] }
   | { type: 'SET_CURRENT_COMPANIES', companies?: IUserCompany[] }
   | { type: 'SET_CURRENT_USER', user?: IUser }
+  | { type: 'UPDATE_CURRENT_USER', user: Partial<IUser> }
   | { type: 'SET_IS_ADMIN', isAdmin?: boolean }
   | { type: 'UPDATE_COMPANY', companyId: string, companyName: string }
   | { type: 'SET_DEVICES', devices?: IDeviceInfo[] }
@@ -114,6 +116,13 @@ const reducer = (state: IState, action: Action): IState => {
         needReReadCompanies,
         needReReadUserData,
         currentUser: undefined
+      }
+    }
+    case 'UPDATE_USER': {
+      const { user } = action;
+      return {
+        ...state,
+        user: state.user ? { ...state.user, ... user } : undefined,
       }
     }
     case 'SET_ACTIVATION_CODE': {
@@ -186,6 +195,13 @@ const reducer = (state: IState, action: Action): IState => {
       return {
         ...state,
         currentUser: user
+      }
+    }
+    case 'UPDATE_CURRENT_USER': {
+      const { user } = action;
+      return {
+        ...state,
+        currentUser: state.currentUser ? { ...state.currentUser, ...user} : undefined,
       }
     }
 
@@ -516,7 +532,7 @@ const App: React.FC = () => {
       .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
   };
 
-  const handleUpdateUser = (editUser: IUser, type: 'SET_USER' | 'SET_CURRENT_USER') => {
+  const handleUpdateUser = (editUser: Partial<IUser>, type: 'UPDATE_USER' | 'UPDATE_CURRENT_USER') => {
     updateUser(editUser)
       .then(data => {
         if (data.type === 'ERROR') {
@@ -785,7 +801,8 @@ const App: React.FC = () => {
                     ?
                     <User
                       user={{ userName: '', creatorId: user.id }}
-                      onEditProfile={handleCreateUser}
+                      mode={'creating'}
+                      onCreateProfile={handleCreateUser}
                       onClearError={handleSetError}
                       isCanEditUser={true}
                     />
@@ -816,7 +833,7 @@ const App: React.FC = () => {
                             companies={currentCompanies}
                             devices={currentDevices}
                             onClearEditOK={() => handleSetAppState('PROFILE')}
-                            onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_CURRENT_USER')}
+                            onEditProfile={(user: Partial<IUser>) => handleUpdateUser(user, 'UPDATE_CURRENT_USER')}
                             onClearError={handleSetError}
                             isCanEditUser={currentUser.creatorId === user.id}
                             isCanEditDevices={isAdmin}
@@ -841,7 +858,7 @@ const App: React.FC = () => {
                               devices={devices}
                               isEditOK={appState === 'SAVED_PROFILE'}
                               onClearEditOK={() => handleSetAppState('PROFILE')}
-                              onEditProfile={(user: IUser) => handleUpdateUser(user, 'SET_USER')}
+                              onEditProfile={(user: Partial<IUser>) => handleUpdateUser(user, 'UPDATE_USER')}
                               onClearError={handleSetError}
                               isCanEditUser={true}
                               isCanEditDevices={isAdmin}

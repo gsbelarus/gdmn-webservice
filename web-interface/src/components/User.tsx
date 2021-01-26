@@ -5,13 +5,15 @@ import { IUser } from '../types';
 export interface IUserProps {
   user: IUser;
   isEditOK?: boolean;
+  mode: 'creating' | 'editing',
   onClearEditOK?: () => void;
-  onEditProfile: (user: IUser) => void;
+  onCreateProfile?: (user: IUser) => void;
+  onEditProfile?: (user: Partial<IUser>) => void;
   onClearError: () => void;
   isCanEditUser?: boolean;
 }
 
-export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditOK, isCanEditUser }: IUserProps) => {
+export const User = ({ onEditProfile, user, onClearError, onCreateProfile, isEditOK, onClearEditOK, isCanEditUser, mode }: IUserProps) => {
   const [state, setState] = useState<IUser>(user);
   const [repeatPassword, setRepeatPassword] = useState<string>();
 
@@ -81,7 +83,18 @@ export const User = ({ onEditProfile, user, onClearError, isEditOK, onClearEditO
               }
               onClick={() => {
                 onClearError();
-                onEditProfile(state);
+                if (mode === 'creating' && onCreateProfile) {
+                  onCreateProfile(state);
+                } else if (onEditProfile) {
+                  const partialUser: Partial<IUser> =
+                  (Object.keys(state) as (keyof IUser)[])
+                  .filter((key) => user[key] !== state[key])
+                  .reduce((partialObj, key) => {
+                    partialObj[key] = state[key];
+                    return partialObj;
+                  }, {} as { [key: string]: unknown });
+                  onEditProfile({ id: user.id, ...partialUser });
+                }
               }}
             />
           </div>

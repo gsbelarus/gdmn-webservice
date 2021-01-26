@@ -12,7 +12,7 @@ export interface IProfileProps {
   devices?: IDeviceInfo[];
   isEditOK?: boolean;
   onClearEditOK?: () => void;
-  onEditProfile: (user: IUser) => void;
+  onEditProfile: (user: Partial<IUser>) => void;
   onClearError: () => void;
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices:  (uIds: string[], isUnBlock: boolean) => void;
@@ -29,6 +29,7 @@ export const Profile = ({ onEditProfile, user, companies, onClearError, isEditOK
         key={user.id}
         isEditOK={isEditOK}
         user={user}
+        mode={'editing'}
         onEditProfile={onEditProfile}
         onClearError={onClearError}
         isCanEditUser={isCanEditUser}
