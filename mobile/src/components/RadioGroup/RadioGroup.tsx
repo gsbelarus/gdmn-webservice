@@ -1,6 +1,6 @@
 import { TouchableHighlight } from '@gorhom/bottom-sheet';
 import { useTheme } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import { IListItem } from '../../model/types';
@@ -14,7 +14,6 @@ type Props = {
 
 export const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: Props) => {
   const { colors } = useTheme();
-  // const [selectedRadio, setSelectedRadio] = useState<IOption>(activeButtonId);
 
   const onPress = useCallback(
     (option) => {

@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
@@ -298,7 +298,7 @@ const DocumentListScreen = () => {
         handelDismiss={handleDismissFilter}
         handelApply={handleApplyFilter}
       >
-        <RadioGroup options={sort_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id} />
+        <RadioGroup options={sort_options} onChange={setSelectedOption} activeButtonId={selectedOption?.id ?? 0} />
       </BottomSheet>
     </View>
   );

@@ -1,12 +1,13 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { BottomSheetModal, TouchableHighlight } from '@gorhom/bottom-sheet';
+import { useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState, useRef } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import { Text, Switch } from 'react-native-paper';
 
-import { IContact, IDocument, IRefData } from '../../../../../common';
+import { IDocument, IRefData } from '../../../../../common';
 import BottomSheet from '../../../components/BottomSheet';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
@@ -35,17 +36,49 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
-  const {
-    date = new Date().toISOString().slice(0, 10),
-    docnumber = getNextDocNumber(appState.documents),
-    tocontactId = -1,
-    fromcontactId = listDepartments.length === 1 ? listDepartments[0].id : -1,
-    doctype = config.system[0].defaultDocType[0],
-    status = 0,
-  } = useMemo(() => {
-    return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
+  useEffect(() => {
+    //Создания объекта в store для экрана создания или редактирования шапки документа
+    //Выполняется при создании экрана
+    console.log('1. appState.forms?.documentParams:', appState.forms?.documentParams);
+    // if (appState.forms?.documentParams) {
+    //   return;
+    // }
+    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
+
+    setStatusId(docObj?.head?.status || 0);
+
+    // Инициализируем параметры
+    if (docId) {
+      appActions.setForm({
+        documentParams: {
+          id: docObj?.id,
+          ...(docObj?.head as IDocumentParams),
+        },
+      });
+    } else {
+      appActions.setForm({
+        documentParams: {
+          date: new Date().toISOString().slice(0, 10),
+          docnumber: getNextDocNumber(appState.documents),
+          fromcontactId: listDepartments.length === 1 ? listDepartments[0].id : -1,
+          tocontactId: -1,
+          doctype: config.system[0].defaultDocType[0],
+          status: 0,
+        },
+      });
+    }
+    return () => {
+      //Выполняется при уничтожении экрана
+      console.log('clearForm');
+      appActions.clearForm('documentParams');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.forms?.documentParams, docId, listDepartments]);
+  }, [appActions, docId, appState.documents]);
+
+  const { date, docnumber, tocontactId, fromcontactId, doctype, status } = useMemo(() => {
+    console.log('2. appState.forms?.documentParams:', appState.forms?.documentParams);
+    return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
+  }, [appState.forms?.documentParams]);
 
   const docTypes = useMemo(() => appState.references?.documenttypes?.data, [appState.references?.documenttypes?.data]);
 
@@ -114,12 +147,11 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: '',
       headerLeft: () => (
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.clearForm('documentParams');
+            // appActions.clearForm('documentParams');
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
             if (docId) {
@@ -145,43 +177,20 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                 return;
               }
 
-              appActions.clearForm('documentParams');
+              // appActions.clearForm('documentParams');
               navigation.navigate('DocumentView', { docId: id });
             }}
           />
         ),
     });
-  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
+  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument, route]);
 
-  useEffect(() => {
-    return () => {
-      console.log('clearrr');
-      appActions.clearForm('documentParams');
-    };
-  }, [appActions]);
-
-  useEffect(() => {
-    if (appState.forms?.documentParams) {
-      return;
-    }
-    console.log('documentParams11', appState.forms?.documentParams);
-    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
-
-    setStatusId(docObj?.head?.status || 0);
-
-    // Инициализируем параметры
-    if (docId) {
-      appActions.setForm({
-        documentParams: {
-          id: docObj?.id,
-          ...(docObj?.head as IDocumentParams),
-        },
-      });
-    } else {
-      appActions.setForm({ documentParams: { date, docnumber, tocontactId, doctype } });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, docId]);
+  // useEffect(() => {
+  //   return () => {
+  //     console.log('clearrr');
+  //     appActions.clearForm('documentParams');
+  //   };
+  // }, [appActions]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -206,6 +215,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     [colors.border, colors.primary, colors.text],
   );
 
+  // Окно bottomsheet для выбора типа документа
   const docTypeRef = useRef<BottomSheetModal>(null);
 
   const [selectedDocType, setSelectedDocType] = useState(selectedItem(listDocumentType, doctype));
@@ -229,12 +239,12 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     docTypeRef.current?.dismiss();
   }, []);
 
+  // Окно bottomsheet для выбора подразделения
   const fromContactRef = useRef<BottomSheetModal>(null);
 
   const [selectedFromContact, setSelectedFromContact] = useState(selectedItem(listDepartments, fromcontactId));
 
   const handlePresentFromContact = useCallback(() => {
-    console.log('listDepartments', listDepartments[0]);
     setSelectedFromContact(selectedItem(listDepartments, fromcontactId) ?? listDepartments[0]);
     fromContactRef.current?.present();
   }, [listDepartments, fromcontactId, selectedItem]);
@@ -251,6 +261,30 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   const handleDismissFromContact = useCallback(() => {
     fromContactRef.current?.dismiss();
+  }, []);
+
+  // Окно bottomsheet для выбора даты
+  const dateRef = useRef<BottomSheetModal>(null);
+
+  const [selectedDate, setSelectedDate] = useState(date);
+
+  const handlePresentDate = useCallback(() => {
+    setSelectedDate(date);
+    dateRef.current?.present();
+  }, [date]);
+
+  const handleApplyDate = useCallback(() => {
+    appActions.setForm({
+      documentParams: {
+        ...appState.forms?.documentParams,
+        date: selectedDate,
+      },
+    });
+    dateRef.current?.dismiss();
+  }, [appState.forms?.documentParams, appActions, selectedDate]);
+
+  const handleDismissDate = useCallback(() => {
+    dateRef.current?.dismiss();
   }, []);
 
   return (
@@ -293,14 +327,15 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             <ReferenceItem
               value={getDateString(date || new Date().toISOString())}
               disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectDate', {
-                  formName: 'documentParams',
-                  fieldName: 'date',
-                  title: 'Дата документа',
-                  value: date,
-                })
-              }
+              onPress={handlePresentDate}
+              // () =>
+              // navigation.navigate('SelectDate', {
+              //   formName: 'documentParams',
+              //   fieldName: 'date',
+              //   title: 'Дата документа',
+              //   value: date,
+              // })
+              // }
             />
           </View>
           <ItemSeparator />
@@ -397,6 +432,23 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
               onChange={(option) => setSelectedFromContact(option)}
               activeButtonId={selectedFromContact?.id}
             />
+          </BottomSheet>
+          <BottomSheet
+            sheetRef={dateRef}
+            title={'Дата'}
+            handelDismiss={handleDismissDate}
+            handelApply={handleApplyDate}
+          >
+            <TouchableHighlight>
+              <Calendar
+                current={selectedDate}
+                markedDates={{
+                  [selectedDate]: { selected: true, selectedColor: 'orange', disableTouchEvent: true },
+                }}
+                onDayPress={(day) => setSelectedDate(day.dateString)}
+                firstDay={1}
+              />
+            </TouchableHighlight>
           </BottomSheet>
         </ScrollView>
       </View>

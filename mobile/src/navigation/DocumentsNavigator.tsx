@@ -2,7 +2,6 @@ import { useTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import BackdropExample from '../components/ModalComponent';
 import { IListItem } from '../model/types';
 import {
   DocumentEditScreen,
@@ -56,7 +55,7 @@ export type DocumentStackParamList = {
   ScanBarcodeReader: {
     docId: number;
   };
-  BackdropExample: undefined;
+  MyModal: undefined;
 };
 
 const Stack = createStackNavigator<DocumentStackParamList>();
@@ -69,15 +68,6 @@ const DocumentsNavigator = () => {
       screenOptions={{ headerStyle: { backgroundColor: colors.background } }}
     >
       <Stack.Screen
-        key="BackdropExample"
-        name="BackdropExample"
-        component={BackdropExample}
-        options={{
-          title: 'Test',
-          animationTypeForReplace: 'pop',
-        }}
-      />
-      <Stack.Screen
         key="DocumentList"
         name="DocumentList"
         component={DocumentListScreen}
@@ -86,7 +76,7 @@ const DocumentsNavigator = () => {
           animationTypeForReplace: 'pop',
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         key="DocumentView"
         name="DocumentView"
         component={DocumentViewScreen}
@@ -106,16 +96,16 @@ const DocumentsNavigator = () => {
         component={DocumentLineEditScreen}
         options={{ title: '' }}
       />
-      <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
+      <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} /> */}
       <Stack.Screen
         key="DocumentRequest"
         name="DocumentRequest"
         component={DocumentRequestScreen}
         options={{ title: 'Загрузить документы' }}
       />
-      <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
-      <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} />
-      <Stack.Screen
+      {/* <Stack.Screen key="SelectItem" name="SelectItem" options={{ title: '' }} component={SelectItemScreen} />
+      <Stack.Screen key="SelectDate" name="SelectDate" options={{ title: '' }} component={SelectDateScreen} /> */}
+      {/* <Stack.Screen
         key="ScanBarCodeScreen"
         name="ScanBarcode"
         component={ScanBarcodeScreen}
@@ -126,7 +116,7 @@ const DocumentsNavigator = () => {
         name="ScanBarcodeReader"
         component={ScanBarcodeReaderScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

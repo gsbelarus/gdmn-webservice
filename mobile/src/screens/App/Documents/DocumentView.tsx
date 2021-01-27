@@ -72,7 +72,7 @@ type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
 const DocumentViewScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
-  const showActionSheet = useActionSheet();
+  // const showActionSheet = useActionSheet();
   const navigation = useNavigation();
 
   const docId = route.params?.docId;
@@ -92,12 +92,16 @@ const DocumentViewScreen = ({ route }: Props) => {
   }, [document]);
 
   const documentTypeName = useMemo(
-    () => (state.references?.documenttypes?.data as IRefData[])?.find((i) => i.id === document?.head?.doctype)?.name,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.contacts?.data, document?.head],
+    () =>
+      (state.references?.documenttypes?.data as IRefData[])?.find(
+        (i) => i.id.toString() === document?.head?.doctype.toString(),
+      )?.name || '',
+    [state.references?.documenttypes?.data, document?.head?.doctype],
   );
 
-  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
+  const contacts = useMemo(() => (state.references?.contacts?.data as unknown) as IContact[], [
+    state.references?.contacts?.data,
+  ]);
 
   const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId), [
     contacts,
@@ -123,7 +127,6 @@ const DocumentViewScreen = ({ route }: Props) => {
           icon="arrow-left-circle-outline"
           size={25}
           onPress={() => {
-            navigation.setOptions({ animationTypeForReplace: 'push' });
             navigation.navigate('DocumentList');
           }}
         />
@@ -138,7 +141,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, navigation, showActionSheet, documentTypeName]);
+  }, [actions, docId, navigation, documentTypeName, route]);
 
   const LineItem = useCallback(
     ({ item }: { item: ILine }) => {
