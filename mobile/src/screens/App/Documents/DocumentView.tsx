@@ -69,11 +69,11 @@ type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
 
 // const notFound: IContact = { id: -1, name: '', contactType: -1 };
 
-const DocumentViewScreen = ({ route }: Props) => {
+const DocumentViewScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   // const showActionSheet = useActionSheet();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const docId = route.params?.docId;
 

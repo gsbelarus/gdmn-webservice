@@ -12,6 +12,12 @@ import {
   RemainsListScreen,
 } from '../screens/App/Documents';
 import { ScanBarcodeReaderScreen, ScanBarcodeScreen } from '../screens/App/Documents/components';
+import {
+  ReferenceDetailScreen,
+  ReferenceViewScreen,
+  RemainsContactListViewScreen,
+  RemainsViewScreen,
+} from '../screens/App/References';
 import { AppStoreProvider, useServiceStore } from '../store';
 import TabsNavigator from './TabsNavigator';
 
@@ -32,6 +38,10 @@ export type RootStackParamList = {
   ScanBarcode: { docId: number };
   ScanBarcodeReader: { docId: number };
   FilterEdit: undefined;
+  Reference: { docId: number };
+  ReferenceDetail: undefined;
+  RemainsContactList: undefined;
+  RemainsView: undefined;
 };
 
 const LoadingScreen = () => {
@@ -110,6 +120,25 @@ const AppNavigator = () => {
                 name="ScanBarcodeReader"
                 component={ScanBarcodeReaderScreen}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen key="Reference" name="Reference" component={ReferenceViewScreen} options={{ title: '' }} />
+              <Stack.Screen
+                key="ReferenceDetail"
+                name="ReferenceDetail"
+                component={ReferenceDetailScreen}
+                options={{ title: '', headerBackTitle: 'Назад' }}
+              />
+              <Stack.Screen
+                key="RemainsView"
+                name="RemainsView"
+                options={{ title: '', headerBackTitle: 'Назад' }}
+                component={RemainsViewScreen}
+              />
+              <Stack.Screen
+                key="RemainsContactList"
+                name="RemainsContactList"
+                component={RemainsContactListViewScreen}
+                options={{ title: '' }}
               />
             </>
           )}

@@ -22,9 +22,8 @@ interface IField extends IGood {
   price?: number;
 }
 
-const RemainsViewScreen = ({ route }) => {
+const RemainsViewScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IField[]>();

@@ -34,7 +34,7 @@ const ReferencesNavigator = () => {
         component={ReferenceListScreen}
         options={{ title: 'Справочники' }}
       />
-      <Stack.Screen key="Reference" name="Reference" component={ReferenceViewScreen} options={{ title: '' }} />
+      {/* <Stack.Screen key="Reference" name="Reference" component={ReferenceViewScreen} options={{ title: '' }} />
       <Stack.Screen
         key="ReferenceDetail"
         name="ReferenceDetail"
@@ -52,7 +52,7 @@ const ReferencesNavigator = () => {
         name="RemainsContactList"
         component={RemainsContactListViewScreen}
         options={{ title: '' }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };
