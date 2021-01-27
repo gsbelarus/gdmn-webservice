@@ -2,6 +2,7 @@ import { ParameterizedContext } from 'koa';
 import log from '../utils/logger';
 import { IResponse, IUser, IUserProfile, IDeviceInfo } from '../../../common';
 import { userService } from '../services';
+import { hashPassword } from '../utils/crypt';
 
 export const makeProfile = (user: IUser) => ({
   id: user.id,
@@ -12,19 +13,6 @@ export const makeProfile = (user: IUser) => ({
   phoneNumber: user.phoneNumber,
   companies: user.companies,
   creatorId: user.creatorId,
-});
-
-export const makeUser = (user: IUser) => ({
-  id: user.id,
-  externalId: user.externalId,
-  userName: user.userName,
-  firstName: user.firstName,
-  lastName: user.lastName,
-  phoneNumber: user.phoneNumber,
-  password: user.password,
-  companies: user.companies,
-  creatorId: user.creatorId,
-  role: user.role,
 });
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -69,7 +57,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  const { body: user } = ctx.request;
+  const user = ctx.request.body as Partial<IUser>;
 
   if (!userId) {
     ctx.throw(400, 'не указан идентификатор пользователя');
@@ -79,8 +67,31 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указаны данные пользователя');
   }
 
+  const oldUser = await userService.findOne(userId);
+
+  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
+
+  if (!oldUser) {
+    ctx.throw(400, 'пользователь не найден');
+  }
+
+  let passwordHash: string | undefined = undefined;
+
+  if (!!user.password) {
+    passwordHash = await hashPassword(user.password);
+  }
+
+  //Удаляем поля, которые нелья менять
+  delete user.creatorId;
+  delete user.role;
+
   try {
-    const id = await userService.updateOne({ ...makeUser(user), id: userId });
+    const id = await userService.updateOne({
+      ...oldUser,
+      ...user,
+      id: userId,
+      password: passwordHash ?? oldUser.password,
+    });
 
     const result: IResponse<string> = { result: true, data: id };
 

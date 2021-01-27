@@ -34,26 +34,8 @@ const addOne = async (user: IUser) => {
  * @param {IUser} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const updateOne = async (user: Partial<IUser>) => {
-  if (!user.id || !user.userName) {
-    throw new Error('не указан идентификатор пользователя');
-  }
-
-  const oldUser = await users.find(user.id || user.userName);
-
-  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
-
-  if (!oldUser) {
-    throw new Error('пользователь не найден');
-  }
-
-  let passwordHash: string | undefined = undefined;
-
-  if (!!user.password) {
-    passwordHash = await hashPassword(user.password);
-  }
-
-  await users.update(passwordHash ? { ...oldUser, ...user, password: passwordHash} : { ...oldUser, ...user });
+const updateOne = async (user: IUser) => {
+  await users.update(user);
 
   return user.id;
 };
