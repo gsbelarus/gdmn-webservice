@@ -43,27 +43,54 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    if (!route.params || saved) {
+    if (!route.params) {
       return;
     }
+
+    // Выполняется если переданы параметры
+    // инициализация данных: продукт, документ
 
     setProduct(state.goods.find((item) => item.id === route.params.prodId));
     setDocument(state.documents.find((item) => item.id === route.params.docId));
-
-    const docLine = (document as ISellDocument)?.lines?.find((item) => item.id === route.params.lineId);
-
-    if (!docLine) {
-      return;
-    }
-
-    setLine(docLine);
-  }, [route.params, state.goods, state.documents, saved, document]);
+  }, [route.params, state.documents, state.goods]);
 
   useEffect(() => {
-    if (!route.params?.weighedGood) {
+    if (!document || !product || route.params?.weighedGood) {
       return;
     }
-    // Если передан route.params?.weighedGood
+    // Поиск сохранённой позиции
+    let docLine: ISellLine = (document as ISellDocument)?.lines?.find((item) => item.id === route.params.lineId);
+
+    if (!docLine) {
+      docLine = {
+        id: '0',
+        goodId: product?.id,
+        quantity: 1,
+        manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
+        tara: [],
+        numreceive: state.weighedGoods.find((item) => {
+          const date = item.datework.split('.').reverse();
+          return (
+            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
+              new Date(document.head.date).toISOString().slice(0, 10) && item.goodkey === product?.id
+          );
+        })?.numreceive,
+      };
+    }
+
+    setGoodQty(docLine.quantity.toString());
+
+    setLine(docLine);
+
+    actions.setFormParams(docLine);
+    actions.setBoxingsLine([{ docId: document.id, lineDoc: docLine.id, lineBoxings: docLine.tara ?? [] }]);
+  }, [route.params, document, actions, product, state.weighedGoods]);
+
+  useEffect(() => {
+    if (!document || !product || !route.params?.weighedGood) {
+      return;
+    }
+    // Если добавление идёт взвешенного товара - передан route.params?.weighedGood
 
     const weighedGood = state.weighedGoods.find((item) => item.id === route.params.weighedGood);
 
@@ -74,114 +101,41 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       return;
     }
 
-    actions.setFormParams({
+    const docLine: ISellLine = {
       id: route.params?.lineId,
-      goodId: route.params?.prodId,
+      goodId: product.id,
       quantity: weighedGood && good ? weighedGood.weight / good.itemWeight : 0,
       manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10),
-      //timeWork: good.timework,
       numreceive: weighedGood.numreceive,
       tara: [],
-      //barcodes: route.params.barcode ? [route.params.barcode] : [],
-    });
-  }, [actions, route.params?.lineId, route.params?.prodId, route.params?.weighedGood, state.goods, state.weighedGoods]);
+    };
 
-  useEffect(() => {
-    if (document) {
-      const lineDocuments =
-        document instanceof Object && (document as IDocument)
-          ? (document as IDocument).lines
-          : (document as ISellDocument).lines;
-      setLine(lineDocuments.find((item) => item.id === route.params?.lineId));
-    }
-  }, [document, route.params?.lineId]);
+    setGoodQty(docLine.quantity.toString());
 
-  useEffect(() => {
-    if (!document || !product) {
-      return;
-    }
+    setLine(docLine);
 
-    if (route.params?.weighedGood) {
-      return;
-    }
-
-    if (!route.params?.modeCor) {
-      actions.setFormParams({
-        id: route.params?.lineId,
-        goodId: route.params?.prodId,
-        quantity: 1,
-        manufacturingDate: new Date(document.head.date).toISOString().slice(0, 10),
-        tara: [],
-        numreceive: state.weighedGoods.find((item) => {
-          const date = item.datework.split('.').reverse();
-          return (
-            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
-              new Date(document.head.date).toISOString().slice(0, 10) && item.goodkey === route.params?.prodId
-          );
-        })?.numreceive,
-      });
-    } else {
-      if (!line) {
-        return;
-      }
-
-      // setGoodQty((line.quantity ?? 0).toString());
-
-      actions.setFormParams(
-        route.params?.manufacturingDate ? { ...line, manufacturingDate: route.params.manufacturingDate } : line,
-      );
-    }
+    actions.setFormParams(docLine);
+    actions.setBoxingsLine([{ docId: document.id, lineDoc: docLine.id, lineBoxings: docLine.tara ?? [] }]);
   }, [
     actions,
     document,
-    line,
     product,
     route.params?.lineId,
-    route.params.manufacturingDate,
-    route.params?.modeCor,
-    route.params?.prodId,
-    route.params?.weighedGood,
+    route.params.prodId,
+    route.params.weighedGood,
+    state.goods,
     state.weighedGoods,
   ]);
-
-  useEffect(() => {
-    if ((state.formParams as ISellLine) && route.params?.manufacturingDate) {
-      actions.setFormParams({ ...(state.formParams as ISellLine), manufacturingDate: route.params.manufacturingDate });
-    }
-  }, [actions, document, product, route.params, state.formParams]);
-
-  useEffect(() => {
-    if ((state.formParams as ISellLine)?.manufacturingDate) {
-      const numberReceive = state.weighedGoods.find((item) => {
-        const date = item.datework.split('.').reverse();
-        return (
-          item.goodkey === (state.formParams as ISellLine)?.goodId &&
-          new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
-            (state.formParams as ISellLine).manufacturingDate
-        );
-      })?.numreceive;
-      if (numberReceive) {
-        actions.setFormParams({
-          ...(state.formParams as ISellLine),
-          numreceive: numberReceive,
-        });
-      }
-    }
-  }, [actions, state.formParams, state.formParams?.manufacturingDate, state.weighedGoods]);
 
   useEffect(() => {
     if (!line) {
       return;
     }
-    // Reactotron.log(line);
 
-    if (goodQty === undefined) {
-      setGoodQty((line.quantity ?? 0).toString());
-      return;
+    if ((state.formParams as ISellLine)?.quantity.toString() !== goodQty) {
+      actions.setFormParams({ ...line, quantity: parseFloat(goodQty.replace(',', '.')) });
     }
-
-    actions.setFormParams({ ...line, quantity: parseFloat(goodQty.replace(',', '.')) });
-  }, [actions, goodQty, line]);
+  }, [actions, goodQty, line, state.formParams]);
 
   useEffect(() => {
     if (isFocused) {
@@ -213,12 +167,16 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
+            if (saved) {
+              return;
+            }
+
+            setSaved(true);
+
             const editLine = (document as ISellDocument)?.lines.find(
               (item) =>
                 item.numreceive === (state.formParams as ISellLine).numreceive && item.goodId === route.params?.prodId,
             );
-
-            setSaved(true);
 
             if ((line?.id && route?.params?.modeCor) || editLine) {
               const idLine = editLine ? editLine.id : line ? line.id : (state.formParams as ISellLine).id;
@@ -268,7 +226,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
-  }, [actions, document, line, navigation, product, route.params, state.boxingsLine, state.formParams]);
+  }, [actions, document, line, navigation, product, route.params, saved, state.boxingsLine, state.formParams]);
 
   const onPress = () => {
     if (isKeyboardVisible) {
@@ -290,6 +248,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       const res = parseFloat(validNumber.test(value) ? value : prev).toString();
+
       return res;
     });
   }, []);

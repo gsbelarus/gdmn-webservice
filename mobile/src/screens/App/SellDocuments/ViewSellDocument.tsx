@@ -66,7 +66,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
           {item.quantity}
         </Text>
       </View>
-      {status === 0 ? (
+      {status === 0 && (
         <View style={localStyles.remainsInfo}>
           <TouchableOpacity
             style={localStyles.buttonDelete}
@@ -87,7 +87,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
         </View>
-      ) : undefined}
+      )}
     </>
   );
 });
@@ -100,7 +100,7 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
     <TouchableOpacity
       style={localStyles.listContainer}
       onPress={() => {
-        actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
+        // actions.setBoxingsLine([{ docId, lineDoc: item.id, lineBoxings: item.tara ?? [] }]);
         navigation.navigate('SellProductDetail', { lineId: item.id, prodId: item.goodId, docId, modeCor: true });
       }}
     >
@@ -269,11 +269,11 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <View style={localStyles.remainsInfo}>
             <Text style={localStyles.productBarcodeView}>Кол-во</Text>
           </View>
-          {document?.head?.status === 0 ? (
+          {document?.head?.status === 0 && (
             <View style={localStyles.remainsInfo}>
               <Text style={localStyles.productBarcodeView} />
             </View>
-          ) : null}
+          )}
         </View>
         <FlatList
           ref={refList}
@@ -398,16 +398,9 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   goodInfo: {
-    flexBasis: '30%',
+    flexBasis: '25%',
     marginLeft: 15,
   },
-  /*   header: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    flex: 15,
-    justifyContent: 'center',
-    padding: 7,
-  }, */
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -435,7 +428,7 @@ const localStyles = StyleSheet.create({
   },
   remainsInfo: {
     alignItems: 'flex-end',
-    flexBasis: 45,
+    flexBasis: 40,
     flexGrow: 1,
     marginRight: 5,
   },

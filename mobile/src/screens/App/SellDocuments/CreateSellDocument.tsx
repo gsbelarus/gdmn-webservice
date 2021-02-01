@@ -382,7 +382,7 @@ const localStyles = StyleSheet.create({
     padding: 10,
   },
   inputCaption: {
-    width: 70,
+    width: '20%',
   },
   picker: {
     borderRadius: 4,
