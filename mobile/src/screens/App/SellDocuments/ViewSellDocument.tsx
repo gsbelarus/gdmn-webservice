@@ -421,7 +421,7 @@ const localStyles = StyleSheet.create({
   },
   productTitleView: {
     flexGrow: 1,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     maxHeight: 70,
     minHeight: 15,
