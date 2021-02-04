@@ -35,7 +35,7 @@ const deleteDevice = async (uId: string) => {
   } as INetworkError;
 };
 
-const blockDevice = async (updateDevice: IDevice) => {
+const blockDevice = async (updateDevice: Partial<IDevice>) => {
   const body = JSON.stringify(updateDevice);
   const res = await patch<IResponse<IDevice>>(`/devices/${updateDevice.id}?deviceId=${DEVICE_ID}`, body);
 

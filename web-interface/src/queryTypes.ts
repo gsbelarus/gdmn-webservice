@@ -72,7 +72,7 @@ export interface IUpdateCompanyData extends IQueryCommand {
 
 export interface IUpdateUserData extends IQueryCommand {
   command: 'UPDATE_USER';
-  user: IUser;
+  user: Partial<IUser>;
 };
 
 export interface IGetUserDevicesData extends IQueryCommand {
