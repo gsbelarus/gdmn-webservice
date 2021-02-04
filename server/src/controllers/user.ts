@@ -77,7 +77,7 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   let passwordHash: string | undefined = undefined;
 
-  if (!!user.password) {
+  if (user.password) {
     passwordHash = await hashPassword(user.password);
   }
 
