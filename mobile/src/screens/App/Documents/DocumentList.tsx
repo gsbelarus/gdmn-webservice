@@ -63,9 +63,8 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const DocumentListScreen = () => {
+const DocumentListScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
 
   const ref = useRef<FlatList<IDocument>>(null);
 

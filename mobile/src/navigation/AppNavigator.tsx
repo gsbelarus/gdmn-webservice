@@ -32,12 +32,12 @@ export type RootStackParamList = {
     lineId?: number;
     price?: number;
     remains?: number;
+    modeCor?: boolean;
   };
   DocumentView: { docId: number };
   RemainsList: { docId: number };
   ScanBarcode: { docId: number };
   ScanBarcodeReader: { docId: number };
-  FilterEdit: undefined;
   Reference: { docId: number };
   ReferenceDetail: undefined;
   RemainsContactList: undefined;
@@ -108,7 +108,6 @@ const AppNavigator = () => {
                 component={DocumentLineEditScreen}
                 options={{ title: '' }}
               />
-              <Stack.Screen key="FilterEdit" name="FilterEdit" component={FilterEditScreen} options={{ title: '' }} />
               <Stack.Screen
                 key="ScanBarCodeScreen"
                 name="ScanBarcode"

@@ -19,6 +19,7 @@ const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
 const TabsNavigator = () => {
   const { colors } = useTheme();
+
   return (
     <TabsStack.Navigator barStyle={[styles.tabBar, { backgroundColor: colors.background }]}>
       <TabsStack.Screen
