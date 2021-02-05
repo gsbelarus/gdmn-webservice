@@ -2,8 +2,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button, Animated } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheet from '../../../components/BottomSheet';
@@ -39,27 +42,66 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
+  const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+
+  let ref = useRef(null);
+
+  const updateRef = (_ref) => {
+    ref = _ref;
+  };
+
+  const renderRightActions = (progress: any) => (
+    <View style={{ width: 120, flexDirection: 'row' }}>
+      {/* {renderRightAction('star', '#ffab00', 120, progress)} */}
+      {renderRightAction('mode-edit', '#ffab00', 120, progress)}
+      {renderRightAction('delete-forever', '#dd2c00', 60, progress)}
+    </View>
+  );
+
+  const renderRightAction = (icon, color, x, progress) => {
+    const trans = progress.interpolate({
+      inputRange: [0, 1, 2],
+      outputRange: [x, 0, 1],
+    });
+
+    const pressHandler = () => {
+      ((ref as unknown) as Swipeable).close();
+    };
+
+    return (
+      <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
+        <RectButton style={[localStyles.rightAction, { backgroundColor: color }]} onPress={pressHandler}>
+          <AnimatedIcon name={icon} size={30} color="#fff" style={localStyles.actionIcon} />
+        </RectButton>
+      </Animated.View>
+    );
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('DocumentView', { docId: item?.id });
-      }}
-    >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status || 0] }]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-        </View>
-        <View style={localStyles.details}>
-          <View style={localStyles.directionRow}>
-            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
-            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
-              {status ? status.name : ''}
+    <Swipeable friction={2} /* rightThreshold={120} */ renderRightActions={renderRightActions} ref={updateRef}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('DocumentView', { docId: item?.id });
+        }}
+      >
+        <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+          <View style={[localStyles.avatar, { backgroundColor: statusColors[item?.head?.status || 0] }]}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          <View style={localStyles.details}>
+            <View style={localStyles.directionRow}>
+              <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead?.docnumber} от ${docDate}`}</Text>
+              <Text style={[localStyles.number, localStyles.field, { color: statusColors[item?.head?.status] }]}>
+                {status ? status.name : ''}
+              </Text>
+            </View>
+            <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+              {fromContact?.name || ''}
             </Text>
           </View>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>{fromContact?.name || ''}</Text>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Swipeable>
   );
 });
 
@@ -313,6 +355,10 @@ const sort_options = [
 export { DocumentListScreen };
 
 const localStyles = StyleSheet.create({
+  actionIcon: {
+    marginHorizontal: 10,
+    width: 30,
+  },
   avatar: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
@@ -366,6 +412,11 @@ const localStyles = StyleSheet.create({
   },
   number: {
     fontSize: 12,
+  },
+  rightAction: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   searchBar: {
     elevation: 0,
