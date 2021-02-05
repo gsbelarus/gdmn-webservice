@@ -79,19 +79,7 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
  * @return uid, идентификатор устройства
  * */
 const updateOne = async (device: IDevice) => {
-  const oldDevice = await devices.find(i => i.id === device.id);
-
-  if (!oldDevice) {
-    throw new Error('устройство не найдено');
-  }
-
-  // Удаляем поля которые нельзя перезаписывать
-  // delete device.userId;
-  // delete device.id;
-  device.userId = '';
-  device.id = undefined;
-
-  await devices.update({ ...oldDevice, ...device });
+  await devices.update(device);
 
   return device.uid;
 };

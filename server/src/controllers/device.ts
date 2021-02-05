@@ -147,7 +147,7 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
-  const deviceInfo = ctx.request.body;
+  const deviceInfo = ctx.request.body as Partial<IDevice>;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');
@@ -157,8 +157,20 @@ const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об устройстве');
   }
 
+  const oldDevice = await deviceService.findOne(deviceId); //devices.find(i => i.id === device.id);
+
+  if (!oldDevice) {
+    ctx.throw(400, 'устройство не найдено');
+  }
+
+  // Удаляем поля которые нельзя перезаписывать
+  delete deviceInfo.userId;
+  delete deviceInfo.id;
+  //deviceInfo.userId = '';
+  //deviceInfo.id = undefined;
+
   try {
-    const id = await deviceService.updateOne({ ...deviceInfo, uid: deviceId });
+    const id = await deviceService.updateOne({ ...oldDevice, ...deviceInfo, uid: deviceId });
 
     const result: IResponse<string> = { result: true, data: id };
 

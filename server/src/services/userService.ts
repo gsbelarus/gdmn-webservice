@@ -35,21 +35,7 @@ const addOne = async (user: IUser) => {
  * @return id, идентификатор пользователя
  * */
 const updateOne = async (user: IUser) => {
-  const oldUser = await users.find(user.id || user.userName);
-
-  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
-
-  if (!oldUser) {
-    throw new Error('пользователь не найден');
-  }
-
-  if (!user.password) {
-    throw new Error('Не указан пароль');
-  }
-
-  const passwordHash = await hashPassword(user.password);
-
-  await users.update({ ...oldUser, ...user, password: passwordHash });
+  await users.update(user);
 
   return user.id;
 };

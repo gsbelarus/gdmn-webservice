@@ -33,7 +33,7 @@ const getUser = async (userId: string) => {
   } as INetworkError;
 };
 
-const updateUser = async (user: IUserType) => {
+const updateUser = async (user: Partial<IUserType>) => {
   const body = JSON.stringify(user);
   const res = await patch<IResponse<IUser>>(`/users/${user.id}?deviceId=${DEVICE_ID}`, body);
 

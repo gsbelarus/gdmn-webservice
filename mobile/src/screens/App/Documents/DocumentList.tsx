@@ -35,7 +35,6 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
   const docHead = useMemo(() => item?.head, [item?.head]);
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
-  // const toContact = useMemo(() => getContact(docHead?.tocontactId), [docHead.tocontactId, getContact]);
 
   const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
 

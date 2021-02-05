@@ -51,7 +51,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
-  const company = ctx.request.body as ICompany;
+  const company = ctx.request.body as Partial<ICompany>;
 
   if (!companyId) {
     ctx.throw(400, 'не указан идентификатор организации');
@@ -61,8 +61,21 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об организации');
   }
 
+  const oldCompany: ICompany | undefined = await companyService.findOne(companyId); //companies.find(company.id);
+
+  /*if (!oldCompany) {
+    oldCompany = await companyService.findOneByName(company.title);
+  }*/
+
+  if (!oldCompany) {
+    ctx.throw(400, 'организация не найдена');
+  }
+
+  // Удаляем поля которые нельзя перезаписывать
+  //company.admin = undefined;
+
   try {
-    const id = await companyService.updateOne({ ...company, id: companyId });
+    const id = await companyService.updateOne({ ...oldCompany, ...company, id: companyId });
     const result: IResponse<string> = { result: true, data: id };
 
     ctx.status = 200;

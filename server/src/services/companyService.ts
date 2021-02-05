@@ -77,26 +77,9 @@ const findAll = async (): Promise<ICompany[]> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (company: ICompany): Promise<string> => {
-  let oldCompany;
+  await companies.update(company);
 
-  if (company.id) {
-    oldCompany = await companies.find(company.id);
-  }
-
-  if (!oldCompany) {
-    oldCompany = await companies.find(i => i.title === company.title);
-  }
-
-  if (!oldCompany) {
-    throw new Error('организация не найдена');
-  }
-
-  // Удаляем поля которые нельзя перезаписывать
-  company.admin = '';
-
-  await companies.update({ ...oldCompany, ...company });
-
-  return oldCompany.id;
+  return company.id;
 };
 
 /**
