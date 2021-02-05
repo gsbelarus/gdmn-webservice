@@ -8,7 +8,6 @@ import {
   DocumentEditScreen,
   DocumentLineEditScreen,
   DocumentViewScreen,
-  FilterEditScreen,
   RemainsListScreen,
 } from '../screens/App/Documents';
 import { ScanBarcodeReaderScreen, ScanBarcodeScreen } from '../screens/App/Documents/components';

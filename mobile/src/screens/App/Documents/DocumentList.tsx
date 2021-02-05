@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button, Animated } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
@@ -206,27 +206,6 @@ const DocumentListScreen = ({ route, navigation }) => {
         const docHead = item?.head;
 
         return docHead?.docnumber?.includes(searchText);
-        // const fromContact = getContact(docHead?.fromcontactId);
-
-        // const toContact = getContact(docHead?.tocontactId);
-
-        // const status = Statuses.find((type) => type.id === item?.head?.status);
-
-        // console.log('Вызов окна DocumentLst');
-
-        // return appState.forms?.filterParams?.fieldSearch
-        //   ? (appState.forms?.filterParams?.fieldSearch as string[]).some((value: string) =>
-        //       value === 'number'
-        //         ? item?.head.docnumber?.includes(searchText)
-        //         : value === 'state' && status
-        //         ? status.name.includes(searchText)
-        //         : value === 'toContact' && toContact
-        //         ? toContact.name.includes(searchText)
-        //         : value === 'fromContact' && fromContact
-        //         ? fromContact.name.includes(searchText)
-        //         : true,
-        //     )
-        //   : true;
       }) || [],
     );
   }, [appState.documents, searchText, getContact, appState.forms?.filterParams?.fieldSearch]);
@@ -339,13 +318,11 @@ const DocumentListScreen = ({ route, navigation }) => {
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}
             icon="file-plus"
             onPress={() => {
-              // appActions.clearForm('DocumentEdit');
               navigation.navigate('DocumentEdit');
             }}
           />
         </>
       )}
-      {/* {modalVisible && <ModalComponent />} */}
       <BottomSheet
         sheetRef={bottomSheetRef}
         title={'Настройка фильтра'}
