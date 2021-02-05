@@ -1,5 +1,5 @@
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme, useScrollToTop, useRoute, RouteProp } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -8,9 +8,8 @@ import { Text, Colors, FAB, IconButton, Avatar } from 'react-native-paper';
 import { ILine, IReference, IGood, IContact, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
-import { useActionSheet } from '../../../helpers/useActionSheet';
 import { formatValue } from '../../../helpers/utils';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -18,11 +17,11 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'DocumentView'>>().params?.docId;
+  const docId = useRoute<RouteProp<RootStackParamList, 'DocumentView'>>().params?.docId;
 
-  const good: IGood = useMemo(() => {
-    return ((state.references?.goods as unknown) as IReference<IGood>)?.data.find((i) => i.id === item.goodId);
-  }, [item?.goodId, state.references?.goods]);
+  const good: IGood = ((state.references?.goods as unknown) as IReference<IGood>)?.data.find(
+    (i) => i.id === item.goodId,
+  );
 
   return (
     <>
@@ -65,15 +64,11 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
   );
 });
 
-type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentView'>;
 
-// const notFound: IContact = { id: -1, name: '', contactType: -1 };
-
-const DocumentViewScreen = ({ route }: Props) => {
+const DocumentViewScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const { state, actions } = useAppStore();
-  const showActionSheet = useActionSheet();
-  const navigation = useNavigation();
+  const { state } = useAppStore();
 
   const docId = route.params?.docId;
 
@@ -82,22 +77,25 @@ const DocumentViewScreen = ({ route }: Props) => {
     state.documents,
   ]);
 
-  const documentLines = useMemo(() => document?.lines as ILine[], [document?.lines]);
+  const documentLines = document?.lines;
 
-  const isEditable = useMemo(() => document?.head?.status === 0, [document?.head?.status]);
+  const isEditable = document?.head?.status === 0;
 
-  const docTitle = useMemo(() => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString('BY-ru', options)}`;
-  }, [document]);
+  const docTitle = `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString('BY-ru', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })}`;
 
   const documentTypeName = useMemo(
-    () => (state.references?.documenttypes?.data as IRefData[])?.find((i) => i.id === document?.head?.doctype)?.name,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.contacts?.data, document?.head],
+    () =>
+      (state.references?.documenttypes?.data as IRefData[])?.find(
+        (i) => i.id.toString() === document?.head?.doctype.toString(),
+      )?.name || '',
+    [state.references?.documenttypes?.data, document?.head?.doctype],
   );
 
-  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
+  const contacts = (state.references?.contacts?.data as unknown) as IContact[];
 
   const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId), [
     contacts,
@@ -117,13 +115,12 @@ const DocumentViewScreen = ({ route }: Props) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: documentTypeName || '',
+      title: documentTypeName,
       headerLeft: () => (
         <IconButton
           icon="arrow-left-circle-outline"
           size={25}
           onPress={() => {
-            navigation.setOptions({ animationTypeForReplace: 'push' });
             navigation.navigate('DocumentList');
           }}
         />
@@ -138,7 +135,7 @@ const DocumentViewScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [actions, docId, navigation, showActionSheet, documentTypeName]);
+  }, [docId, navigation, documentTypeName]);
 
   const LineItem = useCallback(
     ({ item }: { item: ILine }) => {

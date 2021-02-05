@@ -6,7 +6,14 @@ import { IMDGoodRemain, IModel, IModelData } from '../../../../common/base';
 import config from '../../config';
 import { rlog } from '../../helpers/log';
 import { appStorage, getRemainsModel } from '../../helpers/utils';
-import { IAppContextProps, IAppState, IAppSettings, IReferences, ICompanySettings } from '../../model/types';
+import {
+  IAppContextProps,
+  IAppState,
+  IAppSettings,
+  IReferences,
+  ICompanySettings,
+  IViewParams,
+} from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
@@ -23,6 +30,7 @@ const sections = {
   REFERENCES: 'REFERENCES',
   DOCUMENTS: 'DOCUMENTS',
   MODELS: 'MODELS',
+  VIEWPARAMS: 'VIEWPARAMS',
 };
 
 const createStoreContext = () => {
@@ -73,6 +81,10 @@ const createStoreContext = () => {
         // документы
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents);
+
+        // viewParams
+        const viewParams = (await appStorage.getItem(`${storagePath}/${sections.VIEWPARAMS}`)) as IViewParams;
+        actions.setViewParams(viewParams);
 
         rlog('Load data', 'Окончание загрузки данных из Storage');
         setLoading(false);
@@ -131,7 +143,7 @@ const createStoreContext = () => {
     useEffect(() => {
       const saveDocuments = async () => {
         // console.log('saveDocuments');
-        rlog('Save Documents', 'Окончание сохранения документов в Storage');
+        rlog('Save Documents', 'Начало сохранения документов в Storage');
         await appStorage.setItem(`${storagePath}/${sections.DOCUMENTS}`, state.documents);
         rlog('Save Documents', 'Окончание сохранения настроек документов в Storage');
       };
@@ -140,6 +152,19 @@ const createStoreContext = () => {
         saveDocuments();
       }
     }, [state.documents, storagePath]);
+
+    /*  Сохранение viewParams в storage при их изменении */
+    useEffect(() => {
+      const saveViewParams = async () => {
+        // console.log('saveDocuments');
+        rlog('Save ViewParams', 'Начало сохранения viewParams в Storage');
+        await appStorage.setItem(`${storagePath}/${sections.VIEWPARAMS}`, state.viewParams);
+        rlog('Save ViewParams', 'Окончание сохранения viewParams в Storage');
+      };
+      if (state.viewParams && storagePath && !isLoading) {
+        saveViewParams();
+      }
+    }, [state.viewParams, storagePath]);
 
     // useEffect(() => {
     //   console.log('deleteDocument');

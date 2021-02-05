@@ -15,10 +15,9 @@ interface IField {
   [fieldName: string]: unknown;
 }
 
-const RemainsContactListViewScreen = () => {
+const RemainsContactListViewScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const { state: appState } = useAppStore();
-  const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();

@@ -5,9 +5,10 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
-import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData, IRem } from '../../../../../common/base';
+import { IMDGoodRemain, IModelData, IRem } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 
@@ -21,7 +22,7 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'RemainsList'>>().params?.docId;
+  const docId = useRoute<RouteProp<RootStackParamList, 'RemainsList'>>().params?.docId;
   const barcode = !!item.barcode;
 
   return (
@@ -57,7 +58,7 @@ const RemainsItem = React.memo(({ item }: { item: IField }) => {
   );
 });
 
-type Props = StackScreenProps<DocumentStackParamList, 'DocumentView'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentView'>;
 
 const RemainsListScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -75,7 +76,11 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
 
   const goodRemains: IField[] = useMemo(() => {
     const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
-    const goods = data[document?.head?.fromcontactId].goods;
+    const goods = data[document?.head?.fromcontactId]?.goods;
+
+    if (!goods) {
+      return [];
+    }
 
     return Object.keys(goods)
       ?.reduce((r: IRem[], e) => {

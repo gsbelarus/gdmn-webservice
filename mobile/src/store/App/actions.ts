@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IHead, ILine, IDocument, IReference } from '../../../../common';
-import { IModel } from '../../../../common/base';
-import { IAppSettings, ICompanySettings, IForms } from '../../model/types';
+import { IModel, IViewParam } from '../../../../common/base';
+import { IAppSettings, ICompanySettings, IForms, IViewParams } from '../../model/types';
 import { createActionPayload, ActionsUnion, createAction } from '../utils';
 
 // eslint-disable-next-line no-shadow
@@ -23,6 +23,9 @@ export enum ActionAppTypes {
   CLEAR_FORM = 'CLEAR_FORM',
   SET_MODEL = 'SET_MODEL',
   SET_MODELS = 'SET_MODELS',
+  SET_VIEWPARAM = 'SET_VIEWPARAM',
+  SET_VIEWPARAMS = 'SET_VIEWPARAM',
+  CLEAR_VIEWPARAM = 'CLEAR_VIEWPARAM',
 }
 
 export const AppActions = {
@@ -57,6 +60,10 @@ export const AppActions = {
   setDocuments: createActionPayload<ActionAppTypes.SET_DOCUMENTS, IDocument[]>(ActionAppTypes.SET_DOCUMENTS),
   setForm: createActionPayload<ActionAppTypes.SET_FORM, IForms>(ActionAppTypes.SET_FORM),
   clearForm: createActionPayload<ActionAppTypes.CLEAR_FORM, string>(ActionAppTypes.CLEAR_FORM),
+  setViewParam: createActionPayload<ActionAppTypes.SET_VIEWPARAM, IViewParams>(ActionAppTypes.SET_VIEWPARAM),
+  setViewParams: createActionPayload<ActionAppTypes.SET_VIEWPARAMS, { [name: string]: IViewParam }>(
+    ActionAppTypes.SET_VIEWPARAMS,
+  ),
 };
 
 export type TAppActions = ActionsUnion<typeof AppActions>;

@@ -1,122 +1,103 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
+import React, { useMemo, useCallback, useLayoutEffect, useState, useRef } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Text, Switch } from 'react-native-paper';
 
-import { IContact, IDocument, IRefData } from '../../../../../common';
+import { IDocument, IRefData } from '../../../../../common';
+import BottomSheet from '../../../components/BottomSheet';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { RadioGroup } from '../../../components/RadioGroup';
 import SubTitle from '../../../components/SubTitle';
 import config from '../../../config';
 import { getDateString, getNextDocId, getNextDocNumber } from '../../../helpers/utils';
 import { IDocumentParams, IListItem } from '../../../model/types';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 
-type Props = StackScreenProps<DocumentStackParamList, 'DocumentEdit'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentEdit'>;
 
 const DocumentEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const { state: appState, actions: appActions } = useAppStore();
 
-  const [statusId, setStatusId] = useState(0);
-
   const docId = route.params?.docId;
 
-  const {
-    date = new Date().toISOString().slice(0, 10),
-    docnumber = getNextDocNumber(appState.documents),
-    tocontactId = -1,
-    fromcontactId,
-    doctype = config.system[0].defaultDocType[0],
-    status = 0,
-  } = useMemo(() => {
-    return ((appState.forms?.documentParams as unknown) || {}) as IDocumentParams;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.forms?.documentParams, docId]);
+  const [statusId, setStatusId] = useState(0);
+  const isBlocked = statusId !== 0;
 
-  const contacts = useMemo(() => appState.references?.contacts?.data, [appState.references?.contacts?.data]);
+  const { date, docnumber, tocontactId, fromcontactId, doctype, status } = ((appState.forms
+    ?.documentParams as unknown) ?? {}) as IDocumentParams;
 
-  const docTypes = useMemo(() => appState.references?.documenttypes?.data, [appState.references?.documenttypes?.data]);
+  const statusName =
+    docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
+
+  const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
+    con?.map((item) => ({ id: item.id, value: item.name }));
+
+  const listDepartments = useMemo(() => getListItems(appState.references?.contacts?.data), [
+    appState.references?.contacts?.data,
+  ]);
+
+  const listDocumentType = useMemo(() => getListItems(appState.references?.documenttypes?.data as IRefData[]), [
+    appState.references?.documenttypes?.data,
+  ]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Do something when the screen is focused
+      //Создания объекта в store для экрана создания или редактирования шапки документа
+      const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
+      setStatusId(docObj?.head?.status || 0);
+      // Инициализируем параметры
+      if (docObj) {
+        appActions.setForm({
+          documentParams: {
+            id: docObj?.id,
+            ...(docObj?.head as IDocumentParams),
+          },
+        });
+      } else {
+        //Записываем первоначальные параметры формы
+        //doctype - если есть список подразделений
+        appActions.setForm({
+          documentParams: {
+            date: new Date().toISOString().slice(0, 10),
+            docnumber: getNextDocNumber(appState.documents),
+            fromcontactId: listDepartments?.length === 1 ? listDepartments[0].id : undefined,
+            tocontactId: -1,
+            doctype: !listDocumentType?.length ? undefined : config.system[0].defaultDocType[0],
+            status: 0,
+          },
+        });
+      }
+    }, [appActions, docId, appState.documents, listDepartments, listDocumentType]),
+  );
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
     // eslint-disable-next-line eqeqeq
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id == id));
   }, []);
 
-  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
-
-  const statusName = useMemo(
-    () =>
-      docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа',
-    [docId, isBlocked],
-  );
-
-  const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
-    con?.map((item) => ({ id: item.id, value: item.name }));
-
-  const departments: IContact[] = useMemo(() => {
-    // return ((contacts as unknown) as IContact[])?.filter((item) => item.contactType === 4);
-    return (contacts as unknown) as IContact[];
-  }, [contacts]);
-
-  const listDepartments = useMemo(() => getListItems(departments), [departments]);
-
-  const listDocumentType = useMemo(() => getListItems(docTypes as IRefData[]), [docTypes]);
-
   const checkDocument = useCallback(() => {
-    const res = date && docnumber && tocontactId && fromcontactId && doctype;
-
+    const res = date && docnumber && fromcontactId && doctype;
     if (!res) {
       Alert.alert('Ошибка!', 'Заполнены не все поля.', [{ text: 'OK' }]);
     }
 
     return res;
-  }, [date, docnumber, doctype, fromcontactId, tocontactId]);
-
-  const updateDocument = useCallback(() => {
-    appActions.updateDocument({
-      id: docId,
-      head: {
-        doctype,
-        fromcontactId,
-        tocontactId,
-        date,
-        status,
-        docnumber,
-      },
-    });
-    return docId;
-  }, [appActions, docId, doctype, fromcontactId, tocontactId, date, status, docnumber]);
-
-  const addDocument = useCallback(() => {
-    const id = getNextDocId(appState.documents);
-
-    appActions.addDocument({
-      id,
-      head: {
-        doctype,
-        fromcontactId,
-        tocontactId,
-        date,
-        status,
-        docnumber,
-      },
-      lines: [],
-    });
-    return id;
-  }, [appActions, appState.documents, date, docnumber, doctype, fromcontactId, status, tocontactId]);
+  }, [date, docnumber, fromcontactId, doctype]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: '',
       headerLeft: () => (
         <HeaderRight
           text="Отмена"
           onPress={() => {
-            appActions.clearForm('documentParams');
             // При нажатии 'отмена' если редактирование документа
             // то возвращаемся к документу, иначе к списку документов
             if (docId) {
@@ -136,50 +117,56 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                 return;
               }
 
-              const id = docId !== undefined ? updateDocument() : addDocument();
+              let id = docId;
 
-              if (!id) {
-                return;
+              if (docId !== undefined) {
+                appActions.updateDocument({
+                  id: docId,
+                  head: {
+                    doctype,
+                    fromcontactId,
+                    tocontactId,
+                    date,
+                    status,
+                    docnumber,
+                  },
+                });
+              } else {
+                id = getNextDocId(appState.documents);
+
+                appActions.addDocument({
+                  id,
+                  head: {
+                    doctype,
+                    fromcontactId,
+                    tocontactId,
+                    date,
+                    status,
+                    docnumber,
+                  },
+                  lines: [],
+                });
               }
 
-              appActions.clearForm('documentParams');
               navigation.navigate('DocumentView', { docId: id });
             }}
           />
         ),
     });
-  }, [addDocument, appActions, checkDocument, docId, isBlocked, navigation, statusId, updateDocument]);
-
-  useEffect(() => {
-    return () => {
-      console.log('clear');
-      appActions.clearForm('documentParams');
-    };
-  }, [appActions]);
-
-  useEffect(() => {
-    console.log('documentParams', appState.forms?.documentParams);
-    if (appState.forms?.documentParams) {
-      return;
-    }
-
-    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
-
-    setStatusId(docObj?.head?.status || 0);
-
-    // Инициализируем параметры
-    if (docId) {
-      appActions.setForm({
-        documentParams: {
-          id: docObj?.id,
-          ...(docObj?.head as IDocumentParams),
-        },
-      });
-    } else {
-      appActions.setForm({ documentParams: { date, docnumber, tocontactId, doctype } });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, docId]);
+  }, [
+    appActions,
+    docId,
+    navigation,
+    statusId,
+    doctype,
+    fromcontactId,
+    tocontactId,
+    date,
+    status,
+    docnumber,
+    checkDocument,
+  ]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -203,6 +190,78 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     },
     [colors.border, colors.primary, colors.text],
   );
+
+  //---Окно bottomsheet для выбора типа документа---
+  const docTypeRef = useRef<BottomSheetModal>(null);
+
+  //Объект типа документа из параметров формы окна
+  const documentType = selectedItem(listDocumentType, doctype);
+
+  const [selectedDocType, setSelectedDocType] = useState(documentType);
+
+  const handlePresentDocType = () => {
+    //В окне Bottomsheet установим тип документа равным типу из параметров формы
+    //Если тип документа не указан, то первый тип из списка
+    setSelectedDocType(documentType ?? listDocumentType[0]);
+    docTypeRef.current?.present();
+  };
+
+  const handleApplyDocType = () => {
+    //Запишем выбранный тип документа в параметры формы
+    appActions.setForm({
+      documentParams: {
+        ...appState.forms?.documentParams,
+        doctype: selectedDocType?.id,
+      },
+    });
+    docTypeRef.current?.dismiss();
+  };
+
+  const handleDismissDocType = () => docTypeRef.current?.dismiss();
+
+  //---Окно bottomsheet для выбора подразделения---
+  const fromContactRef = useRef<BottomSheetModal>(null);
+
+  const fromContact = selectedItem(listDepartments, fromcontactId);
+
+  //Объект подразделения из параметров формы окна
+  const [selectedFromContact, setSelectedFromContact] = useState(fromContact);
+
+  const handlePresentFromContact = () => {
+    //В окне Bottomsheet установим подразделение равным подразделению из параметров формы
+    //Если подразделение не указано, то первое подразделение из списка
+    setSelectedFromContact(fromContact ?? listDepartments[0]);
+    fromContactRef.current?.present();
+  };
+
+  const handleApplyFromContact = () => {
+    //Запишем выбранное подразделение в параметры формы
+    appActions.setForm({
+      documentParams: {
+        ...appState.forms?.documentParams,
+        fromcontactId: selectedFromContact?.id,
+      },
+    });
+    fromContactRef.current?.dismiss();
+  };
+
+  const handleDismissFromContact = () => fromContactRef.current?.dismiss();
+
+  //---Окно календаря для выбора даты документа---
+  const [showDate, setShowDate] = useState(false);
+
+  const handleApplyDate = (event, selectedDate) => {
+    //Закрываем календарь и записываем выбранную дату в параметры формы
+    setShowDate(false);
+    if (selectedDate) {
+      appActions.setForm({
+        documentParams: {
+          ...appState.forms?.documentParams,
+          date: selectedDate.toISOString().slice(0, 10),
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -244,32 +303,13 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             <ReferenceItem
               value={getDateString(date || new Date().toISOString())}
               disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectDate', {
-                  formName: 'documentParams',
-                  fieldName: 'date',
-                  title: 'Дата документа',
-                  value: date,
-                })
-              }
+              onPress={() => setShowDate(true)}
             />
           </View>
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Тип:</Text>
-            <ReferenceItem
-              value={selectedItem(listDocumentType, doctype)?.value}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  fieldName: 'doctype',
-                  title: 'Тип документа',
-                  list: listDocumentType,
-                  value: [doctype],
-                })
-              }
-            />
+            <ReferenceItem value={documentType?.value} disabled={isBlocked} onPress={handlePresentDocType} />
           </View>
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
@@ -277,34 +317,9 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             <ReferenceItem
               value={selectedItem(listDepartments, fromcontactId)?.value}
               disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  title: 'Подразделение',
-                  fieldName: 'fromcontactId',
-                  list: listDepartments,
-                  value: [fromcontactId],
-                })
-              }
+              onPress={handlePresentFromContact}
             />
           </View>
-          {/*           <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Куда:</Text>
-            <ReferenceItem
-              value={selectedItem(listDepartments, tocontactId)?.value}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectItem', {
-                  formName: 'documentParams',
-                  title: 'Подразделение',
-                  fieldName: 'tocontactId',
-                  list: listDepartments,
-                  value: tocontactId,
-                })
-              }
-            />
-          </View> */}
           {docId !== undefined && (
             <TouchableOpacity
               onPress={() => {
@@ -326,6 +341,40 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
               <Text style={localStyles.button}>Удалить документ</Text>
             </TouchableOpacity>
           )}
+          <BottomSheet
+            sheetRef={docTypeRef}
+            title={'Тип'}
+            handelDismiss={handleDismissDocType}
+            handelApply={handleApplyDocType}
+          >
+            <RadioGroup
+              options={listDocumentType}
+              onChange={(option) => setSelectedDocType(option)}
+              activeButtonId={selectedDocType?.id}
+            />
+          </BottomSheet>
+          <BottomSheet
+            sheetRef={fromContactRef}
+            title={'Подразделение'}
+            handelDismiss={handleDismissFromContact}
+            handelApply={handleApplyFromContact}
+          >
+            <RadioGroup
+              options={listDepartments}
+              onChange={(option) => setSelectedFromContact(option)}
+              activeButtonId={selectedFromContact?.id}
+            />
+          </BottomSheet>
+          {showDate && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={new Date(date)}
+              mode={'date'}
+              is24Hour={true}
+              display="default"
+              onChange={handleApplyDate}
+            />
+          )}
         </ScrollView>
       </View>
     </>
@@ -345,6 +394,7 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
     elevation: 8,
+    marginTop: 4,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },

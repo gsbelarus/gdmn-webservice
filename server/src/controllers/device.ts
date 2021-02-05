@@ -157,7 +157,7 @@ const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об устройстве');
   }
 
-  const oldDevice = await deviceService.findOne(deviceId);//devices.find(i => i.id === device.id);
+  const oldDevice = await deviceService.findOne(deviceId); //devices.find(i => i.id === device.id);
 
   if (!oldDevice) {
     ctx.throw(400, 'устройство не найдено');

@@ -31,6 +31,10 @@ export interface IForm {
   [name: string]: unknown;
 }
 
+export interface IViewParam {
+  [name: string]: unknown;
+}
+
 export interface ICompanySetting {
   [name: string]: unknown;
 }
