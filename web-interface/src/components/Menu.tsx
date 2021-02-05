@@ -43,7 +43,7 @@ export const Menu = ({ onEditProfile, onLogOut, querying, errorMessage, onClearE
             }
           },
           {
-            key: 'createUser',
+            key: 'addUser',
             text: 'Добавить пользователя из системы..',
             disabled: !isAdmin || !onAddUserFromSystem,
             iconProps: { iconName: 'PeopleAdd' },
@@ -53,7 +53,7 @@ export const Menu = ({ onEditProfile, onLogOut, querying, errorMessage, onClearE
             }
           },
           {
-            key: 'createUser',
+            key: 'createDevice',
             text: 'Добавить устройство',
             disabled: !isAdmin || !onCreateDevice,
             iconProps: { iconName: 'Devices3' },
@@ -80,7 +80,7 @@ export const Menu = ({ onEditProfile, onLogOut, querying, errorMessage, onClearE
             }
           },
           {
-            key: 'editProfile',
+            key: 'profile',
             text: 'Мои организации',
             iconProps: { iconName: 'Org' },
             disabled: !isAdmin,
