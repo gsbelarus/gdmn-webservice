@@ -1,11 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Searchbar, FAB, Colors, IconButton } from 'react-native-paper';
+import Reactotron from 'reactotron-react-native';
 
 import { IResponse, IMessageInfo } from '../../../../../common';
-import { IDocumentType } from '../../../../../common/base';
+import { IContact, IDocumentType } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors, statuses } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
@@ -15,59 +16,56 @@ import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
 
 const Statuses: IDocumentType[] = statuses;
 
-const DocumentItem = React.memo(({ item }: { item: ISellDocument }) => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-  const { state } = useAppStore();
+interface IDocInfo {
+  id: number;
+  docDate: string;
+  docNumber: string;
+  fromContact: IContact;
+  toContact: IContact;
+  expeditor: IContact;
+  status: IDocumentType;
+}
 
-  const docHead = item.head as ISellHead;
+const DocumentItem = React.memo(
+  ({ item: { id, docDate, docNumber, expeditor, fromContact, status, toContact } }: { item: IDocInfo }) => {
+    const { colors } = useTheme();
+    const navigation = useNavigation();
 
-  const fromContact = state.contacts
-    ? state.contacts.find((contact) => contact.id === docHead?.fromcontactId)
-    : undefined;
-
-  const toContact = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.tocontactId) : undefined;
-
-  const expeditor = state.contacts ? state.contacts.find((contact) => contact.id === docHead?.expeditorId) : undefined;
-
-  const docDate = new Date(item.head?.date).toLocaleDateString();
-
-  const status = Statuses.find((type) => type.id === item.head.status);
-
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('ViewSellDocument', { docId: item.id });
-      }}
-    >
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-        <View style={[localStyles.avatar, { backgroundColor: statusColors[item.head.status] }]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-        </View>
-        <View style={localStyles.details}>
-          <View style={localStyles.directionRow}>
-            <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docHead.docnumber} от ${docDate}`}</Text>
-            <Text style={[localStyles.number, localStyles.field, { color: statusColors[item.head.status] }]}>
-              {status ? status.name : ''}
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('ViewSellDocument', { docId: id });
+        }}
+      >
+        <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+          <View style={[localStyles.avatar, { backgroundColor: statusColors[status.id] }]}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          <View style={localStyles.details}>
+            <View style={localStyles.directionRow}>
+              <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docNumber} от ${docDate}`}</Text>
+              <Text style={[localStyles.number, localStyles.field, { color: statusColors[status.id] }]}>
+                {status?.name || ''}
+              </Text>
+            </View>
+            <Text style={[localStyles.name, { color: colors.text }]}>{toContact?.name || ''}</Text>
+            <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+              Подразделение: {fromContact?.name || ''}
+            </Text>
+            <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
+              Экспедитор: {expeditor?.name || ''}
             </Text>
           </View>
-          <Text style={[localStyles.name, { color: colors.text }]}>{toContact ? toContact.name : ''}</Text>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Подразделение: {fromContact ? fromContact.name : ''}
-          </Text>
-          <Text style={[localStyles.number, localStyles.field, { color: colors.text }]}>
-            Экспедитор: {expeditor ? expeditor.name : ''}
-          </Text>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
-});
+      </TouchableOpacity>
+    );
+  },
+);
 
 const SellDocumentsListScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const ref = React.useRef<FlatList<ISellDocument>>(null);
+  const ref = React.useRef<FlatList<IDocInfo>>(null);
   useScrollToTop(ref);
 
   const {
@@ -79,51 +77,45 @@ const SellDocumentsListScreen = () => {
   const { state: appState, actions } = useAppStore();
 
   const [searchText, setSearchText] = useState('');
-  const [data, setData] = useState(appState.documents as ISellDocument[]);
+  const [data, setData] = useState<IDocInfo[] | undefined>(undefined);
 
   const showActionSheet = useActionSheet();
 
+  const docList: IDocInfo[] | undefined = useMemo(() => {
+    if (!appState.contacts) {
+      return;
+    }
+
+    return (appState.documents as ISellDocument[])?.map((item) => {
+      const docHead = item.head as ISellHead;
+
+      const fromContact = appState.contacts?.find((contact) => contact.id === docHead?.fromcontactId);
+
+      const toContact = appState.contacts?.find((contact) => contact.id === docHead?.tocontactId);
+
+      const expeditor = appState.contacts?.find((contact) => contact.id === docHead?.expeditorId);
+
+      const status = Statuses.find((type) => type.id === docHead.status);
+
+      const docDate = new Date(docHead.date).toLocaleDateString();
+
+      return { id: item.id, docDate, docNumber: item.head.docnumber, fromContact, toContact, expeditor, status };
+    });
+  }, [appState.contacts, appState.documents]);
+
   useEffect(() => {
-    setData(
-      appState.documents
-        ? (appState.documents as ISellDocument[]).filter((item) => {
-            const docHead = item.head as ISellHead;
-
-            const fromContact = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.fromcontactId)
-              : undefined;
-
-            const toContact = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.tocontactId)
-              : undefined;
-
-            const expeditor = appState.contacts
-              ? appState.contacts.find((contact) => contact.id === docHead?.expeditorId)
-              : undefined;
-
-            const status = Statuses.find((type) => type.id === item.head.status);
-
-            return appState.settingsSearch
-              ? appState.settingsSearch.some((value) =>
-                  value === 'number'
-                    ? item.head.docnumber.toUpperCase().includes(searchText.toUpperCase())
-                    : value === 'state' && status
-                    ? status.name.toUpperCase().includes(searchText.toUpperCase())
-                    : value === 'toContact' && toContact
-                    ? toContact.name.toUpperCase().includes(searchText.toUpperCase())
-                    : value === 'fromContact' && fromContact
-                    ? fromContact.name.toUpperCase().includes(searchText.toUpperCase())
-                    : value === 'expeditor' && expeditor
-                    ? expeditor.name.toUpperCase().includes(searchText.toUpperCase())
-                    : true,
-                )
-              : true;
-          })
-        : [],
+    const docs = docList?.filter(
+      (value) =>
+        value.docDate.toUpperCase().includes(searchText.toUpperCase()) ||
+        value.docNumber.toUpperCase().includes(searchText.toUpperCase()) ||
+        value.expeditor?.name.toUpperCase().includes(searchText.toUpperCase()) ||
+        value.fromContact?.name.toUpperCase().includes(searchText.toUpperCase()) ||
+        value.toContact?.name.toUpperCase().includes(searchText.toUpperCase()),
     );
-  }, [appState.contacts, appState.documents, appState.settingsSearch, searchText]);
+    setData(docs);
+  }, [docList, searchText]);
 
-  const renderItem = ({ item }: { item: ISellDocument }) => <DocumentItem item={item} />;
+  const renderItem = ({ item }: { item: IDocInfo }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = useCallback(async () => {
     const documents = appState.documents.filter((document) => document.head.status === 1);

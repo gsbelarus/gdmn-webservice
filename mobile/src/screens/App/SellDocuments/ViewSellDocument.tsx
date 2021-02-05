@@ -144,6 +144,21 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     [documentLines],
   );
 
+  const totalQtyOrdered = useMemo(() => {
+    return (documentLines ?? []).reduce((total, line) => {
+      const goodLine = state.goods.find((item) => item.id === line.goodId);
+      return (line.orderQuantity ?? 0) + total;
+    }, 0);
+  }, [documentLines, state.goods]);
+
+  const totalQtySelected = useMemo(() => {
+    return (documentLines ?? []).reduce((total, line) => {
+      const goodLine = state.goods.find((item) => item.id === line.goodId);
+      return (line.quantity ?? 0) + total;
+    }, 0);
+  }, [documentLines, state.goods]);
+
+
   const totalNetWeight = useMemo(() => {
     return (documentLines ?? []).reduce((total, line) => {
       const goodLine = state.goods.find((item) => item.id === line.goodId);
@@ -284,6 +299,13 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         />
         <ItemSeparator />
         <SubTitle styles={[localStyles.totalsTitle, { backgroundColor: colors.background }]}>Итого</SubTitle>
+        <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+          <Text style={localStyles.fontWeightBold}>Количество:</Text>
+          <Text style={localStyles.fontWeightBold}>
+            {`${formatValue(totalQtyOrdered)}  /  ${formatValue(totalQtySelected)}`}
+          </Text>
+        </View>
+        <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Товар:</Text>
           <Text style={localStyles.fontWeightBold}>

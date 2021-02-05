@@ -322,6 +322,17 @@ const SettingsScreen = () => {
       </ScrollView>
       <Button
         mode="contained"
+        icon="delete-outline"
+        style={[localStyles.refreshButton, { backgroundColor: colors.notification }]}
+        disabled={isLoading}
+        loading={isLoading}
+        onPress={deleteAllData}
+      >
+        Удалить все данные
+      </Button>
+      <Divider />
+      <Button
+        mode="contained"
         icon="update"
         style={[localStyles.refreshButton, { backgroundColor: colors.primary }]}
         disabled={isLoading}
