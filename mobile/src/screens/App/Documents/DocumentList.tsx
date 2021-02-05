@@ -6,7 +6,6 @@ import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Button, Anim
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { IDocumentStatus, IResponse, IMessageInfo, IDocument, IContact } from '../../../../../common';
 import BottomSheet from '../../../components/BottomSheet';
@@ -24,7 +23,7 @@ const Statuses: IDocumentStatus[] = statuses;
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { state } = useAppStore();
+  const { state, actions: appActions } = useAppStore();
 
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
@@ -42,7 +41,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
-  const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+  const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
 
   let ref = useRef(null);
 
@@ -50,25 +49,40 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     ref = _ref;
   };
 
-  const renderRightActions = (progress: any) => (
-    <View style={{ width: 120, flexDirection: 'row' }}>
-      {/* {renderRightAction('star', '#ffab00', 120, progress)} */}
-      {renderRightAction('mode-edit', '#ffab00', 120, progress)}
-      {renderRightAction('delete-forever', '#dd2c00', 60, progress)}
+  const renderRightActions = (progress: unknown) => (
+    <View style={localStyles.swipeViewItem}>
+      {renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress)}
+      {renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress)}
     </View>
   );
 
-  const renderRightAction = (icon, color, x, progress) => {
-    const trans = progress.interpolate({
+  const renderRightAction = (name, icon, color, x, progress) => {
+    const trans: Animated.AnimatedInterpolation = progress.interpolate({
       inputRange: [0, 1, 2],
       outputRange: [x, 0, 1],
     });
 
     const pressHandler = () => {
+      if (name === 'edit') {
+        navigation.navigate('DocumentEdit', { docId: item?.id });
+      } else if (name === 'delete') {
+        Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+          {
+            text: 'OK',
+            onPress: async () => {
+              appActions.deleteDocument(item?.id);
+            },
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
+      }
       ((ref as unknown) as Swipeable).close();
     };
 
     return (
+      // eslint-disable-next-line react-native/no-inline-styles
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
         <RectButton style={[localStyles.rightAction, { backgroundColor: color }]} onPress={pressHandler}>
           <AnimatedIcon name={icon} size={30} color="#fff" style={localStyles.actionIcon} />
@@ -78,7 +92,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   };
 
   return (
-    <Swipeable friction={2} /* rightThreshold={120} */ renderRightActions={renderRightActions} ref={updateRef}>
+    <Swipeable friction={2} renderRightActions={renderRightActions} ref={updateRef}>
       <TouchableOpacity
         onPress={() => {
           navigation.navigate('DocumentView', { docId: item?.id });
@@ -421,5 +435,9 @@ const localStyles = StyleSheet.create({
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
+  },
+  swipeViewItem: {
+    flexDirection: 'row',
+    width: 120,
   },
 });
