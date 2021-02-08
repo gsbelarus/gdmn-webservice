@@ -150,7 +150,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen key="SettingsSearchScreen" name="SettingsSearchScreen" component={SettingsSearchScreen} />
         <Stack.Screen key="SelectItem" name="SelectItemScreen" options={{ title: '' }} component={SelectItemScreen} />
-        <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} />
+        {/* <Stack.Screen key="SelectDate" name="SelectDateScreen" options={{ title: '' }} component={SelectDateScreen} /> */}
         <Stack.Screen key="SelectBoxingsScreen" name="SelectBoxingsScreen" component={SelectBoxingsScreen} />
         <Stack.Screen
           key="ScanBarCodeScreen"
