@@ -1,7 +1,8 @@
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTheme, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -38,6 +39,13 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
   const today = useMemo(() => new Date(), []);
   const yesterday = useMemo(() => new Date(), []);
   yesterday.setDate(yesterday.getDate() - 1);
+
+  const {
+    toContact,
+    expiditor,
+    dateBegin = yesterday.toISOString().slice(0, 10),
+    dateEnd = today.toISOString().slice(0, 10),
+  } = ((appState.formParams as unknown) ?? {}) as IFormParams;
 
   const sendUpdateRequest = useCallback(() => {
     timeout(
@@ -102,18 +110,10 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           name: 'get_SellDocuments',
           params: [
             {
-              dateBegin: (appState.formParams as IFormParams)?.dateBegin
-                ? new Date((appState.formParams as IFormParams)?.dateBegin).toISOString()
-                : yesterday.toISOString(),
-              dateEnd: (appState.formParams as IFormParams)?.dateBegin
-                ? new Date((appState.formParams as IFormParams)?.dateEnd).toISOString()
-                : today.toISOString(),
-              expiditor: Array.isArray((appState.formParams as IFormParams)?.expiditor)
-                ? (appState.formParams as IFormParams)?.expiditor[0]
-                : (appState.formParams as IFormParams)?.expiditor,
-              toContact: Array.isArray((appState.formParams as IFormParams)?.toContact)
-                ? (appState.formParams as IFormParams)?.toContact[0]
-                : (appState.formParams as IFormParams)?.toContact,
+              dateBegin,
+              dateEnd,
+              expiditor: Array.isArray(expiditor) ? expiditor[0] : expiditor,
+              toContact: Array.isArray(toContact) ? toContact[0] : toContact,
             },
           ],
         },
@@ -145,7 +145,7 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           },
         ]),
       );
-  }, [serverUrl?.timeout, apiService.data, state.companyID, appState.formParams, yesterday, today, appActions]);
+  }, [serverUrl?.timeout, apiService.data, state.companyID, appActions, dateBegin, dateEnd, expiditor, toContact]);
 
   const sendSubscribe = useCallback(async () => {
     try {
@@ -278,6 +278,28 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
     [colors.border, colors.text],
   );
 
+  //---Окно календаря для выбора даты начала---
+  const [showDateBegin, setShowDateBegin] = useState(false);
+
+  const handleApplyDateBegin = (event, selectedDate) => {
+    //Закрываем календарь и записываем выбранную дату начала в параметры формы
+    setShowDateBegin(false);
+    if (selectedDate) {
+      appActions.setFormParams({ ...appState.formParams, dateBegin: selectedDate.toISOString().slice(0, 10) });
+    }
+  };
+
+  //---Окно календаря для выбора даты окончания---
+  const [showDateEnd, setShowDateEnd] = useState(false);
+
+  const handleApplyDateEnd = (event, selectedDate) => {
+    //Закрываем календарь и записываем выбранную дату окончания в параметры формы
+    setShowDateEnd(false);
+    if (selectedDate) {
+      appActions.setFormParams({ ...appState.formParams, dateEnd: selectedDate.toISOString().slice(0, 10) });
+    }
+  };
+
   return (
     <View style={[localStyles.container, { backgroundColor: colors.card }]}>
       <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
@@ -286,39 +308,15 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
           <Text style={localStyles.subdivisionText}>Дата документа</Text>
           <Text style={localStyles.subdivisionText}>с: </Text>
           <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
-            <TouchableOpacity
-              style={localStyles.containerDate}
-              onPress={() =>
-                navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'SettingsGettingDocument',
-                  fieldName: 'dateBegin',
-                  title: 'Дата начала',
-                  value: (appState.formParams as IFormParams)?.dateBegin,
-                })
-              }
-            >
-              <Text style={[localStyles.textDate, { color: colors.text }]}>
-                {getDateString((appState.formParams as IFormParams)?.dateBegin || yesterday.toISOString())}
-              </Text>
+            <TouchableOpacity style={localStyles.containerDate} onPress={() => setShowDateBegin(true)}>
+              <Text style={[localStyles.textDate, { color: colors.text }]}>{getDateString(dateBegin)}</Text>
               <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
           <Text style={localStyles.subdivisionText}>по: </Text>
           <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={1}>
-            <TouchableOpacity
-              style={localStyles.containerDate}
-              onPress={() =>
-                navigation.navigate('SelectDateScreen', {
-                  parentScreen: 'SettingsGettingDocument',
-                  fieldName: 'dateEnd',
-                  title: 'Дата окончания',
-                  value: (appState.formParams as IFormParams)?.dateEnd,
-                })
-              }
-            >
-              <Text style={[localStyles.textDate, { color: colors.text }]}>
-                {getDateString((appState.formParams as IFormParams)?.dateEnd || today.toUTCString())}
-              </Text>
+            <TouchableOpacity style={localStyles.containerDate} onPress={() => setShowDateEnd(true)}>
+              <Text style={[localStyles.textDate, { color: colors.text }]}>{getDateString(dateEnd)}</Text>
               <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
             </TouchableOpacity>
           </View>
@@ -326,14 +324,14 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <View style={[localStyles.area, { borderColor: colors.border }]} key={2}>
           <Text style={localStyles.subdivisionText}>Экспедитор:</Text>
           <ReferenceItem
-            value={selectedItem(listPeople, (appState.formParams as IFormParams)?.expiditor)?.value}
+            value={selectedItem(listPeople, expiditor)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
                 fieldName: 'expiditor',
                 title: 'Экспедитор',
                 list: listPeople,
-                value: (appState.formParams as IFormParams)?.expiditor,
+                value: expiditor,
               })
             }
           />
@@ -341,18 +339,38 @@ const SettingsGettingDocumentScreen = ({ route }: Props) => {
         <View style={[localStyles.area, { borderColor: colors.border }]} key={4}>
           <Text style={localStyles.subdivisionText}>Организация:</Text>
           <ReferenceItem
-            value={selectedItem(listCompanies, (appState.formParams as IFormParams)?.toContact)?.value}
+            value={selectedItem(listCompanies, toContact)?.value}
             onPress={() =>
               navigation.navigate('SelectItemScreen', {
                 parentScreen: 'SettingsGettingDocument',
                 fieldName: 'toContact',
                 title: 'Организация',
                 list: listCompanies,
-                value: (appState.formParams as IFormParams)?.toContact,
+                value: toContact,
               })
             }
           />
         </View>
+        {showDateBegin && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={new Date(dateBegin)}
+            mode={'date'}
+            is24Hour={true}
+            display="default"
+            onChange={handleApplyDateBegin}
+          />
+        )}
+        {showDateEnd && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={new Date(dateEnd)}
+            mode={'date'}
+            is24Hour={true}
+            display="default"
+            onChange={handleApplyDateEnd}
+          />
+        )}
       </ScrollView>
     </View>
   );

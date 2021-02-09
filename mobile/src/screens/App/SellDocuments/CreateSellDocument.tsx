@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
@@ -18,27 +19,11 @@ import { useAppStore } from '../../../store';
 type Props = StackScreenProps<RootStackParamList, 'CreateSellDocument'>;
 
 const CreateSellDocumentScreen = ({ route }: Props) => {
-  const [selectedDocType, setSelectedDocType] = useState<number>();
-  const [selectedContact, setSelectedContact] = useState<number>();
   const { state: appState, actions: appActions } = useAppStore();
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const {
-    date = new Date().toISOString().slice(0, 10),
-    docnumber,
-    tocontactId,
-    fromcontactId,
-    expeditorId,
-    doctype,
-    status = 0,
-  } = useMemo(() => {
-    return ((appState.formParams as unknown) || {}) as IDocumentParams;
-  }, [appState.formParams]);
-
   const [statusId, setStatusId] = useState(0);
-
-  const today = new Date();
 
   const docId = route.params?.docId;
 
@@ -46,13 +31,10 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
 
-  const isBlocked = useMemo(() => statusId !== 0, [statusId]);
+  const isBlocked = statusId !== 0;
 
-  const statusName = useMemo(
-    () =>
-      docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа',
-    [docId, isBlocked],
-  );
+  const statusName =
+    docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
 
   const getListItems = (contacts: IContact[]) =>
     contacts.map((item) => {
@@ -67,6 +49,31 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   const listDepartments = useMemo(() => getListItems(departments), [departments]);
 
   const docTypes = useMemo(() => getListItems(appState.documentTypes ?? []), [appState.documentTypes]);
+
+  const { date, docnumber, tocontactId, fromcontactId, expeditorId, doctype, status } = useMemo(() => {
+    return ((appState.formParams as unknown) || {}) as IDocumentParams;
+  }, [appState.formParams]);
+
+  useEffect(() => {
+    //Создания объекта в store для экрана создания или редактирования шапки документа
+    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as ISellDocument);
+
+    setStatusId(docObj?.head?.status || 0);
+
+    // Инициализируем параметры
+    if (docObj) {
+      appActions.setFormParams({
+        ...(docObj?.head as IDocumentParams),
+      });
+    } else {
+      appActions.setFormParams({
+        docnumber: undefined,
+        date: new Date().toISOString().slice(0, 10),
+        doctype: docTypes?.length === 1 ? docTypes[0].id : undefined,
+        status: 0,
+      });
+    }
+  }, [appActions, docId, appState.documents, docTypes]);
 
   const checkDocument = useCallback(() => {
     const res = date && docnumber && tocontactId && fromcontactId && doctype;
@@ -147,47 +154,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         />
       ),
     });
-  }, [
-    addDocument,
-    appActions,
-    checkDocument,
-    date,
-    docId,
-    navigation,
-    selectedContact,
-    selectedDocType,
-    updateDocument,
-  ]);
-
-  useEffect(() => {
-    if (route.params?.docId !== undefined) {
-      const documet = appState.documents.find((item) => item.id === route.params.docId);
-      setSelectedDocType(documet.head?.doctype);
-      setSelectedContact(documet.head?.fromcontactId);
-    }
-  }, [appState.documents, route.params]);
-
-  useEffect(() => {
-    if (appState.formParams) {
-      return;
-    }
-
-    const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as ISellDocument);
-
-    setStatusId(docObj?.head?.status || 0);
-
-    // Инициализируем параметры
-    if (docId) {
-      appActions.setFormParams({
-        ...(docObj?.head as IDocumentParams),
-      });
-    } else {
-      appActions.setFormParams({
-        date,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appActions, docId]);
+  }, [addDocument, appActions, checkDocument, date, docId, navigation, updateDocument]);
 
   const ReferenceItem = useCallback(
     (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
@@ -211,6 +178,17 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
     },
     [colors.border, colors.primary, colors.text],
   );
+
+  //---Окно календаря для выбора даты документа---
+  const [showDate, setShowDate] = useState(false);
+
+  const handleApplyDate = (event, selectedDate) => {
+    //Закрываем календарь и записываем выбранную дату в параметры формы
+    setShowDate(false);
+    if (selectedDate) {
+      appActions.setFormParams({ ...appState.formParams, date: selectedDate.toISOString().slice(0, 10) });
+    }
+  };
 
   return (
     <>
@@ -245,17 +223,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Дата: </Text>
-            <ReferenceItem
-              value={getDateString(date || new Date().toISOString())}
-              disabled={isBlocked}
-              onPress={() =>
-                navigation.navigate('SelectDateScreen', {
-                  fieldName: 'date',
-                  title: 'Дата документа',
-                  value: date,
-                })
-              }
-            />
+            <ReferenceItem value={getDateString(date)} disabled={isBlocked} onPress={() => setShowDate(true)} />
           </View>
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
@@ -340,6 +308,16 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
             >
               <Text style={localStyles.button}>Удалить документ</Text>
             </TouchableOpacity>
+          )}
+          {showDate && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={new Date(date)}
+              mode={'date'}
+              is24Hour={true}
+              display="default"
+              onChange={handleApplyDate}
+            />
           )}
         </ScrollView>
       </View>
