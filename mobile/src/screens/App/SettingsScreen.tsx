@@ -245,6 +245,16 @@ const SettingsScreen = () => {
           }
         />
       </View>
+      <Button
+        mode="contained"
+        icon="delete-outline"
+        style={[localStyles.refreshButton, { backgroundColor: colors.notification }]}
+        disabled={isLoading}
+        onPress={deleteAllData}
+      >
+        Удалить все данные
+      </Button>
+      <Divider />
       <ScrollView style={{ backgroundColor: colors.background }}>
         <View style={localStyles.content}>
           {__DEV__ && (
@@ -320,16 +330,6 @@ const SettingsScreen = () => {
           }
         />
       </ScrollView>
-      <Button
-        mode="contained"
-        icon="delete-outline"
-        style={[localStyles.refreshButton, { backgroundColor: colors.notification }]}
-        disabled={isLoading}
-        loading={isLoading}
-        onPress={deleteAllData}
-      >
-        Удалить все данные
-      </Button>
       <Divider />
       <Button
         mode="contained"
