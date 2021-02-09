@@ -43,14 +43,9 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
-  const {
-    manufacturingDate = document?.head.date,
-    quantity = 0,
-    tara,
-    id,
-    numreceive,
-    orderQuantity = 0,
-  } = ((state.formParams as unknown) ?? {}) as ISellLine;
+  const { quantity = 0, tara, id, numreceive, orderQuantity = 0 } = ((state.formParams as unknown) ?? {}) as ISellLine;
+
+  const manufacturingDate = (state.formParams as ISellLine)?.manufacturingDate ?? document?.head.date;
 
   useEffect(() => {
     if (!route.params) {

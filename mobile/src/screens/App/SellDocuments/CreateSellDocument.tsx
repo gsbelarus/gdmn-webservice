@@ -60,7 +60,6 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
 
     setStatusId(docObj?.head?.status || 0);
 
-    console.log('docObj', docObj);
     // Инициализируем параметры
     if (docObj) {
       appActions.setFormParams({
