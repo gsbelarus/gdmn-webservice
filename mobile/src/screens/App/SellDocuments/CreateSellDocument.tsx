@@ -71,6 +71,9 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         date: new Date().toISOString().slice(0, 10),
         doctype: docTypes?.length === 1 ? docTypes[0].id : undefined,
         status: 0,
+        tocontactId: undefined,
+        fromcontactId: undefined,
+        expeditorId: undefined,
       });
     }
   }, [appActions, docId, appState.documents, docTypes]);
