@@ -71,6 +71,9 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
         date: new Date().toISOString().slice(0, 10),
         doctype: docTypes?.length === 1 ? docTypes[0].id : undefined,
         status: 0,
+        tocontactId: undefined,
+        fromcontactId: undefined,
+        expeditorId: undefined,
       });
     }
   }, [appActions, docId, appState.documents, docTypes]);
@@ -378,6 +381,7 @@ const localStyles = StyleSheet.create({
     alignSelf: 'center',
     flexGrow: 1,
     padding: 10,
+    width: '90%',
   },
   title: {
     padding: 10,
