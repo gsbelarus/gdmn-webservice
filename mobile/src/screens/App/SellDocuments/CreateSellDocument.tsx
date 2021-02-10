@@ -381,6 +381,7 @@ const localStyles = StyleSheet.create({
     alignSelf: 'center',
     flexGrow: 1,
     padding: 10,
+    width: '90%',
   },
   title: {
     padding: 10,
