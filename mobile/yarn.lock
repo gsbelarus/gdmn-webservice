@@ -1915,17 +1915,32 @@
     "@types/react-native" "*"
     "@types/xdate" "*"
 
-"@types/react-native@*", "@types/react-native@0.63.46":
+"@types/react-native@*":
   version "0.63.46"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.46.tgz#942df5af29046c6f22227495e00d5297cc1cea73"
   integrity sha512-SnBnWRErpISIaWk4K8kAfIKqSPdZ8fdH6HIw7kVdz6jMl/5FAf6iXeIwRfVZg1bCMh+ymNPCpSENNNEVprxj/w==
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@~17.0.0":
+"@types/react-native@0.63.49":
+  version "0.63.49"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.49.tgz#b9a4781a0543763f0079c3ef2ba2148a4509b32e"
+  integrity sha512-ivTn2n9xsmlwSO1GygkwEMjkrSDqPAJVhbhsl3EffGtG6zWPaJ+AJVImPoBZN1VY8GItGPPlLGEb0i6LGb83VA==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*":
   version "17.0.0"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.0.tgz#5af3eb7fad2807092f0046a1302b7823e27919b8"
   integrity sha512-aj/L7RIMsRlWML3YB6KZiXB3fV2t41+5RBGYF8z+tAKU43Px8C3cYUZsDvf1/+Bm4FK21QWBrDutu8ZJ/70qOw==
+  dependencies:
+    "@types/prop-types" "*"
+    csstype "^3.0.2"
+
+"@types/react@~17.0.2":
+  version "17.0.2"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.2.tgz#3de24c4efef902dd9795a49c75f760cbe4f7a5a8"
+  integrity sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
@@ -1959,12 +1974,12 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin-tslint@^4.14.1":
-  version "4.14.1"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin-tslint/-/eslint-plugin-tslint-4.14.1.tgz#d0eb400c7d1245d72c600850f4491c8f1e07773a"
-  integrity sha512-fTcdl+Ih+TrQ0StOOGWpzGn61Qksg6asqLSqq/8nBOvrTVUX3S2flQ+Yj2nTNbuq1t6NdUCVQKv2jmKaTYIvwQ==
+"@typescript-eslint/eslint-plugin-tslint@^4.15.0":
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin-tslint/-/eslint-plugin-tslint-4.15.0.tgz#81f10e7aee1b639501c3db5072f3536c9cf3e85b"
+  integrity sha512-ehdNPTG93WOcJOQhS7rg2zi89AudHGYDSznzcpv1BqU9nXuqQ2MsH/9RMadT/SLMzpX1PFvvyAWxvYH1n4DkPw==
   dependencies:
-    "@typescript-eslint/experimental-utils" "4.14.1"
+    "@typescript-eslint/experimental-utils" "4.15.0"
     lodash "^4.17.15"
 
 "@typescript-eslint/eslint-plugin@^3.1.0":
