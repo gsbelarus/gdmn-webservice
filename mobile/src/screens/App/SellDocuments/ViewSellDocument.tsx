@@ -158,7 +158,6 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     }, 0);
   }, [documentLines, state.goods]);
 
-
   const totalNetWeight = useMemo(() => {
     return (documentLines ?? []).reduce((total, line) => {
       const goodLine = state.goods.find((item) => item.id === line.goodId);

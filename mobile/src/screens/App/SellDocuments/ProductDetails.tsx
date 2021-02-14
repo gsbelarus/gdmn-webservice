@@ -6,7 +6,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, TextInput } from 'react-native-paper';
-// import Reactotron from 'reactotron-react-native';
+import Reactotron from 'reactotron-react-native';
 
 import { IGood } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
@@ -260,22 +260,27 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
+      Reactotron.debug(value);
       value = value.replace(',', '.');
+      value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      const res = parseFloat(validNumber.test(value) ? value : prev).toString();
+      return validNumber.test(value) ? value : prev;
+      // const res = parseFloat(validNumber.test(value) ? value : prev).toString();
 
-      return res;
+      // Reactotron.debug(res);
+      // return res;
     });
   }, []);
 
   //---Окно календаря для выбора даты производства---
   const [showDate, setShowDate] = useState(false);
 
-  const handleApplyDate = (event, selectedDate) => {
+  const handleApplyDate = (_, selectedDate: Date) => {
     //Закрываем календарь и записываем выбранную дату в параметры формы
     setShowDate(false);
+
     if (selectedDate) {
       actions.setFormParams({ ...state.formParams, manufacturingDate: selectedDate.toISOString().slice(0, 10) });
     }
@@ -339,7 +344,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             returnKeyType="done"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={isFocused}
-            value={quantity.toString()}
+            value={goodQty}
             theme={{
               colors: {
                 placeholder: colors.primary,
