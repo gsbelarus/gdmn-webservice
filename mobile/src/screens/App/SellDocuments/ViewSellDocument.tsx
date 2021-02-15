@@ -174,14 +174,15 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   );
 
   const setQuantity = useCallback(() => {
-    if (document?.lines && document.lines !== []) {
-      (document.lines as ISellLine[]).forEach((line) => {
-        actions.editLine({
-          docId: document.id,
-          line: { ...line, quantity: line.quantity > 0 ? line.quantity : line.orderQuantity ?? 0 },
-        });
+    (document?.lines as ISellLine[]).forEach((line) => {
+      if (line.quantity > 0) {
+        return;
+      }
+      actions.editLine({
+        docId: document.id,
+        line: { ...line, quantity: line.orderQuantity ?? 0 },
       });
-    }
+    });
   }, [actions, document?.id, document?.lines]);
 
   useScrollToTop(refList);
