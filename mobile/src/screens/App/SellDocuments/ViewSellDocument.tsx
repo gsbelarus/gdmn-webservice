@@ -1,18 +1,17 @@
 import { MaterialIcons, Feather } from '@expo/vector-icons';
-import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
 import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
-import { IDocument, IContact, IGood } from '../../../../../common';
+import { IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { formatValue } from '../../../helpers/utils';
-import { ISellDocument, ISellLine, ISellHead, ILineTara } from '../../../model';
+import { ISellLine, ISellHead, ILineTara } from '../../../model';
 import { DocumentStackParamList } from '../../../navigation/SellDocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -127,17 +126,14 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
   const refList = React.useRef<FlatList<ISellLine>>(null);
 
   const docId = route.params?.docId;
-
-  const document: IDocument | ISellDocument | undefined = useMemo(() => {
-    return state.documents.find((item) => item.id === docId);
-  }, [docId, state.documents]);
+  const document = state.documents.find((item) => item.id === docId);
 
   const contact: IContact = useMemo(
     () => state.contacts.find((item) => item.id === document?.head.tocontactId) ?? notFound,
     [document?.head.tocontactId, state.contacts],
   );
 
-  const documentLines = useMemo(() => document?.lines as ISellLine[], [document?.lines]);
+  const documentLines = document?.lines as ISellLine[];
 
   const boxings = useMemo(
     () => (documentLines ?? []).reduce((totalLine, line) => [...totalLine, ...(line.tara ?? [])], [] as ILineTara[]),
@@ -173,8 +169,8 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     [boxings],
   );
 
-  const setQuantity = useCallback(() => {
-    (document?.lines as ISellLine[]).forEach((line) => {
+  const setQuantity = () => {
+    documentLines.forEach((line) => {
       if (line.quantity > 0) {
         return;
       }
@@ -183,7 +179,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
         line: { ...line, quantity: line.orderQuantity ?? 0 },
       });
     });
-  }, [actions, document?.id, document?.lines]);
+  };
 
   useScrollToTop(refList);
 
@@ -253,7 +249,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions, docId, document?.head?.status, navigation, showActionSheet]);
+  }, [actions, docId, document?.head?.status, navigation, showActionSheet, document]);
 
   const docTitle = useMemo(() => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
