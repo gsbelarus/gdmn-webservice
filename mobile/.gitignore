@@ -18,3 +18,5 @@ web-report/
 ./src/service/ReactotronConfig.ts
 
 */log/*
+
+yarn-error.log
