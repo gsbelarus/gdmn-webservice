@@ -95,7 +95,10 @@ const SettingsScreen = ({ navigation }: Props) => {
       try {
         setLoading(true);
         // const response = await apiService.data.subscribe(companyID);
-        const response = await timeout<IResponse<IMessage[]>>(10000, apiService.data.getMessages(companyID));
+        const response = await timeout<IResponse<IMessage[]>>(
+          apiService.baseUrl.timeout,
+          apiService.data.getMessages(companyID),
+        );
 
         if (!response.result) {
           Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть', onPress: () => ({}) }]);
