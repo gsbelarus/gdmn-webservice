@@ -57,7 +57,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(
       bodyParser({
         formLimit: '10mb',
-        jsonLimit: '20mb',
+        jsonLimit: '40mb',
         textLimit: '10mb',
         enableTypes: ['json', 'form', 'text'],
       }),

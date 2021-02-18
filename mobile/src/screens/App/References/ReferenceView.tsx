@@ -103,7 +103,7 @@ const localStyles = StyleSheet.create({
     height: '100%',
   },
   details: {
-    margin: 10,
+    margin: 12,
   },
   flexDirectionRow: {
     flexDirection: 'row',

@@ -47,7 +47,7 @@ const RemainsContactListViewScreen = ({ navigation }) => {
   useEffect(() => {
     const remains = appState.models?.remains;
 
-    if (!remains) {
+    if (!remains?.data) {
       return;
     }
 
