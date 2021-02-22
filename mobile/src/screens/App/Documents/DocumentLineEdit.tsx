@@ -127,7 +127,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             },
           ]}
         >
-          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
+          <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>
             {good?.name || 'Товар не найден'}
           </SubTitle>
           <View style={localStyles.item}>

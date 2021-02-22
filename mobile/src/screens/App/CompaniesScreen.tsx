@@ -60,6 +60,7 @@ const CompaniesScreen = () => {
         actions.logOut();
         return;
       }
+      // throw new Error();
       Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
     } catch (error) {
       Alert.alert('Ошибка', 'Нет ответа от сервера', [{ text: 'Закрыть' }]);
@@ -69,7 +70,7 @@ const CompaniesScreen = () => {
   return (
     <>
       <View style={styles.container}>
-        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Выбор организации</SubTitle>
+        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>Выбор организации</SubTitle>
         <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
           <RadioButton.Group onValueChange={(newValue) => setSelectedCompany(newValue)} value={selectedCompany}>
             {companies?.length > 0 &&

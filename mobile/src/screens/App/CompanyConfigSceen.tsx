@@ -51,7 +51,7 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <View style={[localStyles.container, { backgroundColor: colors.card }]}>
-          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Весовой товар</SubTitle>
+          <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>Весовой товар</SubTitle>
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Идентификатор весового товара:</Text>

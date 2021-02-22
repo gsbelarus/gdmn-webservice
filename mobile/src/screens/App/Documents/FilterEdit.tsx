@@ -90,7 +90,7 @@ const FilterEditScreen = ({ navigation }: Props) => {
         },
       ]}
     >
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Настройки фильтра</SubTitle>
+      <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>Настройки фильтра</SubTitle>
       <Line
         name="number"
         title={'Номер документа'}

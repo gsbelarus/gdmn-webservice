@@ -64,7 +64,7 @@ const logOut = (ctx: Context): void => {
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId } = ctx.query;
+  // const { deviceId } = ctx.query;
   const { externalId, userName, password, firstName, lastName, phoneNumber, companies, creatorId } = ctx.request.body;
 
   if (!userName) {
@@ -87,7 +87,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   } as IUser;
 
   try {
-    const id = await authService.signUp({ user, deviceId });
+    const id = await authService.signUp({ user });
 
     const result: IResponse<string> = { result: true, data: id };
 

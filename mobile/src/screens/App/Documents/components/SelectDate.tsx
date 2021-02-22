@@ -75,7 +75,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{title || ''}</SubTitle>
+      <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{title || ''}</SubTitle>
       {date ? (
         <>
           <ItemSeparator />

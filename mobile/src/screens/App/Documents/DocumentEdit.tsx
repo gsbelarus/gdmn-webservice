@@ -265,7 +265,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   return (
     <>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
+      <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
       <View style={[localStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
           {(statusId === 0 || statusId === 1) && (

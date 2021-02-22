@@ -178,7 +178,7 @@ const SettingsScreen = ({ navigation }: Props) => {
     };
 
     getMessages();
-  }, [apiService.data, appActions, companyID, documents]);
+  }, [apiService.data, appActions, companyID, documents, apiService.baseUrl?.timeout]);
 
   return (
     <>

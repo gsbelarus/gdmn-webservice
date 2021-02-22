@@ -67,7 +67,7 @@ const RemainsContactListViewScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
+        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>
           {appState.references?.contacts?.name}
         </SubTitle>
         <ItemSeparator />

@@ -1,18 +1,19 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-import { IOption } from './RadioGroup';
+// import { IOption } from './RadioGroup';
+import { IListItem } from '../../model/types';
 
 type Props = {
-  options: IOption[];
+  options: IListItem[];
   horizontal?: boolean;
   circleStyle?: { [name: string]: string };
   activeButtonId?: number | string;
-  onChange: (option: IOption) => void;
+  onChange: (option: IListItem) => void;
 };
 
 const RadioButton = ({ options }: Props) => {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState<number>(undefined);
 
   return (
     <View>
@@ -57,12 +58,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: 35,
   },
-  result: {
+/*   result: {
     backgroundColor: '#F3FBFE',
     color: 'white',
     fontWeight: '600',
     marginTop: 20,
-  },
+  }, */
   selectedRb: {
     backgroundColor: '#3740ff',
     borderRadius: 50,

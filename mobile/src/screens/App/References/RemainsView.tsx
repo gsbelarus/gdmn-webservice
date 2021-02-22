@@ -96,7 +96,7 @@ const RemainsViewScreen = ({ route, navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{contactItem?.name}</SubTitle>
+        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{contactItem?.name}</SubTitle>
         <ItemSeparator />
         {!!goodRemains && (
           <>
