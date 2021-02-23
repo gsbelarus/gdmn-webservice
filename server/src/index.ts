@@ -5,7 +5,7 @@ const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
   return await init();
 };
 
-if (!module.parent) {
+if (module.children) {
   run().catch(err => {
     console.error('!!! SERVER DROPPED BY ERROR !!!');
     console.error(err instanceof Error || typeof err !== 'object' ? err : '!!! undefined error !!!');
