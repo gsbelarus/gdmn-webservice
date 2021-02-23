@@ -1,5 +1,5 @@
 {
-  "name": "mobile-inventory",
+  "name": "mobile-agents-vmk",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
