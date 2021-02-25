@@ -4,13 +4,20 @@ import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 import SubTitle from '../components/SubTitle';
+import { IListItem } from '../model/types';
 import {
   DocumentEditScreen,
   DocumentLineEditScreen,
   DocumentViewScreen,
+  GoodListScreen,
   RemainsListScreen,
 } from '../screens/App/Documents';
-import { ScanBarcodeReaderScreen, ScanBarcodeScreen } from '../screens/App/Documents/components';
+import {
+  ScanBarcodeReaderScreen,
+  ScanBarcodeScreen,
+  SelectDateScreen,
+  SelectItemScreen,
+} from '../screens/App/Documents/components';
 import {
   ReferenceDetailScreen,
   ReferenceViewScreen,
@@ -34,6 +41,16 @@ export type RootStackParamList = {
     modeCor?: boolean;
   };
   DocumentView: { docId: number };
+  GoodList: { docId: number };
+  SelectDate: { formName: string; fieldName: string; title: string; value: string };
+  SelectItem: {
+    list: IListItem[];
+    isMulti: boolean;
+    formName: string;
+    fieldName: string;
+    title: string;
+    value: number[];
+  };
   RemainsList: { docId: number };
   ScanBarcode: { docId: number };
   ScanBarcodeReader: { docId: number };
@@ -108,6 +125,24 @@ const AppNavigator = () => {
                 name="DocumentLineEdit"
                 component={DocumentLineEditScreen}
                 options={{ title: '', headerBackTitle: 'Назад' }}
+              />
+              <Stack.Screen
+                key="GoodListScreen"
+                name="GoodList"
+                component={GoodListScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                key="SelectItemScreen"
+                name="SelectItem"
+                component={SelectItemScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                key="SelectDateScreen"
+                name="SelectDate"
+                component={SelectDateScreen}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 key="ScanBarCodeScreen"

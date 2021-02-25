@@ -7,15 +7,15 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
-import { useAppStore } from '../../../store';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { useSelector } from '../../../store/App/store';
 import styles from '../../../styles/global';
 
 const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>().params?.docId;
+  const docId = useRoute<RouteProp<RootStackParamList, 'GoodList'>>().params?.docId;
 
   return (
     <TouchableOpacity
@@ -37,17 +37,19 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
 });
 
 const GoodListScreen = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'GoodList'>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
-  const { state } = useAppStore();
+
+  const references = useSelector((store) => store.references);
+
   const [filteredList, setFilteredList] = useState<IRefData[]>();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.good?.data]);
+  const goods = useMemo(() => references?.goods?.data as IGood[], [references?.good?.data]);
 
   useEffect(() => {
     // if (!goods) {

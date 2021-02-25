@@ -10,8 +10,10 @@ import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
+import { IAppSettings, ICompanySettings, IModels } from '../../model/types';
 import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
+import { useSelector } from '../../store/App/store';
 
 type Props = StackScreenProps<SettingsStackParamList, 'Settings'>;
 
@@ -19,10 +21,16 @@ const SettingsScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state: AuthState } = useAuthStore();
-  const {
-    actions: appActions,
-    state: { settings, documents, references, forms, companySettings, models },
-  } = useAppStore();
+
+  const { actions: appActions } = useAppStore();
+
+  const forms = useSelector((store) => store.forms);
+  const references = useSelector((store) => store.references);
+  const settings = useSelector((store) => store.settings) as IAppSettings;
+  const companySettings = useSelector((store) => store.companySettings) as ICompanySettings;
+  const documents = useSelector((store) => store.documents) as IDocument[];
+  const models = useSelector((store) => store.models) as IModels;
+
   const {
     state: { companyID, userID },
     actions: authActions,

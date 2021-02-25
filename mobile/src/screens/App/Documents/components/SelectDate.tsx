@@ -3,12 +3,16 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
+import { IForm } from '../../../../../../common';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
+import { IForms } from '../../../../model/types';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
+import { useSelector } from '../../../../store/App/store';
 
 LocaleConfig.locales.ru = {
   monthNames: [
@@ -31,7 +35,7 @@ LocaleConfig.locales.ru = {
 };
 LocaleConfig.defaultLocale = 'ru';
 
-type Props = StackScreenProps<DocumentStackParamList, 'SelectDate'>;
+type Props = StackScreenProps<RootStackParamList, 'SelectDate'>;
 
 export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -40,7 +44,8 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
 
   const { formName, fieldName, title, value } = route.params;
 
-  const { state, actions } = useAppStore();
+  const { actions } = useAppStore();
+  const forms = useSelector((store) => store.forms) as IForms<IForm>;
 
   useEffect(() => {
     setDate(value);
@@ -65,13 +70,13 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Готово"
           onPress={() => {
-            actions.setForm({ [formName]: { ...state.forms[formName], [fieldName]: date } });
+            actions.setForm({ [formName]: { ...forms[formName], [fieldName]: date } });
             navigation.goBack();
           }}
         />
       ),
     });
-  }, [actions, date, fieldName, formName, navigation, state.forms]);
+  }, [actions, date, fieldName, formName, navigation, forms]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

@@ -5,23 +5,23 @@ import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Colors, FAB, IconButton, Avatar } from 'react-native-paper';
 
-import { ILine, IReference, IGood, IContact, IRefData } from '../../../../../common';
+import { ILine, IReference, IGood, IContact, IRefData, IDocument } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { statusColors } from '../../../constants';
 import { formatValue } from '../../../helpers/utils';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 import styles from '../../../styles/global';
 
 const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable: boolean }) => {
   const { colors } = useTheme();
-  const { state, actions } = useAppStore();
+  const { actions } = useAppStore();
+  const references = useSelector((store) => store.references);
 
   const docId = useRoute<RouteProp<RootStackParamList, 'DocumentView'>>().params?.docId;
 
-  const good: IGood = ((state.references?.goods as unknown) as IReference<IGood>)?.data.find(
-    (i) => i.id === item.goodId,
-  );
+  const good: IGood = ((references?.goods as unknown) as IReference<IGood>)?.data.find((i) => i.id === item.goodId);
 
   return (
     <>
@@ -68,14 +68,14 @@ type Props = StackScreenProps<RootStackParamList, 'DocumentView'>;
 
 const DocumentViewScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const { state } = useAppStore();
+  // const { state } = useAppStore();
+  const references = useSelector((store) => store.references);
+  const settings = useSelector((store) => store.settings);
+  const documents = useSelector((store) => store.documents) as IDocument[];
 
   const docId = route.params?.docId;
 
-  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
-    docId,
-    state.documents,
-  ]);
+  const document = useMemo(() => documents?.find((item: { id: number }) => item.id === docId), [docId, documents]);
 
   const documentLines = document?.lines;
 
@@ -89,13 +89,13 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
 
   const documentTypeName = useMemo(
     () =>
-      (state.references?.documenttypes?.data as IRefData[])?.find(
+      (references?.documenttypes?.data as IRefData[])?.find(
         (i) => i.id.toString() === document?.head?.doctype.toString(),
       )?.name || '',
-    [state.references?.documenttypes?.data, document?.head?.doctype],
+    [references?.documenttypes?.data, document?.head?.doctype],
   );
 
-  const contacts = (state.references?.contacts?.data as unknown) as IContact[];
+  const contacts = (references?.contacts?.data as unknown) as IContact[];
 
   const contact = useMemo(() => contacts?.find((item: { id: number }) => item.id === document?.head?.fromcontactId), [
     contacts,
@@ -187,7 +187,7 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
             style={[localStyles.fabScan, { backgroundColor: colors.primary }]}
             icon="barcode-scan"
             onPress={() =>
-              navigation.navigate(state.settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+              navigation.navigate(settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
                 docId: document?.id,
               })
             }

@@ -17,15 +17,18 @@ import { timeout } from '../../../helpers/utils';
 import statuses from '../../../model/docStates';
 import { IListItem } from '../../../model/types';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 
 const Statuses: IDocumentStatus[] = statuses;
 
 const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { state, actions: appActions } = useAppStore();
+  const { actions: appActions } = useAppStore();
 
-  const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
+  const references = useSelector((store) => store.references);
+
+  const contacts = useMemo(() => references?.contacts?.data as IContact[], [references?.contacts?.data]);
 
   const getContact = useCallback(
     (id: number | number[]): IContact =>
@@ -118,7 +121,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const DocumentListScreen = ({ route, navigation }) => {
+const DocumentListScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   const ref = useRef<FlatList<IDocument>>(null);
@@ -132,12 +135,18 @@ const DocumentListScreen = ({ route, navigation }) => {
   } = useServiceStore();
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
+
+  const documents = useSelector((store) => store.documents) as IDocument[];
+  const viewParams = useSelector((store) => store.viewParams);
+  const references = useSelector((store) => store.references);
+  // const models = useSelector((store) => store.models);
+
   const [searchText, setSearchText] = useState('');
-  const [data, setData] = useState(appState.documents as IDocument[]);
+  const [data, setData] = useState<IDocument[]>(documents);
 
   const option = useMemo(() => {
-    return (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IListItem;
-  }, [appState.viewParams?.InvDoc?.selectedOption]);
+    return (viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IListItem;
+  }, [viewParams?.InvDoc?.selectedOption]);
 
   const [selectedOption, setSelectedOption] = useState<IListItem>(option);
 
@@ -153,19 +162,17 @@ const DocumentListScreen = ({ route, navigation }) => {
   const handleApplyFilter = useCallback(() => {
     setSortData(true);
     appActions.setViewParam({
-      InvDoc: { ...appState.viewParams?.InvDoc, selectedOption },
+      InvDoc: { ...viewParams?.InvDoc, selectedOption },
     });
     bottomSheetRef.current?.dismiss();
-  }, [appState.viewParams?.InvDoc, appActions, selectedOption]);
+  }, [viewParams?.InvDoc, appActions, selectedOption]);
 
   const handleDismissFilter = useCallback(() => {
     setSortData(false);
     bottomSheetRef.current?.dismiss();
   }, []);
 
-  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    appState.references?.contacts?.data,
-  ]);
+  const contacts = useMemo(() => references?.contacts?.data as IContact[], [references?.contacts?.data]);
 
   const getContact = useCallback(
     (id: number | number[]): IContact =>
@@ -202,18 +209,18 @@ const DocumentListScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     setData(
-      appState.documents?.filter((item) => {
+      documents?.filter((item) => {
         const docHead = item?.head;
 
         return docHead?.docnumber?.includes(searchText);
       }) || [],
     );
-  }, [appState.documents, searchText, getContact, appState.forms?.filterParams?.fieldSearch]);
+  }, [documents, searchText, getContact]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
   const sendUpdateRequest = useCallback(async () => {
-    const documents = appState.documents?.filter((document) => document?.head?.status === 1);
+    const docs = documents?.filter((document) => document?.head?.status === 1);
 
     timeout(
       apiService.baseUrl.timeout,
@@ -221,7 +228,7 @@ const DocumentListScreen = ({ route, navigation }) => {
         type: 'data',
         payload: {
           name: 'SellDocument',
-          params: documents,
+          params: docs,
         },
       }),
     )
@@ -242,7 +249,7 @@ const DocumentListScreen = ({ route, navigation }) => {
         }
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
-  }, [appActions, apiService.baseUrl.timeout, apiService.data, appState.documents, state.companyID]);
+  }, [appActions, apiService.baseUrl.timeout, apiService.data, documents, state.companyID]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({

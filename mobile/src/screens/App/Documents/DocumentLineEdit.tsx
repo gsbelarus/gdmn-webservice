@@ -9,15 +9,20 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 import styles from '../../../styles/global';
 
-type Props = StackScreenProps<DocumentStackParamList, 'DocumentLineEdit'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentLineEdit'>;
 
 const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const { state, actions } = useAppStore();
+  const { actions } = useAppStore();
+
+  const references = useSelector((store) => store.references);
+  const documents = useSelector((store) => store.documents) as IDocument[];
 
   const { docId, lineId, prodId, price, remains, quantity } = route.params;
 
@@ -34,8 +39,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [goodQty]);
 
   const good = useMemo(() => {
-    return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
-  }, [prodId, state.references?.goods?.data]);
+    return ((references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
+  }, [prodId, references?.goods?.data]);
 
   useEffect(() => {
     const docLine: ILine = document?.lines.find((item) => item.id === lineId);
@@ -48,11 +53,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       remains: docLine?.remains ?? remains,
     });
 
-    setDocument(state.documents.find((item) => item.id === docId));
+    setDocument(documents.find((item) => item.id === docId));
 
     setGoodQty((docLine?.quantity ?? quantity ?? 1).toString());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.documents, prodId, document?.lines, lineId, docId, price, remains]);
+  }, [documents, prodId, document?.lines, lineId, docId, price, remains]);
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {

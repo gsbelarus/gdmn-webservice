@@ -13,6 +13,7 @@ import { timeout, getDateString, isMessagesArray } from '../../../helpers/utils'
 import { IListItem, IFormParams } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 
 type Props = StackScreenProps<DocumentStackParamList, 'DocumentRequest'>;
 
@@ -20,12 +21,14 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
   const { state } = useAuthStore();
-  const { state: appState, actions: appActions } = useAppStore();
+  const { actions: appActions } = useAppStore();
   const navigation = useNavigation();
 
-  const documentParams = useMemo(() => (appState.forms?.documentParams as unknown) as IFormParams, [
-    appState.forms?.documentParams,
-  ]);
+  const forms = useSelector((store) => store.forms);
+  const references = useSelector((store) => store.references);
+  const documents = useSelector((store) => store.documents) as IDocument[];
+
+  const documentParams = useMemo(() => (forms?.documentParams as unknown) as IFormParams, [forms?.documentParams]);
 
   const today = new Date();
   const yesterday = new Date();
@@ -52,23 +55,6 @@ const DocumentRequestScreen = ({ route }: Props) => {
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
 
-  // useEffect(() => {
-  //   if (!documentParams) {
-  //     // Инициализируем параметры
-  //     appActions.setFormParams({
-  //       dateBegin: yesterday.toISOString().slice(0, 10),
-  //       dateEnd: today.toISOString().slice(0, 10),
-  //     });
-  //   }
-  // }, [appActions, documentParams, today, yesterday]);
-
-  // useEffect(() => {
-  //   if (!route?.params) {
-  //     return;
-  //   }
-  //   appActions.setFormParams(route.params);
-  // }, [appActions, route]);
-
   const selectedItem = useCallback((listItems: IListItem[], id: number[]) => {
     return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
   }, []);
@@ -76,7 +62,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const getListItems = (contacts: IContact[]): IListItem[] =>
     contacts.map((item) => ({ id: item.id, value: item.name }));
 
-  const contacts = useMemo(() => appState.references?.contacts || [], [appState.references?.contacts]);
+  const contacts = useMemo(() => references?.contacts || [], [references?.contacts]);
 
   const departments: IContact[] = useMemo(
     () => ((contacts as unknown) as IContact[]).filter((item) => item.contactType === 4),
@@ -164,7 +150,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
                 const addDocuments = dataSet.data as IDocument[];
-                appActions.setDocuments([...appState.documents, ...addDocuments]);
+                appActions.setDocuments([...documents, ...addDocuments]);
                 break;
               }
               case 'documenttypes': {
@@ -209,7 +195,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
           if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
             message.body.payload?.params?.forEach((paramDoc) => {
               if (paramDoc.result) {
-                const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
+                const document = documents.find((doc) => doc.id === paramDoc.docId);
                 if (document?.head.status === 2) {
                   appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                 }
@@ -223,7 +209,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
     } catch (err) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
-  }, [apiService.data, appActions, appState.documents, state.companyID]);
+  }, [apiService.data, appActions, documents, state.companyID]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({

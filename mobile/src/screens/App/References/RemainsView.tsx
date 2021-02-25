@@ -16,7 +16,6 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
 import { IModels } from '../../../model/types';
-// import { useAppStore } from '../../../store';
 import { useSelector } from '../../../store/App/store';
 
 interface IField extends IGood {
@@ -34,7 +33,6 @@ const RemainsViewScreen = ({ route, navigation }) => {
 
   const { item: contactItem }: { item: IReference } = route.params;
 
-  // const { state } = useAppStore();
   const models = useSelector((store) => store.models) as IModels;
 
   useEffect(() => {

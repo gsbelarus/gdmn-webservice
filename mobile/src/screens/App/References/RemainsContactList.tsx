@@ -9,7 +9,6 @@ import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { IReferences, IModels } from '../../../model/types';
 import { useSelector } from '../../../store/App/store';
-// import { useAppStore } from '../../../store';
 
 interface IField {
   id: number;
@@ -19,7 +18,7 @@ interface IField {
 
 const RemainsContactListViewScreen = ({ navigation }) => {
   const { colors } = useTheme();
-  // const { state: appState } = useAppStore();
+
   const references = useSelector((store) => store.references) as IReferences;
   const models = useSelector((store) => store.models) as IModels;
 

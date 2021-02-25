@@ -9,14 +9,16 @@ import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
-import { IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { ICompanySetting, IDocument, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
+import { useSelector } from '../../../../store/App/store';
 import styles from '../../../../styles/global';
 
 const ONE_SECOND_IN_MS = 1000;
 
-type Props = StackScreenProps<DocumentStackParamList, 'ScanBarcode'>;
+type Props = StackScreenProps<RootStackParamList, 'ScanBarcode'>;
 
 type ScannedObject = IRem & { quantity: number };
 
@@ -26,36 +28,34 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const { state } = useAppStore();
+
+  const references = useSelector((store) => store.references);
+  const companySettings = useSelector((store) => store.companySettings) as ICompanySetting;
+  const documents = useSelector((store) => store.documents) as IDocument[];
 
   const [barcode, setBarcode] = useState('');
   const [goodItem, setGoodItem] = useState<ScannedObject>(undefined);
 
   const docId = route.params?.docId;
 
-  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
-    docId,
-    state.documents,
-  ]);
+  const document = useMemo(() => documents?.find((item: { id: number }) => item.id === docId), [docId, documents]);
 
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+  const goods = useMemo(() => references?.goods?.data as IGood[], [references?.goods?.data]);
 
-  const weightCodeSettings = useMemo(() => (state.companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
-    state.companySettings?.weightSettings,
+  const weightCodeSettings = useMemo(() => (companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
+    companySettings?.weightSettings,
   ]);
 
   const remains = useMemo(
     () =>
-      ((state.references?.remains?.data as unknown) as IRemains[])?.find(
+      ((references?.remains?.data as unknown) as IRemains[])?.find(
         (rem) => rem.contactId === document?.head?.fromcontactId,
       )?.data || [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
+    [document?.head?.fromcontactId, references?.remains?.data],
   );
 
   //список остатков + поля из справочника тмц
   const goodRemains = useMemo(() => {
-    console.log('111');
     return remains?.map((item) => ({
       ...goods.find((good) => good.id === item.goodId),
       price: item.price,

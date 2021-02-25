@@ -11,6 +11,7 @@ import SubTitle from '../../../components/SubTitle';
 import { IFilterParams } from '../../../model/types';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 import styles from '../../../styles/global';
 
 type Props = StackScreenProps<DocumentStackParamList, 'FilterEdit'>;
@@ -34,16 +35,18 @@ const Line = React.memo(
 
 const FilterEditScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
-  const { state, actions } = useAppStore();
+  const { actions } = useAppStore();
+
+  const forms = useSelector((store) => store.forms);
 
   const { fieldSearch } = useMemo(() => {
-    return ((state.forms?.filterParams as unknown) || {}) as IFilterParams;
-  }, [state.forms?.filterParams]);
+    return ((forms?.filterParams as unknown) || {}) as IFilterParams;
+  }, [forms?.filterParams]);
 
   const setFieldSearch = (field: string) =>
     actions.setForm({
       filterParams: {
-        ...state.forms?.filterParams,
+        ...forms?.filterParams,
         fieldSearch: fieldSearch?.some((item) => item === field)
           ? fieldSearch.filter((item) => item !== field)
           : [...fieldSearch, field],
@@ -51,11 +54,11 @@ const FilterEditScreen = ({ navigation }: Props) => {
     });
 
   useEffect(() => {
-    if (state.forms?.filterParams) {
+    if (forms?.filterParams) {
       return;
     }
     actions.setForm({ filterParams: { fieldSearch: [] } });
-  }, [actions, state.forms?.filterParams]);
+  }, [actions, forms?.filterParams]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

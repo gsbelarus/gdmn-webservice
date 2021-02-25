@@ -18,21 +18,25 @@ import {
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
-import { IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
-import { useAppStore } from '../../../../store';
+import { IDocument, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { ICompanySettings } from '../../../../model/types';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
+import { useSelector } from '../../../../store/App/store';
 
 const ONE_SECOND_IN_MS = 1000;
 
-type Props = StackScreenProps<DocumentStackParamList, 'ScanBarcodeReader'>;
+type Props = StackScreenProps<RootStackParamList, 'ScanBarcodeReader'>;
 
 type ScannedObject = IRem & { quantity: number };
 
 const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const [scanned, setScanned] = useState(false);
-  const { state } = useAppStore();
   const [vibroMode, setVibroMode] = useState(false);
+
+  const documents = useSelector((store) => store.documents) as IDocument[];
+  const references = useSelector((store) => store.references);
+  const companySettings = useSelector((store) => store.companySettings) as ICompanySettings;
 
   const ref = useRef<TextInput>(null);
 
@@ -41,29 +45,25 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
 
   const docId = route.params?.docId;
 
-  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
-    docId,
-    state.documents,
-  ]);
+  const document = useMemo(() => documents?.find((item: { id: number }) => item.id === docId), [docId, documents]);
 
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+  const goods = useMemo(() => references?.goods?.data as IGood[], [references?.goods?.data]);
 
-  const weightCodeSettings = useMemo(() => (state.companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
-    state.companySettings?.weightSettings,
+  const weightCodeSettings = useMemo(() => (companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
+    companySettings?.weightSettings,
   ]);
 
   const remains = useMemo(
     () =>
-      ((state.references?.remains?.data as unknown) as IRemains[])?.find(
+      ((references?.remains?.data as unknown) as IRemains[])?.find(
         (rem) => rem.contactId === document?.head?.fromcontactId,
       )?.data || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
+    [references?.remains?.data],
   );
 
   //список остатков + поля из справочника тмц
   const goodRemains = useMemo(() => {
-    console.log('111');
     return remains?.map((item) => ({
       ...goods.find((good) => good.id === item.goodId),
       price: item.price,

@@ -220,7 +220,8 @@ const createStoreContext = () => {
 
   const useStore = () => React.useContext(StoreContext);
 
-  const useSelector = (selector: (arg: IAppState) => unknown) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const useSelector = (selector: (arg: IAppState) => any) => {
     const [, forceRender] = useReducer((s) => s + 1, 0);
     const store = useContext(StoreContext);
     const selectorRef = useRef(selector);

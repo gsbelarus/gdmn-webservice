@@ -5,12 +5,12 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Searchbar, IconButton, Avatar } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
-import { IMDGoodRemain, IModelData, IRem } from '../../../../../common/base';
+import { IDocument, IMDGoodRemain, IModelData, IRem } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { formatValue } from '../../../helpers/utils';
+import { IAppSettings, IModels } from '../../../model/types';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
-import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 
 interface IField extends IGood {
   remains?: number;
@@ -63,19 +63,18 @@ type Props = StackScreenProps<RootStackParamList, 'DocumentView'>;
 const RemainsListScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const [text, onChangeText] = useState('');
-  const { state } = useAppStore();
+  const documents = useSelector((store) => store.documents) as IDocument[];
+  const models = useSelector((store) => store.models) as IModels;
+  const settings = useSelector((store) => store.settings) as IAppSettings;
 
   const [list, setList] = useState<IField[]>([]);
 
   const docId = route.params?.docId;
 
-  const document = useMemo(() => state.documents?.find((item: { id: number }) => item.id === docId), [
-    docId,
-    state.documents,
-  ]);
+  const document = useMemo(() => documents?.find((item: { id: number }) => item.id === docId), [docId, documents]);
 
   const goodRemains: IField[] = useMemo(() => {
-    const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
+    const data = (models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
     const goods = data[document?.head?.fromcontactId]?.goods;
 
     if (!goods) {
@@ -96,7 +95,7 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
         return r;
       }, [])
       .sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1));
-  }, [state.models?.remains?.data, document?.head?.fromcontactId]);
+  }, [models?.remains?.data, document?.head?.fromcontactId]);
 
   useEffect(() => {
     setList(
@@ -120,14 +119,14 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
           icon="barcode-scan"
           size={24}
           onPress={() =>
-            navigation.navigate(state.settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
+            navigation.navigate(settings?.barcodeReader ? 'ScanBarcodeReader' : 'ScanBarcode', {
               docId: document.id,
             })
           }
         />
       ),
     });
-  }, [document.id, navigation, state.settings?.barcodeReader]);
+  }, [document.id, navigation, settings?.barcodeReader]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

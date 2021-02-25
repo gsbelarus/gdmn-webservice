@@ -3,20 +3,23 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
+import { IForm } from '../../../../../../common';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
-import { IListItem } from '../../../../model/types';
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
+import { IForms, IListItem } from '../../../../model/types';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { useAppStore } from '../../../../store';
+import { useSelector } from '../../../../store/App/store';
 
-type Props = StackScreenProps<DocumentStackParamList, 'SelectItem'>;
+type Props = StackScreenProps<RootStackParamList, 'SelectItem'>;
 
 export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
-  const { state, actions } = useAppStore();
+  const { actions } = useAppStore();
+  const forms = useSelector((store) => store.forms) as IForms<IForm>;
 
   const { list, isMulti = false, formName, fieldName, title, value } = route.params;
 
@@ -83,7 +86,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
             // console.log('isMulti', isMulti);
             actions.setForm({
               [formName]: {
-                ...state.forms[formName],
+                ...forms[formName],
                 [fieldName]: isMulti ? checkedItem : Array.isArray(checkedItem) ? checkedItem[0] : checkedItem,
               },
             });
@@ -92,7 +95,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
         />
       ),
     });
-  }, [actions, checkedItem, fieldName, formName, isMulti, navigation, state.forms]);
+  }, [actions, checkedItem, fieldName, formName, isMulti, navigation, forms]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

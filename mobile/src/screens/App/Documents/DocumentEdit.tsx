@@ -18,20 +18,25 @@ import { getDateString, getNextDocId, getNextDocNumber } from '../../../helpers/
 import { IDocumentParams, IListItem } from '../../../model/types';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 
 type Props = StackScreenProps<RootStackParamList, 'DocumentEdit'>;
 
 const DocumentEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
-  const { state: appState, actions: appActions } = useAppStore();
+  const { actions: appActions } = useAppStore();
 
   const docId = route.params?.docId;
+
+  const forms = useSelector((store) => store.forms);
+  const references = useSelector((store) => store.references);
+  const documents = useSelector((store) => store.documents) as IDocument[];
 
   const [statusId, setStatusId] = useState(0);
   const isBlocked = statusId !== 0;
 
-  const { date, docnumber, tocontactId, fromcontactId, doctype, status } = ((appState.forms
-    ?.documentParams as unknown) ?? {}) as IDocumentParams;
+  const { date, docnumber, tocontactId, fromcontactId, doctype, status } = ((forms?.documentParams as unknown) ??
+    {}) as IDocumentParams;
 
   const statusName =
     docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
@@ -39,19 +44,17 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
     con?.map((item) => ({ id: item.id, value: item.name }));
 
-  const listDepartments = useMemo(() => getListItems(appState.references?.contacts?.data), [
-    appState.references?.contacts?.data,
-  ]);
+  const listDepartments = useMemo(() => getListItems(references?.contacts?.data), [references?.contacts?.data]);
 
-  const listDocumentType = useMemo(() => getListItems(appState.references?.documenttypes?.data as IRefData[]), [
-    appState.references?.documenttypes?.data,
+  const listDocumentType = useMemo(() => getListItems(references?.documenttypes?.data as IRefData[]), [
+    references?.documenttypes?.data,
   ]);
 
   useFocusEffect(
     React.useCallback(() => {
       // Do something when the screen is focused
       //Создания объекта в store для экрана создания или редактирования шапки документа
-      const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
+      const docObj = docId !== undefined && (documents?.find((i) => i.id === docId) as IDocument);
       setStatusId(docObj?.head?.status || 0);
       // Инициализируем параметры
       if (docObj) {
@@ -67,7 +70,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
         appActions.setForm({
           documentParams: {
             date: new Date().toISOString().slice(0, 10),
-            docnumber: getNextDocNumber(appState.documents),
+            docnumber: getNextDocNumber(documents),
             fromcontactId: listDepartments?.length === 1 ? listDepartments[0].id : undefined,
             tocontactId: -1,
             doctype: !listDocumentType?.length ? undefined : config.system[0].defaultDocType[0],
@@ -75,7 +78,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
           },
         });
       }
-    }, [appActions, docId, appState.documents, listDepartments, listDocumentType]),
+    }, [appActions, docId, documents, listDepartments, listDocumentType]),
   );
 
   const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
@@ -132,7 +135,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   },
                 });
               } else {
-                id = getNextDocId(appState.documents);
+                id = getNextDocId(documents);
 
                 appActions.addDocument({
                   id,
@@ -210,7 +213,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     //Запишем выбранный тип документа в параметры формы
     appActions.setForm({
       documentParams: {
-        ...appState.forms?.documentParams,
+        ...forms?.documentParams,
         doctype: selectedDocType?.id,
       },
     });
@@ -238,7 +241,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     //Запишем выбранное подразделение в параметры формы
     appActions.setForm({
       documentParams: {
-        ...appState.forms?.documentParams,
+        ...forms?.documentParams,
         fromcontactId: selectedFromContact?.id,
       },
     });
@@ -256,7 +259,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     if (selectedDate) {
       appActions.setForm({
         documentParams: {
-          ...appState.forms?.documentParams,
+          ...forms?.documentParams,
           date: selectedDate.toISOString().slice(0, 10),
         },
       });
@@ -277,7 +280,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   disabled={docId === undefined}
                   onValueChange={() => {
                     appActions.setForm({
-                      documentParams: { ...appState.forms?.documentParams, status: status === 0 ? 1 : 0 },
+                      documentParams: { ...forms?.documentParams, status: status === 0 ? 1 : 0 },
                     });
                   }}
                 />
@@ -292,7 +295,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
               editable={!isBlocked}
               style={[localStyles.input, { borderColor: colors.border }]}
               onChangeText={(text) =>
-                appActions.setForm({ documentParams: { ...appState.forms?.documentParams, docnumber: text.trim() } })
+                appActions.setForm({ documentParams: { ...forms?.documentParams, docnumber: text.trim() } })
               }
               value={docnumber || ' '}
             />

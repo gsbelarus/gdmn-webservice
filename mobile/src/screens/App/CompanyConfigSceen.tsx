@@ -10,18 +10,20 @@ import { IMessageInfo } from '../../../../common/models';
 import ItemSeparator from '../../components/ItemSeparator';
 import SubTitle from '../../components/SubTitle';
 import { timeout } from '../../helpers/utils';
+import { ICompanySettings } from '../../model/types';
 import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
 import { useAppStore, useAuthStore, useServiceStore } from '../../store';
+import { useSelector } from '../../store/App/store';
 
 type Props = StackScreenProps<SettingsStackParamList, 'CompanyConfig'>;
 
 const CompanyConfigScreen = ({ navigation }: Props) => {
   const { colors } = useTheme();
   const { apiService } = useServiceStore();
-  const {
-    state: { companySettings },
-    actions: appActions,
-  } = useAppStore();
+  const { actions: appActions } = useAppStore();
+
+  const companySettings = useSelector((store) => store.companySettings) as ICompanySettings;
+
   const { state } = useAuthStore();
 
   const weightSettings = (companySettings?.weightSettings as unknown) as IWeightCodeSettings;

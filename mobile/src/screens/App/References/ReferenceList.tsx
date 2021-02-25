@@ -41,7 +41,7 @@ const ReferenceItem = React.memo(({ item }: { item: IReference }) => {
 const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
-  // const { state: AppState } = useAppStore();
+
   const refs = useSelector((store) => store.references) as IReferences;
   const { apiService } = useServiceStore();
 
