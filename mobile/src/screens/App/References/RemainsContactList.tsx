@@ -7,7 +7,9 @@ import { Text, Searchbar } from 'react-native-paper';
 import { IMDGoodRemain, IRefData } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
-import { useAppStore } from '../../../store';
+import { IReferences, IModels } from '../../../model/types';
+import { useSelector } from '../../../store/App/store';
+// import { useAppStore } from '../../../store';
 
 interface IField {
   id: number;
@@ -17,7 +19,9 @@ interface IField {
 
 const RemainsContactListViewScreen = ({ navigation }) => {
   const { colors } = useTheme();
-  const { state: appState } = useAppStore();
+  // const { state: appState } = useAppStore();
+  const references = useSelector((store) => store.references) as IReferences;
+  const models = useSelector((store) => store.models) as IModels;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IRefData[]>();
@@ -45,7 +49,7 @@ const RemainsContactListViewScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
-    const remains = appState.models?.remains;
+    const remains = models?.remains;
 
     if (!remains) {
       return;
@@ -57,7 +61,7 @@ const RemainsContactListViewScreen = ({ navigation }) => {
       .sort((a, b) => (a.name < b.name ? -1 : 1));
 
     setFilteredList(contactList);
-  }, [appState.models?.remains, searchQuery]);
+  }, [models?.remains, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
@@ -68,7 +72,7 @@ const RemainsContactListViewScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
         <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>
-          {appState.references?.contacts?.name}
+          {references?.contacts?.name}
         </SubTitle>
         <ItemSeparator />
         <View style={localStyles.flexDirectionRow}>

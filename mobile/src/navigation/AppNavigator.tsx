@@ -80,6 +80,8 @@ const AppNavigator = () => {
                 component={TabsNavigator}
                 options={{
                   headerShown: false,
+                  title: '',
+                  animationTypeForReplace: 'pop',
                 }}
               />
               <Stack.Screen
@@ -87,13 +89,13 @@ const AppNavigator = () => {
                 name="DocumentView"
                 component={DocumentViewScreen}
                 initialParams={{ docId: 0 }}
-                options={{ title: '', animationTypeForReplace: 'pop' }}
+                options={{ title: '', headerBackTitle: '' }}
               />
               <Stack.Screen
                 key="DocumentEdit"
                 name="DocumentEdit"
                 component={DocumentEditScreen}
-                options={{ title: '' }}
+                options={{ title: '', headerBackTitle: 'Назад' }}
               />
               <Stack.Screen
                 key="RemainsList"
@@ -105,7 +107,7 @@ const AppNavigator = () => {
                 key="DocumentLineEdit"
                 name="DocumentLineEdit"
                 component={DocumentLineEditScreen}
-                options={{ title: '' }}
+                options={{ title: '', headerBackTitle: 'Назад' }}
               />
               <Stack.Screen
                 key="ScanBarCodeScreen"
@@ -119,7 +121,12 @@ const AppNavigator = () => {
                 component={ScanBarcodeReaderScreen}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen key="Reference" name="Reference" component={ReferenceViewScreen} options={{ title: '' }} />
+              <Stack.Screen
+                key="Reference"
+                name="Reference"
+                component={ReferenceViewScreen}
+                options={{ title: '', headerBackTitle: 'Назад' }}
+              />
               <Stack.Screen
                 key="ReferenceDetail"
                 name="ReferenceDetail"
@@ -136,7 +143,7 @@ const AppNavigator = () => {
                 key="RemainsContactList"
                 name="RemainsContactList"
                 component={RemainsContactListViewScreen}
-                options={{ title: '' }}
+                options={{ title: '', headerBackTitle: 'Назад' }}
               />
             </>
           )}

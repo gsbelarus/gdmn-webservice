@@ -1,6 +1,14 @@
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  RefreshControl,
+} from 'react-native';
 import { Text, Searchbar, Avatar } from 'react-native-paper';
 
 import { IReference } from '../../../../../common';
@@ -39,7 +47,7 @@ const ReferenceViewScreen = ({ route }) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredList, setFilteredList] = useState<IReference>();
+  const [filteredList, setFilteredList] = useState<IReference>(undefined);
 
   const { item: refItem }: { item: IReference } = route.params;
 
@@ -58,6 +66,7 @@ const ReferenceViewScreen = ({ route }) => {
   }, [refItem, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
+
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
@@ -65,20 +74,25 @@ const ReferenceViewScreen = ({ route }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
+        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{refItem?.name}</SubTitle>
         <ItemSeparator />
-        <View style={localStyles.flexDirectionRow}>
-          <Searchbar
-            placeholder="Поиск"
-            onChangeText={setSearchQuery}
-            value={searchQuery}
-            style={[localStyles.flexGrow, localStyles.searchBar]}
-          />
-        </View>
-        <ItemSeparator />
+        {!!filteredList && (
+          <>
+            <View style={localStyles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск"
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+        )}
         <FlatList
           ref={ref}
           data={filteredList?.data}
+          refreshControl={<RefreshControl refreshing={!filteredList} title="загрузка данных..." />}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}

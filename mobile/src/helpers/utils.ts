@@ -51,6 +51,8 @@ const getDirectory = (path: string): string => {
   return res ? res[1] : path;
 };
 
+const getSafePath = (path: string) => path.replace(/[&#,+()$~%.'":*?<>{} ]/g, '_');
+
 const ensureDirExists = async (dir: string) => {
   const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
 
@@ -61,15 +63,19 @@ const ensureDirExists = async (dir: string) => {
 
 export const appStorage = {
   setItem: async <T>(key: string, data: T) => {
+    key = getSafePath(key);
     try {
       await ensureDirExists(getDirectory(key));
       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
     }
   },
 
   getItem: async (key: string) => {
+    key = getSafePath(key);
     try {
       if (!(await ensureFileExists(`${key}.json`))) {
         return;
@@ -78,18 +84,33 @@ export const appStorage = {
       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
       return result ? JSON.parse(result) : null;
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
     }
   },
 
-  /*   getItems: async (keys: string[]) => {
-      const result = await AsyncStorage.multiGet(keys);
-      return Object.fromEntries(result.map((i) => [i[0], JSON.parse(i[1])]));
-    }, */
+  getItems: async (keys: string[]) => {
+    try {
+      const result = [];
+
+      for await (const key of keys) {
+        const rec = await appStorage.getItem(key);
+        result.push([key, rec || '']);
+      }
+
+      return Object.fromEntries(result);
+    } catch (e) {
+      if (__DEV__) {
+        console.log('error', e);
+      }
+    }
+  },
 
   removeItem: async (key: string) => {
+    key = getSafePath(key);
     try {
-      await ensureDirExists('');
+      await ensureDirExists(getDirectory(key));
       await FileSystem.deleteAsync(`${dbDir}${key}.json`);
     } catch (e) {
       console.log('error', e);

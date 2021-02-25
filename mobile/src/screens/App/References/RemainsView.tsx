@@ -15,7 +15,9 @@ import { IGood, IMDGoodRemain, IModelData, IReference, IRem } from '../../../../
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
-import { useAppStore } from '../../../store';
+import { IModels } from '../../../model/types';
+// import { useAppStore } from '../../../store';
+import { useSelector } from '../../../store/App/store';
 
 interface IField extends IGood {
   remains?: number;
@@ -32,10 +34,11 @@ const RemainsViewScreen = ({ route, navigation }) => {
 
   const { item: contactItem }: { item: IReference } = route.params;
 
-  const { state } = useAppStore();
+  // const { state } = useAppStore();
+  const models = useSelector((store) => store.models) as IModels;
 
   useEffect(() => {
-    const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
+    const data = (models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
 
     const goods = data[contactItem?.id]?.goods;
 
@@ -53,7 +56,7 @@ const RemainsViewScreen = ({ route, navigation }) => {
         .sort((a: IField, b: IField) => (a.name < b.name ? -1 : 1)) || [];
 
     setGoodRemains(goodList);
-  }, [state.models?.remains?.data, contactItem?.id]);
+  }, [contactItem?.id, models?.remains?.data]);
 
   const LineItem = useCallback(
     ({ item }: { item: IField }) => {
@@ -117,6 +120,7 @@ const RemainsViewScreen = ({ route, navigation }) => {
           refreshControl={<RefreshControl refreshing={!goodRemains} title="загрузка данных..." />}
           keyExtractor={(_, i) => String(i)}
           renderItem={({ item }) => <LineItem item={item} />}
+          ListEmptyComponent={goodRemains ? <Text style={localStyles.emptyList}>Список пуст</Text> : null}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>
@@ -135,6 +139,10 @@ const localStyles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
     paddingVertical: 3,
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   flexDirectionRow: {
     flexDirection: 'row',

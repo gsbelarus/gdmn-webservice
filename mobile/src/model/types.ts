@@ -3,7 +3,6 @@ import { ICompanySetting, IForm, IModel, IViewParam } from '../../../common/base
 import Api from '../service/Api';
 import Sync from '../service/Storage';
 import { AppActions, AuthActions, ServiceActions } from '../store';
-import { Selector } from '../store/utils';
 
 export interface IDataFetch {
   isLoading: boolean;
@@ -54,9 +53,10 @@ export interface IAuthContextProps {
 }
 
 export interface IAppContextProps {
-  state: IAppState;
+  state: () => IAppState;
   actions: typeof AppActions;
-  selectors?: Selector<IAppState>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribe?: (cb: any) => any;
 }
 
 export interface IServiceState {

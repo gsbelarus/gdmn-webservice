@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useLayoutEffect, useMemo, useReducer, useContext, useCallback } from 'react';
 
 import { IContact, IDocument, IGood, IRemains } from '../../../../common';
 import { IMDGoodRemain, IModel, IModelData } from '../../../../common/base';
@@ -19,12 +19,9 @@ import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
 import { reducer, initialState } from './reducer';
 
-export const getDocuments = (state: IAppState) => state.documents;
-
 const defaultAppState: IAppContextProps = {
-  state: initialState,
+  state: () => initialState,
   actions: AppActions,
-  selectors: [getDocuments],
 };
 
 const sections = {
@@ -40,15 +37,35 @@ const createStoreContext = () => {
   const StoreContext = React.createContext<IAppContextProps>(defaultAppState);
 
   const StoreProvider = ({ children }) => {
-    const [state, actions, useSelectors] = useTypesafeActions<IAppState, typeof AppActions>(
-      reducer,
-      initialState,
-      AppActions,
-    );
+    const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
+
     const {
       state: { storagePath, isLoading },
       actions: { setLoading },
     } = useServiceStore();
+
+    const storeRef = useRef(state);
+    storeRef.current = state;
+    const subscribersRef = useRef([]);
+
+    useLayoutEffect(() => {
+      subscribersRef.current.forEach((sub) => sub());
+    }, [state]);
+
+    const value = useMemo(
+      () => ({
+        actions,
+        subscribe: (cb: unknown) => {
+          subscribersRef.current.push(cb);
+          return () => {
+            subscribersRef.current = subscribersRef.current.filter((sub) => sub !== cb);
+          };
+        },
+        state: () => storeRef.current,
+        // state,
+      }),
+      [],
+    );
 
     /* При смене ветки хранилища данных (пользователь\копмания) перезагружаем данные из хранилища */
     /* TODO Предотвратить выполнение сохранения в момент выполнения loadData */
@@ -198,14 +215,35 @@ const createStoreContext = () => {
     //   }
     // }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remins?.data]);
 
-    return (
-      <StoreContext.Provider value={{ state, actions, selectors: useSelectors }}>{children}</StoreContext.Provider>
-    );
+    return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
   };
 
   const useStore = () => React.useContext(StoreContext);
 
-  return { StoreProvider, useStore };
+  const useSelector = (selector: (arg: IAppState) => unknown) => {
+    const [, forceRender] = useReducer((s) => s + 1, 0);
+    const store = useContext(StoreContext);
+    const selectorRef = useRef(selector);
+    selectorRef.current = selector;
+    const selectedStateRef = useRef(selector(store.state()));
+    selectedStateRef.current = selector(store.state());
+
+    const checkForUpdates = useCallback(() => {
+      const newState = selectorRef.current(store.state());
+      if (newState !== selectedStateRef.current) {
+        forceRender();
+      }
+    }, [store]);
+
+    useEffect(() => {
+      const subscription = store.subscribe(checkForUpdates);
+      return () => subscription();
+    }, [store, checkForUpdates]);
+
+    return selectedStateRef.current;
+  };
+
+  return { StoreProvider, useStore, useSelector };
 };
 
-export const { StoreProvider, useStore } = createStoreContext();
+export const { StoreProvider, useStore, useSelector } = createStoreContext();
