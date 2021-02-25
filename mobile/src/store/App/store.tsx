@@ -19,9 +19,12 @@ import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
 import { reducer, initialState } from './reducer';
 
+export const getDocuments = (state: IAppState) => state.documents;
+
 const defaultAppState: IAppContextProps = {
   state: initialState,
   actions: AppActions,
+  selectors: [getDocuments],
 };
 
 const sections = {
@@ -37,7 +40,11 @@ const createStoreContext = () => {
   const StoreContext = React.createContext<IAppContextProps>(defaultAppState);
 
   const StoreProvider = ({ children }) => {
-    const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
+    const [state, actions, useSelectors] = useTypesafeActions<IAppState, typeof AppActions>(
+      reducer,
+      initialState,
+      AppActions,
+    );
     const {
       state: { storagePath, isLoading },
       actions: { setLoading },
@@ -191,7 +198,9 @@ const createStoreContext = () => {
     //   }
     // }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remins?.data]);
 
-    return <StoreContext.Provider value={{ state, actions }}>{children}</StoreContext.Provider>;
+    return (
+      <StoreContext.Provider value={{ state, actions, selectors: useSelectors }}>{children}</StoreContext.Provider>
+    );
   };
 
   const useStore = () => React.useContext(StoreContext);

@@ -66,12 +66,19 @@ interface IAction {
   [key: string]: (...args: unknown[]) => unknown;
 }
 
+export type Selector<S> = (newState: S) => S[keyof S];
+
 export function useTypesafeActions<S, Actions extends IAction>(
   reducer: Reducer<S, TActions>,
   initialState: S,
   actions: Actions,
-): [S, Actions] {
+): [S, Actions, (mapStateToSelectors: Selector<S>) => S[keyof S]] {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+/*   const useSelectors = (mapStateToSelectors: Selector<S>) => {
+    const selectors = useMemo(() => mapStateToSelectors(state), [mapStateToSelectors]);
+    return selectors;
+  }; */
 
   const boundActions = useMemo(() => {
     function bindActionCreator(actionCreator: (...args: unknown[]) => unknown, dispatcher: typeof dispatch) {
@@ -85,8 +92,9 @@ export function useTypesafeActions<S, Actions extends IAction>(
       ba[actionName] = bindActionCreator(actions[actionName], dispatch);
       return ba;
     }, {} as IAction);
+
     return newActions;
   }, [actions, dispatch]);
 
-  return [state, boundActions as Actions];
+  return [state, boundActions as Actions, useSelectors];
 }
