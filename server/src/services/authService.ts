@@ -44,7 +44,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   })(ctx, next);
 };
 
-const signUp = async ({ user, deviceId }: { user: Omit<IUser, 'role'>; deviceId?: string }) => {
+const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;

@@ -38,7 +38,7 @@ const ReferenceDetailScreen = ({ route }) => {
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{itm.name}</SubTitle>
+      <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{itm.name}</SubTitle>
       <ItemSeparator />
       <FlatList
         ref={ref}

@@ -6,13 +6,11 @@
   },
   "extends": [
     "eslint:recommended",
-    "prettier",
     "eslint-config-prettier",
 		"plugin:promise/recommended",
     "plugin:sonarjs/recommended",
     "plugin:prettier/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "prettier/@typescript-eslint",
 		"plugin:@typescript-eslint/recommended",
 		"plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],

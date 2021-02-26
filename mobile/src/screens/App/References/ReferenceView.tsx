@@ -65,7 +65,7 @@ const ReferenceViewScreen = ({ route }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={[localStyles.content, { backgroundColor: colors.card }]}>
-        <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
+        <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>{filteredList?.name}</SubTitle>
         <ItemSeparator />
         <View style={localStyles.flexDirectionRow}>
           <Searchbar

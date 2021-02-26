@@ -1,14 +1,14 @@
 import React from 'react';
-import { Text, View, StyleSheet, ImageStyle, TextStyle, ViewStyle } from 'react-native';
+import { Text, View, StyleSheet, ImageStyle, TextStyle, ViewStyle, StyleProp } from 'react-native';
 
 interface IProps {
   children?: string;
-  styles?: ImageStyle | TextStyle | ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
-const SubTitle = ({ children, styles }: IProps) => {
+const SubTitle = ({ children, style }: IProps) => {
   return (
-    <View style={[localStyles.titleContainer, styles]}>
+    <View style={[localStyles.titleContainer, style]}>
       <Text style={localStyles.titleText}>{children?.toUpperCase()}</Text>
     </View>
   );

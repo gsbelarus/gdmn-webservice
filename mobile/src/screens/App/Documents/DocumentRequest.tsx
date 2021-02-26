@@ -268,7 +268,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
 
   return (
     <View style={[localStyles.container, { backgroundColor: colors.card }]}>
-      <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
+      <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>Загрузка заявок</SubTitle>
       <ScrollView>
         <View style={[localStyles.areaChips, { borderColor: colors.border }]} key={0}>
           <Text style={localStyles.subdivisionText}>Дата документа</Text>

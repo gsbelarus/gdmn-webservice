@@ -47,7 +47,7 @@ const LoadingScreen = () => {
   return (
     <View style={localStyles.content}>
       <ActivityIndicator size="large" style={localStyles.item} />
-      <SubTitle styles={localStyles.item}>Загрузка данных</SubTitle>
+      <SubTitle style={localStyles.item}>Загрузка данных</SubTitle>
     </View>
   );
 };

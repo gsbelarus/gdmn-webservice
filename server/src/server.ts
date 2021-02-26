@@ -31,7 +31,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
-  passport.serializeUser((user: IUser, done) => done(null, user.id));
+  passport.serializeUser((user: any, done) => done(null, user.id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
