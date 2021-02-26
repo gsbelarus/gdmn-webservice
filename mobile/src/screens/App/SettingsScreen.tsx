@@ -5,7 +5,7 @@ import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
-import { IResponse, IMessage, IReference, IDocument, IGood, IRefData } from '../../../../common';
+import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
@@ -31,22 +31,6 @@ const SettingsScreen = ({ navigation }: Props) => {
   const [isLoading, setLoading] = useState(false);
 
   const showActionSheet = useActionSheet();
-
-  // const setRemainsModel = useCallback(
-  //   () =>
-  //     (async () => {
-  //       console.log(references?.contacts?.data);
-  //       const remainsModel = getRemainsModel(
-  //         references?.contacts?.data as IContact[],
-  //         references?.goods?.data as IGood[],
-  //         (references?.remains?.data as unknown) as IRemains[],
-  //       );
-  //       console.log(remainsModel);
-  //       appActions.setModel(remainsModel);
-  //     })(),
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [references?.contacts?.data, references?.goods?.data, references?.remins?.data],
-  // );
 
   const logOut = useCallback(
     () =>
@@ -178,7 +162,7 @@ const SettingsScreen = ({ navigation }: Props) => {
     };
 
     getMessages();
-  }, [apiService.data, appActions, companyID, documents]);
+  }, [apiService.data, appActions, companyID, documents, apiService.baseUrl.timeout]);
 
   return (
     <>
@@ -333,7 +317,7 @@ const SettingsScreen = ({ navigation }: Props) => {
         loading={isLoading}
         onPress={() => {
           sendGetReferencesRequest();
-          //await setRemainsModel();
+          // setRemainsModel();
         }}
       >
         Проверить обновления
