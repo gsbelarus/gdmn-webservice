@@ -63,9 +63,9 @@ type Props = StackScreenProps<RootStackParamList, 'DocumentView'>;
 const RemainsListScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
   const [text, onChangeText] = useState('');
-  const documents = useSelector((store) => store.documents) as IDocument[];
-  const models = useSelector((store) => store.models) as IModels;
-  const settings = useSelector((store) => store.settings) as IAppSettings;
+  const documents = useSelector((store) => store.documents);
+  const models = useSelector((store) => store.models);
+  const settings = useSelector((store) => store.settings);
 
   const [list, setList] = useState<IField[]>([]);
 

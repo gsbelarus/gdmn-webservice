@@ -17,6 +17,7 @@ import {
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
+import { middleware } from './middleware';
 import { reducer, initialState } from './reducer';
 
 const defaultAppState: IAppContextProps = {
@@ -37,7 +38,13 @@ const createStoreContext = () => {
   const StoreContext = React.createContext<IAppContextProps>(defaultAppState);
 
   const StoreProvider = ({ children }) => {
-    const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(reducer, initialState, AppActions);
+    const [state, actions] = useTypesafeActions<IAppState, typeof AppActions>(
+      reducer,
+      initialState,
+      AppActions,
+      [middleware],
+      [],
+    );
 
     const {
       state: { storagePath, isLoading },
@@ -220,17 +227,21 @@ const createStoreContext = () => {
 
   const useStore = () => React.useContext(StoreContext);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const useSelector = (selector: (arg: IAppState) => any) => {
+  type SelectorType = IAppState[keyof IAppState];
+
+  const useSelector = <T extends SelectorType>(selector: (arg: IAppState) => T) => {
     const [, forceRender] = useReducer((s) => s + 1, 0);
+
     const store = useContext(StoreContext);
     const selectorRef = useRef(selector);
     selectorRef.current = selector;
+
     const selectedStateRef = useRef(selector(store.state()));
     selectedStateRef.current = selector(store.state());
 
     const checkForUpdates = useCallback(() => {
       const newState = selectorRef.current(store.state());
+
       if (newState !== selectedStateRef.current) {
         forceRender();
       }

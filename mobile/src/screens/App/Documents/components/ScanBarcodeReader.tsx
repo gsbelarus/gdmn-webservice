@@ -34,9 +34,9 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
   const [scanned, setScanned] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
 
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
   const references = useSelector((store) => store.references);
-  const companySettings = useSelector((store) => store.companySettings) as ICompanySettings;
+  const companySettings = useSelector((store) => store.companySettings);
 
   const ref = useRef<TextInput>(null);
 

@@ -33,7 +33,7 @@ const RemainsViewScreen = ({ route, navigation }) => {
 
   const { item: contactItem }: { item: IReference } = route.params;
 
-  const models = useSelector((store) => store.models) as IModels;
+  const models = useSelector((store) => store.models);
 
   useEffect(() => {
     const data = (models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;

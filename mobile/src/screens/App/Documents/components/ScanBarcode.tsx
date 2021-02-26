@@ -30,8 +30,8 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   const [scanned, setScanned] = useState(false);
 
   const references = useSelector((store) => store.references);
-  const companySettings = useSelector((store) => store.companySettings) as ICompanySetting;
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const companySettings = useSelector((store) => store.companySettings);
+  const documents = useSelector((store) => store.documents);
 
   const [barcode, setBarcode] = useState('');
   const [goodItem, setGoodItem] = useState<ScannedObject>(undefined);

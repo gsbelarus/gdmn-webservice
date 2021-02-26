@@ -30,7 +30,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
 
   const forms = useSelector((store) => store.forms);
   const references = useSelector((store) => store.references);
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
 
   const [statusId, setStatusId] = useState(0);
   const isBlocked = statusId !== 0;

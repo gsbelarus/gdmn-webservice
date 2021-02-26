@@ -3,14 +3,11 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig, DateObject } from 'react-native-calendars';
-import { IForm } from '../../../../../../common';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
-import { IForms } from '../../../../model/types';
 import { RootStackParamList } from '../../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../../store';
 import { useSelector } from '../../../../store/App/store';
 
@@ -45,7 +42,7 @@ export const SelectDateScreen = ({ route, navigation }: Props) => {
   const { formName, fieldName, title, value } = route.params;
 
   const { actions } = useAppStore();
-  const forms = useSelector((store) => store.forms) as IForms<IForm>;
+  const forms = useSelector((store) => store.forms);
 
   useEffect(() => {
     setDate(value);

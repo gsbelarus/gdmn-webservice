@@ -3,12 +3,11 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Searchbar, Checkbox, Paragraph } from 'react-native-paper';
-import { IForm } from '../../../../../../common';
 
 import { HeaderRight } from '../../../../components/HeaderRight';
 import ItemSeparator from '../../../../components/ItemSeparator';
 import SubTitle from '../../../../components/SubTitle';
-import { IForms, IListItem } from '../../../../model/types';
+import { IListItem } from '../../../../model/types';
 import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { useAppStore } from '../../../../store';
 import { useSelector } from '../../../../store/App/store';
@@ -19,7 +18,7 @@ export const SelectItemScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
 
   const { actions } = useAppStore();
-  const forms = useSelector((store) => store.forms) as IForms<IForm>;
+  const forms = useSelector((store) => store.forms);
 
   const { list, isMulti = false, formName, fieldName, title, value } = route.params;
 

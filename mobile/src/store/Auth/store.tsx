@@ -4,6 +4,7 @@ import { IAuthState, IAuthContextProps } from '../../model/types';
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AuthActions } from './actions';
+import { middleware } from './middleware';
 import { reducer, initialState } from './reducer';
 
 const defaultAppState: IAuthContextProps = {
@@ -15,7 +16,13 @@ const createStoreContext = () => {
   const StoreContext = React.createContext<IAuthContextProps>(defaultAppState);
 
   const StoreProvider = ({ children }) => {
-    const [state, actions] = useTypesafeActions<IAuthState, typeof AuthActions>(reducer, initialState, AuthActions);
+    const [state, actions] = useTypesafeActions<IAuthState, typeof AuthActions>(
+      reducer,
+      initialState,
+      AuthActions,
+      [middleware],
+      [],
+    );
     const { actions: storeActions } = useServiceStore();
 
     useEffect(() => {

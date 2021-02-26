@@ -1,6 +1,6 @@
-import { Reducer, useReducer, useMemo } from 'react';
+import { Reducer, useReducer, useMemo, useRef, useEffect } from 'react';
 
-import { TActions } from './';
+import { IState, TActions } from './';
 
 /**
  * Create an action that has a strongly typed string literal name with a strongly typed payload
@@ -66,17 +66,45 @@ interface IAction {
   [key: string]: (...args: unknown[]) => unknown;
 }
 
-// export type Selector<S> = (newState: S) => S[keyof S];
+// export type StoreMiddlware = <S, Actions extends TActions>(action: Actions, state: S) => void;
+
+export type StoreMiddlware = (action: TActions, state: IState) => void;
 
 export function useTypesafeActions<S, Actions extends IAction>(
   reducer: Reducer<S, TActions>,
   initialState: S,
   actions: Actions,
+  middlewareFns: StoreMiddlware[],
+  afterwareFns: StoreMiddlware[],
 ): [S, Actions] {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const aRef = useRef<TActions>();
+
+  const dispatchWithMiddleware = useMemo(
+    () => (action: TActions) => {
+      middlewareFns?.forEach((middlewareFn) => middlewareFn(action, state));
+
+      aRef.current = action;
+
+      dispatch(action);
+    },
+    [middlewareFns, state],
+  );
+
+  useEffect(() => {
+    if (!aRef.current) {
+      return;
+    }
+
+    afterwareFns?.forEach((afterwareFn) => afterwareFn(aRef.current, state));
+  }, [afterwareFns, state]);
+
   const boundActions = useMemo(() => {
-    function bindActionCreator(actionCreator: (...args: unknown[]) => unknown, dispatcher: typeof dispatch) {
+    function bindActionCreator(
+      actionCreator: (...args: unknown[]) => unknown,
+      dispatcher: typeof dispatchWithMiddleware,
+    ) {
       return function (this: unknown) {
         // eslint-disable-next-line prefer-rest-params
         return dispatcher(actionCreator.apply(this, (arguments as unknown) as unknown[]));

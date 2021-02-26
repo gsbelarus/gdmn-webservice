@@ -26,7 +26,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
 
   const forms = useSelector((store) => store.forms);
   const references = useSelector((store) => store.references);
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
 
   const documentParams = useMemo(() => (forms?.documentParams as unknown) as IFormParams, [forms?.documentParams]);
 

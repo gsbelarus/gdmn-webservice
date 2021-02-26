@@ -42,7 +42,7 @@ const ReferenceListScreen = () => {
   const { colors } = useTheme();
   const { state } = useAuthStore();
 
-  const refs = useSelector((store) => store.references) as IReferences;
+  const refs = useSelector((store) => store.references);
   const { apiService } = useServiceStore();
 
   const ref = React.useRef<FlatList<IReference>>(null);

@@ -7,7 +7,6 @@ export enum ActionAuthTypes {
   SET_DEVICE_STATUS = 'SET_DEVICE_STATUS',
   SET_USER_STATUS = 'SET_USER_STATUS',
   SET_COMPANY_ID = 'SET_COMPANY_ID',
-  SET_USER_ID = 'SET_USER_ID',
 }
 
 export const AuthActions = {

@@ -6,6 +6,7 @@ import Api from '../../service/Api';
 import Storage from '../../service/Storage';
 import { useTypesafeActions } from '../utils';
 import { ServiceActions } from './actions';
+import { middleware } from './middleware';
 import { initialState, reducer } from './reducer';
 
 const apiService = new Api();
@@ -26,6 +27,8 @@ const createStoreContext = () => {
       reducer,
       initialState,
       ServiceActions,
+      [middleware],
+      [],
     );
 
     /* Загружаем глобальные настройки приложения */

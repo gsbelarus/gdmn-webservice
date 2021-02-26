@@ -10,7 +10,6 @@ import { IDataMessage } from '../../../../common/models';
 import SettingsItem from '../../components/SettingsItem';
 import { useActionSheet } from '../../helpers/useActionSheet';
 import { timeout, isMessagesArray, appStorage } from '../../helpers/utils';
-import { IAppSettings, ICompanySettings, IModels } from '../../model/types';
 import { SettingsStackParamList } from '../../navigation/SettingsNavigator';
 import { useAuthStore, useAppStore, useServiceStore } from '../../store';
 import { useSelector } from '../../store/App/store';
@@ -26,10 +25,10 @@ const SettingsScreen = ({ navigation }: Props) => {
 
   const forms = useSelector((store) => store.forms);
   const references = useSelector((store) => store.references);
-  const settings = useSelector((store) => store.settings) as IAppSettings;
-  const companySettings = useSelector((store) => store.companySettings) as ICompanySettings;
-  const documents = useSelector((store) => store.documents) as IDocument[];
-  const models = useSelector((store) => store.models) as IModels;
+  const settings = useSelector((store) => store.settings);
+  const companySettings = useSelector((store) => store.companySettings);
+  const documents = useSelector((store) => store.documents);
+  const models = useSelector((store) => store.models);
 
   const {
     state: { companyID, userID },

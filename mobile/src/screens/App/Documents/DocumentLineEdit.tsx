@@ -22,7 +22,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { actions } = useAppStore();
 
   const references = useSelector((store) => store.references);
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
 
   const { docId, lineId, prodId, price, remains, quantity } = route.params;
 

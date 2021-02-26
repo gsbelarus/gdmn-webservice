@@ -136,10 +136,9 @@ const DocumentListScreen = ({ navigation }) => {
   const { state } = useAuthStore();
   const { state: appState, actions: appActions } = useAppStore();
 
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
   const viewParams = useSelector((store) => store.viewParams);
   const references = useSelector((store) => store.references);
-  // const models = useSelector((store) => store.models);
 
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState<IDocument[]>(documents);

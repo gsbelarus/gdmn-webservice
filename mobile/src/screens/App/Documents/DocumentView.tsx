@@ -71,7 +71,7 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
   // const { state } = useAppStore();
   const references = useSelector((store) => store.references);
   const settings = useSelector((store) => store.settings);
-  const documents = useSelector((store) => store.documents) as IDocument[];
+  const documents = useSelector((store) => store.documents);
 
   const docId = route.params?.docId;
 
