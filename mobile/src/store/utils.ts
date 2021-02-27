@@ -1,4 +1,4 @@
-import { Reducer, useReducer, useMemo, useRef, useEffect } from 'react';
+import { Reducer, useReducer, useMemo, useRef, Dispatch } from 'react';
 
 import { IState, TActions } from './';
 
@@ -62,61 +62,74 @@ export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<A[keyof
 }
  */
 
-interface IAction {
-  [key: string]: (...args: unknown[]) => unknown;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Action = (...args: unknown[]) => any;
+
+interface IActions {
+  [key: string]: Action;
 }
 
-// export type StoreMiddlware = <S, Actions extends TActions>(action: Actions, state: S) => void;
+export type StoreMiddlware<A> = Dispatch<A>;
+//(action: TActions, state: IState) => void;
 
-export type StoreMiddlware = (action: TActions, state: IState) => void;
-
-export function useTypesafeActions<S, Actions extends IAction>(
+export function useTypesafeActions<S, Actions extends IActions>(
   reducer: Reducer<S, TActions>,
   initialState: S,
   actions: Actions,
-  middlewareFns: StoreMiddlware[],
-  afterwareFns: StoreMiddlware[],
+  middlewareFns: StoreMiddlware<TActions>[],
+  afterwareFns: StoreMiddlware<TActions>[],
 ): [S, Actions] {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const aRef = useRef<TActions>();
+  /*   const aRef = useRef<TActions>();
 
-  const dispatchWithMiddleware = useMemo(
-    () => (action: TActions) => {
-      middlewareFns?.forEach((middlewareFn) => middlewareFn(action, state));
+  const dispatchWithMiddleware: Dispatch<TActions> = (action) => {
+    middlewareFns?.forEach((middlewareFn) => middlewareFn(action));
 
-      aRef.current = action;
+    // aRef.current = action;
 
-      dispatch(action);
+    dispatch(action);
+  }; */
+
+  /*   const dispatchWithMiddleware: Dispatch<TActions> = useMemo(
+      () => (action) => {
+        middlewareFns?.forEach((middlewareFn) => middlewareFn(action));
+
+        aRef.current = action;
+
+        return dispatch(action);
+      },
+      [middlewareFns],
+    ); */
+
+  /*   const withLogger = useMemo(
+    () => (newDispatch: Dispatch<TActions>) => {
+      return (action: TActions) => {
+        console.log('Action Type:', action.type);
+        return newDispatch(action);
+      };
     },
-    [middlewareFns, state],
+    [],
   );
 
-  useEffect(() => {
+  const dispatchWithLogger = withLogger(dispatch); */
+  /*   useEffect(() => {
     if (!aRef.current) {
       return;
     }
 
     afterwareFns?.forEach((afterwareFn) => afterwareFn(aRef.current, state));
-  }, [afterwareFns, state]);
+  }, [afterwareFns, state]); */
 
   const boundActions = useMemo(() => {
-    function bindActionCreator(
-      actionCreator: (...args: unknown[]) => unknown,
-      dispatcher: typeof dispatchWithMiddleware,
-    ) {
-      return function (this: unknown) {
-        // eslint-disable-next-line prefer-rest-params
-        return dispatcher(actionCreator.apply(this, (arguments as unknown) as unknown[]));
-      };
-    }
+    const bindActionCreator = (actionCreator: Action, dispatcher: typeof dispatch) => {
+      return (...args: unknown[]) => dispatcher(actionCreator(...args));
+    };
 
-    const newActions = Object.keys(actions).reduce((ba, actionName) => {
+    return Object.keys(actions).reduce((ba, actionName) => {
       ba[actionName] = bindActionCreator(actions[actionName], dispatch);
       return ba;
-    }, {} as IAction);
-
-    return newActions;
+    }, {} as IActions);
   }, [actions, dispatch]);
 
   return [state, boundActions as Actions];

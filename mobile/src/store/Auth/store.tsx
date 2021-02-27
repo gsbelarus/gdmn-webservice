@@ -29,7 +29,7 @@ const createStoreContext = () => {
       if (state.userID && state.companyID) {
         storeActions.setStoragePath(`${state.userID}/${state.companyID}`);
       }
-    }, [state.userID, state.companyID, actions, storeActions]);
+    }, [state.userID, state.companyID, storeActions]);
 
     return <StoreContext.Provider value={{ state, actions }}>{children}</StoreContext.Provider>;
   };
