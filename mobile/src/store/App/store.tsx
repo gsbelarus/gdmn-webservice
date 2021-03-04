@@ -110,7 +110,7 @@ const createStoreContext = () => {
     //   if (state.references && storagePath && !isLoading) {
     //     saveModel();
     //   }
-    // }, [references?.contacts?.data, , references?.goods?.data, references?.remains?.data, storagePath, isLoading]);
+    // }, [references?.contacts?.data, references?.goods?.data, references?.remains?.data, storagePath, isLoading]);
 
     /*  Сохранение справочников в storage при их изменении */
     useEffect(() => {
@@ -204,13 +204,18 @@ const createStoreContext = () => {
     // }, [actions, state.documents, state.settings]);
 
     // useEffect(() => {
-    //   if (!isLoading) {
-    //     console.log('getRemainsModel');
+    //   console.log('getRemainsModel_1');
+    //   console.log('contacts', state.references?.contacts?.data?.length);
+    //   console.log('goods', state.references?.goods?.data?.length);
+    //   console.log('remins', state.references?.remins?.data?.length);
+    //   if (state.references?.contacts?.data && state.references?.goods?.data && state.references?.remins?.data) {
+    //     console.log('getRemainsModel_2');
     //     const remainsModel = getRemainsModel(
     //       state.references?.contacts?.data as IContact[],
     //       state.references?.goods?.data as IGood[],
     //       (state.references?.remains?.data as unknown) as IRemains[],
     //     );
+    //     console.log('getRemainsModel_3', remainsModel.name);
     //     actions.setModel(remainsModel);
     //   }
     // }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remins?.data]);
