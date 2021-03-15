@@ -18,7 +18,7 @@ const ScanBarCodeScreen = () => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   //фонарик: torch - включен, off - выключен
-  const [flashMode, setFlashMode] = useState(false);
+  const [flashMode, setFlashMode] = useState(true);
   const [scanned, setScanned] = useState(false);
   const { state, actions } = useAppStore();
   const navigation = useNavigation();
