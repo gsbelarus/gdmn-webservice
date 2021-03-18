@@ -76,7 +76,7 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
 
   const goodRemains: IField[] = useMemo(() => {
     const data = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
-    const goods = data[document?.head?.fromcontactId]?.goods;
+    const goods = data?.[document?.head?.fromcontactId]?.goods;
 
     if (!goods) {
       return [];
