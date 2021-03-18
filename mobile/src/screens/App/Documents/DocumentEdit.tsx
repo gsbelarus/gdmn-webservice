@@ -202,6 +202,9 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const handlePresentDocType = () => {
     //В окне Bottomsheet установим тип документа равным типу из параметров формы
     //Если тип документа не указан, то первый тип из списка
+    if (!(documentType ?? listDocumentType?.length)) {
+      return;
+    }
     setSelectedDocType(documentType ?? listDocumentType[0]);
     docTypeRef.current?.present();
   };
@@ -230,6 +233,9 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const handlePresentFromContact = () => {
     //В окне Bottomsheet установим подразделение равным подразделению из параметров формы
     //Если подразделение не указано, то первое подразделение из списка
+    if (!(fromContact ?? listDepartments?.length)) {
+      return;
+    }
     setSelectedFromContact(fromContact ?? listDepartments[0]);
     fromContactRef.current?.present();
   };

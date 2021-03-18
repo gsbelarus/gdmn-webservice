@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: 35,
   },
-/*   result: {
+  /*   result: {
     backgroundColor: '#F3FBFE',
     color: 'white',
     fontWeight: '600',

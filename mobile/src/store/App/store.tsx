@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 
 import { IContact, IDocument, IGood, IRemains } from '../../../../common';
@@ -93,7 +92,25 @@ const createStoreContext = () => {
       if (storagePath) {
         loadData();
       }
-    }, [actions, storagePath]);
+    }, [actions, setLoading, storagePath]);
+
+    // /* Формирование модели при изменениях в справочниках*/
+    // useEffect(() => {
+    //   const saveModel = async () => {
+    //     rlog('getRemainsModel', 'Начало построения модели');
+    //     const remainsModel: IModel<IModelData<IMDGoodRemain>> = getRemainsModel(
+    //       state.references?.contacts?.data as IContact[],
+    //       state.references?.goods?.data as IGood[],
+    //       (state.references?.remains?.data as unknown) as IRemains[],
+    //     );
+    //     rlog('getRemainsModel', 'Окончание построения модели');
+    //     actions.setModel(remainsModel);
+    //   };
+
+    //   if (state.references && storagePath && !isLoading) {
+    //     saveModel();
+    //   }
+    // }, [references?.contacts?.data, references?.goods?.data, references?.remains?.data, storagePath, isLoading]);
 
     /*  Сохранение справочников в storage при их изменении */
     useEffect(() => {
@@ -166,6 +183,13 @@ const createStoreContext = () => {
       }
     }, [state.viewParams, storagePath]);
 
+    // function useSelectors(ourReducer: Reducer<IAppState, TAppActions>, mapStateToSelectors: (arg0: IAppState) => any) {
+    //   // eslint-disable-next-line no-shadow
+    //   const [state] = ourReducer;
+    //   const selectors = useMemo(() => mapStateToSelectors(state), [state]);
+    //   return selectors;
+    // }
+
     // useEffect(() => {
     //   console.log('deleteDocument');
     //   if (!!state.settings?.autodeletingDocument && state.documents && !isLoading) {
@@ -180,13 +204,18 @@ const createStoreContext = () => {
     // }, [actions, state.documents, state.settings]);
 
     // useEffect(() => {
-    //   if (!isLoading) {
-    //     console.log('getRemainsModel');
+    //   console.log('getRemainsModel_1');
+    //   console.log('contacts', state.references?.contacts?.data?.length);
+    //   console.log('goods', state.references?.goods?.data?.length);
+    //   console.log('remins', state.references?.remins?.data?.length);
+    //   if (state.references?.contacts?.data && state.references?.goods?.data && state.references?.remins?.data) {
+    //     console.log('getRemainsModel_2');
     //     const remainsModel = getRemainsModel(
     //       state.references?.contacts?.data as IContact[],
     //       state.references?.goods?.data as IGood[],
     //       (state.references?.remains?.data as unknown) as IRemains[],
     //     );
+    //     console.log('getRemainsModel_3', remainsModel.name);
     //     actions.setModel(remainsModel);
     //   }
     // }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remins?.data]);

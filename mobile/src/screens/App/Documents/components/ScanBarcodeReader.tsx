@@ -19,12 +19,12 @@ import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
 import { IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
-import { DocumentStackParamList } from '../../../../navigation/DocumentsNavigator';
+import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { useAppStore } from '../../../../store';
 
 const ONE_SECOND_IN_MS = 1000;
 
-type Props = StackScreenProps<DocumentStackParamList, 'ScanBarcodeReader'>;
+type Props = StackScreenProps<RootStackParamList, 'ScanBarcodeReader'>;
 
 type ScannedObject = IRem & { quantity: number };
 

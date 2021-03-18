@@ -11,7 +11,7 @@
     "prettier:check": "prettier --check \"src/**/*.ts*\"",
     "prettier:fix": "prettier --write \"src/**/*.ts*\"",
     "eslint:run": "eslint \"src/**/*.ts*\"",
-    "eslint:fix": "eslint --fix \"src/**/*.ts\""
+    "eslint:fix": "eslint --fix \"src/**/*.ts*\""
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.8.0",

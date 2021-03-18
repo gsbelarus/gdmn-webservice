@@ -33,10 +33,10 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     [contacts],
   );
 
-  const docHead = useMemo(() => item?.head, [item?.head]);
+  const docHead = item?.head;
   const fromContact = useMemo(() => getContact(docHead?.fromcontactId), [docHead.fromcontactId, getContact]);
 
-  const docDate = useMemo(() => new Date(item?.head?.date).toLocaleDateString('BY-ru'), [item?.head?.date]);
+  const docDate = new Date(item?.head?.date).toLocaleDateString('BY-ru');
 
   const status = useMemo(() => Statuses.find((type) => type.id === item?.head?.status), [item?.head?.status]);
 
@@ -135,9 +135,7 @@ const DocumentListScreen = ({ route, navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState(appState.documents as IDocument[]);
 
-  const option = useMemo(() => {
-    return (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IListItem;
-  }, [appState.viewParams?.InvDoc?.selectedOption]);
+  const option = (appState.viewParams?.InvDoc?.selectedOption ?? sort_options[0]) as IListItem;
 
   const [selectedOption, setSelectedOption] = useState<IListItem>(option);
 
@@ -145,27 +143,25 @@ const DocumentListScreen = ({ route, navigation }) => {
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentFilter = useCallback(() => {
+  const handlePresentFilter = () => {
     setSelectedOption(option);
     bottomSheetRef.current?.present();
-  }, [option]);
+  };
 
-  const handleApplyFilter = useCallback(() => {
+  const handleApplyFilter = () => {
     setSortData(true);
     appActions.setViewParam({
       InvDoc: { ...appState.viewParams?.InvDoc, selectedOption },
     });
     bottomSheetRef.current?.dismiss();
-  }, [appState.viewParams?.InvDoc, appActions, selectedOption]);
+  };
 
-  const handleDismissFilter = useCallback(() => {
+  const handleDismissFilter = () => {
     setSortData(false);
     bottomSheetRef.current?.dismiss();
-  }, []);
+  };
 
-  const contacts = useMemo(() => appState.references?.contacts?.data as IContact[], [
-    appState.references?.contacts?.data,
-  ]);
+  const contacts = appState.references?.contacts?.data as IContact[];
 
   const getContact = useCallback(
     (id: number | number[]): IContact =>
@@ -208,7 +204,7 @@ const DocumentListScreen = ({ route, navigation }) => {
         return docHead?.docnumber?.includes(searchText);
       }) || [],
     );
-  }, [appState.documents, searchText, getContact, appState.forms?.filterParams?.fieldSearch]);
+  }, [appState.documents, searchText]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
