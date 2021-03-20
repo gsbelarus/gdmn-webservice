@@ -7,6 +7,7 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
@@ -37,7 +38,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
 });
 
 const GoodListScreen = () => {
-  const route = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>();
+  const route = useRoute<RouteProp<RootStackParamList, ''>>();
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);

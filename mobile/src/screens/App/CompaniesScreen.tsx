@@ -40,12 +40,13 @@ const CompaniesScreen = () => {
 
         TODO Если хотим сменить то происходит снова автоматический вход
       */
+      /*
       if (!!savedCompany && companies.some((company) => company === savedCompany)) {
         setSelectedCompany(savedCompany);
         //   actions.setCompanyID({ companyId: savedCompany, companyName: savedCompany });
       } else {
         setSelectedCompany(companies[0]);
-      }
+      } */
     };
 
     if (userID !== null && companies?.length > 0) {

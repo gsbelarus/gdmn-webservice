@@ -57,8 +57,7 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
       ((state.references?.remains?.data as unknown) as IRemains[])?.find(
         (rem) => rem.contactId === document?.head?.fromcontactId,
       )?.data || [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
+    [document?.head?.fromcontactId, state.references?.remains?.data],
   );
 
   //список остатков + поля из справочника тмц

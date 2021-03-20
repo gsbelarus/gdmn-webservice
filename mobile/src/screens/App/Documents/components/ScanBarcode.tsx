@@ -9,7 +9,7 @@ import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
-import { IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { IMDGoodRemain, IModelData, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
 import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
@@ -38,29 +38,32 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
     state.documents,
   ]);
 
-  const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+  // const goods = useMemo(() => state.references?.goods?.data as IGood[], [state.references?.goods?.data]);
+
+  const remainsData = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
+  const goods = remainsData?.[document?.head?.fromcontactId]?.goods;
 
   const weightCodeSettings = useMemo(() => (state.companySettings?.weightSettings as unknown) as IWeightCodeSettings, [
     state.companySettings?.weightSettings,
   ]);
 
-  const remains = useMemo(
+  /*   const remains = useMemo(
     () =>
       ((state.references?.remains?.data as unknown) as IRemains[])?.find(
         (rem) => rem.contactId === document?.head?.fromcontactId,
       )?.data || [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.references?.remains?.data],
-  );
+    [document?.head?.fromcontactId, state.references?.remains?.data],
+  ); */
 
   //список товаров из справочника тмц + поля из остатков
-  const goodRemains = useMemo(() => {
-    return goods?.map((good) => {
-      const rem = remains.find((item) => good.id === item.goodId);
+  // const goodRemains = useMemo(() => {
+  // return Object.keys(goods).find((item) => item === good.id);
+  /* return goods?.map((good) => {
+    const rem = remains.find((item) => good.id === item.goodId);
 
-      return { ...good, price: rem?.price, qty: rem?.q };
-    });
-  }, [goods, remains]);
+    return { ...good, price: rem?.price, qty: rem?.q };
+  }); */
+  // }, []);
 
   useEffect(() => {
     const permission = async () => {
@@ -89,17 +92,31 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
       return;
     }
 
-    console.log('barcode:', barcode);
+    // console.log('barcode:', barcode);
 
     const getScannedObject = (brc: string): ScannedObject => {
-      let goodObj: IRem;
       let charFrom = 0;
 
       let charTo = weightCodeSettings?.weightCode.length;
 
       if (brc.substring(charFrom, charTo) !== weightCodeSettings?.weightCode) {
-        goodObj = goodRemains?.find((item) => item.barcode === brc);
-        return goodObj ? { ...goodObj, quantity: 1 } : undefined;
+        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc)];
+
+        if (!remItem) {
+          return;
+        }
+
+        const { remains, ...good } = remItem;
+
+        return {
+          goodkey: good.id,
+          ...good,
+          quantity: 1,
+          price: remains.length ? remains[0].price : 0,
+          remains: remains.length ? remains?.[0].q : 0,
+        };
+
+        // return goodObj ? { ...goodObj, quantity: 1 } : undefined;
       }
 
       charFrom = charTo;
@@ -111,9 +128,21 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
 
-      goodObj = goodRemains?.find((item) => item.weightCode === code);
+      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code)];
 
-      return goodObj ? { ...goodObj, quantity: qty } : undefined;
+      if (!remItem) {
+        return;
+      }
+
+      const { remains, ...good } = remItem;
+
+      return {
+        goodkey: good.id,
+        ...good,
+        quantity: qty,
+        price: remains.length ? remains[0].price : 0,
+        remains: remains.length ? remains?.[0].q : 0,
+      };
     };
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
@@ -124,11 +153,12 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
   }, [
     barcode,
     scanned,
-    goodRemains,
     vibroMode,
     weightCodeSettings?.weightCode,
     weightCodeSettings?.code,
     weightCodeSettings?.weight,
+    goods,
+    goodItem?.id,
   ]);
 
   if (hasPermission === null) {
@@ -240,7 +270,7 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                       {goodItem?.name}
                     </Text>
                     <Text style={localStyles.barcode}>
-                      цена: {goodItem?.price || 0}, кол-во: {goodItem?.quantity}
+                      цена: {goodItem?.price || 0}, остаток: {goodItem?.remains}, кол-во: {goodItem?.quantity}
                     </Text>
                     <Text style={localStyles.barcode}>{goodItem?.barcode}</Text>
                   </View>
