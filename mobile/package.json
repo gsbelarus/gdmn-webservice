@@ -49,7 +49,7 @@
     "@react-navigation/stack": "^5.14.3",
     "@types/expo": "^33.0.1",
     "@types/react": "~17.0.3",
-    "@types/react-native": "^0.63.52",
+    "@types/react-native": "^0.64.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",

@@ -9,11 +9,12 @@ import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { formatValue } from '../../../helpers/utils';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
-type Props = StackScreenProps<DocumentStackParamList, 'DocumentLineEdit'>;
+type Props = StackScreenProps<RootStackParamList, 'DocumentLineEdit'>;
 
 const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
