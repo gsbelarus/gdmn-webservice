@@ -16,6 +16,7 @@ import {
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
+import { middleware } from './middleware';
 import { reducer, initialState } from './reducer';
 
 const defaultAppState: IAppContextProps = {

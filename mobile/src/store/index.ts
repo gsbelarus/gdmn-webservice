@@ -1,3 +1,4 @@
+import { IAppState, IAuthState, IServiceState } from '../model/types';
 import { TAppActions } from './App/actions';
 import { TAuthActions } from './Auth/actions';
 import { TServiceActions } from './Service/actions';
@@ -10,3 +11,4 @@ export { ServiceActions } from './Service/actions';
 export { useStore as useServiceStore, StoreProvider as ServiceStoreProvider } from './Service/store';
 
 export type TActions = TServiceActions | TAppActions | TAuthActions;
+export type IState = IAuthState | IServiceState | IAppState;

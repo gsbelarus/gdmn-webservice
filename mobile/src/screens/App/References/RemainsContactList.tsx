@@ -1,7 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  RefreshControl,
+} from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
 import { IMDGoodRemain, IRefData } from '../../../../../common/base';
@@ -71,20 +79,26 @@ const RemainsContactListViewScreen = ({ navigation }) => {
           {appState.references?.contacts?.name}
         </SubTitle>
         <ItemSeparator />
-        <View style={localStyles.flexDirectionRow}>
-          <Searchbar
-            placeholder="Поиск"
-            onChangeText={setSearchQuery}
-            value={searchQuery}
-            style={[localStyles.flexGrow, localStyles.searchBar]}
-          />
-        </View>
-        <ItemSeparator />
+        {!!filteredList && (
+          <>
+            <View style={localStyles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск"
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                style={[localStyles.flexGrow, localStyles.searchBar]}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+        )}
         <FlatList
           ref={ref}
           data={filteredList}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
+          refreshControl={<RefreshControl refreshing={!filteredList} title="загрузка данных..." />}
+          ListEmptyComponent={filteredList ? <Text style={localStyles.emptyList}>Список пуст</Text> : null}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>
@@ -108,6 +122,10 @@ const localStyles = StyleSheet.create({
   },
   details: {
     margin: 10,
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   flexDirectionRow: {
     flexDirection: 'row',
