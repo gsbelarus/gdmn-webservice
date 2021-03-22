@@ -3,9 +3,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Text, TextInput } from 'react-native-paper';
+import { Colors, FAB, Text, TextInput } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
 import { IGood } from '../../../../../common';
@@ -397,6 +397,24 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             </View>
             <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
+                  },
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+            style={localStyles.buttonContainer}
+          >
+            <Text style={localStyles.button}>Удалить позицию</Text>
+          </TouchableOpacity>
           {showDate && (
             <DateTimePicker
               testID="dateTimePicker"
@@ -429,6 +447,19 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: 60,
     padding: 10,
+  },
+  button: {
+    alignSelf: 'center',
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  buttonContainer: {
+    backgroundColor: '#FC3F4D',
+    borderRadius: 10,
+    elevation: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   container: {
     justifyContent: 'flex-start',

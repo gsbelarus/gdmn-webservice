@@ -43,7 +43,10 @@ const DocumentItem = React.memo(
           </View>
           <View style={localStyles.details}>
             <View style={localStyles.directionRow}>
-              <Text style={[localStyles.name, { color: colors.text }]}>{`№ ${docNumber} от ${docDate}`}</Text>
+              {console.log(docDate)}
+              <Text style={[localStyles.name, { color: colors.text }]}>
+                {`№ ${docNumber} от ${docDate.split('-').reverse().join('.')}`}
+              </Text>
               <Text style={[localStyles.number, localStyles.field, { color: statusColors[status.id] }]}>
                 {status?.name || ''}
               </Text>
@@ -97,7 +100,7 @@ const SellDocumentsListScreen = () => {
 
       const status = Statuses.find((type) => type.id === docHead.status);
 
-      const docDate = new Date(docHead.date).toLocaleDateString();
+      const docDate = new Date(docHead.date).toISOString().slice(0, 10);
 
       return { id: item.id, docDate, docNumber: item.head.docnumber, fromContact, toContact, expeditor, status };
     });

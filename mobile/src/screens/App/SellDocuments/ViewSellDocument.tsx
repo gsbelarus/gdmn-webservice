@@ -1,4 +1,4 @@
-import { MaterialIcons, Feather } from '@expo/vector-icons';
+//import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme, useScrollToTop, useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useMemo } from 'react';
@@ -7,7 +7,7 @@ import { Text, Colors, FAB, IconButton } from 'react-native-paper';
 
 import { IContact, IGood } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import SubTitle from '../../../components/SubTitle';
+//import SubTitle from '../../../components/SubTitle';
 import { statusColors } from '../../../constants';
 import { useActionSheet } from '../../../helpers/useActionSheet';
 import { formatValue } from '../../../helpers/utils';
@@ -19,18 +19,18 @@ import styles from '../../../styles/global';
 // const statusColors = ['#C52900', '#C56A00', '#008C3D', '#06567D'];
 
 const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: number }) => {
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
+  //const docId = useRoute<RouteProp<DocumentStackParamList, 'ViewSellDocument'>>().params?.docId;
   const { colors } = useTheme();
   const { state, actions } = useAppStore();
   const good: IGood = state.goods.find((i) => i.id === item.goodId);
 
   return (
     <>
-      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+      {/*<View style={[localStyles.item, { backgroundColor: colors.card }]}>
         <View style={[localStyles.avatar, { backgroundColor: colors.primary }]}>
           <Feather name="box" size={20} color={'#FFF'} />
         </View>
-      </View>
+      </View>*/}
       <View style={localStyles.goodInfo}>
         <Text numberOfLines={5} style={localStyles.productTitleView}>
           {good?.name || 'товар не найден'}
@@ -60,12 +60,12 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
           {item.orderQuantity ?? 0}
         </Text>
       </View>
-      <View style={localStyles.remainsInfo}>
+      <View style={[localStyles.remainsInfo, localStyles.marginRight]}>
         <Text numberOfLines={5} style={(localStyles.productBarcodeView, { color: colors.text })}>
           {item.quantity}
         </Text>
       </View>
-      {status === 0 && (
+      {/*status === 0 && (
         <View style={localStyles.remainsInfo}>
           <TouchableOpacity
             style={localStyles.buttonDelete}
@@ -86,14 +86,14 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
             <MaterialIcons size={25} color={colors.primary} name="delete-forever" />
           </TouchableOpacity>
         </View>
-      )}
+          )*/}
     </>
   );
 });
 
 const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status: number; docId: number }) => {
   const navigation = useNavigation();
-  const { actions } = useAppStore();
+  //const { actions } = useAppStore();
 
   return status === 0 ? (
     <TouchableOpacity
@@ -110,6 +110,16 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
       <ContentItem item={item} status={status} />
     </View>
   );
+});
+
+const TotalProps = React.memo(({ title, value }: { title: string, value: string }) => {
+  return (
+    <View>
+      <Text style={[localStyles.boxingText, { color: Colors.blue600 }]}>{title}</Text>
+      {/*<ItemSeparator />*/}
+      <Text style={localStyles.productTitleView}>{value}</Text>
+    </View>
+  )
 });
 
 type Props = StackScreenProps<DocumentStackParamList, 'ViewSellDocument'>;
@@ -187,8 +197,22 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     <LineItem item={item} status={document?.head.status} docId={document?.id} />
   );
 
+  const docTitle = useMemo(() => {
+    /*const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return `№${(document?.head as ISellHead)?.docnumber} ${new Date(document?.head?.date)?.toLocaleString(
+      'ru',
+      options,
+    )}`;*/
+    const date = new Date(document?.head?.date).toISOString().slice(0, 10).split('-').reverse().join('.');
+    return `№${(document?.head as ISellHead)?.docnumber} ${date}`
+  }, [document]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      title: docTitle,
+      headerTitleStyle: {
+        alignSelf: 'center',
+      },
       headerRight: () => (
         <IconButton
           icon="menu"
@@ -251,23 +275,15 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, docId, document?.head?.status, navigation, showActionSheet, document]);
 
-  const docTitle = useMemo(() => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return `№${(document?.head as ISellHead)?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString(
-      'BY-ru',
-      options,
-    )}`;
-  }, [document]);
-
   return document ? (
     <>
       <View style={[styles.container, localStyles.container, { backgroundColor: colors.card }]}>
         <View style={[localStyles.documentHeader, { backgroundColor: statusColors[document?.head?.status] }]}>
-          <Text style={[localStyles.documentHeaderText, { color: colors.card }]}>{docTitle}</Text>
+          {/*<Text style={[localStyles.documentHeaderText, { color: colors.card }]}>{docTitle}</Text>*/}
           <Text style={[localStyles.documentText, { color: colors.card }]}>{contact?.name}</Text>
         </View>
         <View style={localStyles.listContainer}>
-          <View style={localStyles.avatarRow} />
+          {/*<View style={localStyles.avatarRow} />*/}
           <View style={localStyles.goodInfo}>
             <Text style={localStyles.productBarcodeView}>Наименование ТМЦ</Text>
           </View>
@@ -277,14 +293,14 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <View style={localStyles.remainsInfo}>
             <Text style={localStyles.productBarcodeView}>Заявка</Text>
           </View>
-          <View style={localStyles.remainsInfo}>
+          <View style={[localStyles.remainsInfo, localStyles.marginRight]}>
             <Text style={localStyles.productBarcodeView}>Кол-во</Text>
           </View>
-          {document?.head?.status === 0 && (
+          {/*document?.head?.status === 0 && (
             <View style={localStyles.remainsInfo}>
               <Text style={localStyles.productBarcodeView} />
             </View>
-          )}
+          )*/}
         </View>
         <FlatList
           ref={refList}
@@ -294,8 +310,29 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ItemSeparatorComponent={ItemSeparator}
         />
         <ItemSeparator />
-        <SubTitle styles={[localStyles.totalsTitle, { backgroundColor: colors.background }]}>Итого</SubTitle>
-        <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
+        <View style={localStyles.totalContainer} >
+          <TotalProps
+            title={'Количество'}
+            value={`${formatValue(totalQtyOrdered)}  /  ${formatValue(totalQtySelected)}`}
+          />
+          <ItemSeparator vertical />
+          <TotalProps
+            title={'Нетто'}
+            value={formatValue(totalNetWeight)}
+          />
+          <ItemSeparator vertical />
+          <TotalProps
+            title={'Брутто'}
+            value={formatValue(totalNetWeight + boxingTotals.weight)}
+          />
+          <ItemSeparator vertical />
+          <TotalProps
+            title={'Тары: кол-во / вес'}
+            value={`${formatValue(boxingTotals.qty)} / ${formatValue(boxingTotals.weight)}`}
+          />
+        </View>
+        {/*<SubTitle styles={[localStyles.totalsTitle, { backgroundColor: colors.background }]}>Итого</SubTitle>*/}
+        {/*<View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
           <Text style={localStyles.fontWeightBold}>Количество:</Text>
           <Text style={localStyles.fontWeightBold}>
             {`${formatValue(totalQtyOrdered)}  /  ${formatValue(totalQtySelected)}`}
@@ -314,7 +351,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           <Text style={localStyles.fontWeightBold}>
             {`кол-во: ${formatValue(boxingTotals.qty)}  -  вес: ${formatValue(boxingTotals.weight)}`}
           </Text>
-        </View>
+          </View>*/}
         <ItemSeparator />
         <View
           style={[
@@ -395,7 +432,7 @@ const localStyles = StyleSheet.create({
   },
   documentHeader: {
     flexDirection: 'column',
-    height: 50,
+    height: 35,
     justifyContent: 'space-around',
     paddingVertical: 6,
   },
@@ -416,7 +453,7 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   goodInfo: {
-    flexBasis: '25%',
+    flexBasis: '55%',
     marginLeft: 15,
   },
   item: {
@@ -432,6 +469,9 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     width: '100%',
+  },
+  marginRight: {
+    marginRight: 10,
   },
   productBarcodeView: {
     fontSize: 12,
@@ -449,6 +489,12 @@ const localStyles = StyleSheet.create({
     flexBasis: 40,
     flexGrow: 1,
     marginRight: 5,
+    justifyContent: 'center',
+  },
+  totalContainer: {
+    flexDirection: 'row',
+    padding: 5,
+    justifyContent: 'space-around',
   },
   totalsTitle: {
     padding: 10,

@@ -117,6 +117,7 @@ const AppNavigator = () => {
           initialParams={{ lineId: '0', prodId: 0 }}
           options={() => ({
             title: '',
+            headerTitleStyle: { alignSelf: 'center' },
           })}
         />
         <Stack.Screen
