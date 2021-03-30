@@ -61,7 +61,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         </Text>
       </View>
       <View style={[localStyles.remainsInfo, localStyles.marginRight]}>
-        <Text numberOfLines={5} style={(localStyles.productBarcodeView, { color: colors.text })}>
+        <Text numberOfLines={5} style={(localStyles.boxingText)}>
           {item.quantity}
         </Text>
       </View>
@@ -453,7 +453,7 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   goodInfo: {
-    flexBasis: '55%',
+    flexBasis: '53%',
     marginLeft: 15,
   },
   item: {
