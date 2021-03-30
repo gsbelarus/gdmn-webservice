@@ -157,6 +157,22 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
   }, [isFocused]);
 
+    useEffect(() => {
+    if ((state.formParams as ISellLine)?.manufacturingDate && !!line) {
+      actions.setFormParams({
+        ...(state.formParams as ISellLine),
+        numreceive: state.weighedGoods.find((item) => {
+          const date = item.datework.split('.').reverse();
+          return (
+            item.goodkey === line.goodId &&
+            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
+            (state.formParams as ISellLine)?.manufacturingDate
+          );
+        })?.numreceive,
+      });
+    }
+  }, [(state.formParams as ISellLine)?.manufacturingDate]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
@@ -202,6 +218,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                     ? [route.params?.barcode.length === 12 ? route.params?.barcode : route.params?.barcode.slice(1)]
                     : []),
                 ],
+                numreceive,
               };
 
               actions.editLine({
@@ -287,15 +304,12 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.card }}>
       <ScrollView>
         <View
           style={[
             styles.container,
             localStyles.container,
-            {
-              backgroundColor: colors.card,
-            },
           ]}
         >
           <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
@@ -397,24 +411,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
             </View>
             <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
-                  },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
-            }}
-            style={localStyles.buttonContainer}
-          >
-            <Text style={localStyles.button}>Удалить позицию</Text>
-          </TouchableOpacity>
           {showDate && (
             <DateTimePicker
               testID="dateTimePicker"
@@ -427,6 +423,24 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           )}
         </View>
       </ScrollView>
+      <TouchableOpacity
+        onPress={() => {
+          Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+            {
+              text: 'OK',
+              onPress: () => {
+                actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
+              },
+            },
+            {
+              text: 'Отмена',
+            },
+          ]);
+        }}
+        style={localStyles.buttonContainer}
+      >
+        <Text style={localStyles.button}>Удалить позицию</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -458,8 +472,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
     elevation: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    padding: 10,
+    margin: 10,
   },
   container: {
     justifyContent: 'flex-start',
