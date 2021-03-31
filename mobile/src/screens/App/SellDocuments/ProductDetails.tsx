@@ -304,143 +304,148 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.card }}>
-      <ScrollView>
+    <SafeAreaView style={{flex: 1}}>
+      <ScrollView contentContainerStyle={{flex: 1}}>
         <View
           style={[
             styles.container,
             localStyles.container,
+            {
+              backgroundColor: colors.card
+            },
           ]}
         >
-          <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
-            {product?.name || 'товар не найден'}
-          </SubTitle>
-          <TextInput
-            mode={'flat'}
-            label={'Номер партии'}
-            editable={true}
-            onChangeText={(text) => {
-              actions.setFormParams({
-                ...(state.formParams as ISellLine),
-                numreceive: text,
-              });
-            }}
-            value={numreceive ?? ''}
-            theme={{
-              colors: {
-                placeholder: colors.primary,
-              },
-            }}
-            style={{
-              backgroundColor: colors.card,
-            }}
-          />
-          <TextInput
-            mode={'flat'}
-            label={'Количество по заявке'}
-            editable={false}
-            value={orderQuantity.toString()}
-            theme={{
-              colors: {
-                placeholder: colors.primary,
-              },
-            }}
-            style={{
-              backgroundColor: colors.card,
-            }}
-          />
-          <TextInput
-            mode={'flat'}
-            label={'Количество'}
-            editable={true}
-            keyboardType="decimal-pad"
-            onChangeText={handleQuantityChange}
-            returnKeyType="done"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={isFocused}
-            value={goodQty}
-            theme={{
-              colors: {
-                placeholder: colors.primary,
-              },
-            }}
-            style={{
-              backgroundColor: colors.card,
-            }}
-          />
-          <View style={localStyles.text}>
-            <Text style={[localStyles.subdivisionText, { color: colors.primary }]}>Дата производства: </Text>
-            <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
-              <TouchableOpacity
-                style={localStyles.containerDate}
-                onPress={() => {
-                  // if (isKeyboardVisible) {
-                  //   return;
-                  // }
-                  setShowDate(true);
-                }}
-              >
-                <Text style={[localStyles.textDate, { color: colors.text }]}>{getDateString(manufacturingDate)}</Text>
-                <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <ItemSeparator />
-
-          <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
-            <View style={(localStyles.paddingLeft10, { width: '80%' })}>
-              <Text
-                style={
-                  // eslint-disable-next-line react-native/no-inline-styles
-                  {
-                    color: colors.primary,
-                    fontSize: tara && tara.length !== 0 ? 11 : 16,
-                  }
-                }
-              >
-                Тара
-              </Text>
-              {tara && tara.length !== 0 ? (
-                <Text>
-                  {(state.formParams as ISellLine).tara.map((item, idx) => {
-                    const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
-                    return `${box ? box.name : 'неизвестная тара'}${idx === tara.length - 1 ? '' : ', '} `;
-                  })}
-                </Text>
-              ) : null}
-            </View>
-            <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
-          </TouchableOpacity>
-          {showDate && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={new Date(manufacturingDate)}
-              mode={'date'}
-              is24Hour={true}
-              display="default"
-              onChange={handleApplyDate}
+          <View>
+            <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
+              {product?.name || 'товар не найден'}
+            </SubTitle>
+            <TextInput
+              mode={'flat'}
+              label={'Номер партии'}
+              editable={true}
+              onChangeText={(text) => {
+                actions.setFormParams({
+                  ...(state.formParams as ISellLine),
+                  numreceive: text,
+                });
+              }}
+              value={numreceive ?? ''}
+              theme={{
+                colors: {
+                  placeholder: colors.primary,
+                },
+              }}
+              style={{
+                backgroundColor: colors.card,
+              }}
             />
-          )}
+            <TextInput
+              mode={'flat'}
+              label={'Количество по заявке'}
+              editable={false}
+              value={orderQuantity.toString()}
+              theme={{
+                colors: {
+                  placeholder: colors.primary,
+                },
+              }}
+              style={{
+                backgroundColor: colors.card,
+              }}
+            />
+            <TextInput
+              mode={'flat'}
+              label={'Количество'}
+              editable={true}
+              keyboardType="decimal-pad"
+              onChangeText={handleQuantityChange}
+              returnKeyType="done"
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={isFocused}
+              value={goodQty}
+              theme={{
+                colors: {
+                  placeholder: colors.primary,
+                },
+              }}
+              style={{
+                backgroundColor: colors.card,
+              }}
+            />
+            <View style={localStyles.text}>
+              <Text style={[localStyles.subdivisionText, { color: colors.primary }]}>Дата производства: </Text>
+              <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
+                <TouchableOpacity
+                  style={localStyles.containerDate}
+                  onPress={() => {
+                    // if (isKeyboardVisible) {
+                    //   return;
+                    // }
+                    setShowDate(true);
+                  }}
+                >
+                  <Text style={[localStyles.textDate, { color: colors.text }]}>{getDateString(manufacturingDate)}</Text>
+                  <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <ItemSeparator />
+
+            <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
+              <View style={(localStyles.paddingLeft10, { width: '80%' })}>
+                <Text
+                  style={
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    {
+                      color: colors.primary,
+                      fontSize: tara && tara.length !== 0 ? 11 : 16,
+                    }
+                  }
+                >
+                  Тара
+                </Text>
+                {tara && tara.length !== 0 ? (
+                  <Text>
+                    {(state.formParams as ISellLine).tara.map((item, idx) => {
+                      const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
+                      return `${box ? box.name : 'неизвестная тара'}${idx === tara.length - 1 ? '' : ', '} `;
+                    })}
+                  </Text>
+                ) : null}
+              </View>
+              <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
+            </TouchableOpacity>
+            {showDate && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={new Date(manufacturingDate)}
+                mode={'date'}
+                is24Hour={true}
+                display="default"
+                onChange={handleApplyDate}
+              />
+            )}
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
+                  },
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+            style={localStyles.buttonContainer}
+          >
+            <Text style={localStyles.button}>Удалить позицию</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      <TouchableOpacity
-        onPress={() => {
-          Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
-            {
-              text: 'OK',
-              onPress: () => {
-                actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
-              },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
-        }}
-        style={localStyles.buttonContainer}
-      >
-        <Text style={localStyles.button}>Удалить позицию</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -471,12 +476,12 @@ const localStyles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
-    elevation: 8,
+    //elevation: 8,
     padding: 10,
     margin: 10,
   },
   container: {
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     padding: 0,
   },
   containerDate: {
