@@ -226,7 +226,9 @@ const ScanBarCodeScreen = () => {
                   style={[localStyles.buttons, localStyles.backgroundColorBlue]}
                   onPress={() => {
                     editLineDocument();
-                    navigation.goBack();
+                    setScanned(false);
+                    setError(undefined);
+                    //navigation.goBack();
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
