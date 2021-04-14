@@ -116,15 +116,22 @@ const ScanBarCodeScreen = () => {
     }
 
     const editLine = document.lines?.find(
-      (item) => item.numreceive === weighedGood.numreceive && item.goodId === weighedGood.goodkey,
+      (item) =>
+        (item.numreceive === weighedGood.numreceive || (!item.numreceive && !!weighedGood.numreceive)) &&
+        item.goodId === weighedGood.goodkey,
     );
     if (editLine) {
+      const date = weighedGood.datework.split('.').reverse();
       actions.editLine({
         docId: route.params.docId,
         line: {
           ...editLine,
           quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
           barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(1)]),
+          numreceive: weighedGood.numreceive,
+          manufacturingDate:
+            editLine.numreceive ||
+            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10),
         } as ISellLine,
       });
     } else {
