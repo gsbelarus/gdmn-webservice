@@ -43,7 +43,6 @@ const DocumentItem = React.memo(
           </View>
           <View style={localStyles.details}>
             <View style={localStyles.directionRow}>
-              {console.log(docDate)}
               <Text style={[localStyles.name, { color: colors.text }]}>
                 {`№ ${docNumber} от ${docDate.split('-').reverse().join('.')}`}
               </Text>

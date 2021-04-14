@@ -433,6 +433,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
                   text: 'OK',
                   onPress: () => {
                     actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
+                    navigation.goBack();
                   },
                 },
                 {
