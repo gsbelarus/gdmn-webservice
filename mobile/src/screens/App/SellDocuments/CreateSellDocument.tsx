@@ -3,13 +3,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useCallback, useLayoutEffect, useState } from 'react';
-import { TextInput, StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Text, Switch } from 'react-native-paper';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Text, Switch, TextInput } from 'react-native-paper';
 
 import { IContact } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
+import { TextInputWithIcon } from '../../../components/TextInputWithIcon';
 import { getDateString, getNextDocId } from '../../../helpers/utils';
 import { IListItem } from '../../../model';
 import { IDocumentParams, ISellDocument } from '../../../model/sell';
@@ -160,14 +161,9 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
   }, [addDocument, appActions, checkDocument, date, docId, navigation, updateDocument]);
 
   const ReferenceItem = useCallback(
-    (item: { value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
+    (item: { label: string; value: string; onPress: () => void; color?: string; disabled?: boolean }) => {
       return (
-        <TouchableOpacity
-          {...item}
-          onPress={item.disabled ? null : item.onPress}
-          style={[localStyles.picker, { borderColor: colors.border }]}
-        >
-          <Text style={[localStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
+        <TextInputWithIcon label={item.label} value={item.value || 'не выбрано'} onPress={item.onPress}>
           {!item.disabled && (
             <MaterialCommunityIcons
               style={localStyles.pickerButton}
@@ -176,16 +172,16 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
               color={colors.primary}
             />
           )}
-        </TouchableOpacity>
+        </TextInputWithIcon>
       );
     },
-    [colors.border, colors.primary, colors.text],
+    [colors.primary],
   );
 
   //---Окно календаря для выбора даты документа---
   const [showDate, setShowDate] = useState(false);
 
-  const handleApplyDate = (event, selectedDate) => {
+  const handleApplyDate = (_, selectedDate) => {
     //Закрываем календарь и записываем выбранную дату в параметры формы
     setShowDate(false);
     if (selectedDate) {
@@ -198,40 +194,43 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
       <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>{statusName}</SubTitle>
       <View style={[localStyles.container, { backgroundColor: colors.card }]}>
         <ScrollView>
-          {(statusId === 0 || statusId === 1) && (
-            <>
-              <View style={localStyles.fieldContainer}>
-                <Text>Черновик:</Text>
-                <Switch
-                  value={status === 0}
-                  disabled={docId === undefined}
-                  onValueChange={() => {
-                    appActions.setFormParams({ ...appState.formParams, status: status === 0 ? 1 : 0 });
-                  }}
-                />
-              </View>
-              <ItemSeparator />
-            </>
-          )}
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Номер:</Text>
+          <View>
+            {(statusId === 0 || statusId === 1) && (
+              <>
+                <View style={localStyles.fieldContainer}>
+                  <Text>Черновик:</Text>
+                  <Switch
+                    value={status === 0}
+                    disabled={docId === undefined}
+                    onValueChange={() => {
+                      appActions.setFormParams({ ...appState.formParams, status: status === 0 ? 1 : 0 });
+                    }}
+                  />
+                </View>
+                <ItemSeparator />
+              </>
+            )}
+            <ItemSeparator />
             <TextInput
+              label={'Номер'}
+              mode={'flat'}
               editable={!isBlocked}
-              style={[localStyles.input, { borderColor: colors.border }]}
               onChangeText={(text) => appActions.setFormParams({ ...appState.formParams, docnumber: text.trim() })}
               value={docnumber || ' '}
+              theme={
+                !isBlocked && {
+                  colors: {
+                    placeholder: colors.primary,
+                  },
+                }
+              }
+              style={{
+                backgroundColor: colors.card,
+              }}
             />
-          </View>
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Дата: </Text>
-            <ReferenceItem value={getDateString(date)} disabled={isBlocked} onPress={() => setShowDate(true)} />
-          </View>
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Тип:</Text>
+            <ReferenceItem label={'Дата'} value={getDateString(date)} onPress={() => setShowDate(true)} />
             <ReferenceItem
+              label={'Тип'}
               value={selectedItem(docTypes, doctype)?.value}
               disabled={isBlocked}
               onPress={() =>
@@ -243,11 +242,8 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                 })
               }
             />
-          </View>
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Экспедитор:</Text>
             <ReferenceItem
+              label={'Экспедитор'}
               value={selectedItem(listPeople, expeditorId)?.value}
               disabled={isBlocked}
               onPress={() =>
@@ -259,11 +255,8 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                 })
               }
             />
-          </View>
-          <ItemSeparator />
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Подразделение:</Text>
             <ReferenceItem
+              label={'Подразделение'}
               value={selectedItem(listDepartments, fromcontactId)?.value}
               disabled={isBlocked}
               onPress={() =>
@@ -275,10 +268,8 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
                 })
               }
             />
-          </View>
-          <View style={localStyles.fieldContainer}>
-            <Text style={localStyles.inputCaption}>Организация:</Text>
             <ReferenceItem
+              label={'Организация'}
               value={selectedItem(listCompanies, tocontactId)?.value}
               disabled={isBlocked}
               onPress={() =>
@@ -291,27 +282,7 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
               }
             />
           </View>
-          {docId !== undefined && (
-            <TouchableOpacity
-              onPress={() => {
-                Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-                  {
-                    text: 'OK',
-                    onPress: async () => {
-                      appActions.deleteDocument(docId);
-                      navigation.navigate('SellDocumentsListScreen');
-                    },
-                  },
-                  {
-                    text: 'Отмена',
-                  },
-                ]);
-              }}
-              style={localStyles.buttonContainer}
-            >
-              <Text style={localStyles.button}>Удалить документ</Text>
-            </TouchableOpacity>
-          )}
+
           {showDate && (
             <DateTimePicker
               testID="dateTimePicker"
@@ -323,6 +294,27 @@ const CreateSellDocumentScreen = ({ route }: Props) => {
             />
           )}
         </ScrollView>
+        {docId !== undefined && (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    appActions.deleteDocument(docId);
+                    navigation.navigate('SellDocumentsListScreen');
+                  },
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }}
+            style={localStyles.buttonContainer}
+          >
+            <Text style={localStyles.button}>Удалить документ</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </>
   );
@@ -340,11 +332,15 @@ const localStyles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
-    elevation: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    //elevation: 8,
+    //paddingHorizontal: 12,
+    //paddingVertical: 10,
+    margin: 10,
+    padding: 10,
   },
   container: {
+    flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 5,
   },
   fieldContainer: {
@@ -354,34 +350,10 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-between',
     margin: 5,
   },
-  input: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    flexGrow: 1,
-    height: 40,
-    padding: 10,
-  },
-  inputCaption: {
-    width: '20%',
-  },
-  picker: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    flexDirection: 'row',
-    flex: 1,
-  },
   pickerButton: {
     alignSelf: 'center',
     padding: 0,
     textAlign: 'right',
-  },
-  pickerText: {
-    alignSelf: 'center',
-    flexGrow: 1,
-    padding: 10,
-    width: '90%',
   },
   title: {
     padding: 10,
