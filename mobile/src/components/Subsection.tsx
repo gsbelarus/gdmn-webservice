@@ -10,7 +10,9 @@ interface IProps {
 const Subsection = ({ children, styles, colorText }: IProps) => {
   return (
     <View style={[localStyles.titleContainer, styles]}>
-      <Text style={[localStyles.titleText, { color: colorText }]}>{((children as string) || '').toUpperCase()}</Text>
+      <Text style={[localStyles.titleText, { color: colorText || '#333536' }]}>
+        {((children as string) || '').toUpperCase()}
+      </Text>
     </View>
   );
 };
@@ -23,7 +25,6 @@ const localStyles = StyleSheet.create({
     padding: 5,
   },
   titleText: {
-    color: '#333536',
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
