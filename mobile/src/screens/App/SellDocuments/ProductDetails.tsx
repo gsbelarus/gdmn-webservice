@@ -2,16 +2,18 @@ import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme, RouteProp, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Keyboard, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Colors, FAB, Text, TextInput } from 'react-native-paper';
+import { Text, TextInput } from 'react-native-paper';
 import Reactotron from 'reactotron-react-native';
 
 import { IGood } from '../../../../../common';
 import { HeaderRight } from '../../../components/HeaderRight';
-import ItemSeparator from '../../../components/ItemSeparator';
+import { NumberInput } from '../../../components/NumberInput';
 import SubTitle from '../../../components/SubTitle';
+import { Subsection } from '../../../components/Subsection';
+import { TextInputWithIcon } from '../../../components/TextInputWithIcon';
 import { getDateString, getNextDocLineId } from '../../../helpers/utils';
 import { ISellLine, ISellDocument } from '../../../model';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
@@ -41,11 +43,13 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   const [saved, setSaved] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [isNumberKeyboardVisible, setNumberKeyboardVisible] = useState(false);
   const isFocused = useIsFocused();
 
   const { quantity = 0, tara, id, numreceive, orderQuantity = 0 } = ((state.formParams as unknown) ?? {}) as ISellLine;
 
   const manufacturingDate = (state.formParams as ISellLine)?.manufacturingDate ?? document?.head.date;
+
 
   useEffect(() => {
     if (!route.params) {
@@ -157,7 +161,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
   }, [isFocused]);
 
-    useEffect(() => {
+  useEffect(() => {
     if ((state.formParams as ISellLine)?.manufacturingDate && !!line) {
       actions.setFormParams({
         ...(state.formParams as ISellLine),
@@ -166,7 +170,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
           return (
             item.goodkey === line.goodId &&
             new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10) ===
-            (state.formParams as ISellLine)?.manufacturingDate
+              (state.formParams as ISellLine)?.manufacturingDate
           );
         })?.numreceive,
       });
@@ -267,6 +271,8 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       return;
     }
 
+    setNumberKeyboardVisible(false);
+
     navigation.navigate('SelectBoxingsScreen', {
       lineId: route.params?.lineId,
       prodId: route.params?.prodId,
@@ -274,22 +280,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       modeCor: route.params?.modeCor,
     });
   };
-
-  const handleQuantityChange = useCallback((value: string) => {
-    setGoodQty((prev) => {
-      Reactotron.debug(value);
-      value = value.replace(',', '.');
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
-      value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
-
-      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(value) ? value : prev;
-      // const res = parseFloat(validNumber.test(value) ? value : prev).toString();
-
-      // Reactotron.debug(res);
-      // return res;
-    });
-  }, []);
 
   //---Окно календаря для выбора даты производства---
   const [showDate, setShowDate] = useState(false);
@@ -304,93 +294,73 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <ScrollView contentContainerStyle={{flex: 1}}>
+    <SafeAreaView style={localStyles.flex1}>
+      <ScrollView contentContainerStyle={localStyles.flex1}>
         <View
           style={[
             styles.container,
             localStyles.container,
             {
-              backgroundColor: colors.card
+              backgroundColor: colors.card,
             },
           ]}
         >
           <View>
-            <SubTitle styles={[localStyles.title, { backgroundColor: colors.background }]}>
+            <SubTitle styles={[localStyles.title, { backgroundColor: colors.primary }]} colorText={colors.card}>
               {product?.name || 'товар не найден'}
             </SubTitle>
-            <TextInput
-              mode={'flat'}
-              label={'Номер партии'}
-              editable={true}
-              onChangeText={(text) => {
-                actions.setFormParams({
-                  ...(state.formParams as ISellLine),
-                  numreceive: text,
-                });
-              }}
-              value={numreceive ?? ''}
-              theme={{
-                colors: {
-                  placeholder: colors.primary,
-                },
-              }}
-              style={{
-                backgroundColor: colors.card,
-              }}
-            />
-            <TextInput
-              mode={'flat'}
-              label={'Количество по заявке'}
-              editable={false}
-              value={orderQuantity.toString()}
-              theme={{
-                colors: {
-                  placeholder: colors.primary,
-                },
-              }}
-              style={{
-                backgroundColor: colors.card,
-              }}
-            />
-            <TextInput
-              mode={'flat'}
-              label={'Количество'}
-              editable={true}
-              keyboardType="decimal-pad"
-              onChangeText={handleQuantityChange}
-              returnKeyType="done"
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus={isFocused}
-              value={goodQty}
-              theme={{
-                colors: {
-                  placeholder: colors.primary,
-                },
-              }}
-              style={{
-                backgroundColor: colors.card,
-              }}
-            />
-            <View style={localStyles.text}>
-              <Text style={[localStyles.subdivisionText, { color: colors.primary }]}>Дата производства: </Text>
-              <View style={[localStyles.areaChips, { borderColor: colors.border }]}>
-                <TouchableOpacity
-                  style={localStyles.containerDate}
-                  onPress={() => {
-                    // if (isKeyboardVisible) {
-                    //   return;
-                    // }
-                    setShowDate(true);
-                  }}
-                >
-                  <Text style={[localStyles.textDate, { color: colors.text }]}>{getDateString(manufacturingDate)}</Text>
-                  <MaterialIcons style={localStyles.marginRight} size={30} color={colors.text} name="date-range" />
-                </TouchableOpacity>
-              </View>
+            <Subsection styles={{ backgroundColor: colors.background }}>Параметры</Subsection>
+            <View style={localStyles.groupFields}>
+              <TextInput
+                mode={'flat'}
+                label={'Партия'}
+                editable={true}
+                onChangeText={(text) => {
+                  actions.setFormParams({
+                    ...(state.formParams as ISellLine),
+                    numreceive: text,
+                  });
+                }}
+                value={numreceive ?? ''}
+                onFocus={() => setNumberKeyboardVisible(false)}
+                theme={{
+                  colors: {
+                    placeholder: colors.primary,
+                  },
+                }}
+                style={[localStyles.flex1, { backgroundColor: colors.card }]}
+              />
+              <TextInputWithIcon
+                label={'Дата производства'}
+                value={getDateString(manufacturingDate)}
+                onPress={() => {
+                  setShowDate(true);
+                  setNumberKeyboardVisible(false);
+                }}
+              >
+                <MaterialIcons style={localStyles.marginRight} size={20} color={colors.text} name="date-range" />
+              </TextInputWithIcon>
             </View>
-            <ItemSeparator />
-
+            <Subsection styles={{ backgroundColor: colors.background }}>Отгружено</Subsection>
+            <View style={localStyles.groupFields}>
+              <TextInput
+                mode={'flat'}
+                label={'По заявке'}
+                editable={false}
+                value={orderQuantity.toString()}
+                style={[localStyles.flex1, { backgroundColor: colors.card }]}
+              />
+              <NumberInput
+                isKeyboardVisible={isNumberKeyboardVisible}
+                value={goodQty}
+                setValue={setGoodQty}
+                handlePress={() => {
+                  Keyboard.dismiss();
+                  setNumberKeyboardVisible(!isNumberKeyboardVisible);
+                }}
+                label={'Количество'}
+              />
+            </View>
             <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
               <View style={(localStyles.paddingLeft10, { width: '80%' })}>
                 <Text
@@ -454,13 +424,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 export { SellProductDetailScreen };
 
 const localStyles = StyleSheet.create({
-  areaChips: {
-    borderRadius: 4,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    margin: 5,
-    padding: 5,
-  },
   boxingsLine: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -478,37 +441,25 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#FC3F4D',
     borderRadius: 10,
     //elevation: 8,
-    padding: 10,
     margin: 10,
+    padding: 10,
   },
   container: {
     justifyContent: 'space-between',
     padding: 0,
   },
-  containerDate: {
-    alignItems: 'center',
+  flex1: {
+    flex: 1,
+  },
+  groupFields: {
     flexDirection: 'row',
-    margin: 0,
-    padding: 0,
+    width: '100%',
   },
   marginRight: {
     marginRight: 10,
   },
   paddingLeft10: {
     //paddingLeft: 10,
-  },
-  subdivisionText: {
-    fontSize: 11,
-    textAlign: 'left',
-  },
-  text: {
-    padding: 10,
-  },
-  textDate: {
-    flex: 1,
-    flexGrow: 4,
-    fontSize: 20,
-    textAlign: 'center',
   },
   title: {
     padding: 10,

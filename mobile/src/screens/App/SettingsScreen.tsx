@@ -95,7 +95,8 @@ const SettingsScreen = () => {
         setLoading(true);
         // const response = await apiService.data.subscribe(companyID);
         const response = await timeout<IResponse<IMessage[]>>(
-          serverUrl?.timeout,
+          15000,
+          //serverUrl?.timeout,
           apiService.data.getMessages(companyID),
         );
 

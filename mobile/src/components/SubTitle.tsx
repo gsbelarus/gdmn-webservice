@@ -4,13 +4,16 @@ import { Text } from 'react-native-paper';
 
 interface IProps {
   children?: unknown;
+  colorText?: unknown;
   styles?: unknown;
 }
 
-const SubTitle = ({ children, styles }: IProps) => {
+const SubTitle = ({ children, colorText, styles }: IProps) => {
   return (
     <View style={[localStyles.titleContainer, styles]}>
-      <Text style={localStyles.titleText}>{((children as string) || '').toUpperCase()}</Text>
+      <Text style={[localStyles.titleText, colorText && { color: colorText as string }]}>
+        {((children as string) || '').toUpperCase()}
+      </Text>
     </View>
   );
 };
