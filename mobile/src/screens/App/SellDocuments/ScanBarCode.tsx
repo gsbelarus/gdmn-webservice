@@ -232,10 +232,12 @@ const ScanBarCodeScreen = () => {
                 <TouchableOpacity
                   style={[localStyles.buttons, localStyles.backgroundColorBlue]}
                   onPress={() => {
-                    editLineDocument();
-                    setScanned(false);
-                    setError(undefined);
-                    //navigation.goBack();
+                    setTimeout(() => {
+                      editLineDocument();
+                      setScanned(false);
+                      setError(undefined);
+                      //navigation.goBack();
+                    }, 30000);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
