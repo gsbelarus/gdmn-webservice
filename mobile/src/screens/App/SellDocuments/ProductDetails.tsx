@@ -50,7 +50,6 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
 
   const manufacturingDate = (state.formParams as ISellLine)?.manufacturingDate ?? document?.head.date;
 
-
   useEffect(() => {
     if (!route.params) {
       return;
@@ -293,131 +292,143 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
     }
   };
 
+  const [positionNK, setPositionNK] = useState(0);
+
   return (
-    <SafeAreaView style={localStyles.flex1}>
-      <ScrollView contentContainerStyle={localStyles.flex1}>
-        <View
-          style={[
-            styles.container,
-            localStyles.container,
-            {
-              backgroundColor: colors.card,
-            },
-          ]}
-        >
-          <View>
-            <SubTitle styles={[localStyles.title, { backgroundColor: colors.primary }]} colorText={colors.card}>
-              {product?.name || 'товар не найден'}
-            </SubTitle>
-            <Subsection styles={{ backgroundColor: colors.background }}>Параметры</Subsection>
-            <View style={localStyles.groupFields}>
-              <TextInput
-                mode={'flat'}
-                label={'Партия'}
-                editable={true}
-                onChangeText={(text) => {
-                  actions.setFormParams({
-                    ...(state.formParams as ISellLine),
-                    numreceive: text,
-                  });
-                }}
-                value={numreceive ?? ''}
-                onFocus={() => setNumberKeyboardVisible(false)}
-                theme={{
-                  colors: {
-                    placeholder: colors.primary,
-                  },
-                }}
-                style={[localStyles.flex1, { backgroundColor: colors.card }]}
-              />
-              <TextInputWithIcon
-                label={'Дата производства'}
-                value={getDateString(manufacturingDate)}
-                onPress={() => {
-                  setShowDate(true);
-                  setNumberKeyboardVisible(false);
-                }}
-              >
-                <MaterialIcons style={localStyles.marginRight} size={20} color={colors.text} name="date-range" />
-              </TextInputWithIcon>
-            </View>
-            <Subsection styles={{ backgroundColor: colors.background }}>Отгружено</Subsection>
-            <View style={localStyles.groupFields}>
-              <TextInput
-                mode={'flat'}
-                label={'По заявке'}
-                editable={false}
-                value={orderQuantity.toString()}
-                style={[localStyles.flex1, { backgroundColor: colors.card }]}
-              />
-              <NumberInput
-                isKeyboardVisible={isNumberKeyboardVisible}
-                value={goodQty}
-                setValue={setGoodQty}
-                handlePress={() => {
-                  Keyboard.dismiss();
-                  setNumberKeyboardVisible(!isNumberKeyboardVisible);
-                }}
-                label={'Количество'}
-              />
-            </View>
-            <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
-              <View style={(localStyles.paddingLeft10, { width: '80%' })}>
-                <Text
-                  style={
-                    // eslint-disable-next-line react-native/no-inline-styles
-                    {
-                      color: colors.primary,
-                      fontSize: tara && tara.length !== 0 ? 11 : 16,
-                    }
-                  }
+    <>
+      <SafeAreaView style={localStyles.flex1}>
+        <ScrollView contentContainerStyle={localStyles.flex1}>
+          <View
+            style={[
+              styles.container,
+              localStyles.container,
+              {
+                backgroundColor: colors.card,
+              },
+            ]}
+          >
+            <View>
+              <SubTitle styles={[localStyles.title, { backgroundColor: colors.primary }]} colorText={colors.card}>
+                {product?.name || 'товар не найден'}
+              </SubTitle>
+              <Subsection styles={{ backgroundColor: colors.background }}>Параметры</Subsection>
+              <View style={localStyles.groupFields}>
+                <TextInput
+                  mode={'flat'}
+                  label={'Партия'}
+                  editable={true}
+                  onChangeText={(text) => {
+                    actions.setFormParams({
+                      ...(state.formParams as ISellLine),
+                      numreceive: text,
+                    });
+                  }}
+                  value={numreceive ?? ''}
+                  onFocus={() => setNumberKeyboardVisible(false)}
+                  theme={{
+                    colors: {
+                      placeholder: colors.primary,
+                    },
+                  }}
+                  style={[localStyles.flex1, { backgroundColor: colors.card }]}
+                />
+                <TextInputWithIcon
+                  label={'Дата производства'}
+                  value={getDateString(manufacturingDate)}
+                  onPress={() => {
+                    setShowDate(true);
+                    setNumberKeyboardVisible(false);
+                  }}
                 >
-                  Тара
-                </Text>
-                {tara && tara.length !== 0 ? (
-                  <Text>
-                    {(state.formParams as ISellLine).tara.map((item, idx) => {
-                      const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
-                      return `${box ? box.name : 'неизвестная тара'}${idx === tara.length - 1 ? '' : ', '} `;
-                    })}
-                  </Text>
-                ) : null}
+                  <MaterialIcons style={localStyles.marginRight} size={20} color={colors.text} name="date-range" />
+                </TextInputWithIcon>
               </View>
-              <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
-            </TouchableOpacity>
-            {showDate && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={new Date(manufacturingDate)}
-                mode={'date'}
-                is24Hour={true}
-                display="default"
-                onChange={handleApplyDate}
+              <Subsection styles={{ backgroundColor: colors.background }}>Отгружено</Subsection>
+              <View
+                onLayout={(obj) => {
+                  setPositionNK(obj.nativeEvent.layout.y + obj.nativeEvent.layout.height);
+                }}
               />
+              <View style={localStyles.groupFields}>
+                <TextInput
+                  mode={'flat'}
+                  label={'По заявке'}
+                  editable={false}
+                  value={orderQuantity.toString()}
+                  style={[localStyles.flex1, { backgroundColor: colors.card }]}
+                />
+                <NumberInput
+                  isKeyboardVisible={isNumberKeyboardVisible}
+                  value={goodQty}
+                  setValue={setGoodQty}
+                  handlePress={() => {
+                    Keyboard.dismiss();
+                    setNumberKeyboardVisible(!isNumberKeyboardVisible);
+                  }}
+                  position={positionNK}
+                  label={'Количество'}
+                />
+              </View>
+              <TouchableOpacity style={localStyles.boxingsLine} onPress={onPress}>
+                <View style={(localStyles.paddingLeft10, { width: '80%' })}>
+                  <Text
+                    style={
+                      // eslint-disable-next-line react-native/no-inline-styles
+                      {
+                        color: colors.primary,
+                        fontSize: tara && tara.length !== 0 ? 11 : 16,
+                      }
+                    }
+                  >
+                    Тара
+                  </Text>
+                  {tara && tara.length !== 0 ? (
+                    <Text>
+                      {(state.formParams as ISellLine).tara.map((item, idx) => {
+                        const box = state.boxings.find((itemBox) => itemBox.id === item.tarakey);
+                        return `${box ? box.name : 'неизвестная тара'}${idx === tara.length - 1 ? '' : ', '} `;
+                      })}
+                    </Text>
+                  ) : null}
+                </View>
+                <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
+              </TouchableOpacity>
+              {showDate && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={new Date(manufacturingDate)}
+                  mode={'date'}
+                  is24Hour={true}
+                  display="default"
+                  onChange={handleApplyDate}
+                />
+              )}
+            </View>
+            {route?.params?.modeCor && !isNumberKeyboardVisible && (
+              <TouchableOpacity
+                onPress={() => {
+                  Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
+                        navigation.goBack();
+                      },
+                    },
+                    {
+                      text: 'Отмена',
+                    },
+                  ]);
+                }}
+                style={localStyles.buttonContainer}
+              >
+                <Text style={localStyles.button}>Удалить позицию</Text>
+              </TouchableOpacity>
             )}
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    actions.deleteLine({ docId: route.params?.docId, lineId: route.params?.lineId });
-                    navigation.goBack();
-                  },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
-            }}
-            style={localStyles.buttonContainer}
-          >
-            <Text style={localStyles.button}>Удалить позицию</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 };
 

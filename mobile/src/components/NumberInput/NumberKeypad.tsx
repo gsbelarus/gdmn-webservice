@@ -1,6 +1,6 @@
 import { evaluate } from 'mathjs';
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
 
 import { IKeyProps, Key } from './Key';
@@ -70,7 +70,7 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
   ];
 
   return (
-    <>
+    <View style={styles.container}>
       <View style={styles.input}>
         <Text>{expression}</Text>
         <Text style={styles.currentNumber}>{number}</Text>
@@ -84,13 +84,16 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
           </View>
         ))}
       </View>
-    </>
+    </View>
   );
 };
 
 export { NumberKeypad };
 
 const styles = StyleSheet.create({
+  container: {
+    height: Dimensions.get('window').height / 2.6,
+  },
   currentNumber: {
     color: Colors.blue600,
     fontSize: 18,

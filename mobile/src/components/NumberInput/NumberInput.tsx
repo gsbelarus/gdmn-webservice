@@ -1,7 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useHeaderHeight } from '@react-navigation/stack';
 import React from 'react';
-import { Dimensions, StyleSheet, View, BackHandler } from 'react-native';
+import { StyleSheet, View, BackHandler, useWindowDimensions } from 'react-native';
 
 import { TextInputWithIcon } from '../TextInputWithIcon';
 import { NumberKeypad } from './NumberKeypad';
@@ -10,12 +11,15 @@ interface IProps {
   label: string;
   value: string;
   isKeyboardVisible: boolean;
+  position?: number;
   setValue: (newValue: string) => void;
   handlePress: () => void;
 }
 
-const NumberInput = ({ isKeyboardVisible, label, value, setValue, handlePress }: IProps) => {
+const NumberInput = ({ isKeyboardVisible, label, position, value, setValue, handlePress }: IProps) => {
   const { colors } = useTheme();
+  const height = useWindowDimensions().height;
+  const headerHeight = useHeaderHeight();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -43,8 +47,8 @@ const NumberInput = ({ isKeyboardVisible, label, value, setValue, handlePress }:
           style={[
             styles.keypad,
             {
-              //проблема на малых экранах, нужно поднять
-              bottom: (-1.6 * Dimensions.get('window').height) / 2.6,
+              top: -position,
+              height: height - headerHeight,
             },
           ]}
         >
@@ -59,11 +63,10 @@ export { NumberInput };
 
 const styles = StyleSheet.create({
   keypad: {
-    backgroundColor: '#DDD',
-    height: Dimensions.get('window').height / 2.6,
+    justifyContent: 'flex-end',
     position: 'absolute',
     width: '100%',
-    zIndex: 99999,
+    //zIndex: 99999,
   },
   marginRight: {
     alignItems: 'center',
