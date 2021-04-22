@@ -61,8 +61,10 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
       {
         title: '=',
         onPress: () => {
-          handelApply(evaluate(`${expression}${number}`).toFixed(3).toString());
-          handelDismiss();
+          if (number) {
+            handelApply(evaluate(`${expression}${number}`).toFixed(3).toString());
+            handelDismiss();
+          }
         },
         operation: true,
       },
