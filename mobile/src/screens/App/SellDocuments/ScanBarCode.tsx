@@ -3,7 +3,7 @@ import { useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, StatusBar, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../common';
@@ -28,7 +28,6 @@ const ScanBarCodeScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [weighedGood, setWeighedGood] = useState<IWeighedGoods>(undefined);
   const [good, setGood] = useState<IGood>(undefined);
-  const [process, setProcess] = useState(false);
 
   useEffect(() => {
     const permission = async () => {
@@ -116,11 +115,13 @@ const ScanBarCodeScreen = () => {
       return;
     }
 
-    const editLine = document.lines?.find(
-      (item) =>
-        (item.numreceive === weighedGood.numreceive || (!item.numreceive && !!weighedGood.numreceive)) &&
-        item.goodId === weighedGood.goodkey,
-    );
+    const lines = document.lines?.filter((item) => item.goodId === weighedGood.goodkey);
+    let editLine = lines.find((item) => item.numreceive === weighedGood.numreceive);
+
+    if (!editLine) {
+      editLine = lines.find((item) => !item.numreceive && !!weighedGood.numreceive);
+    }
+
     if (editLine) {
       const date = weighedGood.datework.split('.').reverse();
       actions.editLine({
@@ -178,12 +179,10 @@ const ScanBarCodeScreen = () => {
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
       >
-        <View style={[localStyles.header, process && localStyles.justifyContentEnd]}>
-          {!process && (
-            <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
-              <Feather name={'arrow-left'} color={'#FFF'} size={30} />
-            </TouchableOpacity>
-          )}
+        <View style={localStyles.header}>
+          <TouchableOpacity style={localStyles.transparent} onPress={() => navigation.goBack()}>
+            <Feather name={'arrow-left'} color={'#FFF'} size={30} />
+          </TouchableOpacity>
           <TouchableOpacity style={localStyles.transparent} onPress={() => setFlashMode(!flashMode)}>
             <MaterialCommunityIcons
               name={flashMode ? 'flashlight' : 'flashlight-off'}
@@ -192,13 +191,7 @@ const ScanBarCodeScreen = () => {
             />
           </TouchableOpacity>
         </View>
-        {process ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.card}
-            style={[localStyles.scannerContainer, localStyles.activityIndicator]}
-          />
-        ) : !scanned ? (
+        {!scanned ? (
           <View style={[localStyles.scannerContainer, localStyles.alignItemsCenter]}>
             <View style={localStyles.areaScan}>
               <View style={localStyles.flexRow}>
@@ -241,14 +234,10 @@ const ScanBarCodeScreen = () => {
                 <TouchableOpacity
                   style={[localStyles.buttons, localStyles.backgroundColorBlue]}
                   onPress={() => {
-                    setProcess(true);
-                    setTimeout(() => {
-                      editLineDocument();
-                      setScanned(false);
-                      setError(undefined);
-                      //navigation.goBack();
-                      setProcess(false);
-                    }, 2000);
+                    editLineDocument();
+                    setScanned(false);
+                    setError(undefined);
+                    //navigation.goBack();
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
@@ -358,9 +347,6 @@ const localStyles = StyleSheet.create({
     height: 100,
     padding: 10,
     // justifyContent: 'center',
-  },
-  justifyContentEnd: {
-    justifyContent: 'flex-end',
   },
   scannerContainer: {
     flex: 1,
