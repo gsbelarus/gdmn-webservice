@@ -128,7 +128,7 @@ const ScanBarCodeScreen = () => {
         docId: route.params.docId,
         line: {
           ...editLine,
-          quantity: Number(good ? weighedGood.weight / good.itemWeight : 0) + Number(editLine.quantity),
+          quantity: Number(good ? (weighedGood.weight / good.itemWeight).toFixed(3) : 0) + Number(editLine.quantity),
           barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(1)]),
           numreceive: weighedGood.numreceive,
           manufacturingDate:
@@ -147,7 +147,7 @@ const ScanBarCodeScreen = () => {
           manufacturingDate: new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1)
             .toISOString()
             .slice(0, 10),
-          quantity: good ? weighedGood.weight / good.itemWeight : 0,
+          quantity: Number(good ? (weighedGood.weight / good.itemWeight).toFixed(3) : 0),
           orderQuantity: 0,
           numreceive: weighedGood.numreceive,
           barcodes: [barcode.length === 12 ? barcode : barcode.slice(1)],
@@ -264,9 +264,6 @@ const ScanBarCodeScreen = () => {
 export { ScanBarCodeScreen };
 
 const localStyles = StyleSheet.create({
-  activityIndicator: {
-    backgroundColor: '#0008',
-  },
   alignItemsCenter: {
     alignItems: 'center',
   },
