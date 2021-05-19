@@ -18,7 +18,7 @@ const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
         // eslint-disable-next-line react-native/no-inline-styles
         {
           flexGrow: grow,
-          paddingLeft: grow > 1 ? grow : 0,
+          paddingBottom: grow > 1 ? grow : 0,
         },
       ]}
     >
