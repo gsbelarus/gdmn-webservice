@@ -13,8 +13,14 @@ const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      // eslint-disable-next-line react-native/no-inline-styles
-      style={[styles.container, { flexGrow: grow, paddingLeft: grow > 1 ? grow : 0 }]}
+      style={[
+        styles.container,
+        // eslint-disable-next-line react-native/no-inline-styles
+        {
+          flexGrow: grow,
+          paddingLeft: grow > 1 ? grow : 0,
+        },
+      ]}
     >
       <Text style={[styles.text, { color: operation ? Colors.blue600 : Colors.black }]}>{title}</Text>
     </TouchableOpacity>
