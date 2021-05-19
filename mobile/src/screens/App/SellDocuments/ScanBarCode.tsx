@@ -131,9 +131,9 @@ const ScanBarCodeScreen = () => {
           quantity: Number(good ? (weighedGood.weight / good.itemWeight).toFixed(3) : 0) + Number(editLine.quantity),
           barcodes: (editLine.barcodes ?? []).concat([barcode.length === 12 ? barcode : barcode.slice(1)]),
           numreceive: weighedGood.numreceive,
-          manufacturingDate:
-            editLine.numreceive ||
-            new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10),
+          manufacturingDate: editLine.numreceive
+            ? editLine.manufacturingDate
+            : new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]) + 1).toISOString().slice(0, 10),
         } as ISellLine,
       });
     } else {
