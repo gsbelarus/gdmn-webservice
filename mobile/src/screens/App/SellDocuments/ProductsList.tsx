@@ -125,13 +125,14 @@ const SellProductsListScreen = () => {
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <>
         <Searchbar
-          placeholder={`Штрих-код ${route.params?.weighedGood ? '' : 'или название'}`}
+          //placeholder={`Штрих-код ${route.params?.weighedGood ? '' : 'или название'}`}
+          placeholder={'Штрих-код или название'}
           onChangeText={onChangeText}
           value={text}
           style={localStyles.searchBar}
         />
         <ItemSeparator />
-        {route.params?.weighedGood ? (
+        {/*route.params?.weighedGood ? (
           <FlatList
             ref={refWeighed}
             data={
@@ -153,20 +154,20 @@ const SellProductsListScreen = () => {
               </Text>
             }
           />
-        ) : (
-          <FlatList
-            ref={ref}
-            data={state.goods?.filter(
-              (item) =>
-                (item.barcode ?? '').toLowerCase().includes(text.toLowerCase()) ||
-                item.name.toLowerCase().includes(text.toLowerCase()),
-            )}
-            keyExtractor={(_, i) => String(i)}
-            renderItem={renderItem}
-            ItemSeparatorComponent={ItemSeparator}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>Ничего не найдено</Text>}
-          />
-        )}
+          ) : (*/}
+        <FlatList
+          ref={ref}
+          data={state.goods?.filter(
+            (item) =>
+              (item.barcode ?? '').toLowerCase().includes(text.toLowerCase()) ||
+              item.name.toLowerCase().includes(text.toLowerCase()),
+          )}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+          ListEmptyComponent={<Text style={localStyles.emptyList}>Ничего не найдено</Text>}
+        />
+        {/*})}*/}
         <Snackbar
           visible={visible}
           onDismiss={onDismissSnackBar}

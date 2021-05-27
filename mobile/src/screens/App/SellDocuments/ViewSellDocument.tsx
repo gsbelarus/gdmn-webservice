@@ -369,11 +369,11 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                 icon="barcode-scan"
                 onPress={() => navigation.navigate('ScanBarCodeScreen', { docId: document?.id, weighedGood: true })}
               />
-              <FAB
+              {/*<FAB
                 style={localStyles.fab}
                 icon="barcode"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document?.id, weighedGood: true })}
-              />
+              />*/}
               <FAB
                 style={localStyles.fab}
                 icon="plus"
