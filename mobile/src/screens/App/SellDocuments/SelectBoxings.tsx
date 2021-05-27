@@ -196,6 +196,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
   const data = useMemo(
     () =>
       (state.boxings as ITara[])
+        .sort((curr, prev) => (curr.priority !== prev.priority && curr.priority === 'low' ? 1 : 0))
         .sort((curr, prev) => curr.type.localeCompare(prev.type))
         .filter((boxing) => boxing.name.toUpperCase().includes(searchText.toUpperCase())),
     [searchText, state.boxings],

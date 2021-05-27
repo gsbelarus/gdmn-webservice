@@ -28,10 +28,13 @@ export interface ISellLine extends ILine {
 
 export type TTypeTara = 'paper' | 'box' | 'pan';
 
+export type TPriority = 'low' | 'high';
+
 export interface ITara {
   id: number;
   type: TTypeTara;
   name: string;
+  priority: TPriority;
   goodkey?: number;
   weight?: number;
   [fieldName: string]: unknown;
