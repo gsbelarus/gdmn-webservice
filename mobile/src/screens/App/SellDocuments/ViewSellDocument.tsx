@@ -61,7 +61,7 @@ const ContentItem = React.memo(({ item, status }: { item: ISellLine; status: num
         </Text>
       </View>
       <View style={[localStyles.remainsInfo, localStyles.marginRight]}>
-        <Text numberOfLines={5} style={(localStyles.boxingText)}>
+        <Text numberOfLines={5} style={localStyles.boxingText}>
           {item.quantity}
         </Text>
       </View>
@@ -112,14 +112,14 @@ const LineItem = React.memo(({ item, status, docId }: { item: ISellLine; status:
   );
 });
 
-const TotalProps = React.memo(({ title, value }: { title: string, value: string }) => {
+const TotalProps = React.memo(({ title, value }: { title: string; value: string }) => {
   return (
     <View>
       <Text style={[localStyles.boxingText, { color: Colors.blue600 }]}>{title}</Text>
       {/*<ItemSeparator />*/}
       <Text style={localStyles.productTitleView}>{value}</Text>
     </View>
-  )
+  );
 });
 
 type Props = StackScreenProps<DocumentStackParamList, 'ViewSellDocument'>;
@@ -204,7 +204,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
       options,
     )}`;*/
     const date = new Date(document?.head?.date).toISOString().slice(0, 10).split('-').reverse().join('.');
-    return `№${(document?.head as ISellHead)?.docnumber} ${date}`
+    return `№${(document?.head as ISellHead)?.docnumber} ${date}`;
   }, [document]);
 
   React.useLayoutEffect(() => {
@@ -310,21 +310,15 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
           ItemSeparatorComponent={ItemSeparator}
         />
         <ItemSeparator />
-        <View style={localStyles.totalContainer} >
+        <View style={localStyles.totalContainer}>
           <TotalProps
             title={'Количество'}
             value={`${formatValue(totalQtyOrdered)}  /  ${formatValue(totalQtySelected)}`}
           />
           <ItemSeparator vertical />
-          <TotalProps
-            title={'Нетто'}
-            value={formatValue(totalNetWeight)}
-          />
+          <TotalProps title={'Нетто'} value={formatValue(totalNetWeight)} />
           <ItemSeparator vertical />
-          <TotalProps
-            title={'Брутто'}
-            value={formatValue(totalNetWeight + boxingTotals.weight)}
-          />
+          <TotalProps title={'Брутто'} value={formatValue(totalNetWeight + boxingTotals.weight)} />
           <ItemSeparator vertical />
           <TotalProps
             title={'Тары: кол-во / вес'}
@@ -488,13 +482,13 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     flexBasis: 40,
     flexGrow: 1,
-    marginRight: 5,
     justifyContent: 'center',
+    marginRight: 5,
   },
   totalContainer: {
     flexDirection: 'row',
-    padding: 5,
     justifyContent: 'space-around',
+    padding: 5,
   },
   totalsTitle: {
     padding: 10,

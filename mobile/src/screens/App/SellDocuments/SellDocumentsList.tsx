@@ -24,10 +24,15 @@ interface IDocInfo {
   toContact: IContact;
   expeditor: IContact;
   status: IDocumentType;
+  isImportant: boolean;
 }
 
 const DocumentItem = React.memo(
-  ({ item: { id, docDate, docNumber, expeditor, fromContact, status, toContact } }: { item: IDocInfo }) => {
+  ({
+    item: { id, docDate, docNumber, expeditor, fromContact, status, toContact, isImportant },
+  }: {
+    item: IDocInfo;
+  }) => {
     const { colors } = useTheme();
     const navigation = useNavigation();
 
@@ -37,7 +42,7 @@ const DocumentItem = React.memo(
           navigation.navigate('ViewSellDocument', { docId: id });
         }}
       >
-        <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+        <View style={[localStyles.item, { backgroundColor: isImportant ? colors.card : colors.border }]}>
           <View style={[localStyles.avatar, { backgroundColor: statusColors[status.id] }]}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
@@ -101,7 +106,16 @@ const SellDocumentsListScreen = () => {
 
       const docDate = new Date(docHead.date).toISOString().slice(0, 10);
 
-      return { id: item.id, docDate, docNumber: item.head.docnumber, fromContact, toContact, expeditor, status };
+      return {
+        id: item.id,
+        docDate,
+        docNumber: item.head.docnumber,
+        fromContact,
+        toContact,
+        expeditor,
+        status,
+        isImportant: item.head.isImportant,
+      };
     });
   }, [appState.contacts, appState.documents]);
 

@@ -9,6 +9,7 @@ export interface ISellDocument extends IDocument {
 export interface ISellHead extends IHead {
   docnumber: string;
   expeditorId: number;
+  isImportant: boolean;
 }
 
 export interface ILineTara {
