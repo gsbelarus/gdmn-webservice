@@ -375,6 +375,18 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
               />
               <FAB
                 style={localStyles.fab}
+                icon="package-variant"
+                onPress={() =>
+                  navigation.navigate('SelectBoxingsScreen', {
+                    lineId: document.lines[0].id,
+                    prodId: document.lines[0].goodId,
+                    docId: route.params?.docId,
+                    modeCor: document?.head?.status === 0,
+                  })
+                }
+              />
+              <FAB
+                style={localStyles.fab}
                 icon="check"
                 onPress={() =>
                   actions.editStatusDocument({
