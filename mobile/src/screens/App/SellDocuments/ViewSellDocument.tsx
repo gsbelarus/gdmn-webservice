@@ -373,7 +373,7 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                 icon="plus"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document?.id })}
               />
-              {!document?.lines.find((line) => (line as ISellLine).tara && (line as ISellLine).tara !== []) && (
+              {!document?.lines.find((line) => (line as ISellLine).tara && (line as ISellLine).tara.length > 0) && (
                 <FAB
                   style={localStyles.fab}
                   icon="package-variant"
