@@ -277,6 +277,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       prodId: route.params?.prodId,
       docId: route.params?.docId,
       modeCor: route.params?.modeCor,
+      express: false,
     });
   };
 

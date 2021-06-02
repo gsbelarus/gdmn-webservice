@@ -133,6 +133,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
         <HeaderRight
           text="Отмена"
           onPress={() => {
+            actions.clearFormParams();
             navigation.goBack();
           }}
         />
@@ -142,7 +143,13 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
           text="Готово"
           onPress={() => {
             Reactotron.log(boxingsLine);
-            actions.setFormParams({ ...state.formParams, tara: boxingsLine.filter((el) => el.quantity) });
+            route.params?.express
+              ? actions.editLine({
+                  docId: route.params?.docId,
+                  line: { ...(state.formParams as ISellLine), tara: boxingsLine.filter((el) => el.quantity) },
+              })
+              : actions.setFormParams({ ...state.formParams, tara: boxingsLine.filter((el) => el.quantity) });
+            route.params?.express && actions.clearFormParams();
             navigation.goBack();
           }}
         />
@@ -155,6 +162,7 @@ const SelectBoxingsScreen = ({ route, navigation }: Props) => {
     route.params,
     route.params?.docId,
     route.params?.modeCor,
+    route.params?.express,
     state.boxingsLine,
     state.documents,
     state.formParams,

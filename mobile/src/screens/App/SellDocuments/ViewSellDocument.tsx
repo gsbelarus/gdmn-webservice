@@ -373,18 +373,22 @@ const ViewSellDocumentScreen = ({ route }: Props) => {
                 icon="plus"
                 onPress={() => navigation.navigate('SellProductsList', { docId: document?.id })}
               />
-              <FAB
-                style={localStyles.fab}
-                icon="package-variant"
-                onPress={() =>
-                  navigation.navigate('SelectBoxingsScreen', {
-                    lineId: document.lines[0].id,
-                    prodId: document.lines[0].goodId,
-                    docId: route.params?.docId,
-                    modeCor: document?.head?.status === 0,
-                  })
-                }
-              />
+              {!document?.lines.find((line) => (line as ISellLine).tara && (line as ISellLine).tara !== []) && (
+                <FAB
+                  style={localStyles.fab}
+                  icon="package-variant"
+                  onPress={() => {
+                    actions.setFormParams(document.lines[0]);
+                    navigation.navigate('SelectBoxingsScreen', {
+                      lineId: document.lines[0].id,
+                      prodId: document.lines[0].goodId,
+                      docId: route.params?.docId,
+                      modeCor: document?.head?.status === 0,
+                      express: true,
+                    });
+                  }}
+                />
+              )}
               <FAB
                 style={localStyles.fab}
                 icon="check"

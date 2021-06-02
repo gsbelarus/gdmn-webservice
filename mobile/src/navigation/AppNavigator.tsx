@@ -65,6 +65,7 @@ export type RootStackParamList = {
     docId: number;
     prodId: number;
     modeCor: boolean;
+    express: boolean;
   };
   ScanBarCodeScreen: {
     docId: number;
