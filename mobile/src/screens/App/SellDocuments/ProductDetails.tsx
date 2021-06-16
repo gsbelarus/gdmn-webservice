@@ -75,7 +75,7 @@ const SellProductDetailScreen = ({ route, navigation }: Props) => {
       docLine = {
         id: '0',
         goodId: product?.id,
-        quantity: 1,
+        quantity: 0,
         manufacturingDate: headDate,
         tara: [],
         numreceive: state.weighedGoods.find((item) => {
