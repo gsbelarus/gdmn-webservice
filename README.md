@@ -4,9 +4,9 @@
 
 1. Установить Node.js, yarn.
 
-2. Установить репозиторий: 
+2. Установить репозиторий (https://github.com/gsbelarus/gdmn-webservice/tree/Inventory-honeywell-reader - для Инвентаризации): 
     ```bash
-    $ git clone https://github.com/gsbelarus/gdmn-webservice
+    $ git clone https://github.com/gsbelarus/gdmn-webservice/tree/Inventory-honeywell-reader
     $ cd server
     $ yarn
     $ cd web-interface
