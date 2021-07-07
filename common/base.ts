@@ -18,7 +18,8 @@ export interface ILine {
   goodId: number;
   quantity: number;
   price?: number;
-  remains?: number
+  remains?: number,
+  EID?: string,
 }
 
 export interface IRefData {

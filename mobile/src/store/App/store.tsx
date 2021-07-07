@@ -70,14 +70,18 @@ const createStoreContext = () => {
         const references = (await appStorage.getItem(`${storagePath}/${sections.REFERENCES}`)) as IReferences;
         actions.setReferences(references);
 
-        rlog('getRemainsModel', 'Начало построения модели');
-        const remainsModel: IModel<IModelData<IMDGoodRemain>> = getRemainsModel(
-          references?.contacts?.data as IContact[],
-          references?.goods?.data as IGood[],
-          (references?.remains?.data as unknown) as IRemains[],
-        );
-        rlog('getRemainsModel', 'Окончание построения модели');
-        actions.setModel(remainsModel);
+        if (references?.contacts?.data && references?.goods?.data) {
+          rlog('getRemainsModel', 'Начало построения модели');
+          console.log('запись в хранилище', 'Начало построения модели', !!references?.contacts?.data, !!references?.goods?.data, !!references?.remains?.data);
+
+          const remainsModel: IModel<IModelData<IMDGoodRemain>> = await getRemainsModel(
+            references?.contacts?.data as IContact[],
+            references?.goods?.data as IGood[],
+            (references?.remains?.data as unknown) as IRemains[],
+          );
+          rlog('getRemainsModel', 'Окончание построения модели');
+          actions.setModel(remainsModel);
+        }
         // документы
         const documents = (await appStorage.getItem(`${storagePath}/${sections.DOCUMENTS}`)) as IDocument[];
         actions.setDocuments(documents);
@@ -122,6 +126,18 @@ const createStoreContext = () => {
         await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
         rlog('Save references', 'Окончание сохранения справочников в Storage');
         // console.log('Окончание сохранения справочников в Storage');
+
+        if (state.references?.contacts?.data && state.references?.goods?.data) {
+          rlog('getRemainsModel', 'Начало построения модели');
+          console.log('при изменении справочникова - загрузка ', 'Начало построения модели', !!state.references?.contacts?.data, !!state.references?.goods?.data, !!state.references?.remains?.data);
+          const remainsModel: IModel<IModelData<IMDGoodRemain>> = await getRemainsModel(
+            state.references?.contacts?.data as IContact[],
+            state.references?.goods?.data as IGood[],
+            (state.references?.remains?.data as unknown) as IRemains[],
+          );
+          rlog('getRemainsModel', 'Окончание построения модели');
+          actions.setModel(remainsModel);
+        }
       };
 
       if (state.references && storagePath && !isLoading) {
