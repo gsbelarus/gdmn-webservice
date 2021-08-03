@@ -62,7 +62,6 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
 
   //список остатков + поля из справочника тмц
   const goodRemains = useMemo(() => {
-    console.log('111');
     return remains?.map((item) => ({
       ...goods.find((good) => good.id === item.goodId),
       price: item.price,
@@ -158,7 +157,8 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
                 style={{ width: 0 }}
                 autoFocus={true}
                 ref={ref}
-                onFocus={() => Keyboard.dismiss()}
+                // onFocus={() => Keyboard.dismiss()}
+                showSoftInputOnFocus={false}
                 onChangeText={(text) => handleBarCodeScanned(text)}
               />
             </TouchableWithoutFeedback>
@@ -239,14 +239,13 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     elevation: 8,
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
   },
   buttonsContainer: {
     minHeight: 100,
-    // flex: 1,
     padding: 10,
+    display: 'flex',
+    flexDirection: 'column',
   },
   camera: {
     flex: 1,
@@ -263,12 +262,13 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   goodInfo: {
-    // marginHorizontal: 10,
+    display: 'flex',
   },
   goodName: {
     color: '#fff',
     fontSize: 18,
     textTransform: 'uppercase',
+    marginRight: 40,
   },
   header: {
     alignItems: 'center',
