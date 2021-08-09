@@ -14,6 +14,7 @@ import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 import { ScanDataMatrix } from './components/ScanDataMatrix';
+import { ScanDataMatrixReader } from './components/ScanDataMatrixReader';
 
 type Props = StackScreenProps<RootStackParamList, 'DocumentLineEdit'>;
 
@@ -140,12 +141,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <Modal animationType="slide" visible={doScanned}>
-        <ScanDataMatrix
-          onSave={(data) => handleEIDScanned(data)}
-          onCancel={() => {
-            setDoScanned(false);
-          }}
-        />
+        {state.settings?.barcodeReader
+          ? <ScanDataMatrixReader
+              onSave={(data) => handleEIDScanned(data)}
+              onCancel={() => setDoScanned(false)}
+            />
+          : <ScanDataMatrix
+              onSave={(data) => handleEIDScanned(data)}
+              onCancel={() => setDoScanned(false)}
+            />
+        }
       </Modal>
       <SafeAreaView>
         <ScrollView>

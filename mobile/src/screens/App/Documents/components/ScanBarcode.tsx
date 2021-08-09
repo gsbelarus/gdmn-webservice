@@ -324,13 +324,13 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     elevation: 8,
-    flex: 1,
+    // flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+    minHeight: 100,
   },
   buttonsContainer: {
-    minHeight: 100,
-    padding: 10,
+    margin: 10,
   },
   camera: {
     flex: 1,
@@ -338,7 +338,7 @@ const localStyles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight ?? 0,
+    // paddingTop: StatusBar.currentHeight ?? 0,
   },
   footer: {
     alignItems: 'center',
@@ -347,7 +347,8 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   goodInfo: {
-    // marginHorizontal: 10,
+    flexShrink: 1,
+    paddingRight: 10,
   },
   goodName: {
     color: '#fff',

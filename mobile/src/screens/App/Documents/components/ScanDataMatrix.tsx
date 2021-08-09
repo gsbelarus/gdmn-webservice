@@ -14,7 +14,7 @@ interface IProps {
   onCancel: () => void;
 };
 
-export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
+const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState(null);
   const [flashMode, setFlashMode] = useState(false);
@@ -32,6 +32,7 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }, []);
 
   const handleBarCodeScanned = (data: string) => {
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
     setScanned(true);
     setBarcode(data);
   };
@@ -159,14 +160,13 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   );
 };
 
-export { ScanDataMatrix as ScanBarcodeScreen };
+export { ScanDataMatrix };
 
 const localStyles = StyleSheet.create({
   barcode: {
     color: '#fff',
     fontSize: 16,
     opacity: 0.5,
-    paddingRight: 10,
   },
   border: {
     height: 50,
@@ -192,13 +192,12 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     elevation: 8,
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+    minHeight: 100,
   },
   buttonsContainer: {
-    minHeight: 110,
-    padding: 10,
+    margin: 10,
   },
   camera: {
     flex: 1,
@@ -215,8 +214,8 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   goodInfo: {
-    width: '90%',
-    // marginHorizontal: 10,
+    flexShrink: 1,
+    paddingRight: 10,
   },
   goodName: {
     color: '#fff',
