@@ -2,6 +2,14 @@ import { Context, Next } from 'koa';
 import { devices } from '../services/dao/db';
 
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
+  if (!ctx.query.deviceId) {
+    ctx.throw(400, 'Не указан идентификатор устройства');
+  }
+
+  if (ctx.query.deviceId instanceof Array) {
+    ctx.throw(400, 'Устройство должно быть строкой');
+  }
+
   if (ctx.query.deviceId === 'WEB') {
     await next();
     return;

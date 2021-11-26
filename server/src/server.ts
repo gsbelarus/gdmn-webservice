@@ -12,9 +12,9 @@ import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
 import config from '../config';
-import { IUser } from '../../common';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
+import { IUser } from '../../common/models';
 
 // 7 days for session cookie lifetime
 const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
@@ -31,7 +31,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
-  passport.serializeUser((user: any, done) => done(null, user.id));
+  passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {

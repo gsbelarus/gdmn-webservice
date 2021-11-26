@@ -122,7 +122,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { user } = action;
       return {
         ...state,
-        user: state.user ? { ...state.user, ... user } : undefined,
+        user: state.user ? { ...state.user, ...user } : undefined,
       }
     }
     case 'SET_ACTIVATION_CODE': {
