@@ -4,6 +4,7 @@ import { Camera } from 'expo-camera';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
+
 import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
@@ -12,7 +13,7 @@ const ONE_SECOND_IN_MS = 1000;
 interface IProps {
   onSave: (data: string) => void;
   onCancel: () => void;
-};
+}
 
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
@@ -56,19 +57,13 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
         }}
-        autoFocus="on"
+        // autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
       >
         <View style={localStyles.header}>
-          <IconButton
-            icon="arrow-left"
-            color={'#FFF'}
-            size={30}
-            style={localStyles.transparent}
-            onPress={onCancel}
-          />
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={localStyles.transparent} onPress={onCancel} />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}

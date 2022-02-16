@@ -96,20 +96,20 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   }, [isFocused]);
 
   const handleSave = useCallback(() => {
-      if (lineId) {
-        actions.editLine({
-          docId,
-          line,
-        });
-      } else {
-        actions.addLine({
-          docId,
-          line,
-        });
-      }
-      navigation.navigate('DocumentView', { docId: document?.id });
-      // actions.clearProductParams();
-    }, [actions, line, lineId, docId, document?.id]);
+    if (lineId) {
+      actions.editLine({
+        docId,
+        line,
+      });
+    } else {
+      actions.addLine({
+        docId,
+        line,
+      });
+    }
+    navigation.navigate('DocumentView', { docId: document?.id });
+    // actions.clearProductParams();
+  }, [actions, line, lineId, docId, document?.id]);
 
   const handleCancel = useCallback(() => {
     navigation.navigate('DocumentView', { docId: document?.id });
@@ -118,18 +118,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
-      headerLeft: () => (
-        <HeaderRight
-          text="Отмена"
-          onPress={handleCancel}
-        />
-      ),
-      headerRight: () => (
-        <HeaderRight
-          text="Готово"
-          onPress={handleSave}
-        />
-      ),
+      headerLeft: () => <HeaderRight text="Отмена" onPress={handleCancel} />,
+      headerRight: () => <HeaderRight text="Готово" onPress={handleSave} />,
     });
   }, [navigation, handleCancel, handleSave]);
 
@@ -141,16 +131,11 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <Modal animationType="slide" visible={doScanned}>
-        {state.settings?.barcodeReader
-          ? <ScanDataMatrixReader
-              onSave={(data) => handleEIDScanned(data)}
-              onCancel={() => setDoScanned(false)}
-            />
-          : <ScanDataMatrix
-              onSave={(data) => handleEIDScanned(data)}
-              onCancel={() => setDoScanned(false)}
-            />
-        }
+        {state.settings?.barcodeReader ? (
+          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        ) : (
+          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        )}
       </Modal>
       <SafeAreaView>
         <ScrollView>
@@ -183,11 +168,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
             <View style={localStyles.item}>
               <Text style={localStyles.label}>EID</Text>
               <View style={localStyles.flexDirectionRow}>
-                <View style={[localStyles.flexGrow, {
-                    backgroundColor: colors.card,
-                    alignSelf: 'center',
-                    width: '90%'
-                  }]}>
+                <View
+                  style={[
+                    localStyles.flexGrow,
+                    {
+                      backgroundColor: colors.card,
+                      alignSelf: 'center',
+                      width: '90%',
+                    },
+                  ]}
+                >
                   <Text style={localStyles.text}>{line?.EID || 'Не указан'}</Text>
                 </View>
               </View>
@@ -248,12 +238,18 @@ const localStyles = StyleSheet.create({
     flexDirection: 'column',
     padding: 10,
   },
-  content: {
-    height: '100%',
-  },
   container: {
     justifyContent: 'flex-start',
     padding: 0,
+  },
+  content: {
+    height: '100%',
+  },
+  flexDirectionRow: {
+    flexDirection: 'row',
+  },
+  flexGrow: {
+    flexGrow: 10,
   },
   item: {
     marginHorizontal: 8,
@@ -269,11 +265,5 @@ const localStyles = StyleSheet.create({
   },
   title: {
     padding: 10,
-  },
-  flexDirectionRow: {
-    flexDirection: 'row',
-  },
-  flexGrow: {
-    flexGrow: 10,
   },
 });

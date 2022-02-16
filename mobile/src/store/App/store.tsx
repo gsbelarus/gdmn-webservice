@@ -16,7 +16,6 @@ import {
 import { useStore as useServiceStore } from '../Service/store';
 import { useTypesafeActions } from '../utils';
 import { AppActions } from './actions';
-import { middleware } from './middleware';
 import { reducer, initialState } from './reducer';
 
 const defaultAppState: IAppContextProps = {
@@ -72,7 +71,13 @@ const createStoreContext = () => {
 
         if (references?.contacts?.data && references?.goods?.data) {
           rlog('getRemainsModel', 'Начало построения модели');
-          console.log('запись в хранилище', 'Начало построения модели', !!references?.contacts?.data, !!references?.goods?.data, !!references?.remains?.data);
+          console.log(
+            'запись в хранилище',
+            'Начало построения модели',
+            !!references?.contacts?.data,
+            !!references?.goods?.data,
+            !!references?.remains?.data,
+          );
 
           const remainsModel: IModel<IModelData<IMDGoodRemain>> = await getRemainsModel(
             references?.contacts?.data as IContact[],
@@ -129,7 +134,13 @@ const createStoreContext = () => {
 
         if (state.references?.contacts?.data && state.references?.goods?.data) {
           rlog('getRemainsModel', 'Начало построения модели');
-          console.log('при изменении справочникова - загрузка ', 'Начало построения модели', !!state.references?.contacts?.data, !!state.references?.goods?.data, !!state.references?.remains?.data);
+          console.log(
+            'при изменении справочникова - загрузка ',
+            'Начало построения модели',
+            !!state.references?.contacts?.data,
+            !!state.references?.goods?.data,
+            !!state.references?.remains?.data,
+          );
           const remainsModel: IModel<IModelData<IMDGoodRemain>> = await getRemainsModel(
             state.references?.contacts?.data as IContact[],
             state.references?.goods?.data as IGood[],

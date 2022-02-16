@@ -15,6 +15,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
+
 import { useAppStore } from '../../../../store';
 
 const ONE_SECOND_IN_MS = 1000;
@@ -22,7 +23,7 @@ const ONE_SECOND_IN_MS = 1000;
 interface IProps {
   onSave: (data: string) => void;
   onCancel: () => void;
-};
+}
 
 const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
@@ -59,13 +60,7 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
       {/* <View > */}
       <View style={localStyles.camera}>
         <View style={localStyles.header}>
-          <IconButton
-            icon="arrow-left"
-            color={'#FFF'}
-            size={30}
-            style={localStyles.transparent}
-            onPress={onCancel}
-          />
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={localStyles.transparent} onPress={onCancel} />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
