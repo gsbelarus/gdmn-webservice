@@ -7,7 +7,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  StatusBar,
   Vibration,
   Keyboard,
   TextInput,
@@ -18,15 +17,17 @@ import {
 import { Text, IconButton } from 'react-native-paper';
 
 import { IGood } from '../../../../../../common';
-import { IMDGoodRemain, IModelData, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { IContact, IMGoodData, IMGoodRemain, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
+import { getRemGoodByContact } from '../../../../helpers/utils';
 import { RootStackParamList } from '../../../../navigation/AppNavigator';
 import { useAppStore } from '../../../../store';
+import styles from '../../../../styles/global';
 
 const ONE_SECOND_IN_MS = 1000;
 
 type Props = StackScreenProps<RootStackParamList, 'ScanBarcodeReader'>;
 
-type ScannedObject = IRem & { quantity: number };
+type ScannedObject = IRem & { quantity: number, isWeightGood: boolean };
 
 const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
   const { colors } = useTheme();
@@ -37,7 +38,7 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
   const ref = useRef<TextInput>(null);
 
   const [barcode, setBarcode] = useState('');
-  const [goodItem, setGoodItem] = useState<ScannedObject>(undefined);
+  const [goodItem, setGoodItem] = useState<ScannedObject | undefined>(undefined);
 
   const docId = route.params?.docId;
 
@@ -50,8 +51,20 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
     state.companySettings?.weightSettings,
   ]);
 
-  const remainsData = (state.models?.remains?.data as unknown) as IModelData<IMDGoodRemain>;
-  const goods = remainsData?.[document?.head?.fromcontactId]?.goods;
+  const goodRemains: IMGoodData<IMGoodRemain> = useMemo(() => {
+    if (!document?.head?.fromcontactId) {
+      return {};
+    }
+
+    const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(
+      state.references?.contacts?.data as IContact[],
+      state.references?.goods?.data as IGood[],
+      (state.references?.remains?.data as unknown) as IRemains[],
+      document.head.fromcontactId
+    );
+
+    return goodRem;
+  }, [state.references?.contacts?.data, state.references?.goods?.data, state.references?.remains?.data, document?.head?.fromcontactId]);
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -75,60 +88,54 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
       return;
     }
 
-    const getScannedObject = (brc: string): ScannedObject => {
+    const getScannedObject = (brc: string): ScannedObject | undefined => {
       let charFrom = 0;
 
       let charTo = weightCodeSettings?.weightCode.length;
 
       if (brc.substring(charFrom, charTo) !== weightCodeSettings?.weightCode) {
-        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc)];
+        const remItem = goodRemains[brc];
 
         if (!remItem) {
           return;
         }
 
-        const { remains, ...good } = remItem;
-
         return {
-          goodkey: good.id,
-          ...good,
+          ...remItem.good,
+          price: remItem.remains ? remItem.remains[0].price : 0,
+          remains: remItem.remains ? remItem.remains[0].q : 0,
           quantity: 1,
-          price: remains.length ? remains[0].price : 0,
-          remains: remains.length ? remains?.[0].q : 0,
+          isWeightGood: false,
         };
-
-        // return goodObj ? { ...goodObj, quantity: 1 } : undefined;
       }
 
       charFrom = charTo;
       charTo = charFrom + weightCodeSettings?.code;
-      const code = Number(barcode.substring(charFrom, charTo)).toString();
+      const code = Number(brc.substring(charFrom, charTo)).toString();
 
       charFrom = charTo;
       charTo = charFrom + weightCodeSettings?.weight;
 
-      const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
+      const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
-      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code)];
+      const remItem = Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code);
 
       if (!remItem) {
         return;
       }
 
-      const { remains, ...good } = remItem;
-
       return {
-        goodkey: good.id,
-        ...good,
+        ...remItem.good,
+        price: remItem.remains?.length ? remItem.remains[0].price : 0,
+        remains: remItem.remains?.length ? remItem.remains[0].q : 0,
         quantity: qty,
-        price: remains.length ? remains[0].price : 0,
-        remains: remains.length ? remains?.[0].q : 0,
+        isWeightGood: true,
       };
     };
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: ScannedObject = getScannedObject(barcode);
+    const scannedObj: ScannedObject | undefined = getScannedObject(barcode);
 
     setGoodItem(scannedObj);
   }, [
@@ -138,9 +145,12 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
     weightCodeSettings?.weightCode,
     weightCodeSettings?.code,
     weightCodeSettings?.weight,
-    goods,
-    goodItem?.id,
+    goodRemains,
   ]);
+
+  if (!document) {
+    return <Text style={styles.title}>Документ не найден</Text>;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -167,7 +177,7 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={localStyles.transparent}
-            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
+            onPress={() => navigation.navigate('RemainsList', { docId: document.id })}
           />
         </View>
         {!scanned ? (
@@ -224,10 +234,11 @@ const ScanBarcodeReaderScreen = ({ route, navigation }: Props) => {
                     <Text style={localStyles.goodName} numberOfLines={3}>
                       {goodItem?.name}
                     </Text>
-                    <Text style={localStyles.barcode}>
-                      цена: {goodItem?.price || 0}, кол-во: {goodItem?.quantity}
-                    </Text>
                     <Text style={localStyles.barcode}>{goodItem?.barcode}</Text>
+                    <Text style={localStyles.barcode}>
+                      цена: {goodItem?.price || 0} р., остаток: {goodItem?.remains}
+                    </Text>
+                     {goodItem.isWeightGood && <Text style={localStyles.barcode}>количество: {goodItem?.quantity}</Text>}
                   </View>
                 </TouchableOpacity>
               </View>
@@ -272,7 +283,6 @@ const localStyles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    // paddingTop: StatusBar.currentHeight ?? 0,
   },
   footer: {
     alignItems: 'center',

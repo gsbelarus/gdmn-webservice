@@ -93,8 +93,15 @@ export interface IDocumentStatus {
 }
 
 /** Model */
-export interface IMGoodRemain extends IGood {
+export interface IMGoodRemain {
+  good: IGood;
   remains?: IModelRem[];
+}
+
+export interface IRemGood {
+  good: IGood;
+  price: number;
+  remains: number;
 }
 
 export interface IModelRem {
@@ -105,6 +112,11 @@ export interface IModelRem {
 export interface IMDGoodRemain {
   contactName: string;
   goods: IMGoodData<IMGoodRemain>;
+}
+
+export interface IMDGoodRemainNew {
+  contactName: string;
+  goods: IMGoodData<IRemGood[]>;
 }
 
 export interface IModelData<T = unknown> {

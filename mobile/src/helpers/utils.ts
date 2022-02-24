@@ -1,9 +1,14 @@
 import * as FileSystem from 'expo-file-system';
 
 import { IContact, IDocument, IGood, IMessage, IRemains } from '../../../common';
-import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModel, IModelData } from '../../../common/base';
-import { ModelTypes } from '../model/types';
-import { rlog } from './log';
+import {
+  IMGoodData,
+  IMGoodRemain,
+  IRemGood,
+  IModelRem,
+  IRemainsData,
+} from '../../../common/base';
+import { log } from './log';
 
 export const timeout = <T>(ms: number, promise: Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
@@ -63,9 +68,11 @@ export const appStorage = {
   setItem: async <T>(key: string, data: T) => {
     try {
       await ensureDirExists(getDirectory(key));
-      await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
-    } catch (e) {
-      console.log('error', e);
+      const s = JSON.stringify(data);
+      log(`about to start writing ${s.length} chars to ${key}.json`);
+      await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, s);
+    } catch (e: any) {
+      log('error', e);
     }
   },
 
@@ -76,9 +83,10 @@ export const appStorage = {
       }
       await ensureDirExists(getDirectory(key));
       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
+      log(`read ${result.length} chars`);
       return result ? JSON.parse(result) : null;
-    } catch (e) {
-      console.log('error', e);
+    } catch (e: any) {
+      log('error', e);
     }
   },
 
@@ -91,8 +99,8 @@ export const appStorage = {
     try {
       await ensureDirExists('');
       await FileSystem.deleteAsync(`${dbDir}${key}.json`);
-    } catch (e) {
-      console.log('error', e);
+    } catch (e: any) {
+      log('error', e);
     }
   },
 };
@@ -192,28 +200,141 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
   }
 };
 
-export const getRemainsModel = async (contacts: IContact[], goods: IGood[], remains: IRemains[]) => {
-  // console.log('Начало формирования модели');
-  const remModelData: IModelData<IMDGoodRemain> = contacts?.reduce(
-    (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
-      const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-        goodsprev[g.id] = {
-          ...g,
-          remains:
-            remains
-              ?.find((r) => r.contactId === c.id)
-              ?.data?.filter((i) => i.goodId === g.id)
-              ?.map((r) => ({ price: r.price, q: r.q })) || [],
-        };
-        return goodsprev;
+// export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]) => {
+//   log('getRemainsModel', 'Начало построения модели');
+//   const remModelData: IModelData<IMDGoodRemain> = {};
+
+//   if (contacts.length && goods.length) {
+//     for (const c of contacts) {
+//       log('getRemainsModel', `started ${c.name}`);
+
+//       if (remains.length) {
+//         const remainsByGoodId = remains
+//           .find((r: IRemains) => r.contactId === c.id)
+//           ?.data.reduce((p: any, { goodId, price, q }: IRemainsData) => {
+//             const x = p[goodId];
+//             if (!x) {
+//               p[goodId] = [{ price, q }];
+//             } else {
+//               x.push({ price, q });
+//             }
+//             return p;
+//           }, {});
+//         const remGoods: IMGoodData<IMGoodRemain> = {};
+
+//         for (const good of goods) {
+//           remGoods[good.id] = {
+//             good,
+//             remains: remainsByGoodId[good.id],
+//           };
+//         }
+
+//         remModelData[c.id] = { contactName: c.name || `${c.id}`, goods: remGoods };
+//       } else {
+//         const remGoods: IMGoodData<IMGoodRemain> = {};
+
+//         for (const good of goods) {
+//           remGoods[good.id] = { good };
+//         }
+
+//         remModelData[c.id] = { contactName: c.name || `${c.id}`, goods: remGoods };
+//       }
+//     }
+//   }
+
+//   log('getRemainsModel', 'Окончание построения модели');
+//   return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
+// };
+
+export const getRemGoodListByContact = (contacts: IContact[], goods: IGood[], remains: IRemains[], contactId: number) => {
+  log('getRemGoodListByContact', `Начало построения массива товаров по подразделению ${contactId}`);
+
+  const remGoods: IRemGood[] = [];
+  const c = contacts.find((con) => con.id === contactId);
+  if (c && goods.length) {
+    log('getRemGoodListByContact', `подразделение: ${c.name}`);
+
+    //Формируем объект остатков тмц
+    const remainsByGoodId = remains
+      ?.find((r: IRemains) => r.contactId === contactId)
+      ?.data.reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, q = 0 }: IRemainsData) => {
+        const x = p[goodId];
+        if (!x) {
+          p[goodId] = [{ price, q }];
+        } else {
+          x.push({ price, q });
+        }
+        return p;
       }, {});
-      contsprev[c.id] = { contactName: c.name, goods: remGoods };
-      return contsprev;
-    },
-    {},
-  );
-  rlog('Модель остатков', JSON.stringify(remModelData));
-  // console.log({ name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData });
-  // console.log('Окончание формирования модели');
-  return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
+
+    //Формируем массив товаров, добавив свойство цены и остатка
+    goods.reduce((remGoods: IRemGood[], good: IGood) => {
+      if (remainsByGoodId && remainsByGoodId[good.id]) {
+        for (const r of remainsByGoodId[good.id]) {
+          remGoods.push({
+            good,
+            price: r.price,
+            remains: r.q,
+          });
+        };
+      } else {
+        remGoods.push({
+          good,
+          price: 0,
+          remains: 0,
+        });
+      };
+      return remGoods;
+    }, remGoods);
+  }
+
+  log('getRemGoodListByContact', `Окончание построения массива товаров по подразделению ${contactId}`);
+  return remGoods;
 };
+
+export const getRemGoodByContact = (contacts: IContact[], goods: IGood[], remains: IRemains[], contactId: number) => {
+  log('getRemGoodByContact', `Начало построения модели товаров по баркоду по подразделению ${contactId}`);
+
+  const remGoods: IMGoodData<IMGoodRemain> = {};
+  const contact = contacts.find((con) => con.id === contactId);
+
+  if (contact && goods.length) {
+    log('getRemGoodByContact', `подразделение: ${contact.name}`);
+
+    if (remains.length) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = remains
+        .find((r: IRemains) => r.contactId === contact.id)
+        ?.data.reduce((p: any, { goodId, price, q }: IRemainsData) => {
+          const x = p[goodId];
+          if (!x) {
+            p[goodId] = [{ price, q }];
+          } else {
+            x.push({ price, q });
+          }
+          return p;
+        }, {});
+
+      //Заполняем объект товаров по штрихкоду, если есть шк
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.barcode] = {
+            good,
+            remains: remainsByGoodId[good.id],
+          };
+        }
+      }
+    } else {
+      //Если по товару нет остатков, добавляем объект товара без remains
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.id] = { good };
+        }
+      }
+    }
+  }
+
+  log('getRemGoodByContact', `Окончание построения модели товаров по баркоду по подразделению ${contactId}`);
+  return remGoods;
+};
+

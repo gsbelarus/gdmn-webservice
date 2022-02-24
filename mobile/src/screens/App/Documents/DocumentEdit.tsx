@@ -36,7 +36,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const statusName =
     docId !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
 
-  const getListItems = <T extends IRefData>(con: T[]): IListItem[] =>
+  const getListItems = <T extends IRefData>(con?: T[]): IListItem[] | undefined =>
     con?.map((item) => ({ id: item.id, value: item.name }));
 
   const listDepartments = useMemo(() => getListItems(appState.references?.contacts?.data), [
@@ -51,8 +51,8 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     React.useCallback(() => {
       // Do something when the screen is focused
       //Создания объекта в store для экрана создания или редактирования шапки документа
-      const docObj = docId !== undefined && (appState.documents?.find((i) => i.id === docId) as IDocument);
-      setStatusId(docObj?.head?.status || 0);
+      const docObj = docId && appState.documents ? (appState.documents.find((i) => i.id === docId) as IDocument) : undefined;
+      setStatusId(docObj?.head.status || 0);
       // Инициализируем параметры
       if (docObj) {
         appActions.setForm({
@@ -67,7 +67,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
         appActions.setForm({
           documentParams: {
             date: new Date().toISOString().slice(0, 10),
-            docnumber: getNextDocNumber(appState.documents),
+            docnumber: getNextDocNumber(appState.documents || []),
             fromcontactId: listDepartments?.length === 1 ? listDepartments[0].id : undefined,
             tocontactId: -1,
             doctype: !listDocumentType?.length ? undefined : config.system[0].defaultDocType[0],
@@ -78,9 +78,9 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
     }, [appActions, docId, appState.documents, listDepartments, listDocumentType]),
   );
 
-  const selectedItem = useCallback((listItems: IListItem[], id: number | number[]) => {
+  const selectedItem = useCallback((listItems?: IListItem[], id?: number | number[]) => {
     // eslint-disable-next-line eqeqeq
-    return listItems?.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id == id));
+    return listItems?.find((item) => (Array.isArray(id) && item.id ? id.includes(item.id) : item.id == id));
   }, []);
 
   const checkDocument = useCallback(() => {
@@ -132,7 +132,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
                   },
                 });
               } else {
-                id = getNextDocId(appState.documents);
+                id = getNextDocId(appState.documents || []);
 
                 appActions.addDocument({
                   id,
@@ -173,7 +173,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
       return (
         <TouchableOpacity
           {...item}
-          onPress={item.disabled ? null : item.onPress}
+          onPress={item.disabled ? undefined : item.onPress}
           style={[localStyles.picker, { borderColor: colors.border }]}
         >
           <Text style={[localStyles.pickerText, { color: colors.text }]}>{item.value || 'не выбрано'}</Text>
@@ -202,7 +202,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const handlePresentDocType = () => {
     //В окне Bottomsheet установим тип документа равным типу из параметров формы
     //Если тип документа не указан, то первый тип из списка
-    if (!(documentType ?? listDocumentType?.length)) {
+    if (!listDocumentType) {
       return;
     }
     setSelectedDocType(documentType ?? listDocumentType[0]);
@@ -233,7 +233,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   const handlePresentFromContact = () => {
     //В окне Bottomsheet установим подразделение равным подразделению из параметров формы
     //Если подразделение не указано, то первое подразделение из списка
-    if (!(fromContact ?? listDepartments?.length)) {
+    if (!listDepartments) {
       return;
     }
     setSelectedFromContact(fromContact ?? listDepartments[0]);
@@ -256,7 +256,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
   //---Окно календаря для выбора даты документа---
   const [showDate, setShowDate] = useState(false);
 
-  const handleApplyDate = (event, selectedDate) => {
+  const handleApplyDate = (event: any, selectedDate: any) => {
     //Закрываем календарь и записываем выбранную дату в параметры формы
     setShowDate(false);
     if (selectedDate) {
@@ -315,13 +315,13 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Тип:</Text>
-            <ReferenceItem value={documentType?.value} disabled={isBlocked} onPress={handlePresentDocType} />
+            <ReferenceItem value={documentType?.value || ''} disabled={isBlocked} onPress={handlePresentDocType} />
           </View>
           <ItemSeparator />
           <View style={localStyles.fieldContainer}>
             <Text style={localStyles.inputCaption}>Место:</Text>
             <ReferenceItem
-              value={selectedItem(listDepartments, fromcontactId)?.value}
+              value={selectedItem(listDepartments, fromcontactId)?.value || ''}
               disabled={isBlocked}
               onPress={handlePresentFromContact}
             />
@@ -354,7 +354,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             handelApply={handleApplyDocType}
           >
             <RadioGroup
-              options={listDocumentType}
+              options={listDocumentType || []}
               onChange={(option) => setSelectedDocType(option)}
               activeButtonId={selectedDocType?.id}
             />
@@ -366,7 +366,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
             handelApply={handleApplyFromContact}
           >
             <RadioGroup
-              options={listDepartments}
+              options={listDepartments || []}
               onChange={(option) => setSelectedFromContact(option)}
               activeButtonId={selectedFromContact?.id}
             />
@@ -374,7 +374,7 @@ const DocumentEditScreen = ({ route, navigation }: Props) => {
           {showDate && (
             <DateTimePicker
               testID="dateTimePicker"
-              value={new Date(date)}
+              value={date ? new Date(date) : new Date()}
               mode={'date'}
               is24Hour={true}
               display="default"

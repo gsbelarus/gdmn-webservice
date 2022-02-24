@@ -1,5 +1,4 @@
 import { Reducer } from 'react';
-import Reactotron from 'reactotron-react-native';
 
 import { getNextDocLineId } from '../../helpers/utils';
 import { IAppState } from '../../model/types';
@@ -16,15 +15,6 @@ export const initialState: IAppState = {
 };
 
 export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, action): IAppState => {
-  if (__DEV__) {
-    // console.log('App action: ', JSON.stringify(action));
-    Reactotron.display({
-      name: `App action ${action.type}`,
-      value: action,
-      important: false,
-    });
-  }
-
   switch (action.type) {
     case ActionAppTypes.ADD_DOCUMENT: {
       return { ...state, documents: [...(state.documents || []), action.payload] };
@@ -32,7 +22,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.UPDATE_DOCUMENT_HEAD: {
       return {
         ...state,
-        documents: state.documents.map((doc) =>
+        documents: state.documents?.map((doc) =>
           doc.id === action.payload.id ? { ...doc, head: action.payload.head } : doc,
         ),
       };
@@ -40,7 +30,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.UPDATE_DOCUMENT_STATUS: {
       return {
         ...state,
-        documents: state.documents.map((doc) =>
+        documents: state.documents?.map((doc) =>
           doc.id === action.payload.id ? { ...doc, head: { ...doc.head, status: action.payload.status } } : doc,
         ),
       };
@@ -48,7 +38,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DELETE_DOCUMENT:
       return {
         ...state,
-        documents: state.documents.filter((document) => document.id !== action.payload),
+        documents: state.documents?.filter((document) => document.id !== action.payload),
       };
     case ActionAppTypes.DELETE_ALL_DOCUMENTS:
       return {
@@ -56,11 +46,11 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
         documents: [],
       };
     case ActionAppTypes.DOCUMENT_ADD_LINE: {
-      const nextId = getNextDocLineId(state.documents.find((doc) => doc.id === action.payload.docId));
+      const nextId = getNextDocLineId(state.documents?.find((doc) => doc.id === action.payload.docId)!);
 
       return {
         ...state,
-        documents: state.documents.map((doc) =>
+        documents: state.documents?.map((doc) =>
           doc.id === action.payload.docId
             ? { ...doc, lines: [...doc.lines, { ...action.payload.line, id: nextId }] }
             : doc,
@@ -70,7 +60,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DOCUMENT_DELETE_LINE: {
       return {
         ...state,
-        documents: state.documents.map((doc) =>
+        documents: state.documents?.map((doc) =>
           doc.id === action.payload.docId
             ? {
                 ...doc,
@@ -83,7 +73,7 @@ export const reducer: Reducer<IAppState, TAppActions> = (state = initialState, a
     case ActionAppTypes.DOCUMENT_UPDATE_LINE: {
       return {
         ...state,
-        documents: state.documents.map((doc) =>
+        documents: state.documents?.map((doc) =>
           doc.id === action.payload.docId
             ? {
                 ...doc,

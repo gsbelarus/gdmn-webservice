@@ -28,7 +28,7 @@ export enum ActionAppTypes {
   CLEAR_VIEWPARAM = 'CLEAR_VIEWPARAM',
 }
 
-export const AppActions = {
+export const AppActions: any = {
   addDocument: createActionPayload<ActionAppTypes.ADD_DOCUMENT, IDocument>(ActionAppTypes.ADD_DOCUMENT),
   updateDocument: createActionPayload<ActionAppTypes.UPDATE_DOCUMENT_HEAD, { id: number; head: IHead }>(
     ActionAppTypes.UPDATE_DOCUMENT_HEAD,

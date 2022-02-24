@@ -19,7 +19,7 @@ const ContentItem = React.memo(({ item, isEditable }: { item: ILine; isEditable:
 
   const docId = useRoute<RouteProp<RootStackParamList, 'DocumentView'>>().params?.docId;
 
-  const good: IGood = ((state.references?.goods as unknown) as IReference<IGood>)?.data.find(
+  const good: IGood | undefined = ((state.references?.goods as unknown) as IReference<IGood>)?.data?.find(
     (i) => i.id === item.goodId,
   );
 
@@ -81,11 +81,13 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
 
   const isEditable = document?.head?.status === 0;
 
-  const docTitle = `№${document?.head?.docnumber} от ${new Date(document?.head?.date)?.toLocaleDateString('BY-ru', {
+  const options: any = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  })}`;
+  };
+
+  const docTitle = `№${document?.head?.docnumber} от ${document?.head?.date ? new Date(document.head.date).toLocaleDateString('BY-ru', options) : new Date().toLocaleDateString('BY-ru', options)}`;
 
   const documentTypeName = useMemo(
     () =>
@@ -160,6 +162,7 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
     },
     [isEditable, navigation, docId],
   );
+  console.log('state.settings?.barcodeReader', state.settings?.barcodeReader);
 
   return document ? (
     <>
@@ -172,8 +175,13 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
           ref={refList}
           data={document.lines ?? []}
           keyExtractor={(_, i) => String(i)}
-          renderItem={({ item }: { item: ILine }) => <LineItem item={item} />}
+          renderItem={LineItem}
           ItemSeparatorComponent={ItemSeparator}
+          removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialNumToRender={6}
+          maxToRenderPerBatch={6} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
         />
         <ItemSeparator />
         <View style={[localStyles.flexDirectionRow, localStyles.lineTotal]}>
@@ -223,7 +231,7 @@ const localStyles = StyleSheet.create({
   },
   documentHeader: {
     flexDirection: 'column',
-    height: 50,
+    height: 54,
     justifyContent: 'space-around',
     paddingVertical: 6,
   },

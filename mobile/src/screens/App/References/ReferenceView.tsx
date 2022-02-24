@@ -35,7 +35,7 @@ const LineItem = React.memo(({ item }: { item: IField }) => {
   );
 });
 
-const ReferenceViewScreen = ({ route }) => {
+const ReferenceViewScreen = ({ route }: any) => {
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,17 +44,22 @@ const ReferenceViewScreen = ({ route }) => {
   const { item: refItem }: { item: IReference } = route.params;
 
   useEffect(() => {
-    // console.log('params', route.params);
     if (!refItem) {
       return;
     }
 
-    setFilteredList({
-      ...refItem,
-      data: refItem?.data
-        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
-    });
+    if (!searchQuery) {
+      setFilteredList({
+        ...refItem,
+        data: refItem?.data
+      })
+    } else {
+      setFilteredList({
+        ...refItem,
+        data: refItem?.data
+          ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true)),
+      });
+    }
   }, [refItem, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);

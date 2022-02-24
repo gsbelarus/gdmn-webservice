@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Alert, Animated, RefreshControl } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Searchbar, FAB, IconButton } from 'react-native-paper';
@@ -28,7 +28,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   const contacts = useMemo(() => state.references?.contacts?.data as IContact[], [state.references?.contacts?.data]);
 
   const getContact = useCallback(
-    (id: number | number[]): IContact =>
+    (id: number | number[]): IContact | undefined =>
       contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
     [contacts],
   );
@@ -44,7 +44,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
 
   let ref = useRef(null);
 
-  const updateRef = (_ref) => {
+  const updateRef = (_ref: any) => {
     ref = _ref;
   };
 
@@ -55,7 +55,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
     </View>
   );
 
-  const renderRightAction = (name, icon, color, x, progress) => {
+  const renderRightAction = (name: string, icon: any, color: any, x: any, progress: any) => {
     const trans: Animated.AnimatedInterpolation = progress.interpolate({
       inputRange: [0, 1, 2],
       outputRange: [x, 0, 1],
@@ -118,7 +118,7 @@ const DocumentItem = React.memo(({ item }: { item: IDocument }) => {
   );
 });
 
-const DocumentListScreen = ({ route, navigation }) => {
+const DocumentListScreen = ({ route, navigation }: any) => {
   const { colors } = useTheme();
 
   const ref = useRef<FlatList<IDocument>>(null);
@@ -160,14 +160,6 @@ const DocumentListScreen = ({ route, navigation }) => {
     setSortData(false);
     bottomSheetRef.current?.dismiss();
   };
-
-  const contacts = appState.references?.contacts?.data as IContact[];
-
-  const getContact = useCallback(
-    (id: number | number[]): IContact =>
-      contacts?.find((contact) => (Array.isArray(id) ? id.includes(contact.id) : contact.id === id)),
-    [contacts],
-  );
 
   useEffect(() => {
     if (sortData) {
@@ -213,7 +205,7 @@ const DocumentListScreen = ({ route, navigation }) => {
 
     timeout(
       apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID as string, 'gdmn', {
         type: 'data',
         payload: {
           name: 'SellDocument',
@@ -242,17 +234,12 @@ const DocumentListScreen = ({ route, navigation }) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      // headerLeft: () => <IconButton icon="file-send" size={26} onPress={sendUpdateRequest} />,
       headerRight: () => (
         <IconButton
           icon="menu"
           size={28}
           onPress={() =>
             showActionSheet([
-              /*  {
-                title: 'Загрузить',
-                onPress: () => navigation.navigate('DocumentRequest'),
-              }, */
               {
                 title: 'Создать документ',
                 onPress: () => {
@@ -278,6 +265,9 @@ const DocumentListScreen = ({ route, navigation }) => {
       ),
     });
   }, [appActions.deleteAllDocuments, navigation, sendUpdateRequest, showActionSheet]);
+
+  const RC = useMemo( () => <RefreshControl refreshing={!data} title="загрузка данных..." />, [data]);
+  const EC = useMemo( () => <Text style={localStyles.emptyList}>Список пуст</Text>, [] );
 
   return (
     <View style={[localStyles.container, { backgroundColor: colors.card }]}>
@@ -307,8 +297,13 @@ const DocumentListScreen = ({ route, navigation }) => {
             renderItem={renderItem}
             ItemSeparatorComponent={ItemSeparator}
             scrollEventThrottle={400}
-            onEndReached={() => ({})}
-            ListEmptyComponent={<Text style={localStyles.emptyList}>Список пуст</Text>}
+            refreshControl={RC}
+            ListEmptyComponent={EC}
+            removeClippedSubviews={true} // Unmount compsonents when outside of window
+            initialNumToRender={6}
+            maxToRenderPerBatch={6} // Reduce number in each render batch
+            updateCellsBatchingPeriod={100} // Increase time between renders
+            windowSize={7} // Reduce the window size
           />
           <FAB
             style={[localStyles.fabAdd, { backgroundColor: colors.primary }]}

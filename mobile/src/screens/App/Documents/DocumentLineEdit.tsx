@@ -1,7 +1,6 @@
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import { StyleSheet, Keyboard, SafeAreaView, ScrollView, View, Modal } from 'react-native';
 import { TextInput, Text, Colors, Button } from 'react-native-paper';
 
@@ -24,8 +23,8 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
 
   const { docId, lineId, prodId, price, remains, quantity } = route.params;
 
-  const [document, setDocument] = useState<IDocument>(undefined);
-  const [line, setLine] = useState<ILine>(undefined);
+  const [document] = useState<IDocument | undefined>( () => state.documents?.find((item) => item.id === docId) );
+  const [line, setLine] = useState<ILine | undefined>(undefined);
 
   const [goodQty, setGoodQty] = useState<string>('1');
 
@@ -33,23 +32,27 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
   const isFocused = useIsFocused();
 
   const [doScanned, setDoScanned] = useState(false);
-  const [EID, setEID] = useState(undefined);
+  const [EID, setEID] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    setLine((prev) => ({ ...prev, quantity: parseFloat(goodQty) }));
+    if (line) {
+      setLine({ ...line, quantity: parseFloat(goodQty) });
+    }
   }, [goodQty]);
 
   useEffect(() => {
-    setLine((prev) => ({ ...prev, EID }));
+    if (line) {
+      setLine({ ...line, EID });
+    }
   }, [EID]);
 
   const good = useMemo(() => {
     return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId);
   }, [prodId, state.references?.goods?.data]);
 
-  useEffect(() => {
-    const docLine: ILine = document?.lines.find((item) => item.id === lineId);
+  const docLine: ILine | undefined = useMemo(() => document?.lines.find((item) => item.id === lineId), [lineId]);
 
+  useEffect(() => {
     setLine({
       goodId: docLine?.goodId || prodId,
       id: docLine?.id || 1,
@@ -59,16 +62,10 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
       EID: docLine?.EID ?? EID,
     });
 
-    // setDocument(state.documents.find((item) => item.id === docId));
-
     setGoodQty((docLine?.quantity ?? quantity ?? 1).toString());
     setEID(docLine?.EID ?? EID);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodId, document?.lines, lineId, price, remains]);
-
-  useEffect(() => {
-    setDocument(state.documents.find((item) => item.id === docId));
-  }, [state.documents, docId]);
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -93,6 +90,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         keyboardDidShowListener.remove();
       };
     }
+    return;
   }, [isFocused]);
 
   const handleSave = useCallback(() => {
@@ -107,13 +105,12 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
         line,
       });
     }
-    navigation.navigate('DocumentView', { docId: document?.id });
-    // actions.clearProductParams();
-  }, [actions, line, lineId, docId, document?.id]);
+    navigation.navigate('DocumentView', { docId });
+  }, [actions, line, lineId, docId]);
 
   const handleCancel = useCallback(() => {
-    navigation.navigate('DocumentView', { docId: document?.id });
-  }, [navigation, document?.id]);
+    navigation.navigate('DocumentView', { docId });
+  }, [navigation, docId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -123,10 +120,16 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
     });
   }, [navigation, handleCancel, handleSave]);
 
-  const handleEIDScanned = (data: string) => {
+  const handleEIDScanned = useCallback((data: string) => {
     setDoScanned(false);
     setEID(data);
-  };
+  }, []);
+
+  const currRef = useRef<any>(null);
+
+  useEffect(() => {
+    currRef?.current && setTimeout(() => currRef.current?.focus(), 1000);
+  }, []);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -193,6 +196,7 @@ const DocumentLineEditScreen = ({ route, navigation }: Props) => {
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus={isFocused}
               value={goodQty}
+              ref={currRef}
               theme={{
                 colors: {
                   placeholder: colors.primary,

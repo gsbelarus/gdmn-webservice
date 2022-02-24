@@ -1,17 +1,8 @@
-import Reactotron from 'reactotron-react-native';
+import { ActionAuthTypes } from './actions';
 
-import { IAuthState } from '../../model/types';
-import { StoreMiddlware } from '../utils';
-import { ActionAuthTypes, TAuthActions } from './actions';
-
-export const middleware: StoreMiddlware<TAuthActions> = (action) => {
+export const middleware = (action: any) => {
   if (__DEV__) {
     console.log('Middleware Auth action: ', JSON.stringify(action));
-    /*     Reactotron.display({
-      name: `Auth action ${action.type}`,
-      value: action,
-      important: false,
-    }); */
   }
 
   switch (action.type) {

@@ -1,5 +1,5 @@
 import { useScrollToTop, useTheme } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -12,19 +12,7 @@ interface IEntity {
   [fieldName: string]: string;
 }
 
-const LineItem = React.memo(({ item }: { item: [string, string] }) => {
-  const { colors } = useTheme();
-  return (
-    <View style={[localStyles.item, { backgroundColor: colors.card }]}>
-      <View style={localStyles.details}>
-        <Text style={[localStyles.name, { color: colors.text }]}>{item[0]}</Text>
-        <Text style={[localStyles.value, localStyles.fieldName, { color: colors.text }]}>{item[1]}</Text>
-      </View>
-    </View>
-  );
-});
-
-const ReferenceDetailScreen = ({ route }) => {
+const ReferenceDetailScreen = ({ route }: any) => {
   const { colors } = useTheme();
 
   const itm: IEntity = route.params.item;
@@ -34,7 +22,16 @@ const ReferenceDetailScreen = ({ route }) => {
   const ref = React.useRef<FlatList<[string, string]>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: [string, string] }) => <LineItem item={item} />;
+  const LineItem =  useCallback(({ item }: { item: [string, string] }) => {
+    return (
+      <View style={[localStyles.item, { backgroundColor: colors.card }]}>
+        <View style={localStyles.details}>
+          <Text style={[localStyles.name, { color: colors.text }]}>{item[0]}</Text>
+          <Text style={[localStyles.value, localStyles.fieldName, { color: colors.text }]}>{item[1]}</Text>
+        </View>
+      </View>
+    );
+  }, [colors.card, colors.text]);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>
@@ -44,7 +41,7 @@ const ReferenceDetailScreen = ({ route }) => {
         ref={ref}
         data={fields.filter((i) => !['id', 'name'].includes(i[0]))}
         keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
+        renderItem={LineItem}
         ItemSeparatorComponent={ItemSeparator}
       />
     </View>
@@ -66,7 +63,7 @@ const localStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+    padding: 4,
   },
   name: {
     fontSize: 16,

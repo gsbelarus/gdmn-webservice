@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, TouchableOpacity } from '@gorhom/bottom-sheet';
 import React, { useMemo, Ref, ReactNode } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, LogBox } from 'react-native';
 
 import ItemSeparator from './ItemSeparator';
 
@@ -12,6 +12,8 @@ interface IProps {
   handelDismiss: () => void;
   handelApply: () => void;
 }
+
+LogBox.ignoreAllLogs();
 
 const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: IProps) => {
   const snapPoints = useMemo(() => ['40%', '90%'], []);

@@ -34,7 +34,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const sendUpdateRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID as string, 'gdmn', {
         type: 'cmd',
         payload: {
           name: 'get_references',
@@ -69,8 +69,8 @@ const DocumentRequestScreen = ({ route }: Props) => {
   //   appActions.setFormParams(route.params);
   // }, [appActions, route]);
 
-  const selectedItem = useCallback((listItems: IListItem[], id: number[]) => {
-    return listItems.find((item) => (Array.isArray(id) ? id.includes(item.id) : item.id === id));
+  const selectedItem = useCallback((listItems: IListItem[] = [], id: number[] | undefined) => {
+    return listItems.find((item) => (Array.isArray(id) && item.id ? id.includes(item.id) : item.id === id));
   }, []);
 
   const getListItems = (contacts: IContact[]): IListItem[] =>
@@ -88,17 +88,17 @@ const DocumentRequestScreen = ({ route }: Props) => {
   const sendDocumentRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID as string, 'gdmn', {
         type: 'cmd',
         payload: {
           name: 'get_InvDocuments',
           params: [
             {
               dateBegin: documentParams?.dateBegin
-                ? new Date(documentParams?.dateBegin).toISOString()
+                ? (documentParams?.dateBegin ? new Date(documentParams?.dateBegin) : new Date()).toISOString()
                 : yesterday.toISOString(),
               dateEnd: documentParams?.dateBegin
-                ? new Date(documentParams?.dateEnd).toISOString()
+                ? (documentParams?.dateEnd ? new Date(documentParams?.dateEnd) : new Date()).toISOString()
                 : today.toISOString(),
               contact: Array.isArray(documentParams?.contact) ? documentParams?.contact[0] : documentParams?.contact,
             },
@@ -146,7 +146,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
 
   const sendSubscribe = useCallback(async () => {
     try {
-      const response = await apiService.data.subscribe(state.companyID);
+      const response = await apiService.data.subscribe(state.companyID as string);
 
       if (!response.result) {
         Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
@@ -164,7 +164,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
             switch (dataSet.type) {
               case 'get_SellDocuments': {
                 const addDocuments = dataSet.data as IDocument[];
-                appActions.setDocuments([...appState.documents, ...addDocuments]);
+                appActions.setDocuments([...(appState.documents || []), ...addDocuments]);
                 break;
               }
               case 'documenttypes': {
@@ -191,36 +191,36 @@ const DocumentRequestScreen = ({ route }: Props) => {
                 break;
             }
           });
-          apiService.data.deleteMessage(state.companyID, message.head.id);
+          apiService.data.deleteMessage(state.companyID as string, message.head.id);
           Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
         }
         if (message.body.type === 'cmd') {
           // Сообщение содержит команду
-          apiService.data.deleteMessage(state.companyID, message.head.id);
+          apiService.data.deleteMessage(state.companyID  as string, message.head.id);
         }
       });
 
-      const messagesForDocuments = response.data.filter(
+      const messagesForDocuments = response?.data?.filter(
         (message) => message.body.type === 'response' && message.body.payload?.name === 'post_documents',
       );
 
-      if (messagesForDocuments.length > 0) {
+      if (messagesForDocuments && messagesForDocuments.length) {
         messagesForDocuments?.forEach((message) => {
           if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
-            message.body.payload?.params?.forEach((paramDoc) => {
+            message.body.payload?.params?.forEach((paramDoc: any) => {
               if (paramDoc.result) {
-                const document = appState.documents.find((doc) => doc.id === paramDoc.docId);
+                const document = appState.documents?.find((doc) => doc.id === paramDoc.docId);
                 if (document?.head.status === 2) {
                   appActions.updateDocumentStatus({ id: paramDoc.docId, status: 3 });
                 }
               }
             });
           }
-          apiService.data.deleteMessage(state.companyID, message.head.id);
+          apiService.data.deleteMessage(state.companyID as string, message.head.id);
         });
         Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
       }
-    } catch (err) {
+    } catch (err: any) {
       Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
     }
   }, [apiService.data, appActions, appState.documents, state.companyID]);
@@ -253,7 +253,7 @@ const DocumentRequestScreen = ({ route }: Props) => {
   }, [appActions, navigation, sendDocumentRequest, sendSubscribe, sendUpdateRequest]);
 
   const ReferenceItem = useCallback(
-    (props: { value: string; onPress: () => void; color?: string }) => {
+    (props: { value?: string; onPress: () => void; color?: string }) => {
       return (
         <TouchableOpacity {...props}>
           <View style={[localStyles.picker, { borderColor: colors.border }]}>

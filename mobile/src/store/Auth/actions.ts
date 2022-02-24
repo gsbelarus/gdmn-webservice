@@ -9,7 +9,7 @@ export enum ActionAuthTypes {
   SET_COMPANY_ID = 'SET_COMPANY_ID',
 }
 
-export const AuthActions = {
+export const AuthActions: any = {
   disconnect: createActionPayload<ActionAuthTypes.DISCONNECT, void>(ActionAuthTypes.DISCONNECT),
   logOut: createAction<ActionAuthTypes.LOG_OUT>(ActionAuthTypes.LOG_OUT),
   setDeviceStatus: createActionPayload<ActionAuthTypes.SET_DEVICE_STATUS, boolean | undefined>(
@@ -17,9 +17,9 @@ export const AuthActions = {
   ),
   setUserStatus: createActionPayload<
     ActionAuthTypes.SET_USER_STATUS,
-    { userID: string | undefined | null; userName: string }
+    { userID: string | undefined | null; userName?: string }
   >(ActionAuthTypes.SET_USER_STATUS),
-  setCompanyID: createActionPayload<ActionAuthTypes.SET_COMPANY_ID, { companyId: string; companyName: string }>(
+  setCompanyID: createActionPayload<ActionAuthTypes.SET_COMPANY_ID, { companyId: string | null; companyName?: string}>(
     ActionAuthTypes.SET_COMPANY_ID,
   ),
 };

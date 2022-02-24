@@ -103,28 +103,12 @@ const FilterEditScreen = ({ navigation }: Props) => {
         selected={fieldSearch?.some((item) => item === 'state')}
         onPress={() => setFieldSearch('state')}
       />
-      {/* <Line
-        name="toContact"
-        title={'Организация'}
-        selected={fieldSearch?.some((item) => item === 'toContact')}
-        onPress={() => setFieldSearch('toContact')}
-      /> */}
       <Line
         name="fromContact"
         title={'Подразделение'}
         selected={fieldSearch?.some((item) => item === 'fromContact')}
         onPress={() => setFieldSearch('fromContact')}
       />
-      {/* <Line
-        name="expeditor"
-        title={'Экспедитор'}
-        selected={fieldSearch?.some((item) => item === 'expeditor')}
-        onPress={() =>
-          !fieldSearch?.some((item) => item === 'expeditor')
-            ? setFieldSearch([...fieldSearch, 'expeditor'])
-            : setFieldSearch(fieldSearch.filter((item) => item !== 'expeditor'))
-        }
-      /> */}
     </View>
   );
 };

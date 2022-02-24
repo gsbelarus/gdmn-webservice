@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "../tsconfig.base.json",
 }

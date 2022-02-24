@@ -1,11 +1,10 @@
 import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, StatusBar, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
-import { useAppStore } from '../../../../store';
 import styles from '../../../../styles/global';
 
 const ONE_SECOND_IN_MS = 1000;
@@ -17,7 +16,7 @@ interface IProps {
 
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState<null | boolean>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -57,7 +56,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
         }}
-        // autoFocus="on"
+        autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={localStyles.camera}
@@ -76,12 +75,6 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
             style={localStyles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
-          {/* <IconButton
-            icon={'feature-search-outline'}
-            color={'#FFF'}
-            style={localStyles.transparent}
-            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
-          /> */}
         </View>
         {!scanned ? (
           <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
@@ -114,17 +107,6 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
                 <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {/* {scanned && !goodItem && (
-              <View style={localStyles.infoContainer}>
-                <View style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}>
-                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
-                  <View>
-                    <Text style={localStyles.text}>{barcode}</Text>
-                    <Text style={localStyles.text}>{'Товар не найден'}</Text>
-                  </View>
-                </View>
-              </View>
-            )} */}
             {scanned && barcode && (
               <View style={localStyles.buttonsContainer}>
                 <TouchableOpacity

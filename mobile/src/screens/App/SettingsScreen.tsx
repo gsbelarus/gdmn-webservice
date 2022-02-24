@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Divider, Avatar, Button, Text, IconButton } from 'react-native-paper';
-import Reactotron from 'reactotron-react-native';
 
 import { IResponse, IMessage, IReference, IDocument } from '../../../../common';
 import { IDataMessage } from '../../../../common/models';
@@ -21,7 +20,7 @@ const SettingsScreen = ({ navigation }: Props) => {
   const { state: AuthState } = useAuthStore();
   const {
     actions: appActions,
-    state: { settings, documents, references, forms, companySettings, models },
+    state: { settings, documents },
   } = useAppStore();
   const {
     state: { companyID, userID },
@@ -81,7 +80,7 @@ const SettingsScreen = ({ navigation }: Props) => {
         // const response = await apiService.data.subscribe(companyID);
         const response = await timeout<IResponse<IMessage[]>>(
           apiService.baseUrl.timeout,
-          apiService.data.getMessages(companyID),
+          apiService.data.getMessages(companyID as string),
         );
 
         if (!response.result) {
@@ -103,7 +102,7 @@ const SettingsScreen = ({ navigation }: Props) => {
               switch (dataSet.type) {
                 case 'get_SellDocuments': {
                   const addDocuments = dataSet.data as IDocument[];
-                  appActions.setDocuments([...documents, ...addDocuments]);
+                  appActions.setDocuments([...(documents || []), ...addDocuments]);
                   break;
                 }
                 case 'documenttypes':
@@ -122,11 +121,11 @@ const SettingsScreen = ({ navigation }: Props) => {
                   break;
               }
             });
-            apiService.data.deleteMessage(companyID, message.head.id);
+            apiService.data.deleteMessage(companyID as string, message.head.id);
           }
           if (message.body.type === 'cmd') {
             // Сообщение содержит команду
-            apiService.data.deleteMessage(companyID, message.head.id);
+            apiService.data.deleteMessage(companyID as string, message.head.id);
           }
           isUpdated = true;
         });
@@ -139,7 +138,7 @@ const SettingsScreen = ({ navigation }: Props) => {
         if (messagesForDocuments.length > 0) {
           messagesForDocuments?.forEach((message) => {
             if (Array.isArray(message.body.payload?.params) && message.body.payload.params.length > 0) {
-              message.body.payload?.params?.forEach((paramDoc) => {
+              message.body.payload?.params?.forEach((paramDoc: any) => {
                 if (paramDoc.result) {
                   const document = documents?.find((doc) => doc.id === paramDoc.docId);
                   if (document?.head?.status === 2) {
@@ -148,13 +147,13 @@ const SettingsScreen = ({ navigation }: Props) => {
                 }
               });
             }
-            apiService.data.deleteMessage(companyID, message.head.id);
+            apiService.data.deleteMessage(companyID as string, message.head.id);
           });
           isUpdated = true;
           // Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть' }]);
         }
         Alert.alert('Запрос обработан', isUpdated ? 'Справочники обновлены' : 'Обновлений нет', [{ text: 'Закрыть' }]);
-      } catch (err) {
+      } catch (err: any) {
         Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]);
       } finally {
         setLoading(false);
@@ -220,71 +219,6 @@ const SettingsScreen = ({ navigation }: Props) => {
             Настройки организации
           </Button>
           <Divider />
-          {__DEV__ && (
-            <>
-              <Button
-                mode="text"
-                style={localStyles.button}
-                onPress={async () => {
-                  const log = await appStorage.getItem(`${AuthState.userID}/${AuthState.companyID}/REFERENCES`);
-                  Reactotron.display({
-                    name: 'Mobile Storage',
-                    preview: log,
-                    value: log,
-                    important: true,
-                  });
-                }}
-              >
-                Проверить хранилище
-              </Button>
-              <Divider />
-              <Button
-                mode="text"
-                style={localStyles.button}
-                onPress={async () => {
-                  Reactotron.display({
-                    name: 'settings',
-                    preview: 'settings',
-                    value: settings,
-                    important: true,
-                  });
-                  Reactotron.display({
-                    name: 'companySettings',
-                    preview: 'companySettings',
-                    value: companySettings,
-                    important: true,
-                  });
-                  Reactotron.display({
-                    name: 'documents',
-                    preview: 'documents',
-                    value: documents,
-                    important: true,
-                  });
-                  Reactotron.display({
-                    name: 'references',
-                    preview: 'references',
-                    value: references,
-                    important: true,
-                  });
-                  Reactotron.display({
-                    name: 'forms',
-                    preview: 'forms',
-                    value: forms,
-                    important: true,
-                  });
-                  Reactotron.display({
-                    name: 'models',
-                    preview: 'models',
-                    value: models,
-                    important: true,
-                  });
-                }}
-              >
-                Проверить стейт
-              </Button>
-              <Divider />
-            </>
-          )}
         </View>
         {/* <SettingsItem
           label="Синхронизировать"
@@ -296,13 +230,13 @@ const SettingsScreen = ({ navigation }: Props) => {
         <Divider />
         <SettingsItem
           label="Использовать сканер штрихкодов"
-          value={settings?.barcodeReader}
+          value={!!settings?.barcodeReader}
           onValueChange={() => appActions.setSettings({ ...settings, barcodeReader: !settings?.barcodeReader })}
         />
         <Divider />
         <SettingsItem
           label="Удалять документы после обработки учётной системой"
-          value={settings?.autodeletingDocument}
+          value={settings?.autodeletingDocument || false}
           onValueChange={() =>
             appActions.setSettings({ ...settings, autodeletingDocument: !settings?.autodeletingDocument })
           }

@@ -29,7 +29,7 @@ const CompanyConfigScreen = ({ navigation }: Props) => {
   const sendUpdateRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID as string, 'gdmn', {
         type: 'cmd',
         payload: {
           name: 'get_config',

@@ -65,7 +65,7 @@ const initialState: ILoadingState = {
   showSettings: false,
 };
 
-const isUser = (obj: unknown): obj is IUser => typeof obj === 'object' && 'id' in obj;
+const isUser = (obj: any): obj is IUser => typeof obj === 'object' && 'id' in obj;
 
 const AuthNavigator = () => {
   const {
@@ -113,7 +113,7 @@ const AuthNavigator = () => {
           actions.setDeviceId(null);
         }
         authActions.setDeviceStatus(response.result);
-      } catch (err) {
+      } catch (err: any) {
         setState({ type: 'SET_ERROR', text: err.message });
       }
     };
@@ -146,7 +146,7 @@ const AuthNavigator = () => {
           userID: user.id,
           userName: (user.firstName ? `${user.firstName} ${user.lastName || ''}` : user.userName).trim(),
         });
-      } catch (err) {
+      } catch (err: any) {
         setState({ type: 'SET_ERROR', text: err.message });
       }
     };
@@ -192,7 +192,7 @@ const AuthNavigator = () => {
 
   const connection = useCallback(() => setState({ type: 'SET_CONNECTION' }), []);
 
-  const breakConnection = useCallback(() => cancel(), [cancel]);
+  const breakConnection = useCallback(() => cancel && cancel(), [cancel]);
 
   const showSettings = useCallback(() => setState({ type: 'SETTINGS_FORM', showSettings: true }), []);
 
@@ -225,8 +225,8 @@ const AuthNavigator = () => {
       state.serverReq.isLoading,
       state.serverReq.isError,
       state.serverReq.status,
-      serverUrl.server,
-      serverUrl.port,
+      serverUrl?.server,
+      serverUrl?.port,
     ],
   );
 
@@ -239,7 +239,7 @@ const AuthNavigator = () => {
         timeout={serverUrl?.timeout}
       />
     ),
-    [hideSettings, changeSettings, serverUrl.protocol, serverUrl.server, serverUrl.port, serverUrl.timeout],
+    [hideSettings, changeSettings, serverUrl?.protocol, serverUrl?.server, serverUrl?.port, serverUrl?.timeout],
   );
 
   const ConfigComponent = useMemo(

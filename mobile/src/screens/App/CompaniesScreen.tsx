@@ -73,7 +73,7 @@ const CompaniesScreen = () => {
       <View style={styles.container}>
         <SubTitle style={[localStyles.title, { backgroundColor: colors.background }]}>Выбор организации</SubTitle>
         <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
-          <RadioButton.Group onValueChange={(newValue) => setSelectedCompany(newValue)} value={selectedCompany}>
+          <RadioButton.Group onValueChange={(newValue) => setSelectedCompany(newValue)} value={selectedCompany || ''}>
             {companies?.length > 0 &&
               companies.map((el) => {
                 return (
@@ -101,7 +101,7 @@ const CompaniesScreen = () => {
             style={[styles.rectangularButton, localStyles.button]}
             disabled={!companies?.length || !selectedCompany}
             onPress={async () => {
-              actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
+              actions.setCompanyID({ companyId: selectedCompany || null, companyName: selectedCompany });
               await appStorage.setItem(`${userID}/companyId`, selectedCompany);
             }}
           >

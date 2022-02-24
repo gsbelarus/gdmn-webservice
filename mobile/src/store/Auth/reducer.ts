@@ -1,5 +1,4 @@
 import { Reducer } from 'react';
-import Reactotron from 'reactotron-react-native';
 
 import { IAuthState } from '../../model/types';
 import { TAuthActions, ActionAuthTypes } from './actions';
@@ -12,15 +11,6 @@ export const initialState: IAuthState = {
 };
 
 export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState, action): IAuthState => {
-  if (__DEV__) {
-    // console.log('Auth action: ', JSON.stringify(action));
-    Reactotron.display({
-      name: `Auth action ${action.type}`,
-      value: action,
-      important: false,
-    });
-  }
-
   switch (action.type) {
     case ActionAuthTypes.DISCONNECT:
       return initialState;
@@ -31,14 +21,14 @@ export const reducer: Reducer<IAuthState, TAuthActions> = (state = initialState,
     case ActionAuthTypes.SET_USER_STATUS:
       return {
         ...state,
-        userID: action.payload?.userID,
-        profile: { ...state.profile, userName: action.payload?.userName },
+        userID: action.payload.userID,
+        profile: { ...state.profile, userName: action.payload.userName },
       };
     case ActionAuthTypes.SET_COMPANY_ID:
       return {
         ...state,
         companyID: action.payload.companyId,
-        profile: { ...state.profile, companyName: action.payload?.companyName },
+        profile: { ...state.profile, companyName: action.payload.companyName },
       };
     default:
       return state;

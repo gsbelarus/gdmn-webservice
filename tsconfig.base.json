@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "pretty": true,
+    "removeComments": true,
+    "checkJs": false,
+    "allowJs": false,
+    "strict": true,
+    "alwaysStrict": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "allowSyntheticDefaultImports": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "skipLibCheck": true,
+    "noImplicitUseStrict": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "resolveJsonModule": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "target": "ES6",
+    "isolatedModules": false
+  },
+  "exclude": ["node_modules", "dist", "config"]
+}

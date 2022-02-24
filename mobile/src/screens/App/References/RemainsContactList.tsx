@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   FlatList,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Text, Searchbar } from 'react-native-paper';
 
-import { IMDGoodRemain, IRefData } from '../../../../../common/base';
+import { IContact, IRefData, IRemains } from '../../../../../common/base';
 import ItemSeparator from '../../../components/ItemSeparator';
 import SubTitle from '../../../components/SubTitle';
 import { useAppStore } from '../../../store';
@@ -23,7 +23,9 @@ interface IField {
   [fieldName: string]: unknown;
 }
 
-const RemainsContactListViewScreen = ({ navigation }) => {
+const keyExtractor = (item: IField) => String(item.id);
+
+const RemainsContactListViewScreen = ({ navigation }: any) => {
   const { colors } = useTheme();
   const { state: appState } = useAppStore();
 
@@ -52,25 +54,33 @@ const RemainsContactListViewScreen = ({ navigation }) => {
     [colors.card, colors.primary, colors.text, navigation],
   );
 
-  useEffect(() => {
-    const remains = appState.models?.remains;
+  const remains = (appState.references?.remains?.data as unknown) as IRemains[];
+  const contacts = appState.references?.contacts?.data as IContact[];
 
-    if (!remains?.data) {
+  useEffect(() => {
+    if (!remains) {
       return;
     }
 
-    const contactList: IRefData[] = Object.keys(remains.data)
-      .map((el) => ({ id: Number(el), name: (remains.data[el] as IMDGoodRemain).contactName }))
-      .filter((el) => el.name.includes(searchQuery.toUpperCase()))
-      .sort((a, b) => (a.name < b.name ? -1 : 1));
+    const contactList: IField[] = remains
+      .reduce((prev: IField[], el) => {
+        if (!prev.find((c) => c.id === el.contactId)) {
+          const contact = contacts.find((c) => c.id === el.contactId);
+          prev.push({ id: el.contactId, name: contact?.name || '' })
+        }
+        return prev;
+      }, [])
+      .filter((el) => el.name?.includes(searchQuery.toUpperCase()))
+      .sort((a, b) => a.name!.localeCompare(b.name!) );
 
     setFilteredList(contactList);
-  }, [appState.models?.remains, searchQuery]);
+  }, [remains, contacts, searchQuery]);
 
   const ref = React.useRef<FlatList<IField>>(null);
   useScrollToTop(ref);
 
-  const renderItem = ({ item }: { item: IField }) => <LineItem item={item} />;
+  const RC = useMemo( () => <RefreshControl refreshing={!filteredList} title="загрузка данных..." />, [filteredList]);
+  const EC = useMemo( () => filteredList ? <Text style={localStyles.emptyList}>Список пуст</Text> : null, [] );
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -95,10 +105,10 @@ const RemainsContactListViewScreen = ({ navigation }) => {
         <FlatList
           ref={ref}
           data={filteredList}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
-          refreshControl={<RefreshControl refreshing={!filteredList} title="загрузка данных..." />}
-          ListEmptyComponent={filteredList ? <Text style={localStyles.emptyList}>Список пуст</Text> : null}
+          keyExtractor={keyExtractor}
+          renderItem={LineItem}
+          refreshControl={RC}
+          ListEmptyComponent={EC}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>

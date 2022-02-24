@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  StatusBar,
   Vibration,
   Keyboard,
   TextInput,
@@ -15,8 +14,6 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
-
-import { useAppStore } from '../../../../store';
 
 const ONE_SECOND_IN_MS = 1000;
 
@@ -28,7 +25,6 @@ interface IProps {
 const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
   const [scanned, setScanned] = useState(false);
-  const { state } = useAppStore();
   const [vibroMode, setVibroMode] = useState(false);
 
   const ref = useRef<TextInput>(null);

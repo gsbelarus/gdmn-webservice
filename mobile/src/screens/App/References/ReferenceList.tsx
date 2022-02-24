@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, FAB } from 'react-native-paper';
 
-import { IReference, IMessageInfo, IResponse, IDataMessage, IDocument, IContact, IGood } from '../../../../../common';
+import { IReference, IMessageInfo, IResponse } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
 import { timeout } from '../../../helpers/utils';
 import { useAuthStore, useAppStore, useServiceStore } from '../../../store';
@@ -46,7 +46,8 @@ const ReferenceListScreen = () => {
   useScrollToTop(ref);
 
   const references: IReference[] = useMemo(() => {
-    return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
+    return AppState.references ? Object.values(AppState.references) : [];
+    //return AppState.references ? Object.keys(AppState.references).map((i) => AppState.references[i]) : [];
   }, [AppState.references]);
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
@@ -54,7 +55,7 @@ const ReferenceListScreen = () => {
   const sendUpdateRequest = useCallback(() => {
     timeout(
       apiService.baseUrl.timeout,
-      apiService.data.sendMessages(state.companyID, 'gdmn', {
+      apiService.data.sendMessages(state.companyID  as string, 'gdmn', {
         type: 'cmd',
         payload: {
           name: 'get_references',
@@ -71,65 +72,6 @@ const ReferenceListScreen = () => {
       })
       .catch((err: Error) => Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть' }]));
   }, [apiService.baseUrl.timeout, apiService.data, state.companyID]);
-
-  /*  const sendSubscribe = useCallback(async () => {
-    try {
-      const response = await apiService.data.subscribe(state.companyID);
-      // console.log(response);
-      if (!response.result) {
-        Alert.alert('Запрос не был отправлен', '', [{ text: 'Закрыть', onPress: () => ({}) }]);
-        return;
-      }
-      if (!isMessagesArray(response.data)) {
-        Alert.alert('Получены неверные данные.', 'Попробуйте ещё раз.', [{ text: 'Закрыть', onPress: () => ({}) }]);
-      }
-
-      response.data?.forEach((message) => {
-        if (message.body.type === 'data') {
-          // Сообщение содержит данные
-          ((message.body.payload as unknown) as IDataMessage[])?.forEach((dataSet) => {
-            switch (dataSet.type) {
-              case 'get_SellDocuments': {
-                const addDocuments = dataSet.data as IDocument[];
-                appActions.setDocuments([...AppState.documents, ...addDocuments]);
-                break;
-              }
-              case 'documenttypes': {
-                const documentTypes = (dataSet as unknown) as IReference;
-                appActions.setReference(documentTypes);
-                break;
-              }
-              case 'contacts': {
-                const contacts = (dataSet as unknown) as IReference<IContact[]>;
-                appActions.setReference(contacts);
-                break;
-              }
-              case 'goods': {
-                const goods = (dataSet as unknown) as IReference<IGood[]>;
-                appActions.setReference(goods);
-                break;
-              }
-              case 'remains': {
-                const remains = (dataSet as unknown) as IReference<IRemains[]>;
-                appActions.setReference(remains);
-                break;
-              }
-              default:
-                break;
-            }
-          });
-          apiService.data.deleteMessage(state.companyID, message.head.id);
-          Alert.alert('Данные получены', 'Справочники обновлены', [{ text: 'Закрыть', onPress: () => ({}) }]);
-        }
-        if (message.body.type === 'cmd') {
-          // Сообщение содержит команду
-          apiService.data.deleteMessage(state.companyID, message.head.id);
-        }
-      });
-    } catch (err) {
-      Alert.alert('Ошибка!', err.message, [{ text: 'Закрыть', onPress: () => ({}) }]);
-    }
-  }, [AppState.documents, apiService.data, appActions, state.companyID]); */
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

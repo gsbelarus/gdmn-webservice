@@ -9,10 +9,10 @@ export enum ActionServiceTypes {
   SET_STORAGE_PATH = 'SET_STORAGE_PATH',
 }
 
-export const ServiceActions = {
+export const ServiceActions: any = {
   setLoading: createActionPayload<ActionServiceTypes.SET_LOADING, boolean>(ActionServiceTypes.SET_LOADING),
   setServerUrl: createActionPayload<ActionServiceTypes.SET_SERVER_URL, IBaseUrl>(ActionServiceTypes.SET_SERVER_URL),
-  setDeviceId: createActionPayload<ActionServiceTypes.SET_DEVICE_ID, string>(ActionServiceTypes.SET_DEVICE_ID),
+  setDeviceId: createActionPayload<ActionServiceTypes.SET_DEVICE_ID, string | undefined | null>(ActionServiceTypes.SET_DEVICE_ID),
   setStoragePath: createActionPayload<ActionServiceTypes.SET_STORAGE_PATH, string>(ActionServiceTypes.SET_STORAGE_PATH),
 };
 

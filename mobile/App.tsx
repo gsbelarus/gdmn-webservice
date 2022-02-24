@@ -1,6 +1,6 @@
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { InitialState, NavigationContainerRef, NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
 import {
   Provider as PaperProvider,
@@ -12,13 +12,9 @@ import {
 import { ConnectionScreen } from './src/screens/Auth/ConnectionScreen';
 import { AuthStoreProvider, ServiceStoreProvider } from './src/store';
 
-if (__DEV__) {
-  import('./src/service/ReactotronConfig').then(() => console.log('Reactotron Configured'));
-}
-
 const App = () => {
-  const containerRef = React.useRef<NavigationContainerRef>();
-  const [theme] = React.useState(DefaultTheme);
+  const containerRef = useRef<any>();
+  const [theme] = useState(DefaultTheme);
 
   const [initialState] = React.useState<InitialState | undefined>();
 

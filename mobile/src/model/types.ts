@@ -60,7 +60,7 @@ export interface IAppContextProps {
 export interface IServiceState {
   isLoading: boolean;
   serverUrl?: IBaseUrl;
-  deviceId?: string;
+  deviceId?: string | null;
   storagePath?: string;
 }
 
@@ -71,8 +71,8 @@ export interface IAuthState {
   deviceActive?: boolean;
   deviceId?: string;
   profile?: {
-    userName: string;
-    companyName: string;
+    userName?: string;
+    companyName?: string;
   };
 }
 
@@ -110,7 +110,7 @@ export interface IAppState {
   references?: IReferences;
   forms?: IForms;
   models?: IModels;
-  viewParams: IViewParams;
+  viewParams?: IViewParams;
 }
 
 // eslint-disable-next-line no-shadow

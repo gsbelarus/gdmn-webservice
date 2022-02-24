@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useScrollToTop, useTheme, useNavigation, useRoute } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
@@ -7,8 +7,6 @@ import { Text, Button, Searchbar, IconButton } from 'react-native-paper';
 
 import { IGood, IRefData } from '../../../../../common';
 import ItemSeparator from '../../../components/ItemSeparator';
-import { RootStackParamList } from '../../../navigation/AppNavigator';
-import { DocumentStackParamList } from '../../../navigation/DocumentsNavigator';
 import { useAppStore } from '../../../store';
 import styles from '../../../styles/global';
 
@@ -16,7 +14,7 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const docId = useRoute<RouteProp<DocumentStackParamList, 'GoodList'>>().params?.docId;
+  const docId = useRoute<any>().params?.docId;
 
   return (
     <TouchableOpacity
@@ -38,9 +36,8 @@ const GoodItem = React.memo(({ item }: { item: IGood }) => {
 });
 
 const GoodListScreen = () => {
-  const route = useRoute<RouteProp<RootStackParamList, ''>>();
   const { colors } = useTheme();
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [doScanned, setDoScanned] = useState(false);
   const [text, onChangeText] = useState('');
@@ -62,7 +59,7 @@ const GoodListScreen = () => {
             item.barcode?.toLowerCase().includes(text.toLowerCase()) ||
             item.name?.toLowerCase().includes(text.toLowerCase()),
         )
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)),
+        ?.sort((a, b) => a.name!.localeCompare(b.name!)),
     );
   }, [goods, text]);
 
@@ -70,7 +67,6 @@ const GoodListScreen = () => {
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
-  // const renderItemWieghed = ({ item }: { item: IWeighedGoods }) => <WeighedGoodItem item={item} />;
 
   useEffect(() => {
     const permission = async () => {
