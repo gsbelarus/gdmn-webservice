@@ -91,9 +91,7 @@ const createStoreContext = () => {
     /*  Сохранение справочников в storage при их изменении */
     useEffect(() => {
       const saveReferences = async () => {
-        // console.log('saveReferences');
         log('Save references', 'Начало сохранения справочников в Storage');
-        // console.log('Начало сохранения справочников в Storage');
         await appStorage.setItem(`${storagePath}/${sections.REFERENCES}`, state.references);
         log('Save references', 'Окончание сохранения справочников в Storage');
       };
@@ -106,7 +104,6 @@ const createStoreContext = () => {
     /*  Сохранение настроек в storage при их изменении */
     useEffect(() => {
       const saveSettings = async () => {
-        // console.log('saveSettings');
         log('Save setting', 'Начало сохранения настроек в Storage');
         await appStorage.setItem(`${storagePath}/${sections.SETTINGS}`, state.settings);
         log('Save setting', 'Окончание сохранения настроек в Storage');
@@ -120,7 +117,6 @@ const createStoreContext = () => {
     /*  Сохранение настроек компании в storage при их изменении */
     useEffect(() => {
       const saveCompanySettings = async () => {
-        // console.log('saveCompanySettings');
         log('Save CompanySettings', 'Начало сохранения настроек компании в Storage');
         await appStorage.setItem(`${storagePath}/${sections.COMPANYSETTINGS}`, state.companySettings);
         log('Save CompanySettings', 'Окончание сохранения настроек компании в Storage');
@@ -134,7 +130,6 @@ const createStoreContext = () => {
     /*  Сохранение документов в storage при их изменении */
     useEffect(() => {
       const saveDocuments = async () => {
-        // console.log('saveDocuments');
         log('Save Documents', 'Начало сохранения документов в Storage');
         await appStorage.setItem(`${storagePath}/${sections.DOCUMENTS}`, state.documents);
         log('Save Documents', 'Окончание сохранения настроек документов в Storage');
@@ -148,7 +143,6 @@ const createStoreContext = () => {
     /*  Сохранение viewParams в storage при их изменении */
     useEffect(() => {
       const saveViewParams = async () => {
-        // console.log('saveDocuments');
         log('Save ViewParams', 'Начало сохранения viewParams в Storage');
         await appStorage.setItem(`${storagePath}/${sections.VIEWPARAMS}`, state.viewParams);
         log('Save ViewParams', 'Окончание сохранения viewParams в Storage');

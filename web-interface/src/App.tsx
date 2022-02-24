@@ -269,8 +269,6 @@ const App: React.FC = () => {
 
     });
 
-  console.log('appState: ' + appState);
-
   const handleSetError = useCallback((errorMessage?: string) => {
     dispatch({ type: 'SET_ERROR', errorMessage })
   }, [dispatch]);
@@ -280,7 +278,6 @@ const App: React.FC = () => {
   }, [dispatch]);
 
   const handleLogin = (userName: string, password: string) => {
-    console.log('handleLogin');
     login(userName, password)
       .then(data => {
         if (data.type === 'ERROR') {
@@ -372,7 +369,6 @@ const App: React.FC = () => {
   };
 
   const handleCreateDevice = (title: string) => {
-    console.log('handleCreateDevice.user: ', user);
     if (user?.id) {
       createDevice(title, user.id)
         .then(data => {
@@ -394,7 +390,6 @@ const App: React.FC = () => {
   };
 
   const handleCreateCurrentDevice = (title: string) => {
-    console.log('handleCreateCurrentDevice.currentUser: ', currentUser);
     if (currentUser?.id) {
       createDevice(title, currentUser.id)
         .then(data => {
@@ -673,7 +668,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (needReReadCompanies && user?.id) {
-      console.log('useEffect: needReReadCompanies');
       handleGetCompanies(user.companies ?? [], user.id, 'SET_COMPANIES');
       handleGetUserDevices(user.id, 'SET_DEVICES');
     }
@@ -681,14 +675,12 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (currentUser?.id) {
-      console.log('useEffect: currentUser');
       handleGetCompanies(currentUser.companies ?? [], currentUser.id, 'SET_CURRENT_COMPANIES');
       handleGetUserDevices(currentUser.id, 'SET_CURRENT_DEVICES');
     }
   }, [currentUser]);
 
   useEffect(() => {
-    console.log('useEffect: isAdmin = ' + isAdmin);
     if (isAdmin !== undefined) {
       dispatch({ type: 'SET_STATE', appState: isAdmin ? 'ADMIN' : 'PROFILE' });
     }
@@ -696,7 +688,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (needReReadUserData) {
-      console.log('useEffect: needReReadUserData');
       getCurrentUser()
         .then(data => {
           if (data.type === 'ERROR') {
@@ -720,7 +711,6 @@ const App: React.FC = () => {
    */
   useEffect(() => {
     if (company?.companyId && needReReadUsers && user) {
-      console.log('useEffect: company');
       getCompanyUsers(company.companyId)
         .then(data => {
           if (data.type === 'ERROR') {

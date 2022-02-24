@@ -144,7 +144,6 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
 
   const ref = React.useRef<FlatList<IRemGood>>(null);
   useScrollToTop(ref);
-  console.log(123443);
 
   return (
     <View style={[localStyles.content, { backgroundColor: colors.card }]}>

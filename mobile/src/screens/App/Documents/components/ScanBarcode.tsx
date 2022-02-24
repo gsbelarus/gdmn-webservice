@@ -99,12 +99,6 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
           return;
         }
 
-        // console.log('remItem.remains', remItem, remainsByGoodId[]);
-
-        if (remItem.remains && remItem.remains.length >= 2) {
-          Alert.alert('Внимание!', `По штрихкоду ${brc} найдено несколько записей.` , [{ text: 'Закрыть', onPress: () => ({}) }]);
-        }
-
         return {
           ...remItem.good,
           price: remItem.remains ? remItem.remains[0].price : 0,
@@ -126,10 +120,6 @@ const ScanBarcodeScreen = ({ route, navigation }: Props) => {
 
       if (!remItem) {
         return;
-      }
-
-      if (remItem.remains && remItem.remains.length >= 2) {
-        Alert.alert('Внимание!', `По штрихкоду ${brc} найдено несколько записей.` , [{ text: 'Закрыть', onPress: () => ({}) }]);
       }
 
       return {

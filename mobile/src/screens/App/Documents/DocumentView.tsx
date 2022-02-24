@@ -162,7 +162,6 @@ const DocumentViewScreen = ({ route, navigation }: Props) => {
     },
     [isEditable, navigation, docId],
   );
-  console.log('state.settings?.barcodeReader', state.settings?.barcodeReader);
 
   return document ? (
     <>
