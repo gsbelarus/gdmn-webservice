@@ -328,7 +328,7 @@ export const getRemGoodByContact = (contacts: IContact[], goods: IGood[], remain
       //Если по товару нет остатков, добавляем объект товара без remains
       for (const good of goods) {
         if (good.barcode) {
-          remGoods[good.id] = { good };
+          remGoods[good.barcode] = { good };
         }
       }
     }
