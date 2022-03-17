@@ -200,51 +200,6 @@ export const formatValue = (format: NumberFormat | INumberFormat, value: number 
   }
 };
 
-// export const getRemainsModel = (contacts: IContact[], goods: IGood[], remains: IRemains[]) => {
-//   log('getRemainsModel', 'Начало построения модели');
-//   const remModelData: IModelData<IMDGoodRemain> = {};
-
-//   if (contacts.length && goods.length) {
-//     for (const c of contacts) {
-//       log('getRemainsModel', `started ${c.name}`);
-
-//       if (remains.length) {
-//         const remainsByGoodId = remains
-//           .find((r: IRemains) => r.contactId === c.id)
-//           ?.data.reduce((p: any, { goodId, price, q }: IRemainsData) => {
-//             const x = p[goodId];
-//             if (!x) {
-//               p[goodId] = [{ price, q }];
-//             } else {
-//               x.push({ price, q });
-//             }
-//             return p;
-//           }, {});
-//         const remGoods: IMGoodData<IMGoodRemain> = {};
-
-//         for (const good of goods) {
-//           remGoods[good.id] = {
-//             good,
-//             remains: remainsByGoodId[good.id],
-//           };
-//         }
-
-//         remModelData[c.id] = { contactName: c.name || `${c.id}`, goods: remGoods };
-//       } else {
-//         const remGoods: IMGoodData<IMGoodRemain> = {};
-
-//         for (const good of goods) {
-//           remGoods[good.id] = { good };
-//         }
-
-//         remModelData[c.id] = { contactName: c.name || `${c.id}`, goods: remGoods };
-//       }
-//     }
-//   }
-
-//   log('getRemainsModel', 'Окончание построения модели');
-//   return { name: 'Модель остатков', type: ModelTypes.REMAINS, data: remModelData };
-// };
 
 export const getRemGoodListByContact = (contacts: IContact[], goods: IGood[], remains: IRemains[], contactId: number) => {
   log('getRemGoodListByContact', `Начало построения массива товаров по подразделению ${contactId}`);
@@ -268,7 +223,7 @@ export const getRemGoodListByContact = (contacts: IContact[], goods: IGood[], re
       }, {});
 
     //Формируем массив товаров, добавив свойство цены и остатка
-    goods.reduce((remGoods: IRemGood[], good: IGood) => {
+    for (const good of goods) {
       if (remainsByGoodId && remainsByGoodId[good.id]) {
         for (const r of remainsByGoodId[good.id]) {
           remGoods.push({
@@ -284,8 +239,7 @@ export const getRemGoodListByContact = (contacts: IContact[], goods: IGood[], re
           remains: 0,
         });
       };
-      return remGoods;
-    }, remGoods);
+    }
   }
 
   log('getRemGoodListByContact', `Окончание построения массива товаров по подразделению ${contactId}`);
