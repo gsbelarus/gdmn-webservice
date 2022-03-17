@@ -43,8 +43,11 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
 
   useEffect(() => {
     if (!scanned && ref?.current) {
-      ref.current.focus();
-      ref.current.clear();
+      ref?.current &&
+      setTimeout(() => {
+        ref.current?.focus();
+        ref.current?.clear();
+      }, ONE_SECOND_IN_MS);
     }
   }, [scanned, ref]);
 

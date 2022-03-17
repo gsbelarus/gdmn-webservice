@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile-inventory",
+    "name": "GDMN Инвентаризация",
     "slug": "mobile-inventory",
     "privacy": "public",
     "platforms": [
@@ -8,7 +8,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.0",
+    "version": "1.0.2",
     "icon": "src/assets/icon.png",
     "splash": {
       "image": "src/assets/splash.png",
